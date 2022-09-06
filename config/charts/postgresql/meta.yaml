@@ -1,0 +1,4 @@
+REPO_URL: https://charts.helm.sh/stable
+REPO_NAME: stable
+CHART_NAME: postgresql
+CHART_VERSION: 7.3.0

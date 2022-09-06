@@ -1,0 +1,14 @@
+enabled: true
+fullnameOverride: mongodb
+mongodbRootPassword: '{{ env.MONGO_CLIENT_PASSWORD }}'
+resources:
+  requests:
+    cpu: 58m
+    memory: 154Mi
+nodeSelector:
+  project: {{ env.CI_PROJECT_NAME }}-{{ env.CI_COMMIT_REF_SLUG }}
+tolerations:
+  - key: "project"
+    operator: "Equal"
+    value: '{{ env.CI_PROJECT_NAME }}-{{ env.CI_COMMIT_REF_SLUG }}'
+    effect: "NoSchedule"

@@ -1,0 +1,4 @@
+REPO_URL: https://charts.helm.sh/stable
+REPO_NAME: stable
+CHART_NAME: redis
+CHART_VERSION: 10.5.7

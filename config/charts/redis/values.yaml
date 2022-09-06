@@ -1,0 +1,29 @@
+enabled: true
+usePassword: false
+cluster:
+  enabled: false
+  slaveCount: 2
+master:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 200Mi
+  nodeSelector:
+    project: {{ env.CI_PROJECT_NAME }}-{{ env.CI_COMMIT_REF_SLUG }}
+  tolerations:
+    - key: "project"
+      operator: "Equal"
+      value: '{{ env.CI_PROJECT_NAME }}-{{ env.CI_COMMIT_REF_SLUG }}'
+      effect: "NoSchedule"
+slave:
+  resources:
+    requests:
+      cpu: 25m
+      memory: 100Mi
+  nodeSelector:
+    project: {{ env.CI_PROJECT_NAME }}-{{ env.CI_COMMIT_REF_SLUG }}
+  tolerations:
+    - key: "project"
+      operator: "Equal"
+      value: '{{ env.CI_PROJECT_NAME }}-{{ env.CI_COMMIT_REF_SLUG }}'
+      effect: "NoSchedule"
