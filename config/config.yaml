@@ -91,3 +91,10 @@ services:
       cpu: 84m
       memory: 94Mi
 
+  pairing-algorithm:
+    type: python
+    db:
+      mongo: true
+    resources:
+      cpu: 100m
+      memory: 100Mi
