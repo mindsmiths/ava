@@ -9,7 +9,7 @@ public class Runner extends RuleEngineService {
         configureSignals(getClass().getResourceAsStream("config/signals.yaml"));
 
         // Create Smith if he doesn't exist
-        if (!Agents.exists(Smith.Id))
+        if (!Agents.exists(Smith.ID))
             Agents.createAgent(new Smith());
     }
 

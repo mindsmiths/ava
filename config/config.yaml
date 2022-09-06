@@ -109,6 +109,7 @@ services:
       memory: 75Mi
 
   email-receiver:
+    enabled: false
     type: python
     package: email-adapter
     subservice: email_receiver

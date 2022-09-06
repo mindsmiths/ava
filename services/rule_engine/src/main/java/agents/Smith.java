@@ -11,10 +11,9 @@ import lombok.ToString;
 @Data
 @ToString(callSuper = true)
 public class Smith extends Agent {
-    public static String Id;
+    public static String ID = "SMITH";
 
     public Smith() {
-        this.Id = "SMITH";
     }
 
     public void sendEmail(String recipient, String subject, String text) {
