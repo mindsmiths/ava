@@ -91,3 +91,23 @@ services:
       cpu: 84m
       memory: 94Mi
 
+  mitems:
+    type: django
+    version: 4.0.0a9
+    db:
+      postgres: true
+    image:
+      static: true
+    env:
+      SITE_URL: '{{ "mitems." + env.get("HOST_DOMAIN", "") }}'
+      INTERNAL_SITE_URL: "http://mitems"
+      DJANGO_SUPERUSER_USERNAME: admin
+      DJANGO_SUPERUSER_PASSWORD: '{{ env.MITEMS_ADMIN_PASSWORD | default("admin") }}'
+      COMMIT_TOKEN: '{{ env.COMMIT_TOKEN }}'
+      REPO: '{{ env.CI_REPOSITORY_URL }}'
+      BRANCH: '{{ env.CI_COMMIT_BRANCH }}'
+      SECRET_KEY: KE00K%SJ8vjYX46!%6$W3Js1OewOAmk@
+
+    resources:
+      cpu: 100m
+      memory: 67Mi

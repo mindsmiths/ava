@@ -7,8 +7,9 @@ import lombok.ToString;
 @Data
 @ToString(callSuper = true)
 public class Smith extends Agent {
+    public static String Id;
 
     public Smith() {
-        this.id = "SMITH";
+        this.Id = "SMITH";
     }
 }
