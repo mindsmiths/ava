@@ -50,6 +50,11 @@
             <artifactId>mitems-client</artifactId>
             <version>4.0.0a9</version>
         </dependency>
+        <dependency>
+            <groupId>com.mindsmiths</groupId>
+            <artifactId>email-adapter-client</artifactId>
+            <version>4.0.0a10</version>
+        </dependency>
     </dependencies>
 
     <build>
