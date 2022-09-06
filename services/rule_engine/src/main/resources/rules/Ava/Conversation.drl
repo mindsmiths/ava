@@ -1,0 +1,25 @@
+package rules.Ava;
+import agents.Ava;
+import com.mindsmiths.ruleEngine.model.Initialize;
+//import com.mindsmiths.gpt3.completion.GPT3Completion;
+//import com.mindsmiths.ruleEngine.model.Heartbeat; za svakih 7 dana to radi centralna
+//kako prepoznat i prihvatit ping
+import java.util.Date;
+//spajanje na mail?
+import com.mindsmiths.mitems.Mitems; //za tekst
+//String text = Mitems.getText("nesto.text");
+import com.mindsmiths.armory.events.UserConnectedEvent
+import com.mindsmiths.armory.events.SubmitEvent
+
+rule "First contact"
+    salience 100
+    when
+        initialize: Initialize() from entry-point "agent-created"
+        agent: Ava()
+    then
+        ArrayList<Integer> freeDays = new ArrayList<>();
+        freeDays.add(0);
+        agent.sendData(freeDays);
+        //Log.info(agent); na koji od ova dva načina šaljem podatke??
+        //delete(message);
+end

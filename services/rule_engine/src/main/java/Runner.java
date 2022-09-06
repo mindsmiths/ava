@@ -6,9 +6,7 @@ import com.mindsmiths.ruleEngine.util.Signals;
 public class Runner extends RuleEngineService {
     @Override
     public void initialize() {
-        configureSignals(
-            // TODO: listen to signals here
-        );
+        configureSignals(getClass().getResourceAsStream("config/signals.yaml")); 
     }
 
     public static void main(String[] args) {
