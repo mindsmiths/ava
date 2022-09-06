@@ -1,12 +1,19 @@
 package rules.Panic;
 
-import com.mindsmiths.ruleEngine.model.Heartbeat;
-import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.ruleEngine.util.Agents;
 
-rule "Smith's Heartbeat"
+rule "First contact"
+    salience 100
     when
-        Heartbeat() from entry-point "signals"
+        initialize: Initialize() from entry-point "agent-created"
+        agent: Ava()
     then
-        Log.info("Smith's heartbeat - num agents: " + Agents.getCount());
+        agent.sendMessage("Okay, turning my engines on. Let's start!");
+        agent.send("AVA", initialize, "new-agent");
+        delete(message);
 end
+
+rule "Get available days"
+    when
+        
+    then
