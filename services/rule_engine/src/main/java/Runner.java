@@ -1,6 +1,8 @@
+import agents.Smith;
 import com.mindsmiths.ruleEngine.runner.RuleEngineService;
 import com.mindsmiths.ruleEngine.util.Agents;
-import com.mindsmiths.ruleEngine.util.Signals;
+import com.mindsmiths.mitems.Flow;
+import com.mindsmiths.sdk.core.db.DataUtils;
 
 import agents.Panic;
 
@@ -8,10 +10,13 @@ import agents.Panic;
 public class Runner extends RuleEngineService {
     @Override
     public void initialize() {
-        configureSignals(getClass().getResourceAsStream("config/signals.yaml")); 
+        configureSignals(getClass().getResourceAsStream("config/signals.yaml"));
 
-        if (!Agents.exists(Panic.ID))
-            Agents.createAgent(new Panic());
+        // Create Smith if he doesn't exist
+        if (!Agents.exists(Smith.ID))
+            Agents.createAgent(new Smith());
+
+        addListener(Flow.class, DataUtils::save);
     }
 
     public static void main(String[] args) {

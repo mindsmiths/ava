@@ -38,13 +38,18 @@
 		</dependency>
 		<dependency>
 			<groupId>com.mindsmiths</groupId>
-			<artifactId>armory-client</artifactId>
-			<version>4.0.0a12</version>
+			<artifactId>mitems-client</artifactId>
+			<version>4.0.0a9</version>
 		</dependency>
 		<dependency>
 			<groupId>com.mindsmiths</groupId>
-			<artifactId>gpt3-adapter-client</artifactId>
-			<version>4.0.0a8</version>
+			<artifactId>email-adapter-client</artifactId>
+			<version>4.0.0a10</version>
+		</dependency>
+		<dependency>
+			<groupId>com.mindsmiths</groupId>
+			<artifactId>armory-client</artifactId>
+			<version>4.0.0a12</version>
 		</dependency>
 	</dependencies>
 	<build>
