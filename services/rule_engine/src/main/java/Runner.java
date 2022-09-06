@@ -4,7 +4,7 @@ import com.mindsmiths.ruleEngine.util.Agents;
 import com.mindsmiths.mitems.Flow;
 import com.mindsmiths.sdk.core.db.DataUtils;
 
-import agents.Panic;
+import agents.CultureMaster;
 
 
 public class Runner extends RuleEngineService {
@@ -16,6 +16,9 @@ public class Runner extends RuleEngineService {
         if (!Agents.exists(Smith.ID))
             Agents.createAgent(new Smith());
 
+        // Create CultureMaster if he doesn't exist
+        if (!Agents.exists(CultureMaster.ID))
+            Agents.createAgent(new agents.CultureMaster());
         addListener(Flow.class, DataUtils::save);
     }
 

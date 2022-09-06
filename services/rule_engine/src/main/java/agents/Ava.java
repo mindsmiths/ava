@@ -2,7 +2,7 @@ package agents;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mindsmiths.gpt3.GPT3AdapterAPI;
+//import com.mindsmiths.gpt3.GPT3AdapterAPI;
 //import com.mindsmiths.armory.ArmoryAPI;
 import com.mindsmiths.ruleEngine.model.Agent;
 import com.mindsmiths.ruleEngine.util.Log;
