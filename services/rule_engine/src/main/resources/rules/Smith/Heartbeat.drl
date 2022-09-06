@@ -10,5 +10,4 @@ rule "Smith's Heartbeat"
         Heartbeat() from entry-point "signals"
     then
         Log.info("Smith's heartbeat - num agents: " + Agents.getCount());
-        //Log.info(Mitems.getText("test.capa.element")); - test
 end
