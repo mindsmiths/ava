@@ -2,11 +2,10 @@ package rules.Ava;
 import agents.Ava;
 import com.mindsmiths.ruleEngine.model.Initialize;
 //import com.mindsmiths.gpt3.completion.GPT3Completion;
-//import com.mindsmiths.ruleEngine.model.Heartbeat; za svakih 7 dana to radi centralna
-//kako prepoznat i prihvatit ping
 import java.util.Date;
+import java.util.ArrayList;
 //spajanje na mail?
-import com.mindsmiths.mitems.Mitems; //za tekst
+//import com.mindsmiths.mitems.Mitems; //za tekst
 //String text = Mitems.getText("nesto.text");
 import com.mindsmiths.armory.events.UserConnectedEvent
 import com.mindsmiths.armory.events.SubmitEvent
@@ -17,9 +16,28 @@ rule "First contact"
         initialize: Initialize() from entry-point "agent-created"
         agent: Ava()
     then
-        ArrayList<Integer> freeDays = new ArrayList<>();
+        ArrayList<Integer> freeDays = new ArrayList<>(); //Rule Compilation error ArrayList cannot be resolved to a type
         freeDays.add(0);
         agent.sendData(freeDays);
-        //Log.info(agent); na koji od ova dva načina šaljem podatke??
-        //delete(message);
 end
+
+//spajanje na GPT
+/*rule "Handle message"
+    when
+        message: TelegramReceivedMessage() from entry-point "signals"
+        agent: Ava()
+    then
+        agent.askGPT3(message.getText());
+        delete(message);
+end
+
+rule "Send GPT3 response"
+    when
+        gpt3Result: GPT3Completion() from entry-point "signals"
+        agent: Ava()
+    then
+        String response = gpt3Result.getBestResponse();
+        agent.sendMessage(response);
+        delete(gpt3Result);
+end
+*/

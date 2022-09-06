@@ -1,13 +1,13 @@
-package rules.smith;
+package rules.Ava;
 
 import com.mindsmiths.ruleEngine.model.Initialize;
 import com.mindsmiths.ruleEngine.util.Log;
+import agents.Ava;
 
 rule "get signal"
     when
-        initAgent: Initialize(agent: agent) from entry-point "new-pair"
+        Initialize() from entry-point "new-pair"
+        agent: Ava()
     then
-        agent.sendData();
-        Log.info(+ agent);
-        delete(initAgent);
+        Log.info(agent);
 end
