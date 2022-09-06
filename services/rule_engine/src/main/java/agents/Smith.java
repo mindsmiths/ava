@@ -11,5 +11,4 @@ public class Smith extends Agent {
 
     public Smith() {
     }
-    
 }
