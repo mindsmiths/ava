@@ -7,7 +7,7 @@ public class Runner extends RuleEngineService {
     @Override
     public void initialize() {
         configureSignals(
-            // TODO: listen to signals here
+            // TODO: listen to signals here 
         );
     }
 
