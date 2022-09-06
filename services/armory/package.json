@@ -1,0 +1,52 @@
+{
+  "name": "armory",
+  "version": "1.0.0",
+  "author": "Mindsmiths",
+  "licence": "UNLICENCED",
+  "publishConfig": {
+    "registry": "https://nexus.vingd.net/repository/npm-packages"
+  },
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "dev-build": "vue-cli-service build --mode development && rm ../static -rf && mv ./dist ../static",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "armory-sdk": "4.0.9",
+    "vue": "^2.6.11",
+    "sass-loader": "^10.2.0"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "~4.5.0",
+    "@vue/cli-plugin-eslint": "^3.1.1",
+    "@vue/cli-service": "^4.5.13",
+    "@vue/eslint-config-prettier": "^6.0.0",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.32.0",
+    "eslint-plugin-prettier": "^3.3.1",
+    "eslint-plugin-vue": "^8.2.0",
+    "prettier": "^2.2.1",
+    "vue-template-compiler": "^2.6.11",
+    "webpack": "^4.44.0"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/essential",
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "parser": "babel-eslint"
+    },
+    "rules": {}
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}
