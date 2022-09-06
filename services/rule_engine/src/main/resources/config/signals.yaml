@@ -1,0 +1,15 @@
+com.mindsmiths.armory.events.UserConnectedEvent:
+  - !GetOrCreateAgentByConnection
+    connectionName: armory
+    connectionField: connectionId
+    agentType: agents.Smith
+com.mindsmiths.armory.events.SubmitEvent:
+  - !GetOrCreateAgentByConnection
+    connectionName: armory
+    connectionField: connectionId
+    agentType: agents.Smith
+com.mindsmiths.armory.events.UserDisconnectedEvent:
+  - !GetOrCreateAgentByConnection
+    connectionName: armory
+    connectionField: connectionId
+    agentType: agents.Smith
