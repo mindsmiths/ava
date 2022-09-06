@@ -11,7 +11,7 @@ global:
 
     ENVIRONMENT_NAME: {{ env.ENVIRONMENT_NAME }}
     MODULE: '{{ env.MODULE | default("local", True) }}'
-    LOG_LEVEL: DEBUG
+    LOG_LEVEL: INFO
 
     # Messaging
     PULSAR_URL: pulsar://pulsar-proxy.pulsar.svc.cluster.local:6650
@@ -91,3 +91,30 @@ services:
       cpu: 84m
       memory: 94Mi
 
+  email-adapter:
+    type: python
+    version: 4.0.0a10
+    env:
+      PROJECT_EMAIL_NAME: "{{env.PROJECT_EMAIL_NAME}}"
+      PROJECT_EMAIL_ADDRESS: "{{env.PROJECT_EMAIL_ADDRESS}}"
+      PROJECT_EMAIL_PASSWORD: "{{env.PROJECT_EMAIL_PASSWORD}}"
+      SMTP_SERVER: smtp.gmail.com
+      SMTP_PORT: 587
+      IMAP_SERVER: imap.gmail.com
+      IMAP_PORT: 993
+    db:
+      mongo: true
+    resources:
+      cpu: 50m
+      memory: 75Mi
+
+  email-receiver:
+    type: python
+    package: email-adapter
+    subservice: email_receiver
+    version: 4.0.0a10
+    db:
+      mongo: true
+    resources:
+      cpu: 50m
+      memory: 75Mi

@@ -45,6 +45,12 @@
             <artifactId>rule-engine</artifactId>
             <version>4.0.0a20</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.mindsmiths</groupId>
+            <artifactId>email-adapter-client</artifactId>
+            <version>4.0.0a5</version>
+        </dependency>
     </dependencies>
 
     <build>
