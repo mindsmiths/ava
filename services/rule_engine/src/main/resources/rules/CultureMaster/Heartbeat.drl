@@ -1,0 +1,25 @@
+package rules.CultureMaster;
+
+import com.mindsmiths.ruleEngine.util.Agents;
+import com.mindsmiths.ruleEngine.model.Initialize;
+// import com.mindsmiths.
+
+/*
+rule "First contact"
+    salience 100
+    when
+        initialize: Initialize() from entry-point "agent-created"
+        agent: Ava()
+    then
+        agent.sendMessage("Okay, turning my engines on. Let's start!");
+        agent.send("AVA", initialize, "new-agent");
+        delete(message);
+end
+
+rule "Get available days"
+    when
+        availableDays : DayChoiceSignal() from entry-point "signals"
+    then
+        System.out.println(availableDays.getFreeDays());
+end
+*/

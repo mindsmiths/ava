@@ -1,43 +1,17 @@
 package rules.Ava;
 import agents.Ava;
 import com.mindsmiths.ruleEngine.model.Initialize;
-//import com.mindsmiths.gpt3.completion.GPT3Completion;
-import java.util.Date;
 import java.util.ArrayList;
-//spajanje na mail?
-//import com.mindsmiths.mitems.Mitems; //za tekst
-//String text = Mitems.getText("nesto.text");
 import com.mindsmiths.armory.events.UserConnectedEvent
 import com.mindsmiths.armory.events.SubmitEvent
 
-rule "First contact"
+rule "Sending pairs"
     salience 100
     when
-        initialize: Initialize() from entry-point "agent-created"
+        initialize: Initialize() from entry-point "signals"
         agent: Ava()
     then
-        ArrayList<Integer> freeDays = new ArrayList<>(); //Rule Compilation error ArrayList cannot be resolved to a type
+        ArrayList<Integer> freeDays = new ArrayList<>();
         freeDays.add(0);
         agent.sendData(freeDays);
 end
-
-//spajanje na GPT
-/*rule "Handle message"
-    when
-        message: TelegramReceivedMessage() from entry-point "signals"
-        agent: Ava()
-    then
-        agent.askGPT3(message.getText());
-        delete(message);
-end
-
-rule "Send GPT3 response"
-    when
-        gpt3Result: GPT3Completion() from entry-point "signals"
-        agent: Ava()
-    then
-        String response = gpt3Result.getBestResponse();
-        agent.sendMessage(response);
-        delete(gpt3Result);
-end
-*/
