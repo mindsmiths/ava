@@ -4,6 +4,31 @@
     "description": "",
     "items": [
       {
+        "name": "Familiarity Quiz",
+        "elements": [
+          {
+            "description": "Question1",
+            "type": "TEXT",
+            "content": "Who of the following do you know best?"
+          },
+          {
+            "description": "Question2",
+            "type": "TEXT",
+            "content": "Who of the following do you know best?"
+          },
+          {
+            "description": "finishFamiliarityQuiz",
+            "type": "TEXT",
+            "content": "Thanks! I’ll check in with you from time to time to ask about other people too, but for now I have enough to get us started. Ready for fun part?"
+          },
+          {
+            "description": "nextButton",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"Sure thing!\",\"id\":\"button\"}]"
+          }
+        ]
+      },
+      {
         "name": "Intro Screen",
         "elements": [
           {
@@ -20,6 +45,36 @@
             "description": "Title",
             "type": "TEXT",
             "content": "So good to see you!"
+          }
+        ]
+      },
+      {
+        "name": "Personal quiz",
+        "elements": [
+          {
+            "description": "Goodbye Screen",
+            "type": "TEXT",
+            "content": "You are the best :*"
+          },
+          {
+            "description": "Intro Screen",
+            "type": "TEXT",
+            "content": "Okay, first part done! Now, the fun part!I prepared 5 questions for you and your colleagues. Ready to start?"
+          },
+          {
+            "description": "Question1",
+            "type": "TEXT",
+            "content": "What is the name of the last song you listened to?"
+          },
+          {
+            "description": "Question2",
+            "type": "TEXT",
+            "content": "What is the name of the last TV show you watched?"
+          },
+          {
+            "description": "finishPersonalQuiz",
+            "type": "TEXT",
+            "content": "You are officially onboarded! Soon I’ll send you an email with connectivity data. Stay tuned!"
           }
         ]
       }
