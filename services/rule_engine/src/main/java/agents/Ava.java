@@ -92,7 +92,9 @@ public class Ava extends Agent {
                         .addComponent("actionGroup", new PrimarySubmitButtonComponent("Option1","Option 1", "finishPersonalQuiz")),                       
                 "finishPersonalQuiz", new TemplateGenerator("finishPersonalQuiz")
                             .addComponent("title", new TitleComponent("You are officially onboarded! Soon I’ll send you an email with connectivity data. Stay tuned!"))
-                            .addComponent("button", new PrimarySubmitButtonComponent("button", "Great, can't wait!", "finished"))  
+                            .addComponent("button", new PrimarySubmitButtonComponent("button", "Great, can't wait!", "goodbye")),
+                "goodbye", new TemplateGenerator("goodbye")
+                            .addComponent("title", new TitleComponent("You are the best :*"))
         );
         showScreens("question1", screens);
     }
