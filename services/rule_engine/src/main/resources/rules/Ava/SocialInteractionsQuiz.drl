@@ -1,0 +1,12 @@
+package rules.Ava;
+import com.mindsmiths.ruleEngine.model.Heartbeat;
+import com.mindsmiths.ruleEngine.util.Log;
+import com.mindsmiths.ruleEngine.util.Agents;
+
+
+rule "Smith's Heartbeat"
+    when
+        Heartbeat() from entry-point "signals"
+    then
+        Log.info("Ava's heartbeat - num agents: " + Agents.getCount());
+end
