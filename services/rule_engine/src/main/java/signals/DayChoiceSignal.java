@@ -2,15 +2,12 @@ package signals;
 
 import java.util.ArrayList;
 
+import lombok.AllArgsConstructor;
+
 import com.mindsmiths.sdk.core.api.Signal;
 
-import lombok.Data;
 
-@Data
+@AllArgsConstructor
 public class DayChoiceSignal extends Signal {
-    ArrayList<Integer> freeDays;
-
-    public DayChoiceSignal(ArrayList<Integer> freeDays) {
-    }
-    
+    ArrayList<Integer> freeDays;    
 }
