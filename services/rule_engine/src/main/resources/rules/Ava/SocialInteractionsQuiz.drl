@@ -3,10 +3,16 @@ import com.mindsmiths.ruleEngine.model.Heartbeat;
 import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.ruleEngine.util.Agents;
 
+import com.mindsmiths.armory.events.UserConnectedEvent;
+import com.mindsmiths.armory.events.SubmitEvent;
+import agents.Ava;
 
-rule "Smith's Heartbeat"
-    when
-        Heartbeat() from entry-point "signals"
-    then
-        Log.info("Ava's heartbeat - num agents: " + Agents.getCount());
+rule "Hello world"
+   when
+       signal: UserConnectedEvent() from entry-point "signals"
+       agent: Ava(introScreenShowed == false)
+   then
+       agent.showIntroScreen();
+       modify(agent) {setIntroScreenShowed(true)};
+       delete(signal);
 end

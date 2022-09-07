@@ -1,2 +1,28 @@
 [
+  {
+    "title": "Onboarding",
+    "description": "",
+    "items": [
+      {
+        "name": "Intro Screen",
+        "elements": [
+          {
+            "description": "Button",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"Let's see\",\"id\":\"submit\"}]"
+          },
+          {
+            "description": "Description",
+            "type": "TEXT",
+            "content": "Next week I will match you with someone interesting from your organization to spend quality time with over lunch. \n\nBut first, let’s see how well you know your colleagues…"
+          },
+          {
+            "description": "Title",
+            "type": "TEXT",
+            "content": "So good to see you!"
+          }
+        ]
+      }
+    ]
+  }
 ]
