@@ -1,7 +1,7 @@
 global:
   dependencies:
     python:
-      - forge-sdk==4.0.0a10
+      - forge-sdk==4.0.0a11
       - forge-cli==4.0.0a24
       - cecs==4.0.0a3
       - services/*.py
@@ -15,6 +15,7 @@ global:
 
     # Messaging
     PULSAR_URL: pulsar://pulsar-proxy.pulsar.svc.cluster.local:6650
+    PULSAR_ENDPOINT_URL: http://pulsar-proxy.pulsar.svc.cluster.local
 
     # Databases
     MONGO_CLIENT_HOST: mongodb:27017
@@ -140,6 +141,7 @@ services:
     resources:
       cpu: 50m
       memory: 75Mi
+      
   armory:
     type: django
     version: 4.0.0a12
