@@ -14,4 +14,6 @@ rule "First contact"
         agent: Ava()
     then
         Log.info("Created new Ava agent.");
+        agent.send("CultureMaster", agent.sendId(agent.id), "new-agent-id") //ovo ziher ne sljaka ovak
+        delete(initialize) // treba li mi ovo?
 end

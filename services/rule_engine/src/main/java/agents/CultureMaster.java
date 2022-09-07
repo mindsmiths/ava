@@ -12,6 +12,8 @@ import lombok.Data;
 public class CultureMaster extends Agent {
     List<AgentAvailableDays> pairData = new ArrayList<>();
     List<FinalPairWithDays> finalPairs = new ArrayList<>();
+    Date lastGeneratePairsTime;
+    List<String> avaIDs = new ArrayList<>();
     boolean sent = false; 
     Ava ava;
 
@@ -19,6 +21,10 @@ public class CultureMaster extends Agent {
 
     public CultureMaster() {
         id = ID;
+    }
+
+    public void addNewID(String newId) {
+        avaIDs.add(newId);
     }
 
     public void addFinalPairs(ArrayList<FinalPairWithDays> finalPairs) {

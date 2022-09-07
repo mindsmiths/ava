@@ -8,6 +8,8 @@ import com.mindsmiths.pairingalgorithm.Result;
 
 import agents.CultureMaster;
 
+import java.util.Date;
+
 
 rule "First contact"
     salience 100
@@ -38,5 +40,32 @@ rule "Send Generate Pairs Response"
         delete(finalPairs);
 end
 
+rule "Add New Ava ID"
+    when
+        newId: from entry-point "new-agent-id"
+        agent: CultureMaster()
+    then
+        modify(agent) {addNewID()}
+        delete(newId)
+end
 
+rule "Request Availability Data"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        agent: CultureMaster(
+            lastGeneratePairsTime before[10s] ts
+        )
+        newId
+    then
+        modify(agent) {
+            lastGeneratePairsTime(new Date())
+        };
+        Log.info("10 seconds have passed...");
+        // TODO
+        // trazi podatke od ava
+        for (String id : agent.avaIDs) {
+            agent.send(id, initialize, "dodaj nesto");
+        }
+        // triggeraj rule za generiranje novih parova
+end
 

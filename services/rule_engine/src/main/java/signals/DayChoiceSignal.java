@@ -8,5 +8,5 @@ import com.mindsmiths.pairingalgorithm.AgentAvailableDays;
 
 @AllArgsConstructor
 public class DayChoiceSignal extends Signal {
-    AgentAvailableDays agentAvailableDays;    
+    AgentAvailableDays agentAvailableDays;
 }
