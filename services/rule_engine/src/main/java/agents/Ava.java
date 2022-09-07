@@ -1,15 +1,19 @@
 package agents;
+
 import java.util.ArrayList;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import com.mindsmiths.ruleEngine.model.Agent;
 
-import lombok.Data;
-import lombok.ToString;
 import signals.DayChoiceSignal;
+
 
 @Data
 @ToString
-
+@NoArgsConstructor
 public class Ava extends Agent { 
 
     public Ava(String connectionName, String connectionId) {
