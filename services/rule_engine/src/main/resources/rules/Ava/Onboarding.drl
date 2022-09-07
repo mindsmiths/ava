@@ -1,4 +1,4 @@
-package rules.CultureMaster;
+package rules.Ava;
 
 import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.ruleEngine.util.Agents;
