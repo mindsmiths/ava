@@ -3,12 +3,14 @@ package agents;
 import com.mindsmiths.ruleEngine.model.Agent;
 import lombok.Data;
 import lombok.ToString;
+import lombok.NoArgsConstructor;
 
 import com.mindsmiths.mitems.Mitems;
 import com.mindsmiths.mitems.Option;
 
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 
 import com.mindsmiths.armory.ArmoryAPI;
 import com.mindsmiths.armory.components.ActionGroupComponent;
@@ -20,17 +22,13 @@ import com.mindsmiths.armory.templates.BaseTemplate;
 import com.mindsmiths.armory.templates.TemplateGenerator;
 
 import models.OnboardingStage;
+import signals.DayChoiceSignal;
 
 @Data
 @ToString(callSuper = true)
+@NoArgsConstructor
 public class Ava extends Agent {
-    public static String ID = "AVA";
     OnboardingStage onboardingStage = OnboardingStage.NotStarted;
-
-    public Ava() {
-        super();
-        this.id = Ava.ID;
-    }
 
     public Ava(String connectionName, String connectionId) {
         super(connectionName, connectionId);
@@ -98,4 +96,9 @@ public class Ava extends Agent {
         );
         showScreens("question1", screens);
     }
+
+    public void sendData(ArrayList<Integer> freeDays) {
+        send("CultureMaster", new DayChoiceSignal(freeDays));
+    }
+ 
 }

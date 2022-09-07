@@ -141,6 +141,7 @@ services:
     resources:
       cpu: 50m
       memory: 75Mi
+      
   armory:
     type: django
     version: 4.0.0a12
