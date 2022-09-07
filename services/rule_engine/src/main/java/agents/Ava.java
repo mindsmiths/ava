@@ -10,5 +10,7 @@ public class Ava extends Agent {
     public static String ID = "AVA";
 
     public Ava() {
+        super();
+        this.id = Ava.ID;
     }
 }
