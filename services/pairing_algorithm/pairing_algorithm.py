@@ -7,6 +7,7 @@ from forge.core.base import BaseService
 
 from .api import Result
 from .api import AgentAvailableDays
+from .api import FinalPairWithDays
 
 logger = logging.getLogger(forge_settings.DEFAULT_LOGGER)
 
@@ -15,19 +16,32 @@ class PairingAlgorithm(BaseService):
 
     @api
     def generate_pairs(self, pairData: List[AgentAvailableDays]) -> Result:
+        finalPairs: List[FinalPairWithDays] = []
+        alreadyAdded = set()
+        n = len(pairData)
 
-        tempList = pairData
-        finalPairs = List[List]
+        for i in range(n):
+            if pairData[i].agentId in alreadyAdded:
+                continue
+            for j in range(i+1, n):
+                if pairData[j].agentId in alreadyAdded:
+                    continue
+                for k in range(5):
+                    if (pairData[i].availableDays[k] == 1 and
+                            pairData[j].availableDays[k] == 1):
+                        alreadyAdded.add(pairData[i].agentId)
+                        alreadyAdded.add(pairData[j].agentId)
+                        finalPairs.append(FinalPairWithDays(
+                            person1=pairData[i].agentId,
+                            person2=pairData[j].agentId,
+                            day=k))
+                        break
 
-        AgentAvailableDays.ge
+        # temp "algorithm"
+#        for i in range(0, n, 2):
+#            pair = FinalPairWithDays(person1=pairData[i],
+#                                     person2=pairData[i+1],
+#                                     day=0)
+#            finalPairs.append(pair)
 
-        while(len(tempList)):
-            for indPerson, person in enumerate(pairData):
-                for indDay, day in enumerate(person.availableDays):
-
-
-#        for i in range(0, len(pairData), 2):
-#           pair = [pairData[i], pairData[i+1]]
-#           finalPairs.append(pair)
-
-        return Result(success=finalPairs)
+        return Result(result=finalPairs)

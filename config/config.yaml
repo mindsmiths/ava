@@ -2,7 +2,7 @@ global:
   dependencies:
     python:
       - forge-sdk==4.0.0a11
-      - forge-cli==4.0.0a24
+      - forge-cli==4.0.0a25
       - cecs==4.0.0a3
       - services/*.py
   env:

@@ -1,0 +1,42 @@
+package rules.CultureMaster;
+
+import com.mindsmiths.ruleEngine.util.Log;
+import com.mindsmiths.ruleEngine.model.Heartbeat;
+import com.mindsmiths.ruleEngine.util.Agents;
+import com.mindsmiths.ruleEngine.model.Initialize;
+import com.mindsmiths.pairingalgorithm.Result;
+
+import agents.CultureMaster;
+
+
+rule "First contact"
+    salience 100
+    when
+        initialize: Initialize() from entry-point "agent-created"
+        agent: CultureMaster()
+    then
+        Log.info("Created new CultureMaster agent.");
+end
+
+rule "CultureMaster's Heartbeat"
+    when
+        Heartbeat() from entry-point "signals"
+        agent: CultureMaster()
+    then
+        Log.info("generating pairs");
+        agent.generatePairs();
+end
+
+rule "Send Generate Pairs Response"
+    when
+        finalPairs: Result() from entry-point "signals"
+        agent: CultureMaster()
+    then
+        modify(agent) {addFinalPairs(finalPairs.getResult())};
+        Log.info("---------------------rezultati---------------------");
+        Log.info(finalPairs.getResult());
+        delete(finalPairs);
+end
+
+
+
