@@ -1,7 +1,7 @@
 global:
   dependencies:
     python:
-      - forge-sdk==4.0.0a10
+      - forge-sdk==4.0.0a11
       - forge-cli==4.0.0a24
       - cecs==4.0.0a3
       - services/*.py
@@ -11,10 +11,11 @@ global:
 
     ENVIRONMENT_NAME: {{ env.ENVIRONMENT_NAME }}
     MODULE: '{{ env.MODULE | default("local", True) }}'
-    LOG_LEVEL: DEBUG
+    LOG_LEVEL: INFO
 
     # Messaging
     PULSAR_URL: pulsar://pulsar-proxy.pulsar.svc.cluster.local:6650
+    PULSAR_ENDPOINT_URL: http://pulsar-proxy.pulsar.svc.cluster.local
 
     # Databases
     MONGO_CLIENT_HOST: mongodb:27017
@@ -98,3 +99,76 @@ services:
     resources:
       cpu: 100m
       memory: 100Mi
+      
+  mitems:
+    type: django
+    version: 4.0.0a9
+    db:
+      postgres: true
+    image:
+      static: true
+    env:
+      SITE_URL: '{{ "mitems." + env.get("HOST_DOMAIN", "") }}'
+      INTERNAL_SITE_URL: "http://mitems"
+      DJANGO_SUPERUSER_USERNAME: admin
+      DJANGO_SUPERUSER_PASSWORD: '{{ env.MITEMS_ADMIN_PASSWORD | default("admin") }}'
+      COMMIT_TOKEN: '{{ env.COMMIT_TOKEN }}'
+      REPO: '{{ env.CI_REPOSITORY_URL }}'
+      BRANCH: '{{ env.CI_COMMIT_BRANCH }}'
+      SECRET_KEY: KE00K%SJ8vjYX46!%6$W3Js1OewOAmk@
+
+    resources:
+      cpu: 100m
+      memory: 67Mi
+
+  email-adapter:
+    type: python
+    version: 4.0.0a10
+    env:
+      PROJECT_EMAIL_NAME: "{{env.PROJECT_EMAIL_NAME}}"
+      PROJECT_EMAIL_ADDRESS: "{{env.PROJECT_EMAIL_ADDRESS}}"
+      PROJECT_EMAIL_PASSWORD: "{{env.PROJECT_EMAIL_PASSWORD}}"
+      SMTP_SERVER: smtp.gmail.com
+      SMTP_PORT: 587
+      IMAP_SERVER: imap.gmail.com
+      IMAP_PORT: 993
+    db:
+      mongo: true
+    resources:
+      cpu: 50m
+      memory: 75Mi
+
+  email-receiver:
+    enabled: false
+    type: python
+    package: email-adapter
+    subservice: email_receiver
+    version: 4.0.0a10
+    db:
+      mongo: true
+    resources:
+      cpu: 50m
+      memory: 75Mi
+      
+  armory:
+    type: django
+    version: 4.0.0a12
+    command:
+      run: "daphne -b 0.0.0.0 armory.config.asgi:application"
+    db:
+      mongo: true
+      postgres: true
+    dependencies:
+      - channels==3.0.4
+      - channels-redis==3.3.1
+      - django==3.2.9
+      - daphne==3.0.2
+      - django-environ==0.8.1
+      - gunicorn==20.1.0
+      - websockets==10.1
+    env:
+      SITE_URL: '{{ env.ARMORY_URL }}'
+      INTERNAL_SITE_URL: "armory"
+    resources:
+      cpu: 50m
+      memory: 75Mi

@@ -15,3 +15,17 @@ global:
     MONGO_CLIENT_PASSWORD: '{{ env.MONGO_CLIENT_PASSWORD }}'
 
     POSTGRES_CLIENT_PASSWORD: '{{ env.POSTGRES_CLIENT_PASSWORD | default("postgres", true) }}'
+
+services:
+  mitems:
+    env:
+      SITE_URL: localhost:8001
+    port: 8001
+
+  armory:
+    command:
+      build: "./build.sh"
+      run: "armory-admin runserver"
+    env:
+      SITE_URL: '{{ env.ARMORY_SITE_URL | default("http://localhost:8000", true) }}'
+    port: 8000

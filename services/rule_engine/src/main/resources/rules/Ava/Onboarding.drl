@@ -1,0 +1,17 @@
+package rules.Ava;
+
+import com.mindsmiths.ruleEngine.util.Log;
+import com.mindsmiths.ruleEngine.util.Agents;
+import com.mindsmiths.ruleEngine.model.Initialize;
+
+import agents.Ava;
+
+
+rule "First contact"
+    salience 100
+    when
+        initialize: Initialize() from entry-point "agent-created"
+        agent: Ava()
+    then
+        Log.info("Created new Ava agent.");
+end
