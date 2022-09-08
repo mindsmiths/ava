@@ -1,8 +1,8 @@
 global:
   dependencies:
     python:
-      - forge-sdk==4.0.0a10
-      - forge-cli==4.0.0a24
+      - forge-sdk==4.0.0a11
+      - forge-cli==4.0.0a25
       - cecs==4.0.0a3
       - services/*.py
   env:
@@ -15,7 +15,7 @@ global:
 
     # Messaging
     PULSAR_URL: pulsar://pulsar-proxy.pulsar.svc.cluster.local:6650
-
+    PULSAR_ENDPOINT_URL: http://pulsar-proxy.pulsar.svc.cluster.local
     # Databases
     MONGO_CLIENT_HOST: mongodb:27017
     MONGO_CLIENT_USERNAME: root
@@ -163,7 +163,6 @@ services:
     resources:
       cpu: 50m
       memory: 75Mi
-
   employee-manager:
     type: django
     db:
@@ -179,7 +178,7 @@ services:
       DJANGO_SUPERUSER_PASSWORD: '{{ env.EMPLOYEE_MANAGER_ADMIN_PASSWORD | default("admin") }}'
       SITE_URL: '{{ env.EMPLOYEE_MANAGER_URL }}'
       INTERNAL_SITE_URL: http://employee-manager
-      SECRET_KEY: 54ZCoqlLoEszCgU4PukmV2IYt8hCvg5UydnS97hNK56LwS0Hnf
+      SECRET_KEY: BKZvpQTokpkC7ArkUBdXGIyYe9s1py2XvQMTcyt7nFIQolTaS5
     resources:
       cpu: 100m
       memory: 300Mi

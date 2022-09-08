@@ -4,6 +4,21 @@
     "description": "asd",
     "items": [
       {
+        "name": "Test",
+        "elements": [
+          {
+            "description": "Prvi",
+            "type": "TEXT",
+            "content": "prvi"
+          },
+          {
+            "description": "drugi",
+            "type": "TEXT",
+            "content": "drugi"
+          }
+        ]
+      },
+      {
         "name": "Test2",
         "elements": [
           {

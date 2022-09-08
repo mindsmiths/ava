@@ -12,7 +12,7 @@ from .common import *  # noqa: F403
 DEBUG = True
 TEMPLATES[0]['OPTIONS']['debug'] = True  # type: ignore # noqa: F405
 
-SECRET_KEY = env('SECRET_KEY', default='54ZCoqlLoEszCgU4PukmV2IYt8hCvg5UydnS97hNK56LwS0Hnf')  # noqa: F405
+SECRET_KEY = env('SECRET_KEY', default='BKZvpQTokpkC7ArkUBdXGIyYe9s1py2XvQMTcyt7nFIQolTaS5')  # noqa: F405
 ALLOWED_HOSTS = ['*']
 SITE_URL = 'http://localhost:8000'
 
