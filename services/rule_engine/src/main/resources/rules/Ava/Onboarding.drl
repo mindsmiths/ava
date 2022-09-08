@@ -12,7 +12,7 @@ import models.OnboardingStage;
 rule "Show intro screen"
    when
        signal: UserConnectedEvent() from entry-point "signals"
-       agent: Ava(onboardingStage == OnboardingStage.NotStarted)
+       agent: Ava()
    then
        agent.showIntroScreen();
        modify(agent) {setOnboardingStage(OnboardingStage.IntroDone)};

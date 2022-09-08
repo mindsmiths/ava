@@ -8,15 +8,12 @@ import lombok.NoArgsConstructor;
 import com.mindsmiths.mitems.Mitems;
 import com.mindsmiths.mitems.Option;
 
-import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
 
 import com.mindsmiths.armory.ArmoryAPI;
-import com.mindsmiths.armory.components.ActionGroupComponent;
 import com.mindsmiths.armory.components.DescriptionComponent;
 import com.mindsmiths.armory.components.ImageComponent;
-import com.mindsmiths.armory.components.InputComponent;
 import com.mindsmiths.armory.components.PrimarySubmitButtonComponent;
 import com.mindsmiths.armory.components.TextAreaComponent;
 import com.mindsmiths.armory.components.TitleComponent;
@@ -130,7 +127,7 @@ public class Ava extends Agent {
                 .addComponent("image", new ImageComponent("/public/Ava.png"))
                 .addComponent("title", new TitleComponent(finishpersonalquiz))
                 .addComponent(buttons[1].getId(), new PrimarySubmitButtonComponent(buttons[1].getId(),
-                    buttons[0].getText(), "goodbye")),
+                    buttons[1].getText(), "goodbye")),
             "goodbye", new TemplateGenerator("goodbye")
                 .addComponent("title", new TitleComponent(goodbye_screen))
         );
