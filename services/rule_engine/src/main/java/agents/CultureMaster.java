@@ -4,6 +4,7 @@ import java.util.*;
 
 import lombok.Data;
 
+import com.mindsmiths.mitems.Mitems;
 import com.mindsmiths.ruleEngine.model.Agent;
 import com.mindsmiths.sdk.utils.templating.Templating;
 

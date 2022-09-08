@@ -1,2 +1,23 @@
 [
+  {
+    "title": "Onboarding",
+    "description": "Flow from mail to next screen",
+    "items": [
+      {
+        "name": "Welcome email",
+        "elements": [
+          {
+            "description": "Description",
+            "type": "HTML",
+            "content": "<p>Dear {{ firstName }},</p>\n<p>I'm here to help you connect with your colleagues.</p>\n<p>&nbsp;</p>\n<p>Ava</p>"
+          },
+          {
+            "description": "Subject",
+            "type": "TEXT",
+            "content": "Welcome onboard!"
+          }
+        ]
+      }
+    ]
+  }
 ]
