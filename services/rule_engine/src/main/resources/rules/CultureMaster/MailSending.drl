@@ -1,0 +1,47 @@
+package rules.CultureMaster;
+
+import java.lang.string.*; 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import com.mindsmiths.emailAdapter.EmailAdapterAPI;
+import com.mindsmiths.emailAdapter.SendEmailPayload;
+import com.mindsmiths.ruleEngine.util.Agents;
+import com.mindsmiths.ruleEngine.model.Heartbeat;
+import com.mindsmiths.ruleEngine.util.Log;
+import com.mindsmiths.sdk.utils.templating.Templating;
+
+import agents.CultureMaster;
+
+rule "Mail sending"
+    when
+        //Heartbeat(ts: timestamp) from entry-point "signals"
+        agent: CultureMaster(
+            //lastEmailSentTime before[1s] ts
+            pinged == false
+        )
+    then
+        modify(agent) {
+            //setLastEmailSentTime(new Date())
+            setPinged(true)
+        };
+        Log.info("5 seconds have passed...");
+
+        String tekst = String.join("", Files.readAllLines(Paths.get("EmailTemplate.html"), StandardCharsets.UTF_8));
+
+        Map<String, Object> newMap = Map.of("title", "<p>Dear all,</p> <p>Thanks so much for the warm welcome!</p> <p>I’m so looking forward to working with all of you and help you get to know each other a little bit better.</p> <p>With that in mind, don’t hesitate to jump right in to answer a few of my questions.</p> <p>AVA</p>",
+                                            "callToAction", "Let's go");
+        tekst = Templating.recursiveRender(tekst, newMap);
+
+        SendEmailPayload e = new SendEmailPayload();
+        e.setRecipients(List.of("filipbacic08@gmail.com"));
+        e.setSubject("subject");
+        e.setHtmlText(tekst);
+        EmailAdapterAPI.newEmail(e);
+end
+    
+    

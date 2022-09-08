@@ -2,7 +2,7 @@ global:
   dependencies:
     python:
       - forge-sdk==4.0.0a11
-      - forge-cli==4.0.0a24
+      - forge-cli==4.0.0a25
       - cecs==4.0.0a3
       - services/*.py
   env:
@@ -11,7 +11,7 @@ global:
 
     ENVIRONMENT_NAME: {{ env.ENVIRONMENT_NAME }}
     MODULE: '{{ env.MODULE | default("local", True) }}'
-    LOG_LEVEL: INFO
+    LOG_LEVEL: DEBUG
 
     # Messaging
     PULSAR_URL: pulsar://pulsar-proxy.pulsar.svc.cluster.local:6650
@@ -71,7 +71,7 @@ services:
     type: python
     version: 4.0.0a4
     env:
-      HEARTBEAT_CYCLE: 30
+      HEARTBEAT_CYCLE: 1
     db:
       mongo: true
     dependencies:
@@ -93,6 +93,7 @@ services:
       memory: 94Mi
 
   mitems:
+    enabled: true
     type: django
     version: 4.0.0a9
     db:
@@ -114,6 +115,7 @@ services:
       memory: 67Mi
 
   email-adapter:
+    enabled: true
     type: python
     version: 4.0.0a10
     env:
@@ -143,6 +145,7 @@ services:
       memory: 75Mi
       
   armory:
+    enabled: true
     type: django
     version: 4.0.0a12
     command:
