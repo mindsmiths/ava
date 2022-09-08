@@ -62,7 +62,4 @@ public class Ava extends Agent {
         showScreen(thanksScreen2);
     }
 
-    //kako spriječiti osobu da ne ispuni ponovno nakon sumbita refreshanjem ili ponovnim otvaranjem linka??
-
-    //kako postaviti da se svaki ovaj iz određenog maila otvori
 }
