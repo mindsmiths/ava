@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.time.LocalDateTime;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -41,12 +42,32 @@ rule "Mail sending"
         String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
             "description", description,
             "callToAction", "Let's go",
-            "armoryUrl", "http://asdf"
+            "armoryUrl", "http://8000.workspace-ms-86851026.sandbox.mindsmiths.io/"
         ));
 
         SendEmailPayload e = new SendEmailPayload();
-        e.setRecipients(List.of("filipbacic08@gmail.com"));
+        e.setRecipients(List.of("tomislav.matic01@gmail.com"));
         e.setSubject(subject);
         e.setHtmlText(htmlBody);
         EmailAdapterAPI.newEmail(e);
+end
+
+rule "Updating time"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        agent: CultureMaster()
+    then
+        modify(agent) {
+            setTimeNow(LocalDateTime.now())
+        }    
+end
+
+rule "Working hours"
+    when
+        agent: CultureMaster(timeNow.getDayOfWeek() != "SATURDAY", timeNow.getDayOfWeek() != "SUNDAY",
+                             timeNow.getHour() > 8 , timeNow.getHour() < 17)
+    then
+        modify(agent) {
+            setDecentTime(true)
+        }
 end
