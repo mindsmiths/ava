@@ -10,6 +10,6 @@ import java.util.ArrayList;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PairDataPayload implements Serializable {
-    private ArrayList<AgentAvailableDays> pairData;
+public class AvailabilityListPayload implements Serializable {
+    private ArrayList<AgentAvailableDays> availabilityList;
 }

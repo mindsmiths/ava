@@ -7,50 +7,60 @@ import com.mindsmiths.ruleEngine.model.Agent;
 import java.util.*;
 
 import lombok.Data;
+import signals.MatchInfoSignal;
 
 @Data
 public class CultureMaster extends Agent {
-    List<AgentAvailableDays> pairData = new ArrayList<>();
-    List<FinalPairWithDays> finalPairs = new ArrayList<>();
-    Date lastGeneratePairsTime;
-    List<String> avaIDs = new ArrayList<>();
-    boolean sent = false; 
-    Ava ava;
-
+    private List<AgentAvailableDays> availabilityList = new ArrayList<>();
+    private List<FinalPairWithDays> finalPairs = new ArrayList<>();
+    private Date lastRequestDataTime = new Date();
+    private List<String> avaIDs = new ArrayList<>();
+    private boolean sentGenerate = false; 
+    private boolean sentCollect = false; 
+    private boolean canGenerate = false; 
+    private boolean sendGenerated = false; 
+    private Ava ava;
     public static String ID = "CULTURE_MASTER";
 
     public CultureMaster() {
         id = ID;
     }
 
-    public void addNewID(String newId) {
-        avaIDs.add(newId);
+    public void addNewAva(String newAva) {
+        avaIDs.add(newAva);
+    }
+
+    public void addAgentAvailableDays(AgentAvailableDays agentAvailableDays) {
+        availabilityList.add(agentAvailableDays);
+    }
+
+    public void clearAvailabilityList() {
+        this.availabilityList = new ArrayList<>();
+    }
+
+    public void generatePairs() {
+        if(!sentGenerate) {
+            PairingAlgorithmAPI.generatePairs(new ArrayList<>(availabilityList));
+            sentGenerate = true;
+        }  
     }
 
     public void addFinalPairs(ArrayList<FinalPairWithDays> finalPairs) {
         this.finalPairs = finalPairs;
     }
 
-    public void generatePairs() {
-        // hardcoding for testing ----------------------
-        List<Boolean> mon = List.of(true,false,false,false,false);
-        List<Boolean> fri = List.of(false,false,false,false,true);
-        List<Boolean> thu_fri = List.of(false,false,false,true,true);
-        pairData.add(new AgentAvailableDays("Marko", mon));
-        pairData.add(new AgentAvailableDays("Misko", thu_fri));
-        pairData.add(new AgentAvailableDays("Joza", fri));
-        pairData.add(new AgentAvailableDays("Eugen", fri));
-        pairData.add(new AgentAvailableDays("Stef", mon));
-        //----------------------------------------------
-        if(!sent) {
-            PairingAlgorithmAPI.generatePairs(new ArrayList<>(pairData));
-            sent = true;
+    public void giveMatchInfo() {
+        for(String ava : avaIDs) {
+            for(FinalPairWithDays fp: finalPairs) {
+                if(ava.equals(fp.getPerson1())) {
+                    send(ava, new MatchInfoSignal(fp.getPerson2(), fp.getDay()));
+                    break;
+                }
+                if(ava.equals(fp.getPerson2())) {
+                    send(ava, new MatchInfoSignal(fp.getPerson1(), fp.getDay()));
+                    break;
+                }
+            }
         }
-        
     }
-
-    public void sendAvailabilityData(){
-
-    }
-
 }

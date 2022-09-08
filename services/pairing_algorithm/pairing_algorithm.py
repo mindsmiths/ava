@@ -15,33 +15,32 @@ logger = logging.getLogger(forge_settings.DEFAULT_LOGGER)
 class PairingAlgorithm(BaseService):
 
     @api
-    def generate_pairs(self, pairData: List[AgentAvailableDays]) -> Result:
+    def generate_pairs(self,
+                       availabilityList: List[AgentAvailableDays]) -> Result:
         finalPairs: List[FinalPairWithDays] = []
         alreadyAdded = set()
-        n = len(pairData)
+        n = len(availabilityList)
+        found = False
 
         for i in range(n):
-            if pairData[i].agentId in alreadyAdded:
+            if availabilityList[i].agentId in alreadyAdded:
                 continue
             for j in range(i+1, n):
-                if pairData[j].agentId in alreadyAdded:
+                if availabilityList[j].agentId in alreadyAdded:
                     continue
                 for k in range(5):
-                    if (pairData[i].availableDays[k] == 1 and
-                            pairData[j].availableDays[k] == 1):
-                        alreadyAdded.add(pairData[i].agentId)
-                        alreadyAdded.add(pairData[j].agentId)
+                    if (availabilityList[i].availableDays[k] == 1 and
+                            availabilityList[j].availableDays[k] == 1):
+                        alreadyAdded.add(availabilityList[i].agentId)
+                        alreadyAdded.add(availabilityList[j].agentId)
                         finalPairs.append(FinalPairWithDays(
-                            person1=pairData[i].agentId,
-                            person2=pairData[j].agentId,
+                            person1=availabilityList[i].agentId,
+                            person2=availabilityList[j].agentId,
                             day=k))
+                        found = True
                         break
-
-        # temp "algorithm"
-#        for i in range(0, n, 2):
-#            pair = FinalPairWithDays(person1=pairData[i],
-#                                     person2=pairData[i+1],
-#                                     day=0)
-#            finalPairs.append(pair)
+                if found:
+                    found = False
+                    break
 
         return Result(result=finalPairs)

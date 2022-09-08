@@ -71,7 +71,7 @@ services:
     type: python
     version: 4.0.0a4
     env:
-      HEARTBEAT_CYCLE: 30
+      HEARTBEAT_CYCLE: 5
     db:
       mongo: true
     dependencies:
