@@ -17,14 +17,24 @@
             "content": "Who of the following do you know best?"
           },
           {
+            "description": "Question3",
+            "type": "TEXT",
+            "content": "With whom of the following do you cooperate often?"
+          },
+          {
+            "description": "Question4",
+            "type": "TEXT",
+            "content": "With whom of the following do you talk on daily basis?"
+          },
+          {
+            "description": "buttons",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"Submit\",\"id\":\"submit\"},{\"text\":\"Sure thing!\",\"id\":\"button\"}]"
+          },
+          {
             "description": "finishFamiliarityQuiz",
             "type": "TEXT",
             "content": "Thanks! I’ll check in with you from time to time to ask about other people too, but for now I have enough to get us started. Ready for fun part?"
-          },
-          {
-            "description": "nextButton",
-            "type": "OPTIONS",
-            "content": "[{\"text\":\"Sure thing!\",\"id\":\"button\"}]"
           }
         ]
       },
@@ -54,7 +64,7 @@
           {
             "description": "Goodbye Screen",
             "type": "TEXT",
-            "content": "You are the best :*"
+            "content": "You are the best 😘"
           },
           {
             "description": "Intro Screen",
@@ -64,17 +74,22 @@
           {
             "description": "Question1",
             "type": "TEXT",
-            "content": "What is the name of the last song you listened to?"
+            "content": "🌴What is the name of the last song you listened to?"
           },
           {
             "description": "Question2",
             "type": "TEXT",
-            "content": "What is the name of the last TV show you watched?"
+            "content": "💃What is the name of the last TV show you watched?"
+          },
+          {
+            "description": "buttons",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"Submit\",\"id\":\"submit\"},{\"text\":\"Great, can't wait!\",\"id\":\"submit\"},{\"text\":\"Let's do it\",\"id\":\"submit\"}]"
           },
           {
             "description": "finishPersonalQuiz",
             "type": "TEXT",
-            "content": "You are officially onboarded! Soon I’ll send you an email with connectivity data. Stay tuned!"
+            "content": "You are officially onboarded! 🥳 Soon I’ll send you an email with connectivity data. Stay tuned!"
           }
         ]
       }

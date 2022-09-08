@@ -15,11 +15,14 @@ import java.util.ArrayList;
 import com.mindsmiths.armory.ArmoryAPI;
 import com.mindsmiths.armory.components.ActionGroupComponent;
 import com.mindsmiths.armory.components.DescriptionComponent;
+import com.mindsmiths.armory.components.ImageComponent;
 import com.mindsmiths.armory.components.InputComponent;
 import com.mindsmiths.armory.components.PrimarySubmitButtonComponent;
+import com.mindsmiths.armory.components.TextAreaComponent;
 import com.mindsmiths.armory.components.TitleComponent;
 import com.mindsmiths.armory.templates.BaseTemplate;
 import com.mindsmiths.armory.templates.TemplateGenerator;
+import com.mindsmiths.armory.components.CloudSelectComponent;
 
 import models.OnboardingStage;
 import signals.DayChoiceSignal;
@@ -48,6 +51,7 @@ public class Ava extends Agent {
         Option[] button = Mitems.getOptions("onboarding.intro-screen.button");
 
         BaseTemplate screen = new TemplateGenerator()
+                .addComponent("image", new ImageComponent("/public/Ava.png"))
                 .addComponent("title", new TitleComponent(title))
                 .addComponent("description", new DescriptionComponent(description))
                 .addComponent("submit", new PrimarySubmitButtonComponent(button[0].getText(), "true"));
@@ -57,24 +61,45 @@ public class Ava extends Agent {
     public void showFamiliarityQuizScreens() {
         String question1 = Mitems.getText("onboarding.familiarity-quiz.question1");
         String question2 = Mitems.getText("onboarding.familiarity-quiz.question2");
+        String question3 = Mitems.getText("onboarding.familiarity-quiz.question3");
+        String question4 = Mitems.getText("onboarding.familiarity-quiz.question4");
         String finishfamiliarityquiz = Mitems.getText("onboarding.familiarity-quiz.finishfamiliarityquiz");
-        Option[] nextbutton = Mitems.getOptions("onboarding.familiarity-quiz.nextbutton");
+        Option[] buttons = Mitems.getOptions("onboarding.familiarity-quiz.buttons");
+
         Map<String, BaseTemplate> screens = Map.of(
                 "question1", new TemplateGenerator("question1")
                         .addComponent("question", new TitleComponent(question1))
-                        .addComponent("actionGroup", new ActionGroupComponent(List.of(
-                            new PrimarySubmitButtonComponent("Option1","Option 1", "question2"),
-                            new PrimarySubmitButtonComponent("Option2","Option 2", "question2"),
-                            new PrimarySubmitButtonComponent("Option3","Option 3", "question2")))),
+                        .addComponent("answers", new CloudSelectComponent("answers", Map.of(
+                            "Tomislav Matić", "tomislav matić", "Emil Prpić", "emil pripić",
+                            "Juraj Malenica", "juraj malenica", "Domagoj Blažanin", "domagoj blažanin")))
+                        .addComponent(buttons[0].getId(), new PrimarySubmitButtonComponent(buttons[0].getId(),
+                            buttons[0].getText(), "question2")),
                 "question2", new TemplateGenerator("question2")
                         .addComponent("question", new TitleComponent(question2))
-                        .addComponent("actionGroup", new ActionGroupComponent(List.of(
-                            new PrimarySubmitButtonComponent("Option 1", "Option 1", "finishFamiliarityQuiz"),
-                            new PrimarySubmitButtonComponent("Option 2", "Option 2", "finishFamiliarityQuiz"),
-                            new PrimarySubmitButtonComponent("Option 3", "Option 3", "finishFamiliarityQuiz")))),
-                "finishFamiliarityQuiz", new TemplateGenerator(finishfamiliarityquiz)
-                            .addComponent("title", new TitleComponent("Thanks! I’ll check in with you from time to time to ask about other people too, but for now I have enough to get us started. Ready for fun part?"))
-                            .addComponent("button", new PrimarySubmitButtonComponent("button", nextbutton[0].getText(), "finished"))  
+                        .addComponent("answers", new CloudSelectComponent("answers", Map.of(
+                            "Tomislav Matić", "tomislav matić", "Emil Prpić", "emil pripić",
+                            "Juraj Malenica", "juraj malenica", "Domagoj Blažanin", "domagoj blažanin")))
+                        .addComponent(buttons[0].getId(), new PrimarySubmitButtonComponent(buttons[0].getId(),
+                        buttons[0].getText(), "question3")),
+                "question3", new TemplateGenerator("question3")
+                        .addComponent("question", new TitleComponent(question3))
+                        .addComponent("answers", new CloudSelectComponent("answers", Map.of(
+                            "Tomislav Matić", "tomislav matić", "Emil Prpić", "emil pripić",
+                            "Juraj Malenica", "juraj malenica", "Domagoj Blažanin", "domagoj blažanin")))
+                        .addComponent(buttons[0].getId(), new PrimarySubmitButtonComponent(buttons[0].getId(),
+                        buttons[0].getText(), "question4")),
+                "question4", new TemplateGenerator("question4")
+                        .addComponent("question", new TitleComponent(question4))
+                        .addComponent("answers", new CloudSelectComponent("answers", Map.of(
+                            "Tomislav Matić", "tomislav matić", "Emil Prpić", "emil pripić",
+                            "Juraj Malenica", "juraj malenica", "Domagoj Blažanin", "domagoj blažanin")))
+                        .addComponent(buttons[0].getId(), new PrimarySubmitButtonComponent(buttons[0].getId(),
+                        buttons[0].getText(), "finishFamiliarityQuiz")),
+                "finishFamiliarityQuiz", new TemplateGenerator("finishfamiliarityquiz")
+                            .addComponent("image", new ImageComponent("/public/Ava.png"))
+                            .addComponent("title", new TitleComponent(finishfamiliarityquiz))
+                            .addComponent(buttons[1].getId(), new PrimarySubmitButtonComponent(buttons[1].getId(),
+                            buttons[1].getText(), "finished"))
         );
         showScreens("question1", screens);
     }
@@ -85,26 +110,31 @@ public class Ava extends Agent {
         String intro_screen = Mitems.getText("onboarding.personal-quiz.intro-screen");
         String question1 = Mitems.getText("onboarding.personal-quiz.question1");
         String question2 = Mitems.getText("onboarding.personal-quiz.question2");
+        Option[] buttons = Mitems.getOptions("onboarding.personal-quiz.buttons");
 
         Map<String, BaseTemplate> screens = Map.of(
             "introScreen", new TemplateGenerator("introScreen")
-            .addComponent("title", new TitleComponent(intro_screen))
-            .addComponent("button", new PrimarySubmitButtonComponent("button", "Let's do it", "question1")),
-                "question1", new TemplateGenerator("question1")
-                        .addComponent("question", new TitleComponent(question1))
-                        .addComponent("answer", new InputComponent("answer", "Type your answer here", true))
-                        .addComponent("submit", new PrimarySubmitButtonComponent("submit", "Submit", "question2")),
-                "question2", new TemplateGenerator("question2")
-                        .addComponent("question", new TitleComponent(question2))
-                        .addComponent("answer", new InputComponent("answer", "Type your answer here", true))
-                        .addComponent("button", new PrimarySubmitButtonComponent("Option1","Option 1", "finishPersonalQuiz")),                       
-                "finishPersonalQuiz", new TemplateGenerator("finishPersonalQuiz")
-                            .addComponent("title", new TitleComponent(finishpersonalquiz))
-                            .addComponent("button", new PrimarySubmitButtonComponent("button", "Great, can't wait!", "goodbye")),
-                "goodbye", new TemplateGenerator("goodbye")
-                            .addComponent("title", new TitleComponent(goodbye_screen))
+                .addComponent("title", new TitleComponent(intro_screen))
+                .addComponent(buttons[2].getId(), new PrimarySubmitButtonComponent(buttons[2].getId(), buttons[2].getText(), "question1")),
+            "question1", new TemplateGenerator("question1")
+                .addComponent("question", new TitleComponent(question1))
+                .addComponent("answer", new TextAreaComponent("answer", "Type your answer here", true))
+                .addComponent(buttons[0].getId(), new PrimarySubmitButtonComponent(buttons[0].getId(),
+                    buttons[0].getText(), "question2")),
+            "question2", new TemplateGenerator("question2")
+                .addComponent("question", new TitleComponent(question2))
+                .addComponent("answer", new TextAreaComponent("answer", "Type your answer here", true))
+                .addComponent(buttons[0].getId(), new PrimarySubmitButtonComponent(buttons[0].getId(),
+                    buttons[0].getText(), "finishPersonalQuiz")),                       
+            "finishPersonalQuiz", new TemplateGenerator("finishPersonalQuiz")
+                .addComponent("image", new ImageComponent("/public/Ava.png"))
+                .addComponent("title", new TitleComponent(finishpersonalquiz))
+                .addComponent(buttons[1].getId(), new PrimarySubmitButtonComponent(buttons[1].getId(),
+                    buttons[0].getText(), "goodbye")),
+            "goodbye", new TemplateGenerator("goodbye")
+                .addComponent("title", new TitleComponent(goodbye_screen))
         );
-        showScreens("question1", screens);
+        showScreens("introScreen", screens);
     }
 
     public void sendData(ArrayList<Integer> freeDays) {

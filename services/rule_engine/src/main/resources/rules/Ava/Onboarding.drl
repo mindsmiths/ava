@@ -35,6 +35,6 @@ rule "Start personal quiz"
        agent: Ava(onboardingStage == OnboardingStage.FamiliarityQuizDone)
    then
        agent.showPersonalQuizScreens();
-       modify(agent) {setOnboardingStage(OnboardingStage.FamiliarityQuizDone)};
+       modify(agent) {setOnboardingStage(OnboardingStage.PersonalQuizDone)};
        delete(signal);
 end
