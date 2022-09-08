@@ -1,2 +1,78 @@
 [
+  {
+    "title": "Weekly core",
+    "description": "Weekly loop",
+    "items": [
+      {
+        "name": "Confirmation of choosen available days",
+        "elements": [
+          {
+            "description": "Title",
+            "type": "TEXT",
+            "content": "Okay great, I’ll send you an email when I catch up with others :)"
+          }
+        ]
+      },
+      {
+        "name": "Days",
+        "elements": [
+          {
+            "description": "Friday",
+            "type": "TEXT",
+            "content": "Fri"
+          },
+          {
+            "description": "Monday",
+            "type": "TEXT",
+            "content": "Mon"
+          },
+          {
+            "description": "Thursday",
+            "type": "TEXT",
+            "content": "Thu"
+          },
+          {
+            "description": "Tuesday",
+            "type": "TEXT",
+            "content": "Tue"
+          },
+          {
+            "description": "Wednsday",
+            "type": "TEXT",
+            "content": "Wed"
+          }
+        ]
+      },
+      {
+        "name": "Description asking for available days",
+        "elements": [
+          {
+            "description": "Text",
+            "type": "TEXT",
+            "content": "I’m glad you are in for a lunch!\nLet’s choose a lunch day first. \n\nYou can choose what suits you best."
+          }
+        ]
+      },
+      {
+        "name": "Stay tuned second confirmation of available days",
+        "elements": [
+          {
+            "description": "Title",
+            "type": "TEXT",
+            "content": "You’re welcome. Stay tuned for the lunch :)"
+          }
+        ]
+      },
+      {
+        "name": "Title asking for available days",
+        "elements": [
+          {
+            "description": "Title",
+            "type": "TEXT",
+            "content": "When works best?"
+          }
+        ]
+      }
+    ]
+  }
 ]

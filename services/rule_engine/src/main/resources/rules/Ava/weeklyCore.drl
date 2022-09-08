@@ -9,13 +9,12 @@ import agents.Ava;
 import agents.CultureMaster;
 import signals.DayChoiceSignal;
 
-
 rule "Best Time"
     when
         signal: UserConnectedEvent() from entry-point "signals"
         agent: Ava()
     then 
-        agent.bestTimeScreen();
+        agent.chooseAvailableDaysScreen();
         delete(signal);
 end
 
@@ -24,19 +23,10 @@ rule "Confirm days"
         signal: SubmitEvent(getParamAsString("submit") == "confirmDays") from entry-point "signals"
         agent: Ava()
     then
-        agent.confirmationScreen1();
+        agent.confirmingDaysScreen();
         ArrayList<String> days = (ArrayList<String>)(signal.getParam("days"));
-        Log.info(days);
         agent.send(CultureMaster.ID, new DayChoiceSignal(days));
         delete(signal);
 end
 
-rule "Confirm thanks"
-    when 
-        signal: SubmitEvent(getParamAsString("submit") == "confirmThanks") from entry-point "signals"
-        agent: Ava()
-    then
-        agent.confirmationScreen2();
-        delete(signal);
-end
 
