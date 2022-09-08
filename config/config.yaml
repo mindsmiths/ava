@@ -2,7 +2,7 @@ global:
   dependencies:
     python:
       - forge-sdk==4.0.0a11
-      - forge-cli==4.0.0a24
+      - forge-cli==4.0.0a25
       - cecs==4.0.0a3
       - services/*.py
   env:
@@ -144,7 +144,7 @@ services:
       
   armory:
     type: django
-    version: 4.0.0a12
+    version: 4.0.0a14
     command:
       run: "daphne -b 0.0.0.0 armory.config.asgi:application"
     db:

@@ -1,0 +1,42 @@
+package rules.Ava;
+
+import java.util.*;
+
+import com.mindsmiths.armory.events.UserConnectedEvent
+import com.mindsmiths.armory.events.SubmitEvent
+
+import agents.Ava;
+import agents.CultureMaster;
+import signals.DayChoiceSignal;
+
+
+rule "Best Time"
+    when
+        signal: UserConnectedEvent() from entry-point "signals"
+        agent: Ava()
+    then 
+        agent.bestTimeScreen();
+        delete(signal);
+end
+
+rule "Confirm days"
+    when 
+        signal: SubmitEvent(getParamAsString("submit") == "confirmDays") from entry-point "signals"
+        agent: Ava()
+    then
+        agent.confirmationScreen1();
+        ArrayList<String> days = (ArrayList<String>)(signal.getParam("days"));
+        Log.info(days);
+        agent.send(CultureMaster.ID, new DayChoiceSignal(days));
+        delete(signal);
+end
+
+rule "Confirm thanks"
+    when 
+        signal: SubmitEvent(getParamAsString("submit") == "confirmThanks") from entry-point "signals"
+        agent: Ava()
+    then
+        agent.confirmationScreen2();
+        delete(signal);
+end
+

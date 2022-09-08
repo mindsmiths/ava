@@ -49,7 +49,7 @@
 		<dependency>
 			<groupId>com.mindsmiths</groupId>
 			<artifactId>armory-client</artifactId>
-			<version>4.0.0a12</version>
+			<version>4.0.0a14</version>
 		</dependency>
 	</dependencies>
 	<build>
