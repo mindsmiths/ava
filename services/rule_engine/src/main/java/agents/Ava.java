@@ -15,6 +15,9 @@ import signals.DayChoiceSignal;
 @ToString
 @NoArgsConstructor
 public class Ava extends Agent { 
+    
+    private boolean workingHours = false;
+
     public Ava(String connectionName, String connectionId) {
         super(connectionName, connectionId);
     }

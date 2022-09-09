@@ -16,8 +16,6 @@ public class CultureMaster extends Agent {
     Map<String, Ava> agentInfo; // information about agents
     private Date lastEmailSentTime = new Date();
     private boolean pinged = false;
-    private LocalDateTime timeNow = LocalDateTime.now();
-    private boolean decentTime = false;
 
     public static String ID = "CULTURE_MASTER";
 
