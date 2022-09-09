@@ -13,3 +13,8 @@ com.mindsmiths.armory.events.UserDisconnectedEvent:
     connectionName: armory
     connectionField: connectionId
     agentType: agents.Ava
+com.mindsmiths.employeeManager.employees.Employee:
+  - !GetOrCreateAgentByConnection
+    connectionName: employeeId
+    connectionField: id
+    agentType: agents.Ava

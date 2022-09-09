@@ -1,0 +1,18 @@
+package rules.CultureMaster;
+
+import agents.CultureMaster;
+import signals.SendEmployeeInfo;
+import com.mindsmiths.ruleEngine.util.Log;
+
+
+rule "Add or update Ava data"
+    when
+        signal: SendEmployeeInfo() from entry-point "signals"
+        agent: CultureMaster()
+    then
+        modify(agent) {
+            addOrUpdateAvaData(signal.getId(), signal.getFirstName(), signal.getLastName());
+        }
+        //Log.info("RADI");
+        delete(signal)
+end
