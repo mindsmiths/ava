@@ -1,0 +1,32 @@
+package rules.Ava;
+
+
+import com.mindsmiths.ruleEngine.util.Agents;
+import com.mindsmiths.armory.events.UserConnectedEvent;
+import com.mindsmiths.armory.events.SubmitEvent;
+import agents.Ava;
+import models.OnboardingStage;
+
+rule "Start familiarity quiz"
+   when
+        signal: UserConnectedEvent() from entry-point "signals"
+        agent: Ava()
+   then
+        agent.showFamiliarityQuizScreens();
+        modify(agent) {
+            setOnboardingStage(OnboardingStage.FamiliarityQuiz)
+        };
+        delete(signal);
+end
+
+rule "Start personal quiz"
+   when
+        signal: SubmitEvent(getParamAsString("submit") == "finished") from entry-point "signals"
+        agent: Ava(onboardingStage == OnboardingStage.FamiliarityQuiz)
+   then
+        agent.showPersonalQuizScreens();
+        modify(agent) {
+            setOnboardingStage(OnboardingStage.PersonalQuiz)
+        };
+        delete(signal);
+end
