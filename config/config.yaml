@@ -11,7 +11,7 @@ global:
 
     ENVIRONMENT_NAME: {{ env.ENVIRONMENT_NAME }}
     MODULE: '{{ env.MODULE | default("local", True) }}'
-    LOG_LEVEL: INFO
+    LOG_LEVEL: DEBUG
 
     # Messaging
     PULSAR_URL: pulsar://pulsar-proxy.pulsar.svc.cluster.local:6650
@@ -71,7 +71,7 @@ services:
     type: python
     version: 4.0.0a4
     env:
-      HEARTBEAT_CYCLE: 1
+      HEARTBEAT_CYCLE: 5
     db:
       mongo: true
     dependencies:
@@ -95,7 +95,7 @@ services:
   mitems:
     enabled: true
     type: django
-    version: 4.0.0a10
+    version: 4.0.0a11
     db:
       postgres: true
     image:

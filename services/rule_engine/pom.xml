@@ -39,7 +39,7 @@
 		<dependency>
 			<groupId>com.mindsmiths</groupId>
 			<artifactId>mitems-client</artifactId>
-			<version>4.0.0a10</version>
+			<version>4.0.0a11</version>
 		</dependency>
 		<dependency>
 			<groupId>com.mindsmiths</groupId>

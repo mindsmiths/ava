@@ -15,6 +15,8 @@ public class CultureMaster extends Agent {
     Map<String, Ava> agentInfo; // information about agents
     private Date lastEmailSentTime = new Date();
     private boolean pinged = false;
+    private boolean workingHours = false;
+    private boolean firstMailSent = false;
 
     public static String ID = "CULTURE_MASTER";
 

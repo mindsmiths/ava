@@ -4,7 +4,6 @@ import java.lang.string.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -20,33 +19,25 @@ import com.mindsmiths.mitems.Mitems;
 
 import agents.CultureMaster;
 
-rule "Mail sending"
+
+rule "Working hours"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        agent: CultureMaster(
-            lastEmailSentTime before[5s] ts
-            //pinged == false
-        )
+        eval(evaluateCronExpression("* * 8-17 ? * MON-FRI *", ts, "Europe/Zagreb"))
+        agent: CultureMaster()
     then
         modify(agent) {
-            setLastEmailSentTime(new Date())
-            //setPinged(true)
-        };
-        Log.info("5 seconds have passed...");
+            setWorkingHours(true)
+        }
+end
 
-        String subject = Mitems.getText("onboarding.welcome-email.subject");
-        String description = Mitems.getText("onboarding.welcome-email.description");
-        String htmlTemplate = String.join("", Files.readAllLines(Paths.get("EmailTemplate.html"), StandardCharsets.UTF_8));
-
-        String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
-            "description", description,
-            "callToAction", "Let's go",
-            "armoryUrl", "http://asdf"
-        ));
-
-        SendEmailPayload e = new SendEmailPayload();
-        e.setRecipients(List.of("filipbacic08@gmail.com"));
-        e.setSubject(subject);
-        e.setHtmlText(htmlBody);
-        EmailAdapterAPI.newEmail(e);
+rule "Non working hours"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        eval(!evaluateCronExpression("* * 8-17 ? * MON-FRI *", ts, "Europe/Zagreb"))
+        agent: CultureMaster()
+    then
+        modify(agent) {
+            setWorkingHours(false)
+        }
 end
