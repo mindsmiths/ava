@@ -1,8 +1,8 @@
 from django.db import models
-from services.employee_manager.api.views import Employee as EmployeeView
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from forge.utils.base import random_generator
+
+from services.employee_manager.api.views import Employee as EmployeeView
 
 
 class Employee(models.Model):
@@ -23,6 +23,7 @@ class Employee(models.Model):
             "email": self.email,
             "active": self.active
         }
+
 
 @receiver(post_save, sender=Employee)
 def Employeeupdated(sender, instance: Employee, *args, **kwargs):
