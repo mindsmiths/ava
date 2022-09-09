@@ -51,6 +51,13 @@
 			<artifactId>armory-client</artifactId>
 			<version>4.0.0a12</version>
 		</dependency>
+        <dependency>
+			<groupId>com.mindsmiths</groupId>
+            <artifactId>employee-manager</artifactId>
+            <version>4.0.0a0</version>
+		</dependency>
+
+   
 	</dependencies>
 	<build>
 		<finalName>app</finalName>

@@ -3,12 +3,15 @@ import com.mindsmiths.ruleEngine.model.Heartbeat;
 import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.ruleEngine.util.Agents;
 import com.mindsmiths.mitems.Mitems;
+import com.mindsmiths.employeeManager.employees.Employee;
 
 
 rule "Smith's Heartbeat"
     when
         Heartbeat() from entry-point "signals"
+        employee: Employee()
     then
         Log.info("Smith's heartbeat - num agents: " + Agents.getCount());
+        Log.info(employee);
 
 end

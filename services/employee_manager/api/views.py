@@ -1,9 +1,12 @@
-from forge.api import DBView
+from forge.core.db import DBView
 
 
 class Employee(DBView):
-    name: str
-    surname: str
+    id: str
+    firstName: str
+    lastName: str
+    email: str
+    active: bool
 
     @classmethod
     def get_service_name(cls) -> str:
