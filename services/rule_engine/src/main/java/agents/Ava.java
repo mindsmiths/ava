@@ -47,7 +47,7 @@ public class Ava extends Agent {
         Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
         String avaImagePath = Mitems.getText("onboarding.familiarity-quiz.ava-image-path");
         
-        //Adding intro screen
+        // Adding intro screen
         Option[] introButton = Mitems.getOptions("onboarding.familiarity-quiz.intro-button");
         String introScreenTitle = Mitems.getText("onboarding.familiarity-quiz.intro-screen-title");
         String introScreenDescription = Mitems.getText("onboarding.familiarity-quiz.intro-screen-description");
@@ -58,7 +58,7 @@ public class Ava extends Agent {
             .addComponent("description", new DescriptionComponent(introScreenDescription))
             .addComponent("submit", new PrimarySubmitButtonComponent(introButton[0].getText(), "question1"))
                    );
-        //Adding questions and final screen in familiarity quiz
+        // Adding questions and final screen in familiarity quiz
         int questionNum = 1;
         Option[] submitButton = Mitems.getOptions("onboarding.familiarity-quiz.submit-button");
         
@@ -80,7 +80,7 @@ public class Ava extends Agent {
                 questionNum += 1;
             }
             catch(Exception e){
-                //Changing  button value 
+                // Changing  button value 
                 String wrongQuestionTag = "question" + String.valueOf(questionNum-1);
                 TemplateGenerator templateGenerator = (TemplateGenerator) screens.get(wrongQuestionTag);
                 PrimarySubmitButtonComponent buttonComponent = (PrimarySubmitButtonComponent) templateGenerator.getComponents()
@@ -105,7 +105,7 @@ public class Ava extends Agent {
         Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
         String avaImagePath = Mitems.getText("onboarding.personal-quiz.ava-image-path");
 
-        //Adding intro screen
+        // Adding intro screen
         Option[] acceptButton = Mitems.getOptions("onboarding.personal-quiz.accept-button");
         String introScreen = Mitems.getText("onboarding.personal-quiz.intro-screen");
 
@@ -114,7 +114,7 @@ public class Ava extends Agent {
             .addComponent(acceptButton[0].getId(), new PrimarySubmitButtonComponent(
                 acceptButton[0].getId(), acceptButton[0].getText(), "question1"))
                     );
-        //Adding questions and final screens
+        // Adding questions and final screens
         int questionNum = 1;
         while(true){
             String questionTag = "question" + String.valueOf(questionNum);
@@ -133,7 +133,7 @@ public class Ava extends Agent {
                 questionNum += 1;
             }
             catch(Exception e){
-                //Changing  button value 
+                // Changing  button value 
                 String wrongQuestionTag = "question" + String.valueOf(questionNum-1);
                 TemplateGenerator templateGenerator = (TemplateGenerator) screens.get(wrongQuestionTag);
                 PrimarySubmitButtonComponent buttonComponent = (PrimarySubmitButtonComponent) templateGenerator.getComponents()
