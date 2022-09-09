@@ -1,13 +1,14 @@
 import logging
+from typing import Set
 from typing import List
 
 from forge.conf import settings as forge_settings
 from forge.core.api import api
 from forge.core.base import BaseService
 
-from .api import Result
-from .api import AgentAvailableDays
-from .api import FinalPairWithDays
+from .api import AllMatches
+from .api import AvaAvailability
+from .api import Match
 
 logger = logging.getLogger(forge_settings.DEFAULT_LOGGER)
 
@@ -16,31 +17,27 @@ class PairingAlgorithm(BaseService):
 
     @api
     def generate_pairs(self,
-                       availabilityList: List[AgentAvailableDays]) -> Result:
-        finalPairs: List[FinalPairWithDays] = []
-        alreadyAdded = set()
-        n = len(availabilityList)
-        found = False
+                       avaAvailabilities: List[AvaAvailability]) -> AllMatches:
+        all_matches: List[Match] = []
+        already_added = set()
 
-        for i in range(n):
-            if availabilityList[i].agentId in alreadyAdded:
+        for index, first in enumerate(avaAvailabilities):
+            if first.agentId in already_added:
                 continue
-            for j in range(i+1, n):
-                if availabilityList[j].agentId in alreadyAdded:
+            for second in avaAvailabilities[index + 1:]:
+                if second.agentId in already_added:
                     continue
-                for k in range(5):
-                    if (availabilityList[i].availableDays[k] == 1 and
-                            availabilityList[j].availableDays[k] == 1):
-                        alreadyAdded.add(availabilityList[i].agentId)
-                        alreadyAdded.add(availabilityList[j].agentId)
-                        finalPairs.append(FinalPairWithDays(
-                            person1=availabilityList[i].agentId,
-                            person2=availabilityList[j].agentId,
-                            day=k))
-                        found = True
-                        break
-                if found:
-                    found = False
+                possible_days = (
+                    first.availableDays
+                    ).intersection(second.availableDays)
+                if possible_days:
+                    all_matches.append(Match(
+                        first=first.agentId,
+                        second=second.agentId,
+                        day=possible_days.pop()
+                    ))
+                    already_added.add(first.agentId)
+                    already_added.add(second.agentId)
                     break
 
-        return Result(result=finalPairs)
+        return AllMatches(allMatches=all_matches)

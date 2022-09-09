@@ -1,17 +1,28 @@
-from forge.core.models import ExtendableModel
 from typing import List
+from typing import Set
+from enum import Enum
+
+from forge.core.models import ExtendableModel
 
 
-class AgentAvailableDays(ExtendableModel):
+class Days(str, Enum):
+    MON = "MON"
+    TUE = "TUE"
+    WED = "WED"
+    THU = "THU"
+    FRI = "FRI"
+
+
+class AvaAvailability(ExtendableModel):
     agentId: str
-    availableDays: List[bool]
+    availableDays: Set[Days]
 
 
-class FinalPairWithDays(ExtendableModel):
-    person1: str
-    person2: str
-    day: int
+class Match(ExtendableModel):
+    first: str
+    second: str
+    day: Days
 
 
-class Result(ExtendableModel):
-    result: List[FinalPairWithDays]
+class AllMatches(ExtendableModel):
+    allMatches: List[Match]

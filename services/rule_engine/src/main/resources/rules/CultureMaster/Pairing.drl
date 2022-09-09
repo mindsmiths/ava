@@ -1,18 +1,16 @@
 package rules.CultureMaster;
 
+import java.util.Date;
+
 import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.ruleEngine.model.Heartbeat;
 import com.mindsmiths.ruleEngine.util.Agents;
 import com.mindsmiths.ruleEngine.model.Initialize;
-import com.mindsmiths.pairingalgorithm.Result;
-
+import com.mindsmiths.pairingalgorithm.AllMatches;
 import signals.NewAvaRegistered;
 import signals.RequestAvailableDays;
 import signals.SendAvailableDays;
-
 import agents.CultureMaster;
-
-import java.util.Date;
 
 
 rule "First contact"
@@ -38,13 +36,12 @@ rule "Request Availability Data"
         Heartbeat(ts: timestamp) from entry-point "signals"
         agent: CultureMaster(lastRequestDataTime before[10s] ts, sentCollect == false)
     then
-        modify(agent) {setLastRequestDataTime(new Date()), clearAvailabilityList(), setSentCollect(true)};
+        modify(agent) {setLastRequestDataTime(new Date()), clearAvaAvailabilities(), setSentCollect(true)};
         Log.info("Requesting availability data.......");
 
         for (String ava : agent.getAvaIDs()) {
             Log.info("Requesting from " + ava);
             agent.send(ava, new RequestAvailableDays());
-
         }
 end
 
@@ -54,9 +51,9 @@ rule "Accept Availability Data"
         agent: CultureMaster()
     then
         Log.info("Got some data :)");
-        modify(agent) {addAgentAvailableDays(signal.getAgentAvailableDays())};
+        modify(agent) {addAvaAvailability(signal.getAvaAvailability())};
         // we can generate new pairs only when we have info from all Avas
-        if(agent.getAvaIDs().size() == agent.getAvailabilityList().size()) {
+        if(agent.getAvaIDs().size() == agent.getAvaAvailabilities().size()) {
             modify(agent) {setCanGenerate(true)};
         }
         delete(signal);
@@ -64,35 +61,35 @@ end
 
 
 
-rule "Generate This Weeks Pairs"
+rule "Generate This Weeks Matches"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
         agent: CultureMaster(canGenerate == true, sentGenerate == false)
     then
-        Log.info("Generating pairs....");
+        Log.info("Generating matches....");
         Log.info("AvaIDs List: " + agent.getAvaIDs());
-        Log.info("Availability List: " + agent.getAvailabilityList());
+        Log.info("Availability List: " + agent.getAvaAvailabilities());
         modify(agent) {setCanGenerate(false)};
-        agent.generatePairs();
+        agent.generateMatches();
 end
 
 rule "Accept Generated Pairs"
     when
-        finalPairs: Result() from entry-point "signals"
+        matches: AllMatches() from entry-point "signals"
         agent: CultureMaster()
     then
-        modify(agent) {addFinalPairs(finalPairs.getResult()), setSendGenerated(true)};
+        modify(agent) {addMatches(matches.getAllMatches()), setSendGenerated(true)};
         Log.info("---------------------rezultati pairinga---------------------");
-        Log.info(finalPairs.getResult());
-        delete(finalPairs);
+        Log.info(matches.getAllMatches());
+        delete(matches);
 end
 
-rule "Give Match Info To Avas"
+rule "Send Match Info To Avas"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
         agent: CultureMaster(sendGenerated == true)
     then
-        modify(agent) {setSendGenerated(false), giveMatchInfo()}
+        modify(agent) {setSendGenerated(false), sendMatchInfo()}
 end
 
 

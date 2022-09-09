@@ -5,11 +5,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import com.mindsmiths.sdk.core.api.Signal;
-import com.mindsmiths.pairingalgorithm.AgentAvailableDays;
+import com.mindsmiths.pairingalgorithm.AvaAvailability;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class SendAvailableDays extends Signal {
-    AgentAvailableDays agentAvailableDays;
+    AvaAvailability avaAvailability;
 }

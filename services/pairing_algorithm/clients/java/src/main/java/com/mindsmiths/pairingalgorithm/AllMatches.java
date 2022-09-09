@@ -1,7 +1,7 @@
 package com.mindsmiths.pairingalgorithm;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.List;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,6 +11,6 @@ import lombok.AllArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Result implements Serializable {
-    private ArrayList<FinalPairWithDays> result;
+public class AllMatches implements Serializable {
+    private List<Match> allMatches;
 }

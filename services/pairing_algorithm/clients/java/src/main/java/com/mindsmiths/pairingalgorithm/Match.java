@@ -5,8 +5,8 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class FinalPairWithDays {
-    private String person1;
-    private String person2;
-    private int day;
+public class Match {
+    private String first;
+    private String second;
+    private Days day;
 }
