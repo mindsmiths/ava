@@ -1,16 +1,16 @@
 package agents;
 
-import com.mindsmiths.ruleEngine.model.Agent;
 import lombok.Data;
 import lombok.ToString;
 import lombok.NoArgsConstructor;
 
-import com.mindsmiths.mitems.Mitems;
-import com.mindsmiths.mitems.Option;
-
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import com.mindsmiths.mitems.Mitems;
+import com.mindsmiths.mitems.Option;
+import com.mindsmiths.ruleEngine.model.Agent;
 
 import com.mindsmiths.armory.ArmoryAPI;
 import com.mindsmiths.armory.components.DescriptionComponent;
@@ -75,15 +75,18 @@ public class Ava extends Agent {
                 questionNum += 1;
             }
             catch(Exception e){
-                //String wrongQuestionTag = "question" + String.valueOf(questionNum);
-                //screens.get(wrongQuestionTag).getComponents().get("submit");
-                String finishFamiliarityQuiz = Mitems.getText("onboarding.familiarity-quiz.finishfamiliarityquiz");
+                //
+                String wrongQuestionTag = "question" + String.valueOf(questionNum-1);
+                TemplateGenerator templateGenerator = (TemplateGenerator) screens.get(wrongQuestionTag);
+                PrimarySubmitButtonComponent buttonComponent = (PrimarySubmitButtonComponent) templateGenerator.getComponents().get(buttons[1].getId());
+                buttonComponent.setValue("finishfamiliarityquiz");
                 
-                screens.put(questionTag, new TemplateGenerator("finishfamiliarityquiz")
+                String finishFamiliarityQuiz = Mitems.getText("onboarding.familiarity-quiz.finishfamiliarityquiz");
+                screens.put("finishfamiliarityquiz", new TemplateGenerator("finishfamiliarityquiz")
                     .addComponent("image", new ImageComponent("/public/Ava.png"))
                     .addComponent("title", new TitleComponent(finishFamiliarityQuiz))
                     .addComponent(buttons[2].getId(), new PrimarySubmitButtonComponent(
-                        buttons[2].getId(), buttons[2].getText(), "finished"))
+                            buttons[2].getId(), buttons[2].getText(), "finished"))
                             );
                 break;
             }
@@ -119,10 +122,15 @@ public class Ava extends Agent {
                 questionNum += 1;
             }
             catch(Exception e){
-                String finishFamiliarityQuiz = Mitems.getText("onboarding.familiarity-quiz.finishfamiliarityquiz");
-                screens.put(questionTag, new TemplateGenerator("finishfamiliarityquiz")
+                String wrongQuestionTag = "question" + String.valueOf(questionNum-1);
+                TemplateGenerator templateGenerator = (TemplateGenerator) screens.get(wrongQuestionTag);
+                PrimarySubmitButtonComponent buttonComponent = (PrimarySubmitButtonComponent) templateGenerator.getComponents().get(buttons[1].getId());
+                buttonComponent.setValue("finishpersonalquiz");
+
+                String finishPersonalQuiz = Mitems.getText("onboarding.personal-quiz.finishpersonalquiz");
+                screens.put("finishpersonalquiz", new TemplateGenerator("finishpersonalquiz")
                     .addComponent("image", new ImageComponent("/public/Ava.png"))
-                    .addComponent("title", new TitleComponent(finishFamiliarityQuiz))
+                    .addComponent("title", new TitleComponent(finishPersonalQuiz))
                     .addComponent(buttons[2].getId(), new PrimarySubmitButtonComponent(
                         buttons[2].getId(), buttons[2].getText(), "goodbye"))
                             );
