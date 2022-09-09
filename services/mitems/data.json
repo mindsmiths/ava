@@ -17,29 +17,9 @@
         "name": "Days",
         "elements": [
           {
-            "description": "Friday",
-            "type": "TEXT",
-            "content": "Fri"
-          },
-          {
-            "description": "Monday",
-            "type": "TEXT",
-            "content": "Mon"
-          },
-          {
-            "description": "Thursday",
-            "type": "TEXT",
-            "content": "Thu"
-          },
-          {
-            "description": "Tuesday",
-            "type": "TEXT",
-            "content": "Tue"
-          },
-          {
-            "description": "Wednsday",
-            "type": "TEXT",
-            "content": "Wed"
+            "description": "Each day",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"Mon\",\"id\":\"0\"},{\"text\":\"Tue\",\"id\":\"1\"},{\"text\":\"Wed\",\"id\":\"2\"},{\"text\":\"Thu\",\"id\":\"3\"},{\"text\":\"Fri\",\"id\":\"4\"}]"
           }
         ]
       },

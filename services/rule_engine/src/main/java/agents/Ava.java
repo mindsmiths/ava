@@ -1,13 +1,11 @@
 package agents;
 
-import com.mindsmiths.mitems.Mitems;
-
 import java.util.*;
 
 import com.mindsmiths.armory.ArmoryAPI;
 import com.mindsmiths.armory.templates.*;
 import com.mindsmiths.armory.components.*;
-import com.mindsmiths.armory.components.CloudSelectComponent.Option;
+import com.mindsmiths.mitems.Mitems;
 import com.mindsmiths.ruleEngine.model.Agent;
 
 import lombok.*;
@@ -39,18 +37,14 @@ public class Ava extends Agent {
     public void chooseAvailableDaysScreen() {
         String title = Mitems.getText("weekly-core.title-asking-for-available-days.title");
         String description = Mitems.getText("weekly-core.description-asking-for-available-days.text");
-        String mon = Mitems.getText("weekly-core.days.monday");
-        String tue = Mitems.getText("weekly-core.days.tuesday");
-        String wed = Mitems.getText("weekly-core.days.wednsday");
-        String thu = Mitems.getText("weekly-core.days.thursday");
-        String fri = Mitems.getText("weekly-core.days.friday");
-
+        com.mindsmiths.mitems.Option[] days = Mitems.getOptions("weekly-core.days.each-day");
+        
         List<CloudSelectComponent.Option> options = List.of(
-            new CloudSelectComponent.Option(mon, "1", true),
-            new CloudSelectComponent.Option(tue, "2", true),
-            new CloudSelectComponent.Option(wed, "3", true),
-            new CloudSelectComponent.Option(thu, "4", true),
-            new CloudSelectComponent.Option(fri, "5", true)
+            new CloudSelectComponent.Option(days[0].getText(), "0", true),
+            new CloudSelectComponent.Option(days[1].getText(), "1", true),
+            new CloudSelectComponent.Option(days[2].getText(), "2", true),
+            new CloudSelectComponent.Option(days[3].getText(), "3", true),
+            new CloudSelectComponent.Option(days[4].getText(), "4", true)
         );
 
         BaseTemplate daysScreen = new TemplateGenerator()
