@@ -7,24 +7,24 @@ from services.employee_manager.api.views import Employee as EmployeeView
 
 class Employee(models.Model):
     id = models.AutoField(primary_key=True, db_index=True)
-    firstName = models.CharField(max_length=200)
-    lastName = models.CharField(max_length=200)
+    first_name = models.CharField(max_length=200)
+    last_name = models.CharField(max_length=200)
     email = models.EmailField()
     active = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"{self.firstName} {self.lastName}"
+        return f"{self.first_name} {self.last_name}"
 
     def to_dict(self):
         return {
             "id": self.id,
-            "firstName": self.firstName,
-            "lastName": self.lastName,
+            "firstName": self.first_name,
+            "lastName": self.last_name,
             "email": self.email,
             "active": self.active
         }
 
 
 @receiver(post_save, sender=Employee)
-def Employeeupdated(sender, instance: Employee, *args, **kwargs):
+def employee_emit(sender, instance: Employee, *args, **kwargs):
     EmployeeView(**instance.to_dict()).emit()

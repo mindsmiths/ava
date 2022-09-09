@@ -163,7 +163,6 @@ services:
     resources:
       cpu: 50m
       memory: 75Mi
-  
   employee-manager:
     type: django
     db:

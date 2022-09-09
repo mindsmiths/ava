@@ -5,7 +5,7 @@ from .models import Employee
 
 
 class EmployeeAdmin(ImportExportModelAdmin, admin.ModelAdmin):
-    list_display = ('firstName', 'lastName', 'email', 'activebox',)
+    list_display = ('first_name', 'last_name', 'email', 'activebox',)
 
     @admin.display(description='active')
     def activebox(self, obj):
