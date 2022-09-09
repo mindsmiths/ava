@@ -1,2 +1,118 @@
 [
+  {
+    "title": "Onboarding",
+    "description": "",
+    "items": [
+      {
+        "name": "Familiarity Quiz",
+        "elements": [
+          {
+            "description": "Ava image path",
+            "type": "TEXT",
+            "content": "/public/Ava.png"
+          },
+          {
+            "description": "Familiarity quiz final button",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"Sure thing!\",\"id\":\"submit\"}]"
+          },
+          {
+            "description": "Finish familiarity quiz text",
+            "type": "TEXT",
+            "content": "Thanks! I’ll check in with you from time to time to ask about other people too, but for now I have enough to get us started. Ready for fun part?"
+          },
+          {
+            "description": "Intro button",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"Let's see\",\"id\":\"submit\"}]"
+          },
+          {
+            "description": "Intro screen description",
+            "type": "TEXT",
+            "content": "Next week I will match you with someone interesting from your organization to spend quality time with over lunch. \n\nBut first, let’s see how well you know your colleagues…\n\n"
+          },
+          {
+            "description": "Intro screen title",
+            "type": "TEXT",
+            "content": "So good to see you!"
+          },
+          {
+            "description": "Submit button",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"Submit\",\"id\":\"submit\"}]"
+          },
+          {
+            "description": "question1",
+            "type": "TEXT",
+            "content": "Who of the following do you know best?"
+          },
+          {
+            "description": "question2",
+            "type": "TEXT",
+            "content": "Who of the following do you know best?"
+          },
+          {
+            "description": "question3",
+            "type": "TEXT",
+            "content": "With whom of the following do you cooperate often?"
+          },
+          {
+            "description": "question4",
+            "type": "TEXT",
+            "content": "With whom of the following do you talk on daily basis?"
+          }
+        ]
+      },
+      {
+        "name": "Personal quiz",
+        "elements": [
+          {
+            "description": "Accept button",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"Let's do it!\",\"id\":\"submit\"}]"
+          },
+          {
+            "description": "Ava image path",
+            "type": "TEXT",
+            "content": "/public/Ava.png"
+          },
+          {
+            "description": "Finish personal quiz",
+            "type": "TEXT",
+            "content": "You are officially onboarded! 🥳 Soon I’ll send you an email with connectivity data. Stay tuned!"
+          },
+          {
+            "description": "Finish quiz button",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"Great, can't wait!\",\"id\":\"submit\"}]"
+          },
+          {
+            "description": "Goodbye screen",
+            "type": "TEXT",
+            "content": "You are the best 😘"
+          },
+          {
+            "description": "Intro screen",
+            "type": "TEXT",
+            "content": "Okay, first part done! Now, the fun part!I prepared 5 questions for you and your colleagues. Ready to start?"
+          },
+          {
+            "description": "Submit button",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"Submit\",\"id\":\"submit\"}]"
+          },
+          {
+            "description": "question1",
+            "type": "TEXT",
+            "content": "🌴What is the name of the last song you listened to?"
+          },
+          {
+            "description": "question2",
+            "type": "TEXT",
+            "content": "💃What is the name of the last TV show you watched?"
+          }
+        ]
+      }
+    ]
+  }
 ]

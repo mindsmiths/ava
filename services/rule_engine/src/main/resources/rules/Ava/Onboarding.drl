@@ -1,17 +1,32 @@
 package rules.Ava;
 
-import com.mindsmiths.ruleEngine.util.Log;
+
 import com.mindsmiths.ruleEngine.util.Agents;
-import com.mindsmiths.ruleEngine.model.Initialize;
-
+import com.mindsmiths.armory.events.UserConnectedEvent;
+import com.mindsmiths.armory.events.SubmitEvent;
 import agents.Ava;
+import models.OnboardingStage;
 
-
-rule "First contact"
-    salience 100
-    when
-        initialize: Initialize() from entry-point "agent-created"
+rule "Start familiarity quiz"
+   when
+        signal: UserConnectedEvent() from entry-point "signals"
         agent: Ava()
-    then
-        Log.info("Created new Ava agent.");
+   then
+        agent.showFamiliarityQuizScreens();
+        modify(agent) {
+            setOnboardingStage(OnboardingStage.FamiliarityQuiz)
+        };
+        delete(signal);
+end
+
+rule "Start personal quiz"
+   when
+        signal: SubmitEvent(getParamAsString("submit") == "finished") from entry-point "signals"
+        agent: Ava(onboardingStage == OnboardingStage.FamiliarityQuiz)
+   then
+        agent.showPersonalQuizScreens();
+        modify(agent) {
+            setOnboardingStage(OnboardingStage.PersonalQuiz)
+        };
+        delete(signal);
 end
