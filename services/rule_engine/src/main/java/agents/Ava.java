@@ -98,7 +98,7 @@ public class Ava extends Agent {
                 break;
             }
         }  
-    showScreens("introScreen", screens);
+        showScreens("introScreen", screens);
     }
 
     public void showPersonalQuizScreens(){
@@ -156,7 +156,7 @@ public class Ava extends Agent {
                 break;
             }
         }
-    showScreens("introScreen", screens);
+        showScreens("introScreen", screens);
     }
 
     public void sendData(ArrayList<Integer> freeDays) {
