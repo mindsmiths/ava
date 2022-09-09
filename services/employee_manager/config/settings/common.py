@@ -41,12 +41,13 @@ DJANGO_APPS = (
 
 PRIMARY_THIRD_PARTY_APPS = ()
 
-THIRD_PARTY_APPS = ()
+THIRD_PARTY_APPS = (
+    'import_export',
+)
 
 LOCAL_APPS = (
     'base',
-    'employees.apps.EmployeesConfig',
-    'import_export',
+    'employees',
 )
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

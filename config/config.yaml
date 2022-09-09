@@ -64,6 +64,8 @@ services:
     resources:
       cpu: 500m
       memory: 650Mi
+    dependencies:
+      - employee-manager
 
   heartbeat-scheduler:
     package: heartbeat
@@ -163,6 +165,7 @@ services:
     resources:
       cpu: 50m
       memory: 75Mi
+  
   employee-manager:
     type: django
     db:

@@ -3,9 +3,10 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from services.employee_manager.api.views import Employee as EmployeeView
+from base.models import BaseModel
 
 
-class Employee(models.Model):
+class Employee(BaseModel):
     id = models.AutoField(primary_key=True, db_index=True)
     first_name = models.CharField(max_length=200)
     last_name = models.CharField(max_length=200)
