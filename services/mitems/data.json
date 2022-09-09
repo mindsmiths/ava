@@ -7,24 +7,39 @@
         "name": "Familiarity Quiz",
         "elements": [
           {
-            "description": "buttons",
-            "type": "OPTIONS",
-            "content": "[{\"text\":\"Let's see\",\"id\":\"submit\"},{\"text\":\"Submit\",\"id\":\"submit\"},{\"text\":\"Sure thing!\",\"id\":\"submit\"}]"
+            "description": "Ava image path",
+            "type": "TEXT",
+            "content": "/public/Ava.png"
           },
           {
-            "description": "finishFamiliarityQuiz",
+            "description": "Familiarity quiz final button",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"Sure thing!\",\"id\":\"submit\"}]"
+          },
+          {
+            "description": "Finish familiarity quiz text",
             "type": "TEXT",
             "content": "Thanks! I’ll check in with you from time to time to ask about other people too, but for now I have enough to get us started. Ready for fun part?"
           },
           {
-            "description": "introScreenDescription",
+            "description": "Intro button",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"Let's see\",\"id\":\"submit\"}]"
+          },
+          {
+            "description": "Intro screen description",
             "type": "TEXT",
             "content": "Next week I will match you with someone interesting from your organization to spend quality time with over lunch. \n\nBut first, let’s see how well you know your colleagues…\n\n"
           },
           {
-            "description": "introScreenTitle",
+            "description": "Intro screen title",
             "type": "TEXT",
             "content": "So good to see you!"
+          },
+          {
+            "description": "Submit button",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"Submit\",\"id\":\"submit\"}]"
           },
           {
             "description": "question1",
@@ -52,24 +67,39 @@
         "name": "Personal quiz",
         "elements": [
           {
-            "description": "buttons",
+            "description": "Accept button",
             "type": "OPTIONS",
-            "content": "[{\"text\":\"Let's do it!\",\"id\":\"submit\"},{\"text\":\"Submit\",\"id\":\"submit\"},{\"text\":\"Great, can't wait!\",\"id\":\"submit\"}]"
+            "content": "[{\"text\":\"Let's do it!\",\"id\":\"submit\"}]"
           },
           {
-            "description": "finishPersonalQuiz",
+            "description": "Ava image path",
+            "type": "TEXT",
+            "content": "/public/Ava.png"
+          },
+          {
+            "description": "Finish personal quiz",
             "type": "TEXT",
             "content": "You are officially onboarded! 🥳 Soon I’ll send you an email with connectivity data. Stay tuned!"
           },
           {
-            "description": "goodbyeScreen",
+            "description": "Finish quiz button",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"Great, can't wait!\",\"id\":\"submit\"}]"
+          },
+          {
+            "description": "Goodbye screen",
             "type": "TEXT",
             "content": "You are the best 😘"
           },
           {
-            "description": "introScreen",
+            "description": "Intro screen",
             "type": "TEXT",
             "content": "Okay, first part done! Now, the fun part!I prepared 5 questions for you and your colleagues. Ready to start?"
+          },
+          {
+            "description": "Submit button",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"Submit\",\"id\":\"submit\"}]"
           },
           {
             "description": "question1",
