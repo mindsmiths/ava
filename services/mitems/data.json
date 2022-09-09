@@ -14,6 +14,21 @@
         ]
       },
       {
+        "name": "Confirming quiz guesses",
+        "elements": [
+          {
+            "description": "Button",
+            "type": "TEXT",
+            "content": "Okay"
+          },
+          {
+            "description": "Title",
+            "type": "TEXT",
+            "content": "Okay great! I'll send Melissa's answers to my other AI assistant who'll try to guess what kind of person she is."
+          }
+        ]
+      },
+      {
         "name": "Days",
         "elements": [
           {
@@ -34,6 +49,51 @@
         ]
       },
       {
+        "name": "Guessing options",
+        "elements": [
+          {
+            "description": "Options",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"The Joker\",\"id\":\"0\"},{\"text\":\"The Godfather\",\"id\":\"1\"},{\"text\":\"Her\",\"id\":\"2\"},{\"text\":\"Maldivi\",\"id\":\"3\"},{\"text\":\"Petrinja\",\"id\":\"4\"},{\"text\":\"Vienna\",\"id\":\"5\"}]"
+          }
+        ]
+      },
+      {
+        "name": "Guessing questions",
+        "elements": [
+          {
+            "description": "Questions",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"Last movie Melissa watched is\",\"id\":\"0\"},{\"text\":\"Last place Melissa has visited is\",\"id\":\"1\"}]"
+          }
+        ]
+      },
+      {
+        "name": "Guessing quiz intro screen title",
+        "elements": [
+          {
+            "description": "Button",
+            "type": "TEXT",
+            "content": "Let's start!"
+          },
+          {
+            "description": "Title",
+            "type": "TEXT",
+            "content": "Okay! I prepared 2 questions about Melissa. Ready to start?"
+          }
+        ]
+      },
+      {
+        "name": "Message about not working hours for links",
+        "elements": [
+          {
+            "description": "Title",
+            "type": "TEXT",
+            "content": "Sorry, time has passed. Better luck next time ;)"
+          }
+        ]
+      },
+      {
         "name": "Stay tuned second confirmation of available days",
         "elements": [
           {
@@ -50,6 +110,16 @@
             "description": "Title",
             "type": "TEXT",
             "content": "When works best?"
+          }
+        ]
+      },
+      {
+        "name": "Title for person who is not available any day",
+        "elements": [
+          {
+            "description": "Title",
+            "type": "TEXT",
+            "content": "Sorry to hear that :(\nHope to see you next week"
           }
         ]
       }

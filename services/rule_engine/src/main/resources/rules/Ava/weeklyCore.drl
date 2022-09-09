@@ -4,13 +4,33 @@ import java.util.*;
 
 import com.mindsmiths.armory.events.UserConnectedEvent
 import com.mindsmiths.armory.events.SubmitEvent
+import com.mindsmiths.ruleEngine.model.Heartbeat;
+import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
 
 import agents.Ava;
 import agents.CultureMaster;
 import signals.DayChoiceSignal;
 
-rule "Best Time"
+
+rule "Non working hours message"
     when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        eval(!evaluateCronExpression("* * 9-23 * * WED", ts, "Europe/Zagreb") 
+        || (!evaluateCronExpression("* * * * * THU", ts, "Europe/Zagreb"))
+        || (!evaluateCronExpression("* * 00-14 * * FRI", ts, "Europe/Zagreb")))
+        signal: UserConnectedEvent() from entry-point "signals"
+        agent: Ava()
+    then 
+        agent.notWorkingHours();
+        delete(signal);
+end
+
+rule "Ask for available days"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        eval(evaluateCronExpression("* 9-23 * * WED", ts, "Europe/Zagreb") 
+        || (evaluateCronExpression("* * * * THU", ts, "Europe/Zagreb"))
+        || (evaluateCronExpression("* 00-14 * * FRI", ts, "Europe/Zagreb")))
         signal: UserConnectedEvent() from entry-point "signals"
         agent: Ava()
     then 
@@ -18,13 +38,24 @@ rule "Best Time"
         delete(signal);
 end
 
+rule "Proceed to person is not available"
+    when 
+        signal: SubmitEvent((getParamAsString("submit") == "confirmDays") && (signal.getParam("availableDays") == [])) from entry-point "signals"
+        agent: Ava()
+    then
+        agent.showNotAvailable();
+        ArrayList<String> days = null;
+        agent.send(CultureMaster.ID, new DayChoiceSignal(days)); 
+        delete(signal);
+end
+
 rule "Confirm days"
     when 
-        signal: SubmitEvent(getParamAsString("submit") == "confirmDays") from entry-point "signals"
+        signal: SubmitEvent((getParamAsString("submit") == "confirmDays")) from entry-point "signals"
         agent: Ava()
     then
         agent.confirmingDaysScreen();
-        ArrayList<String> days = (ArrayList<String>)(signal.getParam("days"));
+        ArrayList<String> days = (ArrayList<String>)(signal.getParam("availableDays"));
         agent.send(CultureMaster.ID, new DayChoiceSignal(days));
         delete(signal);
 end

@@ -1,6 +1,6 @@
 package signals;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import com.mindsmiths.sdk.core.api.Signal;
 
@@ -13,5 +13,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class DayChoiceSignal extends Signal {
-    ArrayList<String> notFreeDays;    
+    List<String> notFreeDays;    
 }

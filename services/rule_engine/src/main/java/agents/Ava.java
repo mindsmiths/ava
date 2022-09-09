@@ -6,6 +6,7 @@ import com.mindsmiths.armory.ArmoryAPI;
 import com.mindsmiths.armory.templates.*;
 import com.mindsmiths.armory.components.*;
 import com.mindsmiths.mitems.Mitems;
+import com.mindsmiths.mitems.Option;
 import com.mindsmiths.ruleEngine.model.Agent;
 
 import lombok.*;
@@ -34,38 +35,42 @@ public class Ava extends Agent {
         ArmoryAPI.showScreens(getConnection("armory"), firstScreenId, screens);
     }
 
+    public void notWorkingHours() {
+        BaseTemplate notWorkingScreen = new TemplateGenerator()
+            .addComponent("title", new TitleComponent(Mitems.getText("weekly-core.message-about-not-working-hours-for-links.title")));
+        showScreen(notWorkingScreen);
+    }
+
     public void chooseAvailableDaysScreen() {
-        String title = Mitems.getText("weekly-core.title-asking-for-available-days.title");
-        String description = Mitems.getText("weekly-core.description-asking-for-available-days.text");
-        com.mindsmiths.mitems.Option[] days = Mitems.getOptions("weekly-core.days.each-day");
+        Option[] days = Mitems.getOptions("weekly-core.days.each-day");
+        List<CloudSelectComponent.Option> options = new ArrayList<>();
         
-        List<CloudSelectComponent.Option> options = List.of(
-            new CloudSelectComponent.Option(days[0].getText(), "0", true),
-            new CloudSelectComponent.Option(days[1].getText(), "1", true),
-            new CloudSelectComponent.Option(days[2].getText(), "2", true),
-            new CloudSelectComponent.Option(days[3].getText(), "3", true),
-            new CloudSelectComponent.Option(days[4].getText(), "4", true)
-        );
+        for(int i = 0; i < days.length; i++) {
+            options.add(new CloudSelectComponent.Option(days[i].getText(), Integer.toString(i), true));
+        }
 
         BaseTemplate daysScreen = new TemplateGenerator()
-            .addComponent("title", new TitleComponent(title))
-            .addComponent("text", new DescriptionComponent(description))
+            .addComponent("title", new TitleComponent(Mitems.getText("weekly-core.title-asking-for-available-days.title")))
+            .addComponent("text", new DescriptionComponent(Mitems.getText("weekly-core.description-asking-for-available-days.text")))
             .addComponent("cloudSelect", new CloudSelectComponent("availableDays", options))
             .addComponent("submit", new PrimarySubmitButtonComponent("submit", "confirmDays"));
         showScreen(daysScreen);
     }
 
-    public void confirmingDaysScreen() {
-        String title1 = Mitems.getText("weekly-core.confirmation-of-choosen-available-days.title");
-        String title2 = Mitems.getText("weekly-core.stay-tuned-second-confirmation-of-available-days.title");
-        Map<String, BaseTemplate> screens = Map.of(
-            "confirmDaysScreen", new TemplateGenerator("confirmScreen")
-                .addComponent("title", new TitleComponent(title1))
-                .addComponent("button", new PrimarySubmitButtonComponent("submit", "confirmDaysAndThanksScreen")),
-            "confirmDaysAndThanksScreen", new TemplateGenerator("confirmAndThanksScreen")
-                .addComponent("title", new TitleComponent(title2))
-        );
-    showScreens("confirmDaysScreen", screens);
+    public void showNotAvailable() {
+        BaseTemplate notAvailableScreen = new TemplateGenerator()
+            .addComponent("title", new TitleComponent(Mitems.getText("weekly-core.title-for-person-who-is-not-available-any-day.title")));
+        showScreen(notAvailableScreen);
     }
 
+    public void confirmingDaysScreen() {
+        Map<String, BaseTemplate> screens = Map.of(
+            "confirmDaysScreen", new TemplateGenerator("confirmScreen")
+                .addComponent("title", new TitleComponent(Mitems.getText("weekly-core.confirmation-of-choosen-available-days.title")))
+                .addComponent("button", new PrimarySubmitButtonComponent("submit", "confirmDaysAndThanksScreen")),
+            "confirmDaysAndThanksScreen", new TemplateGenerator("confirmAndThanksScreen")
+                .addComponent("title", new TitleComponent(Mitems.getText("weekly-core.stay-tuned-second-confirmation-of-available-days.title")))
+        );
+        showScreens("confirmDaysScreen", screens);
+    }
 }
