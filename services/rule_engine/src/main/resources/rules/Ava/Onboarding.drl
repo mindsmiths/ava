@@ -16,3 +16,17 @@ rule "First contact"
     then
         Log.info("Created new Ava agent.");
 end
+
+rule "Send welcome email"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        agent: Ava(
+            workingHours == true,
+            welcomeEmailSent == false
+        )
+    then
+        agent.sendWelcomeEmail();
+        modify(agent) {
+            setWelcomeEmailSent(true)
+        };
+end
