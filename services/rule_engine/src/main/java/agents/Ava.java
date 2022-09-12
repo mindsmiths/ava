@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -43,7 +44,7 @@ public class Ava extends Agent {
 
     private boolean workingHours;
     private boolean welcomeEmailSent;
-    private Boolean statisticsEmailSent;
+    private Date statsEmailLastSentAt;
 
     public Ava(String connectionName, String connectionId) {
         super(connectionName, connectionId);
@@ -196,7 +197,7 @@ public class Ava extends Agent {
         EmailAdapterAPI.newEmail(e);
     }
 
-    public void sendStatisticsEmail() throws IOException {
+    public void sendStatisticsEmail(Employee employee) throws IOException {
         String subject = Mitems.getText("statistics.statistics-email.subject");
         String description = Mitems.getText("statistics.statistics-email.description");
         String htmlTemplate = String.join("", Files.readAllLines(Paths.get("EmailTemplate.html"), StandardCharsets.UTF_8));
@@ -204,7 +205,7 @@ public class Ava extends Agent {
         String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
             "description", description,
             "callToAction", Mitems.getText("statistics.statistics-email.action"),
-            "firstName", "Juraj",
+            "firstName", employee.getFirstName(),
             "armoryUrl", String.format("%s/%s?trigger=show-stats", Settings.ARMORY_SITE_URL, getConnection("armory"))
         ));
 

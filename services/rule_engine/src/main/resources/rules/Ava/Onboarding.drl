@@ -17,8 +17,9 @@ rule "Send welcome email"
             workingHours == true,
             welcomeEmailSent == false
         )
+        employee: Employee()
     then
-        agent.sendWelcomeEmail();
+        agent.sendWelcomeEmail(employee);
         modify(agent) {
             setWelcomeEmailSent(true)
         };
