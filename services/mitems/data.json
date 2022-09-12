@@ -14,12 +14,17 @@
           {
             "description": "Familiarity quiz final button",
             "type": "OPTIONS",
-            "content": "[{\"text\":\"Sure thing!\",\"id\":\"submit\"}]"
+            "content": "[{\"text\":\"Bye now!\",\"id\":\"submit\"}]"
           },
           {
             "description": "Finish familiarity quiz text",
             "type": "TEXT",
-            "content": "Thanks! I’ll check in with you from time to time to ask about other people too, but for now I have enough to get us started. Ready for fun part?"
+            "content": "You did a great job, it’s time I let you go back to work 😁\n\nYou can expect an email from me in the near future, I will let you and the team know how you stand in terms of connectivity and start matching you guys for work lunches.\n"
+          },
+          {
+            "description": "Goodbye screen",
+            "type": "TEXT",
+            "content": "You are the best 😘"
           },
           {
             "description": "Intro button",
@@ -29,12 +34,12 @@
           {
             "description": "Intro screen description",
             "type": "TEXT",
-            "content": "Next week I will match you with someone interesting from your organization to spend quality time with over lunch. \n\nBut first, let’s see how well you know your colleagues…\n\n"
+            "content": "I will show you a list of names, feel free to choose those you know better than others.\nYou can choose more than one person.\n\nYou can also decide to not choose anyone if you feel like you don’t know anyone on the list that well.\n"
           },
           {
             "description": "Intro screen title",
             "type": "TEXT",
-            "content": "So good to see you!"
+            "content": "Who do you know better?"
           },
           {
             "description": "Submit button",
@@ -79,22 +84,12 @@
           {
             "description": "Finish personal quiz",
             "type": "TEXT",
-            "content": "You are officially onboarded! 🥳 Soon I’ll send you an email with connectivity data. Stay tuned!"
+            "content": "This was great, you’re such an interesting person! Thank you 🥳\n\nNow let’s see how connected you are to others in your organization!"
           },
           {
             "description": "Finish quiz button",
             "type": "OPTIONS",
-            "content": "[{\"text\":\"Great, can't wait!\",\"id\":\"submit\"}]"
-          },
-          {
-            "description": "Goodbye screen",
-            "type": "TEXT",
-            "content": "You are the best 😘"
-          },
-          {
-            "description": "Intro screen",
-            "type": "TEXT",
-            "content": "Okay, first part done! Now, the fun part!I prepared 5 questions for you and your colleagues. Ready to start?"
+            "content": "[{\"text\":\"Great, let's do it\",\"id\":\"submit\"}]"
           },
           {
             "description": "Submit button",
@@ -104,12 +99,22 @@
           {
             "description": "question1",
             "type": "TEXT",
-            "content": "🌴What is the name of the last song you listened to?"
+            "content": "🌴When do you feel most productive?"
           },
           {
             "description": "question2",
             "type": "TEXT",
-            "content": "💃What is the name of the last TV show you watched?"
+            "content": "💃Have you ever binge watched a good show? Name the first that comes to mind."
+          },
+          {
+            "description": "question3",
+            "type": "TEXT",
+            "content": "🌴Name one song that you could listen on repeat."
+          },
+          {
+            "description": "question4",
+            "type": "TEXT",
+            "content": "🌴Describe your version of the perfect work lunch."
           }
         ]
       }

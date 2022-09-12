@@ -29,7 +29,7 @@ import signals.DayChoiceSignal;
 @ToString(callSuper = true)
 @NoArgsConstructor
 public class Ava extends Agent {
-    OnboardingStage onboardingStage;
+    private OnboardingStage onboardingStage;
 
     public Ava(String connectionName, String connectionId) {
         super(connectionName, connectionId);
@@ -93,11 +93,15 @@ public class Ava extends Agent {
                     .addComponent("image", new ImageComponent(avaImagePath))
                     .addComponent("title", new TitleComponent(finishFamiliarityQuizText))
                     .addComponent(familiarityQuizFinalButton[0].getId(), new PrimarySubmitButtonComponent(
-                        familiarityQuizFinalButton[0].getId(), familiarityQuizFinalButton[0].getText(), "finished"))
+                        familiarityQuizFinalButton[0].getId(), familiarityQuizFinalButton[0].getText(), "finished-familiarity-quiz"))
+                            );
+                String goodbyeScreen = Mitems.getText("onboarding.familiarity-quiz.goodbye-screen");
+                screens.put("finished-familiarity-quiz", new TemplateGenerator("goodbye")
+                    .addComponent("title", new TitleComponent(goodbyeScreen))
                             );
                 break;
             }
-        }  
+        }
         showScreens("introScreen", screens);
     }
 
@@ -105,15 +109,6 @@ public class Ava extends Agent {
         Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
         String avaImagePath = Mitems.getText("onboarding.personal-quiz.ava-image-path");
 
-        // Adding intro screen
-        Option[] acceptButton = Mitems.getOptions("onboarding.personal-quiz.accept-button");
-        String introScreen = Mitems.getText("onboarding.personal-quiz.intro-screen");
-
-        screens.put("introScreen", new TemplateGenerator("introScreen")
-            .addComponent("title", new TitleComponent(introScreen))
-            .addComponent(acceptButton[0].getId(), new PrimarySubmitButtonComponent(
-                acceptButton[0].getId(), acceptButton[0].getText(), "question1"))
-                    );
         // Adding questions and final screens
         int questionNum = 1;
         while(true){
@@ -147,20 +142,22 @@ public class Ava extends Agent {
                     .addComponent("image", new ImageComponent(avaImagePath))
                     .addComponent("title", new TitleComponent(finishPersonalQuiz))
                     .addComponent(finishQuizButton[0].getId(), new PrimarySubmitButtonComponent(
-                        finishQuizButton[0].getId(), finishQuizButton[0].getText(), "goodbye"))
-                            );
-                String goodbyeScreen = Mitems.getText("onboarding.personal-quiz.goodbye-screen");
-                screens.put("goodbye", new TemplateGenerator("goodbye")
-                    .addComponent("title", new TitleComponent(goodbyeScreen))
+                        finishQuizButton[0].getId(), finishQuizButton[0].getText(), "finished-personal-quiz"))
                             );
                 break;
             }
         }
-        showScreens("introScreen", screens);
+        showScreens("question1", screens);
+    }
+
+    public void showFinalScreen() {
+        String goodbyeScreen = Mitems.getText("onboarding.familiarity-quiz.goodbye-screen");
+        BaseTemplate screen = new TemplateGenerator("goodbye").addComponent("title", new TitleComponent(goodbyeScreen));
+        showScreen(screen);
     }
 
     public void sendData(ArrayList<Integer> freeDays) {
         send("CultureMaster", new DayChoiceSignal(freeDays));
     }
- 
+    
 }
