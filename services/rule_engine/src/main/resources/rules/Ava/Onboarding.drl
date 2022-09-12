@@ -3,9 +3,9 @@ package rules.Ava;
 import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.ruleEngine.util.Agents;
 import com.mindsmiths.ruleEngine.model.Initialize;
-import signals.RequestAvailableDays;
-import signals.SendAvailableDays;
-import signals.NewAvaRegistered;
+import signals.RequestAvailableDaysSignal;
+import signals.AvailableDaysSignal;
+import signals.AvaRegisteredSignal;
 import signals.MatchInfoSignal;
 import agents.Ava;
 import agents.CultureMaster;
@@ -16,18 +16,18 @@ rule "First contact"
         initialize: Initialize() from entry-point "agent-created"
         agent: Ava()
     then
-        agent.send(CultureMaster.ID, new NewAvaRegistered(agent.getId()));
+        agent.send(CultureMaster.ID, new AvaRegisteredSignal(agent.getId()));
         Log.info("Sent my id to CM " + agent.getId());
         delete(initialize);
 end
 
 rule "Send Available Days"
     when
-        signal: RequestAvailableDays() from entry-point "signals"
+        signal: RequestAvailableDaysSignal() from entry-point "signals"
         agent: Ava()
     then
         modify(agent) {updateAvaAvailability()};
-        agent.send(CultureMaster.ID, new SendAvailableDays(agent.getAvaAvailability()));
+        agent.send(CultureMaster.ID, new AvailableDaysSignal(agent.getAvaAvailability()));
         delete(signal)
 end
 

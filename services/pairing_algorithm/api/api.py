@@ -24,5 +24,5 @@ class Match(ExtendableModel):
     day: Days
 
 
-class AllMatches(ExtendableModel):
+class Matches(ExtendableModel):
     allMatches: List[Match]

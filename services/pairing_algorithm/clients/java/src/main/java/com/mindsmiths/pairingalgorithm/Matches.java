@@ -11,6 +11,6 @@ import lombok.AllArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AllMatches implements Serializable {
+public class Matches implements Serializable {
     private List<Match> allMatches;
 }

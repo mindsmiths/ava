@@ -5,10 +5,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import com.mindsmiths.sdk.core.api.Signal;
+import com.mindsmiths.pairingalgorithm.AvaAvailability;
 
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
-public class NewAvaRegistered extends Signal{
-    String avaId;
+public class AvailableDaysSignal extends Signal {
+    AvaAvailability avaAvailability;
 }

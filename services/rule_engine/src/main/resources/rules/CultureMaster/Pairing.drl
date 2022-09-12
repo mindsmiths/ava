@@ -6,10 +6,10 @@ import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.ruleEngine.model.Heartbeat;
 import com.mindsmiths.ruleEngine.util.Agents;
 import com.mindsmiths.ruleEngine.model.Initialize;
-import com.mindsmiths.pairingalgorithm.AllMatches;
-import signals.NewAvaRegistered;
-import signals.RequestAvailableDays;
-import signals.SendAvailableDays;
+import com.mindsmiths.pairingalgorithm.Matches;
+import signals.AvaRegisteredSignal;
+import signals.RequestAvailableDaysSignal;
+import signals.AvailableDaysSignal;
 import agents.CultureMaster;
 
 
@@ -24,7 +24,7 @@ end
 
 rule "Add New Ava"
     when
-        signal: NewAvaRegistered() from entry-point "signals"
+        signal: AvaRegisteredSignal() from entry-point "signals"
         agent: CultureMaster()
     then
         modify(agent) {addNewAva(signal.getAvaId())};
@@ -41,19 +41,19 @@ rule "Request Availability Data"
 
         for (String ava : agent.getAvaIDs()) {
             Log.info("Requesting from " + ava);
-            agent.send(ava, new RequestAvailableDays());
+            agent.send(ava, new RequestAvailableDaysSignal());
         }
 end
 
 rule "Accept Availability Data"
     when
-        signal: SendAvailableDays() from entry-point "signals"
+        signal: AvailableDaysSignal() from entry-point "signals"
         agent: CultureMaster()
     then
         Log.info("Got some data :)");
         modify(agent) {addAvaAvailability(signal.getAvaAvailability())};
         // we can generate new pairs only when we have info from all Avas
-        if(agent.getAvaIDs().size() == agent.getAvaAvailabilities().size()) {
+        if(agent.getAvaIDs().size() == agent.getAvaAvailabilities().size()) {  //!!!!!!!!!!!!
             modify(agent) {setCanGenerate(true)};
         }
         delete(signal);
@@ -75,7 +75,7 @@ end
 
 rule "Accept Generated Pairs"
     when
-        matches: AllMatches() from entry-point "signals"
+        matches: Matches() from entry-point "signals"
         agent: CultureMaster()
     then
         modify(agent) {addMatches(matches.getAllMatches()), setSendGenerated(true)};

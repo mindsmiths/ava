@@ -6,7 +6,7 @@ from forge.conf import settings as forge_settings
 from forge.core.api import api
 from forge.core.base import BaseService
 
-from .api import AllMatches
+from .api import Matches
 from .api import AvaAvailability
 from .api import Match
 
@@ -17,7 +17,7 @@ class PairingAlgorithm(BaseService):
 
     @api
     def generate_pairs(self,
-                       avaAvailabilities: List[AvaAvailability]) -> AllMatches:
+                       avaAvailabilities: List[AvaAvailability]) -> Matches:
         all_matches: List[Match] = []
         already_added = set()
 
@@ -40,4 +40,4 @@ class PairingAlgorithm(BaseService):
                     already_added.add(second.agentId)
                     break
 
-        return AllMatches(allMatches=all_matches)
+        return Matches(allMatches=all_matches)
