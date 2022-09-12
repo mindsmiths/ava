@@ -16,12 +16,6 @@ public class Runner extends RuleEngineService {
         if (!Agents.exists(CultureMaster.ID))
             Agents.createAgent(new agents.CultureMaster());
 
-        // test
-            Ava ava = new Ava("email", "tomislav.matic01@gmail.com");
-            ava.addConnection("armory", "tomislav");
-            Agents.createAgent(ava);
-        // test
-
         addListener(Flow.class, DataUtils::save);
         addListener(Employee.class, DataUtils::save);
     }
@@ -30,5 +24,4 @@ public class Runner extends RuleEngineService {
         Runner runner = new Runner();
         runner.start();
     }
-
 }

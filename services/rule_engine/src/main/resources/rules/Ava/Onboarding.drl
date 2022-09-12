@@ -10,18 +10,6 @@ import com.mindsmiths.armory.events.SubmitEvent;
 import agents.Ava;
 import models.OnboardingStage;
 
-rule "Start familiarity quiz"
-    when
-        signal: UserConnectedEvent() from entry-point "signals"
-        agent: Ava()
-    then
-        agent.showFamiliarityQuizScreens();
-        modify(agent) {
-            setOnboardingStage(OnboardingStage.FamiliarityQuiz)
-        };
-        delete(signal);
-end
-
 rule "Send welcome email"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
@@ -34,6 +22,18 @@ rule "Send welcome email"
         modify(agent) {
             setWelcomeEmailSent(true)
         };
+end
+
+rule "Start familiarity quiz"
+    when
+        signal: UserConnectedEvent() from entry-point "signals"
+        agent: Ava()
+    then
+        agent.showFamiliarityQuizScreens();
+        modify(agent) {
+            setOnboardingStage(OnboardingStage.FamiliarityQuiz)
+        };
+        delete(signal);
 end
 
 rule "Start personal quiz"

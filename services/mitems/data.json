@@ -15,6 +15,11 @@
             "description": "Subject",
             "type": "TEXT",
             "content": "Welcome onboard!"
+          },
+          {
+            "description": "Action",
+            "type": "TEXT",
+            "content": "Let's start"
           }
         ]
       },
@@ -146,6 +151,11 @@
             "description": "Subject",
             "type": "TEXT",
             "content": "Statistics"
+          },
+          {
+            "description": "Action",
+            "type": "TEXT",
+            "content": "Let me see!!!"
           }
         ]
       }

@@ -72,7 +72,7 @@ services:
     type: python
     version: 4.0.0a4
     env:
-      HEARTBEAT_CYCLE: 1
+      HEARTBEAT_CYCLE: 30
     db:
       mongo: true
     dependencies:
@@ -116,7 +116,6 @@ services:
       memory: 67Mi
 
   email-adapter:
-    enabled: true
     type: python
     version: 4.0.0a10
     env:
@@ -146,7 +145,6 @@ services:
       memory: 75Mi
 
   armory:
-    enabled: true
     type: django
     version: 4.0.0a12
     command:

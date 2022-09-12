@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 
 import com.mindsmiths.emailAdapter.EmailAdapterAPI;
 import com.mindsmiths.emailAdapter.SendEmailPayload;
+import com.mindsmiths.employeeManager.employees.Employee;
 import com.mindsmiths.mitems.Mitems;
 import com.mindsmiths.mitems.Option;
 import com.mindsmiths.ruleEngine.model.Agent;
@@ -176,16 +177,16 @@ public class Ava extends Agent {
         send("CultureMaster", new DayChoiceSignal(freeDays));
     }
 
-    public void sendWelcomeEmail() throws IOException {
+    public void sendWelcomeEmail(Employee employee) throws IOException {
         String subject = Mitems.getText("onboarding.welcome-email.subject");
         String description = Mitems.getText("onboarding.welcome-email.description");
         String htmlTemplate = String.join("", Files.readAllLines(Paths.get("EmailTemplate.html"), StandardCharsets.UTF_8));
 
         String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
             "description", description,
-            "callToAction", "Let's go",
-            "firstName", "Juraj",
-            "armoryUrl", String.format("%s/%s", Settings.ARMORY_SITE_URL, getConnection("armory"))
+            "callToAction", Mitems.getText("onboarding.welcome-email.action"),
+            "firstName", employee.getFirstName(),
+            "armoryUrl", String.format("%s/%s?trigger=start-onboarding", Settings.ARMORY_SITE_URL, getConnection("armory"))
         ));
 
         SendEmailPayload e = new SendEmailPayload();
@@ -202,9 +203,9 @@ public class Ava extends Agent {
 
         String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
             "description", description,
-            "callToAction", "Let me see!!!",
+            "callToAction", Mitems.getText("statistics.statistics-email.action"),
             "firstName", "Juraj",
-            "armoryUrl", String.format("%s/%s", Settings.ARMORY_SITE_URL, getConnection("armory"))
+            "armoryUrl", String.format("%s/%s?trigger=show-stats", Settings.ARMORY_SITE_URL, getConnection("armory"))
         ));
 
         SendEmailPayload e = new SendEmailPayload();
