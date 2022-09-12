@@ -7,6 +7,7 @@ import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.ruleEngine.util.Agents;
 import com.mindsmiths.armory.events.UserConnectedEvent;
 import com.mindsmiths.armory.events.SubmitEvent;
+import com.mindsmiths.employeeManager.employees.Employee;
 import agents.Ava;
 import models.OnboardingStage;
 
