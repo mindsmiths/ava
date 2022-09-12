@@ -29,6 +29,7 @@ public class Ava extends Agent {
 
     private boolean workingHours;
     private boolean welcomeEmailSent;
+    private Boolean statisticsEmailSent;
 
     public Ava(String connectionName, String connectionId) {
         super(connectionName, connectionId);
@@ -46,6 +47,25 @@ public class Ava extends Agent {
         String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
             "description", description,
             "callToAction", "Let's go",
+            "firstName", "Juraj",
+            "armoryUrl", String.format("%s/%s", Settings.ARMORY_SITE_URL, getConnection("armory"))
+        ));
+
+        SendEmailPayload e = new SendEmailPayload();
+        e.setRecipients(List.of(getConnection("email")));
+        e.setSubject(subject);
+        e.setHtmlText(htmlBody);
+        EmailAdapterAPI.newEmail(e);
+    }
+
+    public void sendStatisticsEmail() throws IOException {
+        String subject = Mitems.getText("statistics.statistics-email.subject");
+        String description = Mitems.getText("statistics.statistics-email.description");
+        String htmlTemplate = String.join("", Files.readAllLines(Paths.get("EmailTemplate.html"), StandardCharsets.UTF_8));
+
+        String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
+            "description", description,
+            "callToAction", "Let me see!!!",
             "firstName", "Juraj",
             "armoryUrl", String.format("%s/%s", Settings.ARMORY_SITE_URL, getConnection("armory"))
         ));

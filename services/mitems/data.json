@@ -19,5 +19,26 @@
         ]
       }
     ]
+  },
+  {
+    "title": "Statistics",
+    "description": "Flow which displays statistics about company silos to users",
+    "items": [
+      {
+        "name": "Statistics email",
+        "elements": [
+          {
+            "description": "Description",
+            "type": "HTML",
+            "content": "<p>Dear {{ firstName }},</p>\n<p><span style=\"font-weight: 400;\">Thank you for taking the time to help me analyze our individual relations and learn more about you.</span></p>\n<p><span style=\"font-weight: 400;\">Based on your feedback I was able to identify our current level of exposure to risk of knowledge silos.</span></p>\n<p><span style=\"font-weight: 400;\">Take a look at where we stand right now, we will work together to break the silos and observe our impact on the trend in the future.</span></p>"
+          },
+          {
+            "description": "Subject",
+            "type": "TEXT",
+            "content": "Statistics"
+          }
+        ]
+      }
+    ]
   }
 ]
