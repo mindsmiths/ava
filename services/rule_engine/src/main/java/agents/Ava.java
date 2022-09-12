@@ -93,7 +93,11 @@ public class Ava extends Agent {
                     .addComponent("image", new ImageComponent(avaImagePath))
                     .addComponent("title", new TitleComponent(finishFamiliarityQuizText))
                     .addComponent(familiarityQuizFinalButton[0].getId(), new PrimarySubmitButtonComponent(
-                        familiarityQuizFinalButton[0].getId(), familiarityQuizFinalButton[0].getText(), "finished"))
+                        familiarityQuizFinalButton[0].getId(), familiarityQuizFinalButton[0].getText(), "goodbye"))
+                            );
+                String goodbyeScreen = Mitems.getText("onboarding.familiarity-quiz.goodbye-screen");
+                screens.put("goodbye", new TemplateGenerator("goodbye")
+                    .addComponent("title", new TitleComponent(goodbyeScreen))
                             );
                 break;
             }
@@ -106,6 +110,7 @@ public class Ava extends Agent {
         String avaImagePath = Mitems.getText("onboarding.personal-quiz.ava-image-path");
 
         // Adding intro screen
+        /*
         Option[] acceptButton = Mitems.getOptions("onboarding.personal-quiz.accept-button");
         String introScreen = Mitems.getText("onboarding.personal-quiz.intro-screen");
 
@@ -114,6 +119,7 @@ public class Ava extends Agent {
             .addComponent(acceptButton[0].getId(), new PrimarySubmitButtonComponent(
                 acceptButton[0].getId(), acceptButton[0].getText(), "question1"))
                     );
+        */
         // Adding questions and final screens
         int questionNum = 1;
         while(true){
@@ -147,16 +153,12 @@ public class Ava extends Agent {
                     .addComponent("image", new ImageComponent(avaImagePath))
                     .addComponent("title", new TitleComponent(finishPersonalQuiz))
                     .addComponent(finishQuizButton[0].getId(), new PrimarySubmitButtonComponent(
-                        finishQuizButton[0].getId(), finishQuizButton[0].getText(), "goodbye"))
-                            );
-                String goodbyeScreen = Mitems.getText("onboarding.personal-quiz.goodbye-screen");
-                screens.put("goodbye", new TemplateGenerator("goodbye")
-                    .addComponent("title", new TitleComponent(goodbyeScreen))
+                        finishQuizButton[0].getId(), finishQuizButton[0].getText(), "finished"))
                             );
                 break;
             }
         }
-        showScreens("introScreen", screens);
+        showScreens("question1", screens);
     }
 
     public void sendData(ArrayList<Integer> freeDays) {

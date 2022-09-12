@@ -5,10 +5,22 @@ import com.mindsmiths.armory.events.SubmitEvent;
 import agents.Ava;
 import models.OnboardingStage;
 
-rule "Start familiarity quiz"
+rule "Start personal quiz"
    when
         signal: UserConnectedEvent() from entry-point "signals"
         agent: Ava()
+   then
+        agent.showPersonalQuizScreens();
+        modify(agent) {
+            setOnboardingStage(OnboardingStage.PERSONAL_QUIZ)
+        };
+        delete(signal);
+end
+
+rule "Start familiarity quiz"
+   when
+        signal: SubmitEvent(getParamAsString("submit") == "finished") from entry-point "signals"
+        agent: Ava(onboardingStage == OnboardingStage.PERSONAL_QUIZ)
    then
         agent.showFamiliarityQuizScreens();
         modify(agent) {
@@ -17,14 +29,13 @@ rule "Start familiarity quiz"
         delete(signal);
 end
 
-rule "Start personal quiz"
+rule "Finish onboarding"
    when
-        signal: SubmitEvent(getParamAsString("submit") == "finished") from entry-point "signals"
+        signal: SubmitEvent(getParamAsString("submit") == "goodbye") from entry-point "signals"
         agent: Ava(onboardingStage == OnboardingStage.FAMILIARITY_QUIZ)
    then
-        agent.showPersonalQuizScreens();
         modify(agent) {
-            setOnboardingStage(OnboardingStage.PERSONAL_QUIZ)
+            setOnboardingStage(OnboardingStage.ONBOARDING_FINISHED)
         };
         delete(signal);
 end
