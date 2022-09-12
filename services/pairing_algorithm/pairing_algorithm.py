@@ -28,8 +28,8 @@ class PairingAlgorithm(BaseService):
                 if second.agentId in already_added:
                     continue
                 possible_days = (
-                    first.availableDays
-                    ).intersection(second.availableDays)
+                    set(first.availableDays)
+                    ).intersection(set(second.availableDays))
                 if possible_days:
                     all_matches.append(Match(
                         first=first.agentId,

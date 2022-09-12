@@ -8,6 +8,7 @@ import com.mindsmiths.pairingalgorithm.PairingAlgorithmAPI;
 import com.mindsmiths.pairingalgorithm.AvaAvailability;
 import com.mindsmiths.pairingalgorithm.Match;
 import com.mindsmiths.ruleEngine.model.Agent;
+
 import signals.MatchInfoSignal;
 
 @Data
@@ -15,11 +16,7 @@ public class CultureMaster extends Agent {
     private List<AvaAvailability> avaAvailabilities = new ArrayList<>();
     private List<Match> allMatches = new ArrayList<>();
     private List<String> avaIDs = new ArrayList<>();
-    private Date lastRequestDataTime = new Date();
-    private boolean sentGenerate = false;
-    private boolean sentCollect = false; 
-    private boolean canGenerate = false; 
-    private boolean sendGenerated = false; 
+    private CultureMasterWeeklyStage weeklyStage = CultureMasterWeeklyStage.COLLECT_AVA_AVAILABILITIES;
     public static String ID = "CULTURE_MASTER";
 
     public CultureMaster() {
@@ -39,10 +36,7 @@ public class CultureMaster extends Agent {
     }
 
     public void generateMatches() {
-        if(!sentGenerate) {
             PairingAlgorithmAPI.generatePairs(new ArrayList<>(avaAvailabilities));
-            sentGenerate = true;
-        }  
     }
 
     public void addMatches(List<Match> allMatches) {

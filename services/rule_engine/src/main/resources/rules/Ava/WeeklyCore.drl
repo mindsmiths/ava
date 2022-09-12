@@ -1,0 +1,83 @@
+package rules.Ava;
+
+import java.util.*;
+
+import com.mindsmiths.armory.events.UserConnectedEvent
+import com.mindsmiths.armory.events.SubmitEvent
+import com.mindsmiths.ruleEngine.model.Heartbeat;
+import com.mindsmiths.pairingalgorithm.Days;
+import com.mindsmiths.pairingalgorithm.AvaAvailability;
+import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
+
+import agents.Ava;
+import agents.AvaWeeklyStage;
+import agents.CultureMaster;
+
+import signals.AvaAvailabilitySignal;
+import signals.MatchInfoSignal;
+
+// revertaj ruleove nazad
+rule "Non working hours message"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        eval(evaluateCronExpression("* * 9-23 * * WED", ts, "Europe/Zagreb") 
+        || (evaluateCronExpression("* * * * * THU", ts, "Europe/Zagreb"))
+        || (evaluateCronExpression("* * 00-14 * * FRI", ts, "Europe/Zagreb")))
+        signal: UserConnectedEvent() from entry-point "signals"
+        agent: Ava(weeklyStage == AvaWeeklyStage.FIND_AVAILABILITY)
+    then 
+        agent.notWorkingHours();
+        delete(signal);
+end
+
+rule "Ask for available days"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        eval(!evaluateCronExpression("* * 9-23 * * WED", ts, "Europe/Zagreb") 
+        || (!evaluateCronExpression("* * * * * THU", ts, "Europe/Zagreb"))
+        || (!evaluateCronExpression("* * 00-14 * * FRI", ts, "Europe/Zagreb")))
+        signal: UserConnectedEvent() from entry-point "signals"
+        agent: Ava(weeklyStage == AvaWeeklyStage.FIND_AVAILABILITY)
+    then 
+        // what if person decides to exit this screen without answering, now we can't get back because we are in the next stage
+        modify(agent) {setWeeklyStage(AvaWeeklyStage.FORWARD_AVAILABILITY)}
+        agent.chooseAvailableDaysScreen();
+        delete(signal);
+end
+
+rule "Proceed to person is not available"
+    when 
+        signal: SubmitEvent((getParamAsString("submit") == "confirmDays") && (signal.getParam("availableDays") == [])) from entry-point "signals"
+        agent: Ava(weeklyStage == AvaWeeklyStage.FORWARD_AVAILABILITY)
+    then
+        agent.showNotAvailable();
+        modify(agent) {updateAvailableDays((ArrayList<String>)(signal.getParam("availableDays")))};
+        agent.send(CultureMaster.ID, new AvaAvailabilitySignal(new AvaAvailability(agent.getId(), agent.getAvailableDays()))); 
+        modify(agent) {setWeeklyStage(AvaWeeklyStage.ACCEPT_MATCH_INFO)};
+        delete(signal);
+end
+
+rule "Confirm days"
+    when
+        // nece li ovo potencijalno hvatati i ove gore? stavit salience -10? 
+        signal: SubmitEvent((getParamAsString("submit") == "confirmDays")) from entry-point "signals"  
+        agent: Ava(weeklyStage == AvaWeeklyStage.FORWARD_AVAILABILITY)
+    then
+        agent.confirmingDaysScreen();
+        modify(agent) {updateAvailableDays((ArrayList<String>)(signal.getParam("availableDays")))};
+        agent.send(CultureMaster.ID, new AvaAvailabilitySignal(new AvaAvailability(agent.getId(), agent.getAvailableDays())));
+        modify(agent) {setWeeklyStage(AvaWeeklyStage.ACCEPT_MATCH_INFO)};
+        delete(signal);
+end
+
+rule "Accept Match Info"
+    when
+        signal: MatchInfoSignal() from entry-point "signals"
+        agent: Ava(weeklyStage == AvaWeeklyStage.ACCEPT_MATCH_INFO)
+    then
+        modify(agent) {setMatchName(signal.getMatchName()), setMatchDay(signal.getMatchDay())};
+        Log.info("I'm " + agent.getId() + " and my match is " + agent.getMatchName() + " on " + agent.getMatchDay());
+        delete(signal);
+end
+
+

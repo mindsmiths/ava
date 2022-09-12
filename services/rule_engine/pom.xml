@@ -48,13 +48,13 @@
 		</dependency>
 		<dependency>
 			<groupId>com.mindsmiths</groupId>
-			<artifactId>armory-client</artifactId>
-			<version>4.0.0a12</version>
+			<artifactId>pairing-algorithm-client</artifactId>
+			<version>4.0.0a0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.mindsmiths</groupId>
-			<artifactId>pairing-algorithm-client</artifactId>
-			<version>4.0.0a0</version>
+			<artifactId>armory-client</artifactId>
+			<version>4.0.0a14</version>
 		</dependency>
 	</dependencies>
 	<build>

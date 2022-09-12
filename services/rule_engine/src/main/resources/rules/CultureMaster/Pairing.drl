@@ -7,10 +7,13 @@ import com.mindsmiths.ruleEngine.model.Heartbeat;
 import com.mindsmiths.ruleEngine.util.Agents;
 import com.mindsmiths.ruleEngine.model.Initialize;
 import com.mindsmiths.pairingalgorithm.Matches;
+
 import signals.AvaRegisteredSignal;
 import signals.RequestAvailableDaysSignal;
-import signals.AvailableDaysSignal;
+import signals.AvaAvailabilitySignal;
+
 import agents.CultureMaster;
+import agents.CultureMasterWeeklyStage;
 
 
 rule "First contact"
@@ -20,9 +23,10 @@ rule "First contact"
         agent: CultureMaster()
     then
         Log.info("Created new CultureMaster agent.");
+        delete(initialize);
 end
 
-rule "Add New Ava"
+rule "Add New Ava Id"
     when
         signal: AvaRegisteredSignal() from entry-point "signals"
         agent: CultureMaster()
@@ -31,65 +35,58 @@ rule "Add New Ava"
         delete(signal);
 end
 
-rule "Request Availability Data"
+rule "Accept Ava Availability"
     when
-        Heartbeat(ts: timestamp) from entry-point "signals"
-        agent: CultureMaster(lastRequestDataTime before[10s] ts, sentCollect == false)
+        signal: AvaAvailabilitySignal() from entry-point "signals"
+        agent: CultureMaster(weeklyStage == CultureMasterWeeklyStage.COLLECT_AVA_AVAILABILITIES)
     then
-        modify(agent) {setLastRequestDataTime(new Date()), clearAvaAvailabilities(), setSentCollect(true)};
-        Log.info("Requesting availability data.......");
-
-        for (String ava : agent.getAvaIDs()) {
-            Log.info("Requesting from " + ava);
-            agent.send(ava, new RequestAvailableDaysSignal());
-        }
-end
-
-rule "Accept Availability Data"
-    when
-        signal: AvailableDaysSignal() from entry-point "signals"
-        agent: CultureMaster()
-    then
-        Log.info("Got some data :)");
+        Log.info("Received some ava availability\n");
         modify(agent) {addAvaAvailability(signal.getAvaAvailability())};
-        // we can generate new pairs only when we have info from all Avas
-        if(agent.getAvaIDs().size() == agent.getAvaAvailabilities().size()) {  //!!!!!!!!!!!!
-            modify(agent) {setCanGenerate(true)};
-        }
+        Log.info(agent.getAvaAvailabilities());
         delete(signal);
 end
 
+
+rule "Check That All Ava Availabilities Came"
+    when
+        Heartbeat() from entry-point "signals"
+        agent: CultureMaster(weeklyStage == CultureMasterWeeklyStage.COLLECT_AVA_AVAILABILITIES,
+                            avaIDs.size() == avaAvailabilities.size(),
+                            !avaIDs.isEmpty())
+    then
+        modify(agent) {setWeeklyStage(CultureMasterWeeklyStage.GENERATE_MATCHES)};
+end
 
 
 rule "Generate This Weeks Matches"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        agent: CultureMaster(canGenerate == true, sentGenerate == false)
+        agent: CultureMaster(weeklyStage == CultureMasterWeeklyStage.GENERATE_MATCHES)
     then
         Log.info("Generating matches....");
         Log.info("AvaIDs List: " + agent.getAvaIDs());
-        Log.info("Availability List: " + agent.getAvaAvailabilities());
-        modify(agent) {setCanGenerate(false)};
+        modify(agent) {setWeeklyStage(CultureMasterWeeklyStage.COLLECT_GENERATED_MATCHES)};
         agent.generateMatches();
 end
 
-rule "Accept Generated Pairs"
+rule "Accept Generated Matches"
     when
         matches: Matches() from entry-point "signals"
         agent: CultureMaster()
     then
-        modify(agent) {addMatches(matches.getAllMatches()), setSendGenerated(true)};
+        modify(agent) {addMatches(matches.getAllMatches())};
         Log.info("---------------------rezultati pairinga---------------------");
         Log.info(matches.getAllMatches());
+        modify(agent) {setWeeklyStage(CultureMasterWeeklyStage.SEND_TO_AVAS)};
         delete(matches);
 end
 
 rule "Send Match Info To Avas"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        agent: CultureMaster(sendGenerated == true)
+        agent: CultureMaster(weeklyStage == CultureMasterWeeklyStage.SEND_TO_AVAS)
     then
-        modify(agent) {setSendGenerated(false), sendMatchInfo()}
+        agent.sendMatchInfo();
 end
 
 

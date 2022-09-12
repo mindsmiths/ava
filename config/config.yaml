@@ -99,7 +99,7 @@ services:
     resources:
       cpu: 100m
       memory: 100Mi
-      
+
   mitems:
     type: django
     version: 4.0.0a9
@@ -149,10 +149,10 @@ services:
     resources:
       cpu: 50m
       memory: 75Mi
-      
+
   armory:
     type: django
-    version: 4.0.0a12
+    version: 4.0.0a14
     command:
       run: "daphne -b 0.0.0.0 armory.config.asgi:application"
     db:

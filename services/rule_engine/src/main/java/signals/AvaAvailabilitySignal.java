@@ -10,6 +10,6 @@ import com.mindsmiths.pairingalgorithm.AvaAvailability;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AvailableDaysSignal extends Signal {
+public class AvaAvailabilitySignal extends Signal {
     AvaAvailability avaAvailability;
 }
