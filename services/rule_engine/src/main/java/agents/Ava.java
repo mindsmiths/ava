@@ -29,7 +29,7 @@ import signals.DayChoiceSignal;
 @ToString(callSuper = true)
 @NoArgsConstructor
 public class Ava extends Agent {
-    OnboardingStage onboardingStage;
+    private OnboardingStage onboardingStage;
 
     public Ava(String connectionName, String connectionId) {
         super(connectionName, connectionId);
@@ -97,7 +97,7 @@ public class Ava extends Agent {
                             );
                 break;
             }
-        }  
+        }
         showScreens("introScreen", screens);
     }
 

@@ -1,39 +1,9 @@
 package rules.Ava;
 
-
-import com.mindsmiths.ruleEngine.util.Agents;
 import com.mindsmiths.armory.events.UserConnectedEvent;
 import com.mindsmiths.armory.events.SubmitEvent;
-import com.mindsmiths.employeeManager.employees.Employee;
-import com.mindsmiths.sdk.utils.Utils;
-import com.mindsmiths.ruleEngine.util.Log;
 import agents.Ava;
-import agents.CultureMaster;
 import models.OnboardingStage;
-import signals.SendEmployeeInfo;
-
-rule "Create new employee"
-    when
-        employee: Employee() from entry-point "signals"
-        agent: Ava(onboardingStage == null)
-    then
-        delete(employee);
-        insert(employee);
-        modify(agent) { addConnection("email", employee.getEmail()) };
-        modify(agent) { addConnection("armory", Utils.randomGenerator()) };
-        agent.send(CultureMaster.ID, new SendEmployeeInfo(agent.getId(), employee.getFirstName(), employee.getLastName()));
-        // posalji mail
-        modify(agent) { setOnboardingStage(OnboardingStage.ONBOARDING_EMAIL_SENT) }
-end
-
-rule "Update existing employee"
-    when
-        employee: Employee() from entry-point "signals"
-        agent: Ava(onboardingStage != null)
-    then
-    agent.send(CultureMaster.ID, new SendEmployeeInfo(agent.getId(), employee.getFirstName(), employee.getLastName()));
-     //Log.info("update");
-end
 
 rule "Start familiarity quiz"
    when
