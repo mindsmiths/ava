@@ -16,12 +16,14 @@ rule "Create new employee"
         agent: Ava(onboardingStage == null)
     then
         delete(newEmployee);
-        modify(agent) { addConnection("email", newEmployee.getEmail()) };
-        modify(agent) { addConnection("armory", Utils.randomGenerator()) };
+        // TODO: send email method with `?trigger=start-onboarding
+        modify(agent) {
+            addConnection("email", newEmployee.getEmail()),
+            addConnection("armory", Utils.randomGenerator()),
+            setOnboardingStage(OnboardingStage.EMAIL_SENT)
+        };
         insert(newEmployee);
-        agent.send(CultureMaster.ID, new EmployeeUpdateSignal(agent.getId(), newEmployee));
-        // send email method
-        modify(agent) { setOnboardingStage(OnboardingStage.ONBOARDING_EMAIL_SENT) }
+        agent.send(CultureMaster.ID, new EmployeeUpdateSignal(newEmployee));
 end
 
 rule "Update existing employee"
@@ -31,12 +33,8 @@ rule "Update existing employee"
         agent: Ava(onboardingStage != null)
     then
         delete(oldEmployee);
-        //------------------
         delete(newEmployee);
-        modify(agent) { addConnection("email", newEmployee.getEmail()) };
-        modify(agent) { addConnection("armory", Utils.randomGenerator()) };
+        modify(agent) {addConnection("email", newEmployee.getEmail())};
         insert(newEmployee);
-        //------------------
-        agent.send(CultureMaster.ID, new EmployeeUpdateSignal(agent.getId(), newEmployee));
-        //Log.info("Update existing employee");
+        agent.send(CultureMaster.ID, new EmployeeUpdateSignal(newEmployee));
 end

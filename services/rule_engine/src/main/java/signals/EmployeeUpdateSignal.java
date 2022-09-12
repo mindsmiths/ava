@@ -9,11 +9,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class EmployeeUpdateSignal extends Signal {
-    private String id;
     private Employee employee;
 
-    public EmployeeUpdateSignal (String id, Employee employee){
-        this.id = id;
-        this.employee = new Employee(null, employee.getFirstName(), employee.getLastName(), null, null);
+    public EmployeeUpdateSignal (Employee employee){
+        this.employee = new Employee(employee.getId(), employee.getFirstName(), employee.getLastName(), null, null);
     }
 }

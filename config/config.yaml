@@ -11,7 +11,7 @@ global:
 
     ENVIRONMENT_NAME: {{ env.ENVIRONMENT_NAME }}
     MODULE: '{{ env.MODULE | default("local", True) }}'
-    LOG_LEVEL: INFO
+    LOG_LEVEL: DEBUG
 
     # Messaging
     PULSAR_URL: pulsar://pulsar-proxy.pulsar.svc.cluster.local:6650
@@ -66,7 +66,7 @@ services:
       memory: 650Mi
     dependencies:
       - employee-manager
-      
+
   heartbeat-scheduler:
     package: heartbeat
     type: python
