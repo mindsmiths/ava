@@ -1,0 +1,29 @@
+package rules.Ava;
+
+import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
+import com.mindsmiths.ruleEngine.model.Heartbeat;
+
+import agents.Ava;
+
+
+rule "Working hours"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        eval(evaluateCronExpression("* * 8-17 ? * MON,TUE,WED,TUE,FRI *", ts, "Europe/Zagreb"))
+        agent: Ava()
+    then
+        modify(agent) {
+            setWorkingHours(true)
+        }
+end
+
+rule "Non working hours"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        eval(!evaluateCronExpression("* * 8-17 ? * MON,TUE,WED,TUE,FRI *", ts, "Europe/Zagreb"))
+        agent: Ava()
+    then
+        modify(agent) {
+            setWorkingHours(false)
+        }
+end

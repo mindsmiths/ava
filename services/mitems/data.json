@@ -117,6 +117,52 @@
             "content": "🌴Describe your version of the perfect work lunch."
           }
         ]
+      },
+      {
+        "name": "Welcome email",
+        "elements": [
+          {
+            "description": "Action",
+            "type": "TEXT",
+            "content": "Let's start"
+          },
+          {
+            "description": "Description",
+            "type": "HTML",
+            "content": "<p><span style=\"font-weight: 400;\">Dear all,</span></p>\n<p><span style=\"font-weight: 400;\">Thanks for the warm welcome! I&rsquo;m so looking forward to working with all of you and help you get to know each other a little bit better.</span></p>\n<p><span style=\"font-weight: 400;\">When team members are working in silos, they cannot collaborate effectively, which can lead to missed deadlines, subpar work, poor communication, and general feelings of frustration.</span></p>\n<p><span style=\"font-weight: 400;\">To avoid this, we will encourage communication and collaboration, promote knowledge sharing and encourage networking.&nbsp;</span></p>\n<p><span style=\"font-weight: 400;\">How? Easy, I will do all the work and guide you all the way.</span></p>"
+          },
+          {
+            "description": "Subject",
+            "type": "TEXT",
+            "content": "Welcome onboard!"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "Statistics",
+    "description": "Flow which displays statistics about company silos to users",
+    "items": [
+      {
+        "name": "Statistics email",
+        "elements": [
+          {
+            "description": "Action",
+            "type": "TEXT",
+            "content": "Let me see!!!"
+          },
+          {
+            "description": "Description",
+            "type": "HTML",
+            "content": "<p>Dear {{ firstName }},</p>\n<p><span style=\"font-weight: 400;\">Thank you for taking the time to help me analyze our individual relations and learn more about you.</span></p>\n<p><span style=\"font-weight: 400;\">Based on your feedback I was able to identify our current level of exposure to risk of knowledge silos.</span></p>\n<p><span style=\"font-weight: 400;\">Take a look at where we stand right now, we will work together to break the silos and observe our impact on the trend in the future.</span></p>"
+          },
+          {
+            "description": "Subject",
+            "type": "TEXT",
+            "content": "Statistics"
+          }
+        ]
       }
     ]
   }

@@ -16,11 +16,9 @@ rule "Create new employee"
         agent: Ava(onboardingStage == null)
     then
         delete(newEmployee);
-        // TODO: send email method with `?trigger=start-onboarding
         modify(agent) {
             addConnection("email", newEmployee.getEmail()),
-            addConnection("armory", Utils.randomGenerator()),
-            setOnboardingStage(OnboardingStage.EMAIL_SENT)
+            addConnection("armory", Utils.randomGenerator())
         };
         insert(newEmployee);
         agent.send(CultureMaster.ID, new EmployeeUpdateSignal(newEmployee));
