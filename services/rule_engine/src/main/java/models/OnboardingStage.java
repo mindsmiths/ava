@@ -1,6 +1,8 @@
 package models;
 
 public enum OnboardingStage {
-    FamiliarityQuiz,
-    PersonalQuiz;
+    EMAIL_SENT,
+    FAMILIARITY_QUIZ,
+    PERSONAL_QUIZ,
+    FINISHED;
 }

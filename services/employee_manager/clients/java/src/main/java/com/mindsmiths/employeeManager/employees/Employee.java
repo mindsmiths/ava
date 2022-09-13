@@ -3,6 +3,7 @@ package com.mindsmiths.employeeManager.employees;
 import com.mindsmiths.sdk.core.db.DataModel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import java.io.Serializable;
@@ -11,6 +12,7 @@ import java.io.Serializable;
 @Setter
 @ToString(callSuper = true)
 @NoArgsConstructor
+@AllArgsConstructor
 @DataModel(serviceName = "employee-manager")
 public class Employee implements Serializable {
     private String id;

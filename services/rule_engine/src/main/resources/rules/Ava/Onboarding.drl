@@ -16,36 +16,65 @@ rule "Send welcome email"
         Heartbeat(ts: timestamp) from entry-point "signals"
         agent: Ava(
             workingHours == true,
-            welcomeEmailSent == false
+            onboardingStage == null
         )
         employee: Employee()
     then
         agent.sendWelcomeEmail(employee);
         modify(agent) {
-            setWelcomeEmailSent(true)
+            setOnboardingStage(OnboardingStage.EMAIL_SENT)
         };
 end
 
-rule "Start familiarity quiz"
-    when
-        signal: UserConnectedEvent() from entry-point "signals"
-        agent: Ava()
-    then
-        agent.showFamiliarityQuizScreens();
+rule "Start and reconnect personal quiz"
+   when
+        signal: UserConnectedEvent(getParamAsString("trigger") == "start-onboarding") from entry-point "signals"
+        agent: Ava(onboardingStage in (OnboardingStage.EMAIL_SENT, OnboardingStage.PERSONAL_QUIZ))
+   then
+        agent.showPersonalQuizScreens();
         modify(agent) {
-            setOnboardingStage(OnboardingStage.FamiliarityQuiz)
+            setOnboardingStage(OnboardingStage.PERSONAL_QUIZ)
         };
         delete(signal);
 end
 
-rule "Start personal quiz"
+rule "Start familiarity quiz"
    when
-        signal: SubmitEvent(getParamAsString("submit") == "finished") from entry-point "signals"
-        agent: Ava(onboardingStage == OnboardingStage.FamiliarityQuiz)
+        signal: SubmitEvent(getParamAsString("submit") == "finished-personal-quiz") from entry-point "signals"
+        agent: Ava(onboardingStage == OnboardingStage.PERSONAL_QUIZ)
    then
-        agent.showPersonalQuizScreens();
+        agent.showFamiliarityQuizScreens();
         modify(agent) {
-            setOnboardingStage(OnboardingStage.PersonalQuiz)
+            setOnboardingStage(OnboardingStage.FAMILIARITY_QUIZ)
         };
+        delete(signal);
+end
+
+rule "Reconnect familiarity quiz"
+   when
+        signal: UserConnectedEvent(getParamAsString("trigger") == "start-onboarding") from entry-point "signals"
+        agent: Ava(onboardingStage == OnboardingStage.FAMILIARITY_QUIZ)
+   then
+        agent.showFamiliarityQuizScreens();
+        delete(signal);
+end
+
+rule "Finish onboarding"
+   when
+        signal: SubmitEvent(getParamAsString("submit") == "finished-familiarity-quiz") from entry-point "signals"
+        agent: Ava(onboardingStage == OnboardingStage.FAMILIARITY_QUIZ)
+   then
+        modify(agent) {
+            setOnboardingStage(OnboardingStage.FINISHED)
+        };
+        delete(signal);
+end
+
+rule "Reconnect final screen"
+   when
+        signal: UserConnectedEvent(getParamAsString("trigger") == "start-onboarding") from entry-point "signals"
+        agent: Ava(onboardingStage == OnboardingStage.FINISHED)
+   then
+        agent.showFinalScreen();
         delete(signal);
 end
