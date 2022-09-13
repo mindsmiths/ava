@@ -1,5 +1,7 @@
 package rules.Ava;
 
+import java.util.HashMap;
+import java.util.Map;
 import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.employeeManager.employees.Employee;
 import com.mindsmiths.sdk.utils.Utils;
@@ -16,7 +18,6 @@ rule "Create new employee"
         agent: Ava(onboardingStage == null)
     then
         delete(newEmployee);
-        // TODO: send email method with `?trigger=start-onboarding
         modify(agent) {
             addConnection("email", newEmployee.getEmail()),
             addConnection("armory", Utils.randomGenerator()),
@@ -37,4 +38,17 @@ rule "Update existing employee"
         modify(agent) {addConnection("email", newEmployee.getEmail())};
         insert(newEmployee);
         agent.send(CultureMaster.ID, new EmployeeUpdateSignal(newEmployee));
+end
+
+rule "Save or update all employees"
+    when
+        signal: AllEmployees() from entry-point "signals"
+        agent: Ava()
+    then
+        Map<String, Employee> allEmployees = new HashMap<>(signal.getAllEmployees());
+        allEmployees.remove(agent.getId());
+        modify (agent) {
+            setOtherEmployees(allEmployees)
+        };
+        delete(signal);
 end

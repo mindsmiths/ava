@@ -22,6 +22,8 @@ import com.mindsmiths.armory.templates.BaseTemplate;
 import com.mindsmiths.armory.templates.TemplateGenerator;
 import com.mindsmiths.armory.components.CloudSelectComponent;
 
+import com.mindsmiths.employeeManager.employees.Employee;
+
 import models.OnboardingStage;
 import signals.DayChoiceSignal;
 
@@ -30,7 +32,8 @@ import signals.DayChoiceSignal;
 @NoArgsConstructor
 public class Ava extends Agent {
     private OnboardingStage onboardingStage;
-
+    private Map<String, Employee> otherEmployees;
+    
     public Ava(String connectionName, String connectionId) {
         super(connectionName, connectionId);
     }
@@ -46,6 +49,7 @@ public class Ava extends Agent {
     public void showFamiliarityQuizScreens() {
         Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
         String avaImagePath = Mitems.getText("onboarding.familiarity-quiz.ava-image-path");
+        Map<String, String> names = createMapNames();
 
         // Adding intro screen
         Option[] introButton = Mitems.getOptions("onboarding.familiarity-quiz.intro-button");
@@ -70,9 +74,7 @@ public class Ava extends Agent {
                 String questionText = Mitems.getText("onboarding.familiarity-quiz." + questionTag);
                 screens.put(questionTag, new TemplateGenerator(questionTag)
                         .addComponent("question", new TitleComponent(questionText))
-                        .addComponent(answersTag, new CloudSelectComponent(answersTag, Map.of(
-                                "Tomislav Matić", "tomislav matić", "Emil Prpić", "emil pripić",
-                                "Juraj Malenica", "juraj malenica", "Domagoj Blažanin", "domagoj blažanin")))
+                        .addComponent(answersTag, new CloudSelectComponent(answersTag, names))
                         .addComponent(submitButton[0].getId(), new PrimarySubmitButtonComponent(
                                 submitButton[0].getId(), submitButton[0].getText(), nextQuestionTag)));
                 questionNum += 1;
@@ -155,5 +157,13 @@ public class Ava extends Agent {
 
     public void sendData(ArrayList<Integer> freeDays) {
         send("CultureMaster", new DayChoiceSignal(freeDays));
+    }
+
+    private Map<String, String> createMapNames() {
+        Map<String, String> names = new HashMap<>();
+        for (Employee employee : otherEmployees.values()) {
+            names.put(employee.getFirstName() + " " + employee.getLastName(), employee.getId());
+        }
+        return names;
     }
 }

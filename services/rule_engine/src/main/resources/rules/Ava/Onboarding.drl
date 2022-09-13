@@ -4,6 +4,7 @@ import com.mindsmiths.armory.events.UserConnectedEvent;
 import com.mindsmiths.armory.events.SubmitEvent;
 import agents.Ava;
 import models.OnboardingStage;
+import signals.AllEmployees;
 
 rule "Start and reconnect personal quiz"
    when
