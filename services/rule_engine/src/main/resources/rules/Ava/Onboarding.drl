@@ -4,13 +4,19 @@ import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.ruleEngine.util.Agents;
 import com.mindsmiths.ruleEngine.model.Initialize;
 
+import com.mindsmiths.armory.events.UserConnectedEvent;
+import com.mindsmiths.armory.events.SubmitEvent;
+
+import agents.Ava;
+import agents.CultureMaster;
+import models.OnboardingStage;
+import models.AvaWeeklyStage;
+
 import signals.RequestAvailableDaysSignal;
 import signals.AvaAvailabilitySignal;
 import signals.AvaRegisteredSignal;
 import signals.MatchInfoSignal;
 
-import agents.Ava;
-import agents.CultureMaster;
 
 rule "First contact"
     salience 100
@@ -23,3 +29,55 @@ rule "First contact"
         delete(initialize);
 end
 
+rule "Start and reconnect personal quiz"
+   when
+        signal: UserConnectedEvent(getParamAsString("trigger") == "start-onboarding") from entry-point "signals"
+        agent: Ava(onboardingStage in (OnboardingStage.EMAIL_SENT, OnboardingStage.PERSONAL_QUIZ))
+   then
+        agent.showPersonalQuizScreens();
+        modify(agent) {
+            setOnboardingStage(OnboardingStage.PERSONAL_QUIZ)
+        };
+        delete(signal);
+end
+
+rule "Start familiarity quiz"
+   when
+        signal: SubmitEvent(getParamAsString("submit") == "finished-personal-quiz") from entry-point "signals"
+        agent: Ava(onboardingStage == OnboardingStage.PERSONAL_QUIZ)
+   then
+        agent.showFamiliarityQuizScreens();
+        modify(agent) {
+            setOnboardingStage(OnboardingStage.FAMILIARITY_QUIZ)
+        };
+        delete(signal);
+end
+
+rule "Reconnect familiarity quiz"
+   when
+        signal: UserConnectedEvent(getParamAsString("trigger") == "start-onboarding") from entry-point "signals"
+        agent: Ava(onboardingStage == OnboardingStage.FAMILIARITY_QUIZ)
+   then
+        agent.showFamiliarityQuizScreens();
+        delete(signal);
+end
+
+rule "Finish onboarding"
+   when
+        signal: SubmitEvent(getParamAsString("submit") == "finished-familiarity-quiz") from entry-point "signals"
+        agent: Ava(onboardingStage == OnboardingStage.FAMILIARITY_QUIZ)
+   then
+        modify(agent) {
+            setOnboardingStage(OnboardingStage.FINISHED)
+        };
+        delete(signal);
+end
+
+rule "Reconnect final screen"
+   when
+        signal: UserConnectedEvent(getParamAsString("trigger") == "start-onboarding") from entry-point "signals"
+        agent: Ava(onboardingStage == OnboardingStage.FINISHED)
+   then
+        agent.showFinalScreen();
+        delete(signal);
+end

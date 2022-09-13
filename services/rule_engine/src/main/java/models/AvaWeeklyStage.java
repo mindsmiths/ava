@@ -1,4 +1,4 @@
-package agents;
+package models;
 
 public enum AvaWeeklyStage {
     FIND_AVAILABILITY,

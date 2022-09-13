@@ -29,3 +29,6 @@ services:
     env:
       SITE_URL: '{{ env.ARMORY_SITE_URL | default("http://localhost:8000", true) }}'
     port: 8000
+
+  employee-manager:
+    port: 8002

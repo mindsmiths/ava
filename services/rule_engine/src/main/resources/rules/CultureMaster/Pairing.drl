@@ -13,7 +13,7 @@ import signals.RequestAvailableDaysSignal;
 import signals.AvaAvailabilitySignal;
 
 import agents.CultureMaster;
-import agents.CultureMasterWeeklyStage;
+import models.CultureMasterWeeklyStage;
 
 
 rule "First contact"

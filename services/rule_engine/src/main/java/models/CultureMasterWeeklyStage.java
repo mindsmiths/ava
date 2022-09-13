@@ -1,4 +1,4 @@
-package agents;
+package models;
 
 public enum CultureMasterWeeklyStage {
     COLLECT_AVA_AVAILABILITIES,

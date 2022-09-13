@@ -10,11 +10,13 @@ import com.mindsmiths.pairingalgorithm.AvaAvailability;
 import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
 
 import agents.Ava;
-import agents.AvaWeeklyStage;
 import agents.CultureMaster;
 
 import signals.AvaAvailabilitySignal;
 import signals.MatchInfoSignal;
+
+import models.AvaWeeklyStage;
+
 
 // revertaj ruleove nazad
 rule "Non working hours message"
@@ -60,7 +62,7 @@ end
 rule "Confirm days"
     when
         // nece li ovo potencijalno hvatati i ove gore? stavit salience -10? 
-        signal: SubmitEvent((getParamAsString("submit") == "confirmDays")) from entry-point "signals"  
+        signal: SubmitEvent(getParamAsString("submit") == "confirmDays") from entry-point "signals"  
         agent: Ava(weeklyStage == AvaWeeklyStage.FORWARD_AVAILABILITY)
     then
         agent.confirmingDaysScreen();

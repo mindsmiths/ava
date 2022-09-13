@@ -1,24 +1,33 @@
 package agents;
 
+import com.mindsmiths.employeeManager.employees.Employee;
+import com.mindsmiths.ruleEngine.model.Agent;
 import java.util.*;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import models.CultureMasterWeeklyStage;
 
 import com.mindsmiths.pairingalgorithm.PairingAlgorithmAPI;
 import com.mindsmiths.pairingalgorithm.AvaAvailability;
 import com.mindsmiths.pairingalgorithm.Match;
-import com.mindsmiths.ruleEngine.model.Agent;
 
+import signals.EmployeeUpdateSignal;
 import signals.MatchInfoSignal;
 
+import models.CultureMasterWeeklyStage;
+
 @Data
+@AllArgsConstructor
 public class CultureMaster extends Agent {
     private List<AvaAvailability> avaAvailabilities = new ArrayList<>();
     private List<Match> allMatches = new ArrayList<>();
     private List<String> avaIDs = new ArrayList<>();
     private CultureMasterWeeklyStage weeklyStage = CultureMasterWeeklyStage.COLLECT_AVA_AVAILABILITIES;
-    public static String ID = "CULTURE_MASTER";
+    private List<Map<String, List<Integer>>> freeDays; // information about available days
+    private Map<String, Employee> employees = new HashMap<>();
 
+    public static String ID = "CULTURE_MASTER";
     public CultureMaster() {
         id = ID;
     }
@@ -56,5 +65,9 @@ public class CultureMaster extends Agent {
                 }
             }
         }
+    }
+    
+    public void addOrUpdateEmployee(EmployeeUpdateSignal signal){
+        employees.put(signal.getFrom(), signal.getEmployee());
     }
 }

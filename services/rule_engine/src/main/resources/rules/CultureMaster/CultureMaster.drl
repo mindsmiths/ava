@@ -1,0 +1,17 @@
+package rules.CultureMaster;
+
+import agents.CultureMaster;
+import signals.EmployeeUpdateSignal;
+import com.mindsmiths.ruleEngine.util.Log;
+
+
+rule "Add or update Ava data"
+    when
+        signal: EmployeeUpdateSignal() from entry-point "signals"
+        agent: CultureMaster()
+    then
+        modify(agent) {
+            addOrUpdateEmployee(signal);
+        };
+        delete(signal);
+end
