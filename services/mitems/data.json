@@ -4,8 +4,153 @@
     "description": "Flow from mail to next screen",
     "items": [
       {
+        "name": "Familiarity Quiz",
+        "elements": [
+          {
+            "description": "Ava image path",
+            "type": "TEXT",
+            "content": "/public/Ava.png"
+          },
+          {
+            "description": "Familiarity quiz final button",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"Sure thing!\",\"id\":\"submit\"}]"
+          },
+          {
+            "description": "Finish familiarity quiz text",
+            "type": "TEXT",
+            "content": "Thanks! I’ll check in with you from time to time to ask about other people too, but for now I have enough to get us started. Ready for fun part?"
+          },
+          {
+            "description": "Intro button",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"Let's see\",\"id\":\"submit\"}]"
+          },
+          {
+            "description": "Intro screen description",
+            "type": "TEXT",
+            "content": "Next week I will match you with someone interesting from your organization to spend quality time with over lunch. \n\nBut first, let’s see how well you know your colleagues…\n\n"
+          },
+          {
+            "description": "Intro screen title",
+            "type": "TEXT",
+            "content": "So good to see you!"
+          },
+          {
+            "description": "Submit button",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"Submit\",\"id\":\"submit\"}]"
+          },
+          {
+            "description": "question1",
+            "type": "TEXT",
+            "content": "Who of the following do you know best?"
+          },
+          {
+            "description": "question2",
+            "type": "TEXT",
+            "content": "Who of the following do you know best?"
+          },
+          {
+            "description": "question3",
+            "type": "TEXT",
+            "content": "With whom of the following do you cooperate often?"
+          },
+          {
+            "description": "question4",
+            "type": "TEXT",
+            "content": "With whom of the following do you talk on daily basis?"
+          }
+        ]
+      },
+      {
+        "name": "Matching mail",
+        "elements": [
+          {
+            "description": "",
+            "type": "TEXT",
+            "content": ""
+          },
+          {
+            "description": "Calendar invite text",
+            "type": "TEXT",
+            "content": "This is invite for a meeting"
+          },
+          {
+            "description": "Description",
+            "type": "HTML",
+            "content": "<p>Dear {{ firstName }},</p>\n<p>I'm here to help you connect with your colleagues.</p>\n<p>&nbsp;</p>\n<p>Ava</p>"
+          },
+          {
+            "description": "SubjectName",
+            "type": "TEXT",
+            "content": "It's a match !"
+          },
+          {
+            "description": "templateHTML",
+            "type": "HTML",
+            "content": "<div>\n<div>&lt;center style=\"background-color: #f5f5f5;padding:10px;\"&gt;</div>\n<div>&nbsp; &nbsp; &lt;table class=\"m_7036428470069034316templateContainer\"</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;style=\"border-collapse:collapse;border:0;max-width:660px;width:100%;background-color:#ffffff\" width=\"100%\"</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;cellspacing=\"0\"</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;cellpadding=\"0\" border=\"0\"&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &lt;tbody&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &lt;tr&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;td id=\"m_7036428470069034316templateHeader\"</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; style=\"background:#ffffff none no-repeat center/cover;border-top:0;border-bottom:0;padding-top:9px;padding-bottom:0;max-width:660px;width:100%\"</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; valign=\"top\"&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;table style=\"min-width:100%;border-collapse:collapse\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;border=\"0\"&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;tbody&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;tr&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;td style=\"padding-top:9px\" valign=\"top\"&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;table style=\"max-width:100%;min-width:100%;border-collapse:collapse\"</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;class=\"m_7036428470069034316mcnTextContentContainer\" width=\"100%\" cellspacing=\"0\"</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;cellpadding=\"0\" border=\"0\" align=\"left\"&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;tbody&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;tr&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;td class=\"m_7036428470069034316mcnTextContent\"</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; style=\"padding-top:0;padding-right:18px;padding-bottom:9px;padding-left:18px;word-break:break-word;color:#202020;font-family:Montserrat, Sans-serif;font-size:22px;line-height:150%;text-align:left;font-weight: bold\"</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; valign=\"top\"&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {{ biggerTitle }}</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;/td&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;/tr&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;tr&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;td class=\"m_7036428470069034316mcnTextContent\"</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; style=\"padding-top:0;padding-right:18px;padding-bottom:9px;padding-left:18px;word-break:break-word;color:#202020;font-family:Montserrat, Sans-serif;font-size:14px;line-height:150%;text-align:left\"</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; valign=\"top\"&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {{ title }}</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;/td&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;/tr&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;/tbody&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;/table&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;/td&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;/tr&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;/tbody&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;/table&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;/td&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &lt;/tr&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &lt;tr&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;td id=\"m_7036428470069034316templateFooter\"</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; style=\"background:#ffffff none no-repeat center/cover;background-color:#ffffff;background-image:none;background-repeat:no-repeat;background-position:center;background-size:cover;border-top:0;border-bottom:0;padding-top:9px;padding-bottom:9px\"</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; valign=\"top\"&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;table style=\"min-width:100%;border-collapse:collapse\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;border=\"0\"&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;tbody&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;tr&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;td style=\"padding-top:0;padding-right:18px;padding-bottom:18px;padding-left:18px\"</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; valign=\"top\" align=\"center\"&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;table style=\"border-collapse:separate!important;border-radius:4px;\" cellspacing=\"0\"</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;cellpadding=\"0\" border=\"0\"&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;tbody&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;tr&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;td style=\"background-color:white;border-radius:8px;text-align:center\"</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; valign=\"top\"&gt;&lt;a</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; href=\"{{ armoryUrl }}\"</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; style=\"background-color:#3385ff;border-radius:8px;font-weight:500;border:2px solid #3385ff;color:#ffffff;display:inline-block;font-family:Montserrat, sans-serif;font-size:14px;font-style:normal;padding:14px 28px;text-decoration:none;min-width:30px\"</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; target=\"_blank\"&gt;&lt;strong&gt;{{ callToAction }}&lt;/strong&gt;&lt;/a&gt;&lt;/td&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;/tr&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;/tbody&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;/table&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;/td&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;/tr&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;/tbody&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;/table&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;/td&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &lt;/tr&gt;</div>\n<div>&nbsp; &nbsp; &nbsp; &nbsp; &lt;/tbody&gt;</div>\n<div>&nbsp; &nbsp; &lt;/table&gt;</div>\n<div>&lt;/center&gt;</div>\n</div>"
+          }
+        ]
+      },
+      {
+        "name": "Personal quiz",
+        "elements": [
+          {
+            "description": "Accept button",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"Let's do it!\",\"id\":\"submit\"}]"
+          },
+          {
+            "description": "Ava image path",
+            "type": "TEXT",
+            "content": "/public/Ava.png"
+          },
+          {
+            "description": "Finish personal quiz",
+            "type": "TEXT",
+            "content": "You are officially onboarded! 🥳 Soon I’ll send you an email with connectivity data. Stay tuned!"
+          },
+          {
+            "description": "Finish quiz button",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"Great, can't wait!\",\"id\":\"submit\"}]"
+          },
+          {
+            "description": "Goodbye screen",
+            "type": "TEXT",
+            "content": "You are the best 😘"
+          },
+          {
+            "description": "Intro screen",
+            "type": "TEXT",
+            "content": "Okay, first part done! Now, the fun part!I prepared 5 questions for you and your colleagues. Ready to start?"
+          },
+          {
+            "description": "Submit button",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"Submit\",\"id\":\"submit\"}]"
+          },
+          {
+            "description": "question1",
+            "type": "TEXT",
+            "content": "🌴What is the name of the last song you listened to?"
+          },
+          {
+            "description": "question2",
+            "type": "TEXT",
+            "content": "💃What is the name of the last TV show you watched?"
+          }
+        ]
+      },
+      {
         "name": "Welcome email",
         "elements": [
+          {
+            "description": "",
+            "type": "TEXT",
+            "content": ""
+          },
           {
             "description": "Description",
             "type": "HTML",
