@@ -16,7 +16,6 @@ rule "Create new employee"
         agent: Ava(onboardingStage == null)
     then
         delete(newEmployee);
-        // TODO: send email method with `?trigger=start-onboarding
         modify(agent) {
             addConnection("email", newEmployee.getEmail()),
             addConnection("armory", Utils.randomGenerator())
