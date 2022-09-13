@@ -61,13 +61,15 @@ end
 
 rule "Finish onboarding"
    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
         signal: SubmitEvent(getParamAsString("submit") == "finished-familiarity-quiz") from entry-point "signals"
         agent: Ava(onboardingStage == OnboardingStage.FAMILIARITY_QUIZ)
         employee: Employee()
    then
         agent.sendStatisticsEmail(employee);
         modify(agent) {
-            setOnboardingStage(OnboardingStage.FINISHED)
+            setOnboardingStage(OnboardingStage.FINISHED),
+            setStatsEmailLastSentAt(ts)
         };
         delete(signal);
 end

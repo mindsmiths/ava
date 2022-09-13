@@ -43,7 +43,6 @@ public class Ava extends Agent {
     private OnboardingStage onboardingStage;
 
     private boolean workingHours;
-    private boolean welcomeEmailSent;
     private Date statsEmailLastSentAt;
 
     public Ava(String connectionName, String connectionId) {

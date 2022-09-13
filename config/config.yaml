@@ -94,7 +94,6 @@ services:
       memory: 94Mi
 
   mitems:
-    enabled: true
     type: django
     version: 4.0.0a11
     db:
