@@ -7,6 +7,10 @@ import com.mindsmiths.ruleEngine.model.Initialize;
 import com.mindsmiths.armory.events.UserConnectedEvent;
 import com.mindsmiths.armory.events.SubmitEvent;
 
+import com.mindsmiths.sdk.utils.templating.*;
+
+import com.mindsmiths.employeeManager.employees.Employee;
+
 import agents.Ava;
 import agents.CultureMaster;
 import models.OnboardingStage;
@@ -27,6 +31,21 @@ rule "First contact"
         agent.send(CultureMaster.ID, new AvaRegisteredSignal(agent.getId()));
         Log.info("Sent my id to CM " + agent.getId());
         delete(initialize);
+end
+
+rule "Send welcome email"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        agent: Ava(
+            workingHours == true,
+            onboardingStage == null
+        )
+        employee: Employee()
+    then
+        agent.sendWelcomeEmail(employee);
+        modify(agent) {
+            setOnboardingStage(OnboardingStage.EMAIL_SENT)
+        };
 end
 
 rule "Start and reconnect personal quiz"
@@ -64,11 +83,15 @@ end
 
 rule "Finish onboarding"
    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
         signal: SubmitEvent(getParamAsString("submit") == "finished-familiarity-quiz") from entry-point "signals"
         agent: Ava(onboardingStage == OnboardingStage.FAMILIARITY_QUIZ)
+        employee: Employee()
    then
+        agent.sendStatisticsEmail(employee);
         modify(agent) {
-            setOnboardingStage(OnboardingStage.FINISHED)
+            setOnboardingStage(OnboardingStage.FINISHED),
+            setStatsEmailLastSentAt(ts)
         };
         delete(signal);
 end

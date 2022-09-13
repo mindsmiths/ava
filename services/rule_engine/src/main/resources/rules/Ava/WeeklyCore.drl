@@ -16,17 +16,19 @@ import signals.AvaAvailabilitySignal;
 import signals.MatchInfoSignal;
 
 import models.AvaWeeklyStage;
+import models.OnboardingStage;
 
 
-// revertaj ruleove nazad
+// revert the conditions
 rule "Non working hours message"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
         eval(evaluateCronExpression("* * 9-23 * * WED", ts, "Europe/Zagreb") 
         || (evaluateCronExpression("* * * * * THU", ts, "Europe/Zagreb"))
         || (evaluateCronExpression("* * 00-14 * * FRI", ts, "Europe/Zagreb")))
-        signal: UserConnectedEvent() from entry-point "signals"
-        agent: Ava(weeklyStage == AvaWeeklyStage.FIND_AVAILABILITY)
+        signal: UserConnectedEvent(getParamAsString("trigger") == "start-weekly-core") from entry-point "signals"
+        agent: Ava(weeklyStage == AvaWeeklyStage.FIND_AVAILABILITY,
+                   onboardingStage == OnboardingStage.FINISHED)
     then 
         agent.notWorkingHours();
         delete(signal);
@@ -61,7 +63,6 @@ end
 
 rule "Confirm days"
     when
-        // nece li ovo potencijalno hvatati i ove gore? stavit salience -10? 
         signal: SubmitEvent(getParamAsString("submit") == "confirmDays") from entry-point "signals"  
         agent: Ava(weeklyStage == AvaWeeklyStage.FORWARD_AVAILABILITY)
     then

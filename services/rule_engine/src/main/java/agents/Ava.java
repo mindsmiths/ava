@@ -1,21 +1,33 @@
 package agents;
 
 import java.util.*;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import lombok.Data;
 import lombok.ToString;
 import lombok.NoArgsConstructor;
 
 import com.mindsmiths.armory.ArmoryAPI;
-import com.mindsmiths.armory.templates.*;
-import com.mindsmiths.employeeManager.employees.Employee;
 import com.mindsmiths.armory.components.*;
+import com.mindsmiths.armory.templates.*;
+
+import com.mindsmiths.employeeManager.employees.Employee;
 
 import com.mindsmiths.mitems.Mitems;
 import com.mindsmiths.mitems.Option;
 
 import com.mindsmiths.ruleEngine.model.Agent;
+
 import com.mindsmiths.pairingalgorithm.Days;
+import com.mindsmiths.emailAdapter.EmailAdapterAPI;
+import com.mindsmiths.emailAdapter.SendEmailPayload;
+
+import com.mindsmiths.sdk.utils.templating.Templating;
+
+import utils.Settings;
 
 import models.AvaWeeklyStage;
 import models.OnboardingStage;
@@ -30,6 +42,9 @@ public class Ava extends Agent {
     private Employee employee;
     private AvaWeeklyStage weeklyStage = AvaWeeklyStage.FIND_AVAILABILITY;
     private OnboardingStage onboardingStage;
+
+    private boolean workingHours;
+    private Date statsEmailLastSentAt;
 
     public Ava(String connectionName, String connectionId) {
         super(connectionName, connectionId);
@@ -199,4 +214,42 @@ public class Ava extends Agent {
         showScreen(screen);
     }
 
+    public void sendWelcomeEmail(Employee employee) throws IOException {
+        String subject = Mitems.getText("onboarding.welcome-email.subject");
+        String description = Mitems.getText("onboarding.welcome-email.description");
+        String htmlTemplate = String.join("", Files.readAllLines(Paths.get("EmailTemplate.html"), StandardCharsets.UTF_8));
+
+        String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
+            "description", description,
+            "callToAction", Mitems.getText("onboarding.welcome-email.action"),
+            "firstName", employee.getFirstName(),
+            "armoryUrl", String.format("%s/%s?trigger=start-onboarding", Settings.ARMORY_SITE_URL, getConnection("armory"))
+        ));
+
+        SendEmailPayload e = new SendEmailPayload();
+        e.setRecipients(List.of(getConnection("email")));
+        e.setSubject(subject);
+        e.setHtmlText(htmlBody);
+        EmailAdapterAPI.newEmail(e);
+    }
+
+    public void sendStatisticsEmail(Employee employee) throws IOException {
+        String subject = Mitems.getText("statistics.statistics-email.subject");
+        String description = Mitems.getText("statistics.statistics-email.description");
+        String htmlTemplate = String.join("", Files.readAllLines(Paths.get("EmailTemplate.html"), StandardCharsets.UTF_8));
+
+        String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
+            "description", description,
+            "callToAction", Mitems.getText("statistics.statistics-email.action"),
+            "firstName", employee.getFirstName(),
+            "armoryUrl", String.format("%s/%s?trigger=show-stats", Settings.ARMORY_SITE_URL, getConnection("armory"))
+        ));
+
+        SendEmailPayload e = new SendEmailPayload();
+        e.setRecipients(List.of(getConnection("email")));
+        e.setSubject(subject);
+        e.setHtmlText(htmlBody);
+        EmailAdapterAPI.newEmail(e);
+    }
+ 
 }
