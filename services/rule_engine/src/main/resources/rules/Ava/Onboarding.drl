@@ -1,10 +1,56 @@
 package rules.Ava;
 
+import com.mindsmiths.ruleEngine.util.Log;
+import com.mindsmiths.ruleEngine.util.Agents;
+import com.mindsmiths.ruleEngine.model.Initialize;
+
 import com.mindsmiths.armory.events.UserConnectedEvent;
 import com.mindsmiths.armory.events.SubmitEvent;
+
+import com.mindsmiths.sdk.utils.templating.*;
+
+import com.mindsmiths.employeeManager.employees.Employee;
+
 import agents.Ava;
+import agents.CultureMaster;
 import models.OnboardingStage;
+<<<<<<< HEAD
 import signals.AllEmployees;
+=======
+import models.AvaWeeklyStage;
+
+import signals.RequestAvailableDaysSignal;
+import signals.AvaAvailabilitySignal;
+import signals.AvaRegisteredSignal;
+import signals.MatchInfoSignal;
+
+
+rule "First contact"
+    salience 100
+    when
+        initialize: Initialize() from entry-point "agent-created"
+        agent: Ava()
+    then
+        agent.send(CultureMaster.ID, new AvaRegisteredSignal(agent.getId()));
+        Log.info("Sent my id to CM " + agent.getId());
+        delete(initialize);
+end
+
+rule "Send welcome email"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        agent: Ava(
+            workingHours == true,
+            onboardingStage == null
+        )
+        employee: Employee()
+    then
+        agent.sendWelcomeEmail(employee);
+        modify(agent) {
+            setOnboardingStage(OnboardingStage.EMAIL_SENT)
+        };
+end
+>>>>>>> 23d28c950d698aebf0b3c4156ffcaa0aec181fde
 
 rule "Start and reconnect personal quiz"
    when
@@ -41,11 +87,15 @@ end
 
 rule "Finish onboarding"
    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
         signal: SubmitEvent(getParamAsString("submit") == "finished-familiarity-quiz") from entry-point "signals"
         agent: Ava(onboardingStage == OnboardingStage.FAMILIARITY_QUIZ)
+        employee: Employee()
    then
+        agent.sendStatisticsEmail(employee);
         modify(agent) {
-            setOnboardingStage(OnboardingStage.FINISHED)
+            setOnboardingStage(OnboardingStage.FINISHED),
+            setStatsEmailLastSentAt(ts)
         };
         delete(signal);
 end
