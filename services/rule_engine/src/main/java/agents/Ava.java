@@ -1,48 +1,48 @@
 package agents;
 
+import java.util.*;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 
 import lombok.Data;
 import lombok.ToString;
 import lombok.NoArgsConstructor;
 
-import com.mindsmiths.emailAdapter.EmailAdapterAPI;
-import com.mindsmiths.emailAdapter.SendEmailPayload;
+import com.mindsmiths.armory.ArmoryAPI;
+import com.mindsmiths.armory.components.*;
+import com.mindsmiths.armory.templates.*;
+
 import com.mindsmiths.employeeManager.employees.Employee;
+
 import com.mindsmiths.mitems.Mitems;
 import com.mindsmiths.mitems.Option;
+
 import com.mindsmiths.ruleEngine.model.Agent;
+
+import com.mindsmiths.pairingalgorithm.Days;
+import com.mindsmiths.emailAdapter.EmailAdapterAPI;
+import com.mindsmiths.emailAdapter.SendEmailPayload;
+
 import com.mindsmiths.sdk.utils.templating.Templating;
 
-import signals.DayChoiceSignal;
 import utils.Settings;
-import com.mindsmiths.armory.ArmoryAPI;
-import com.mindsmiths.armory.components.DescriptionComponent;
-import com.mindsmiths.armory.components.ImageComponent;
-import com.mindsmiths.armory.components.PrimarySubmitButtonComponent;
-import com.mindsmiths.armory.components.TextAreaComponent;
-import com.mindsmiths.armory.components.TitleComponent;
-import com.mindsmiths.armory.templates.BaseTemplate;
-import com.mindsmiths.armory.templates.TemplateGenerator;
-import com.mindsmiths.armory.components.CloudSelectComponent;
 
-import com.mindsmiths.employeeManager.employees.Employee;
-
+import models.AvaWeeklyStage;
 import models.OnboardingStage;
 
 @Data
 @ToString(callSuper = true)
 @NoArgsConstructor
 public class Ava extends Agent {
+    private List<Days> availableDays = new ArrayList<>();
+    private String matchName;
+    private Days matchDay;
+    private Employee employee;
+    private AvaWeeklyStage weeklyStage = AvaWeeklyStage.FIND_AVAILABILITY;
     private OnboardingStage onboardingStage;
+
     private Map<String, Employee> otherEmployees;
     private boolean workingHours;
     private Date statsEmailLastSentAt;
@@ -51,12 +51,58 @@ public class Ava extends Agent {
         super(connectionName, connectionId);
     }
 
+    public void updateAvailableDays(List<String> availableDaysStr) {
+        this.availableDays = new ArrayList<>();
+        for(String day: availableDaysStr) {
+            this.availableDays.add(Days.valueOf(day));
+        }
+    }
+
     public void showScreen(BaseTemplate screen) {
         ArmoryAPI.showScreen(getConnection("armory"), screen);
     }
 
     public void showScreens(String firstScreenId, Map<String, BaseTemplate> screens) {
         ArmoryAPI.showScreens(getConnection("armory"), firstScreenId, screens);
+    }
+
+    public void notWorkingHours() {
+        BaseTemplate notWorkingScreen = new TemplateGenerator()
+            .addComponent("title", new TitleComponent(Mitems.getText("weekly-core.message-about-not-working-hours-for-links.title")));
+        showScreen(notWorkingScreen);
+    }
+
+    public void chooseAvailableDaysScreen() {
+        Option[] days = Mitems.getOptions("weekly-core.days.each-day");
+        List<CloudSelectComponent.Option> options = new ArrayList<>();
+        
+        for(Option option: days)
+            options.add(new CloudSelectComponent.Option(option.getText(), option.getId(), true));
+
+        BaseTemplate daysScreen = new TemplateGenerator()
+            .addComponent("title", new TitleComponent(Mitems.getText("weekly-core.title-asking-for-available-days.title")))
+            .addComponent("text", new DescriptionComponent(Mitems.getText("weekly-core.description-asking-for-available-days.text")))
+            .addComponent("cloudSelect", new CloudSelectComponent("availableDays", options))
+            .addComponent("submit", new PrimarySubmitButtonComponent("submit", "confirmDays"));
+        showScreen(daysScreen);
+    }
+
+    public void showNotAvailable() {
+        BaseTemplate notAvailableScreen = new TemplateGenerator()
+            .addComponent("title", new TitleComponent(Mitems.getText("weekly-core.title-for-person-who-is-not-available-any-day.title")));
+        // implement free form where they have to explain why they are not available
+        showScreen(notAvailableScreen);
+    }
+
+    public void confirmingDaysScreen() {
+        Map<String, BaseTemplate> screens = Map.of(
+            "confirmDaysScreen", new TemplateGenerator("confirmScreen")
+                .addComponent("title", new TitleComponent(Mitems.getText("weekly-core.confirmation-of-choosen-available-days.title")))
+                .addComponent("button", new PrimarySubmitButtonComponent("submit", "confirmDaysAndThanksScreen")),
+            "confirmDaysAndThanksScreen", new TemplateGenerator("confirmAndThanksScreen")
+                .addComponent("title", new TitleComponent(Mitems.getText("weekly-core.stay-tuned-second-confirmation-of-available-days.title")))
+        );
+        showScreens("confirmDaysScreen", screens);
     }
 
     public void showFamiliarityQuizScreens() {
@@ -168,10 +214,6 @@ public class Ava extends Agent {
         showScreen(screen);
     }
 
-    public void sendData(ArrayList<Integer> freeDays) {
-        send("CultureMaster", new DayChoiceSignal(freeDays));
-    }
-
     private Map<String, String> createMapNames() {
         Map<String, String> names = new HashMap<>();
         for (Employee employee : otherEmployees.values()) {
@@ -217,5 +259,4 @@ public class Ava extends Agent {
         e.setHtmlText(htmlBody);
         EmailAdapterAPI.newEmail(e);
     }
- 
 }

@@ -1,16 +1,38 @@
 package rules.Ava;
 
-import com.mindsmiths.sdk.utils.templating.*;
-import com.mindsmiths.ruleEngine.util.Agents;
-import com.mindsmiths.ruleEngine.model.Initialize;
 import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.ruleEngine.util.Agents;
+import com.mindsmiths.ruleEngine.model.Initialize;
+
 import com.mindsmiths.armory.events.UserConnectedEvent;
 import com.mindsmiths.armory.events.SubmitEvent;
+
+import com.mindsmiths.sdk.utils.templating.*;
+
 import com.mindsmiths.employeeManager.employees.Employee;
+
 import agents.Ava;
+import agents.CultureMaster;
 import models.OnboardingStage;
 import signals.AllEmployees;
+import models.AvaWeeklyStage;
+
+import signals.RequestAvailableDaysSignal;
+import signals.AvaAvailabilitySignal;
+import signals.AvaRegisteredSignal;
+import signals.MatchInfoSignal;
+
+
+rule "First contact"
+    salience 100
+    when
+        initialize: Initialize() from entry-point "agent-created"
+        agent: Ava()
+    then
+        agent.send(CultureMaster.ID, new AvaRegisteredSignal(agent.getId()));
+        Log.info("Sent my id to CM " + agent.getId());
+        delete(initialize);
+end
 
 rule "Send welcome email"
     when
