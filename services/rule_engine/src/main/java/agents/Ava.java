@@ -1,17 +1,29 @@
 package agents;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+
 import lombok.Data;
 import lombok.ToString;
 import lombok.NoArgsConstructor;
 
-import java.util.Map;
-import java.util.ArrayList;
-import java.util.HashMap;
-
+import com.mindsmiths.emailAdapter.EmailAdapterAPI;
+import com.mindsmiths.emailAdapter.SendEmailPayload;
+import com.mindsmiths.employeeManager.employees.Employee;
 import com.mindsmiths.mitems.Mitems;
 import com.mindsmiths.mitems.Option;
 import com.mindsmiths.ruleEngine.model.Agent;
+import com.mindsmiths.sdk.utils.templating.Templating;
 
+import signals.DayChoiceSignal;
+import utils.Settings;
 import com.mindsmiths.armory.ArmoryAPI;
 import com.mindsmiths.armory.components.DescriptionComponent;
 import com.mindsmiths.armory.components.ImageComponent;
@@ -25,7 +37,6 @@ import com.mindsmiths.armory.components.CloudSelectComponent;
 import com.mindsmiths.employeeManager.employees.Employee;
 
 import models.OnboardingStage;
-import signals.DayChoiceSignal;
 
 @Data
 @ToString(callSuper = true)
@@ -33,7 +44,9 @@ import signals.DayChoiceSignal;
 public class Ava extends Agent {
     private OnboardingStage onboardingStage;
     private Map<String, Employee> otherEmployees;
-    
+    private boolean workingHours;
+    private Date statsEmailLastSentAt;
+
     public Ava(String connectionName, String connectionId) {
         super(connectionName, connectionId);
     }
@@ -166,4 +179,43 @@ public class Ava extends Agent {
         }
         return names;
     }
+
+    public void sendWelcomeEmail(Employee employee) throws IOException {
+        String subject = Mitems.getText("onboarding.welcome-email.subject");
+        String description = Mitems.getText("onboarding.welcome-email.description");
+        String htmlTemplate = String.join("", Files.readAllLines(Paths.get("EmailTemplate.html"), StandardCharsets.UTF_8));
+
+        String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
+            "description", description,
+            "callToAction", Mitems.getText("onboarding.welcome-email.action"),
+            "firstName", employee.getFirstName(),
+            "armoryUrl", String.format("%s/%s?trigger=start-onboarding", Settings.ARMORY_SITE_URL, getConnection("armory"))
+        ));
+
+        SendEmailPayload e = new SendEmailPayload();
+        e.setRecipients(List.of(getConnection("email")));
+        e.setSubject(subject);
+        e.setHtmlText(htmlBody);
+        EmailAdapterAPI.newEmail(e);
+    }
+
+    public void sendStatisticsEmail(Employee employee) throws IOException {
+        String subject = Mitems.getText("statistics.statistics-email.subject");
+        String description = Mitems.getText("statistics.statistics-email.description");
+        String htmlTemplate = String.join("", Files.readAllLines(Paths.get("EmailTemplate.html"), StandardCharsets.UTF_8));
+
+        String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
+            "description", description,
+            "callToAction", Mitems.getText("statistics.statistics-email.action"),
+            "firstName", employee.getFirstName(),
+            "armoryUrl", String.format("%s/%s?trigger=show-stats", Settings.ARMORY_SITE_URL, getConnection("armory"))
+        ));
+
+        SendEmailPayload e = new SendEmailPayload();
+        e.setRecipients(List.of(getConnection("email")));
+        e.setSubject(subject);
+        e.setHtmlText(htmlBody);
+        EmailAdapterAPI.newEmail(e);
+    }
+ 
 }

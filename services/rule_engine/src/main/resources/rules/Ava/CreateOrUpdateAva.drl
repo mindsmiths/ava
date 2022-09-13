@@ -20,8 +20,7 @@ rule "Create new employee"
         delete(newEmployee);
         modify(agent) {
             addConnection("email", newEmployee.getEmail()),
-            addConnection("armory", Utils.randomGenerator()),
-            setOnboardingStage(OnboardingStage.EMAIL_SENT)
+            addConnection("armory", Utils.randomGenerator())
         };
         insert(newEmployee);
         agent.send(CultureMaster.ID, new EmployeeUpdateSignal(newEmployee));
