@@ -63,7 +63,9 @@ rule "Finish onboarding"
    when
         signal: SubmitEvent(getParamAsString("submit") == "finished-familiarity-quiz") from entry-point "signals"
         agent: Ava(onboardingStage == OnboardingStage.FAMILIARITY_QUIZ)
+        employee: Employee()
    then
+        agent.sendStatisticsEmail(employee);
         modify(agent) {
             setOnboardingStage(OnboardingStage.FINISHED)
         };
