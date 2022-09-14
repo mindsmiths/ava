@@ -4,9 +4,13 @@ import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.employeeManager.employees.Employee;
 import com.mindsmiths.sdk.utils.Utils;
 import com.mindsmiths.ruleEngine.util.Agents;
+
 import signals.EmployeeUpdateSignal;
+
 import agents.CultureMaster;
 import agents.Ava;
+
+import models.EmployeeProfile;
 import models.OnboardingStage;
 
 
@@ -20,19 +24,24 @@ rule "Create new employee"
             addConnection("email", newEmployee.getEmail()),
             addConnection("armory", Utils.randomGenerator())
         };
-        insert(newEmployee);
-        agent.send(CultureMaster.ID, new EmployeeUpdateSignal(newEmployee));
+        EmployeeProfile profile = new EmployeeProfile(newEmployee);
+        insert(profile);
+        agent.send(CultureMaster.ID, new EmployeeUpdateSignal(profile));
 end
 
 rule "Update existing employee"
     when
         newEmployee: Employee() from entry-point "signals"
-        oldEmployee: Employee()
+        profile: EmployeeProfile()
         agent: Ava(onboardingStage != null)
     then
-        delete(oldEmployee);
         delete(newEmployee);
         modify(agent) {addConnection("email", newEmployee.getEmail())};
-        insert(newEmployee);
-        agent.send(CultureMaster.ID, new EmployeeUpdateSignal(newEmployee));
+        modify(profile) {
+            setFirstName(newEmployee.getFirstName()),
+            setLastName(newEmployee.getLastName()),
+            setEmail(newEmployee.getEmail()),
+            setActive(newEmployee.getActive())
+        };
+        agent.send(CultureMaster.ID, new EmployeeUpdateSignal(profile));
 end
