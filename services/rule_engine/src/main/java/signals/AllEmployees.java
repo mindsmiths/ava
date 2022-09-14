@@ -6,14 +6,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.mindsmiths.employeeManager.employees.Employee;
+import models.EmployeeProfile;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 public class AllEmployees extends Signal {
-    private Map<String, Employee> allEmployees = new HashMap<>();
+    private Map<String, EmployeeProfile> allEmployees = new HashMap<>();
 }

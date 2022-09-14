@@ -16,13 +16,16 @@ import signals.EmployeeUpdateSignal;
 import signals.AllEmployees;
 import signals.SendMatchesSignal;
 
+import models.EmployeeProfile;
+
+
 @Data
 @AllArgsConstructor
 public class CultureMaster extends Agent {
     private List<AvaAvailability> avaAvailabilities = new ArrayList<>();
     private List<Match> allMatches = new ArrayList<>();
     private CmLunchCycleStage lunchCycleStage = CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES;
-    private Map<String, Employee> employees = new HashMap<>();
+    private Map<String, EmployeeProfile> employees = new HashMap<>();
 
     public static String ID = "CULTURE_MASTER";
     public CultureMaster() {
@@ -46,7 +49,7 @@ public class CultureMaster extends Agent {
     }
 
     public void sendMatches() {
-        for(Employee employee : employees.values()) {
+        for(EmployeeProfile employee : employees.values()) {
             for(Match m: allMatches) {
                 if(employee.getId().equals(m.getFirst())) {
                     send(employee.getId(), new SendMatchesSignal(employees.get(m.getSecond()).getFirstName() + " " +

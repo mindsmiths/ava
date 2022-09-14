@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import utils.Settings;
 
 import lombok.Data;
 import lombok.ToString;
@@ -13,24 +14,18 @@ import lombok.NoArgsConstructor;
 import com.mindsmiths.armory.ArmoryAPI;
 import com.mindsmiths.armory.components.*;
 import com.mindsmiths.armory.templates.*;
-
-import com.mindsmiths.employeeManager.employees.Employee;
-
-import com.mindsmiths.mitems.Mitems;
-import com.mindsmiths.mitems.Option;
-
-import com.mindsmiths.ruleEngine.model.Agent;
-
-import com.mindsmiths.pairingalgorithm.Days;
 import com.mindsmiths.emailAdapter.EmailAdapterAPI;
 import com.mindsmiths.emailAdapter.SendEmailPayload;
-
+import com.mindsmiths.mitems.Mitems;
+import com.mindsmiths.mitems.Option;
+import com.mindsmiths.ruleEngine.model.Agent;
+import com.mindsmiths.pairingalgorithm.Days;
 import com.mindsmiths.sdk.utils.templating.Templating;
 
-import utils.Settings;
-
 import models.AvaLunchCycleStage;
+import models.EmployeeProfile;
 import models.OnboardingStage;
+
 
 @Data
 @ToString(callSuper = true)
@@ -41,7 +36,7 @@ public class Ava extends Agent {
     private Days matchDay;
     private AvaLunchCycleStage lunchCycleStage = AvaLunchCycleStage.FIND_AVAILABILITY;
     private OnboardingStage onboardingStage;
-    private Map<String, Employee> otherEmployees;
+    private Map<String, EmployeeProfile> otherEmployees;
     private boolean workingHours;
     private Date statsEmailLastSentAt;
 
@@ -135,6 +130,7 @@ public class Ava extends Agent {
                         .addComponent(submitButton[0].getId(), new PrimarySubmitButtonComponent(
                                 submitButton[0].getId(), submitButton[0].getText(), nextQuestionTag)));
                 questionNum += 1;
+                
             } catch (Exception e) {
                 // Changing button value
                 String wrongQuestionTag = "question" + String.valueOf(questionNum - 1);
@@ -212,19 +208,19 @@ public class Ava extends Agent {
         showScreen(screen);
     }
 
-    private String getFullName(Employee employee) {
+    private String getFullName(EmployeeProfile employee) {
         return employee.getFirstName() + " " + employee.getLastName();
     }
 
     private Map<String, String> collectOtherEmployees() {
         Map<String, String> names = new HashMap<>();
-        for (Employee employee : otherEmployees.values()) {
+        for (EmployeeProfile employee : otherEmployees.values()) {
             names.put(getFullName(employee), employee.getId());
         }
         return names;
     }
 
-    public void sendWelcomeEmail(Employee employee) throws IOException {
+    public void sendWelcomeEmail(EmployeeProfile employee) throws IOException {
         String subject = Mitems.getText("onboarding.welcome-email.subject");
         String description = Mitems.getText("onboarding.welcome-email.description");
         String htmlTemplate = String.join("", Files.readAllLines(Paths.get("EmailTemplate.html"), StandardCharsets.UTF_8));
@@ -243,7 +239,7 @@ public class Ava extends Agent {
         EmailAdapterAPI.newEmail(e);
     }
 
-    public void sendStatisticsEmail(Employee employee) throws IOException {
+    public void sendStatisticsEmail(EmployeeProfile employee) throws IOException {
         String subject = Mitems.getText("statistics.statistics-email.subject");
         String description = Mitems.getText("statistics.statistics-email.description");
         String htmlTemplate = String.join("", Files.readAllLines(Paths.get("EmailTemplate.html"), StandardCharsets.UTF_8));
