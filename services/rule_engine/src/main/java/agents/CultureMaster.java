@@ -21,17 +21,12 @@ import signals.SendMatchesSignal;
 public class CultureMaster extends Agent {
     private List<AvaAvailability> avaAvailabilities = new ArrayList<>();
     private List<Match> allMatches = new ArrayList<>();
-    private List<String> avaIDs = new ArrayList<>();
     private CmLunchCycleStage lunchCycleStage = CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES;
     private Map<String, Employee> employees = new HashMap<>();
 
     public static String ID = "CULTURE_MASTER";
     public CultureMaster() {
         id = ID;
-    }
-
-    public void addNewAva(String newAva) {
-        avaIDs.add(newAva);
     }
 
     public void addAvaAvailability(AvaAvailability avaAvailability) {
@@ -51,14 +46,18 @@ public class CultureMaster extends Agent {
     }
 
     public void sendMatches() {
-        for(String ava : avaIDs) {
+        for(Employee employee : employees.values()) {
             for(Match m: allMatches) {
-                if(ava.equals(m.getFirst())) {
-                    send(ava, new SendMatchesSignal(m.getSecond(), m.getDay()));
+                if(employee.getId().equals(m.getFirst())) {
+                    send(employee.getId(), new SendMatchesSignal(employees.get(m.getSecond()).getFirstName() + " " +
+                                                                 employees.get(m.getSecond()).getLastName(),
+                                                                 m.getDay()));
                     break;
                 }
-                if(ava.equals(m.getSecond())) {
-                    send(ava, new SendMatchesSignal(m.getFirst(), m.getDay()));
+                if(employee.getId().equals(m.getSecond())) {
+                    send(employee.getId(), new SendMatchesSignal(employees.get(m.getFirst()).getFirstName() + " " +
+                                                                 employees.get(m.getFirst()).getLastName(),
+                                                                 m.getDay()));
                     break;
                 }
             }

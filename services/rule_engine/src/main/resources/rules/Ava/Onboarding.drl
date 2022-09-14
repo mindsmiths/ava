@@ -15,17 +15,6 @@ import agents.Ava;
 import agents.CultureMaster;
 import models.OnboardingStage;
 
-import signals.AvaRegisteredSignal;
-
-rule "First contact"
-    salience 100
-    when
-        initialize: Initialize() from entry-point "agent-created"
-        agent: Ava()
-    then
-        agent.send(CultureMaster.ID, new AvaRegisteredSignal(agent.getId()));
-        delete(initialize);
-end
 
 rule "Send welcome email"
     when

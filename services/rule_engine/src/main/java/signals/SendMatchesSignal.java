@@ -11,6 +11,6 @@ import com.mindsmiths.sdk.core.api.Signal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SendMatchesSignal extends Signal {
-    private String matchName;
+    private String match;
     private Days matchDay;
 }

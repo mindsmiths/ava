@@ -14,5 +14,6 @@ rule "Add or update Ava data"
             addOrUpdateEmployee(signal),
             sendEmployeesToAva()
         };
+        Log.info("Added new Ava: " + signal.getEmployee());
         delete(signal);
 end

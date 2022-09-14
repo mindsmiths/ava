@@ -37,11 +37,10 @@ import models.OnboardingStage;
 @NoArgsConstructor
 public class Ava extends Agent {
     private List<Days> availableDays = new ArrayList<>();
-    private String matchName;
+    private String match;
     private Days matchDay;
     private AvaLunchCycleStage lunchCycleStage = AvaLunchCycleStage.FIND_AVAILABILITY;
     private OnboardingStage onboardingStage;
-
     private Map<String, Employee> otherEmployees;
     private boolean workingHours;
     private Date statsEmailLastSentAt;
