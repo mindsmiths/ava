@@ -19,7 +19,6 @@ import models.AvaLunchCycleStage;
 import models.OnboardingStage;
 
 
-// revert the conditions
 rule "Lunch invite expired"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
