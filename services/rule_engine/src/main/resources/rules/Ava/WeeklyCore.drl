@@ -40,8 +40,9 @@ rule "Ask for available days"
         eval(!evaluateCronExpression("* * 9-23 * * WED", ts, "Europe/Zagreb") 
         || (!evaluateCronExpression("* * * * * THU", ts, "Europe/Zagreb"))
         || (!evaluateCronExpression("* * 00-14 * * FRI", ts, "Europe/Zagreb")))
-        signal: UserConnectedEvent() from entry-point "signals"
-        agent: Ava(weeklyStage == AvaWeeklyStage.FIND_AVAILABILITY)
+        signal: UserConnectedEvent(getParamAsString("trigger") == "start-weekly-core") from entry-point "signals"
+        agent: Ava(weeklyStage == AvaWeeklyStage.FIND_AVAILABILITY,
+                   onboardingStage == OnboardingStage.FINISHED)
     then 
         // what if person decides to exit this screen without answering, now we can't get back because we are in the next stage
         modify(agent) {setWeeklyStage(AvaWeeklyStage.FORWARD_AVAILABILITY)}

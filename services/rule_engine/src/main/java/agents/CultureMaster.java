@@ -15,8 +15,6 @@ import com.mindsmiths.pairingalgorithm.Match;
 import signals.EmployeeUpdateSignal;
 import signals.MatchInfoSignal;
 
-import models.CultureMasterWeeklyStage;
-
 @Data
 @AllArgsConstructor
 public class CultureMaster extends Agent {
