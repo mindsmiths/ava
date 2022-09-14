@@ -108,7 +108,7 @@ public class Ava extends Agent {
     public void showFamiliarityQuizScreens() {
         Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
         String avaImagePath = Mitems.getText("onboarding.familiarity-quiz.ava-image-path");
-        Map<String, String> names = createMapNames();
+        List<Map<String, String>> names = createName();
 
         // Adding intro screen
         Option[] introButton = Mitems.getOptions("onboarding.familiarity-quiz.intro-button");
@@ -133,7 +133,7 @@ public class Ava extends Agent {
                 String questionText = Mitems.getText("onboarding.familiarity-quiz." + questionTag);
                 screens.put(questionTag, new TemplateGenerator(questionTag)
                         .addComponent("question", new TitleComponent(questionText))
-                        .addComponent(answersTag, new CloudSelectComponent(answersTag, names))
+                        .addComponent(answersTag, new CloudSelectComponent(answersTag, names.get(questionNum-1)))
                         .addComponent(submitButton[0].getId(), new PrimarySubmitButtonComponent(
                                 submitButton[0].getId(), submitButton[0].getText(), nextQuestionTag)));
                 questionNum += 1;
@@ -214,10 +214,22 @@ public class Ava extends Agent {
         showScreen(screen);
     }
 
-    private Map<String, String> createMapNames() {
-        Map<String, String> names = new HashMap<>();
-        for (Employee employee : otherEmployees.values()) {
-            names.put(employee.getFirstName() + " " + employee.getLastName(), employee.getId());
+    private List<Map<String, String>> createName() {
+        List<Map<String, String>> names = new ArrayList<>();
+        List<Integer> employeesPerQuestionDistribution = employeesPerQuestionDistribution();
+        List<Employee> employees = new ArrayList<>(otherEmployees.values());
+
+        int startIndex = 0;
+        int endIndex = 0;
+        for(int len : employeesPerQuestionDistribution) {
+            endIndex += len;
+            Map<String, String> namesPerQuestion = new HashMap<>();
+
+            for(Employee employee : employees.subList(startIndex, endIndex)) {
+                namesPerQuestion.put(employee.getFirstName() + " " + employee.getLastName(), employee.getId());
+            }
+            names.add(namesPerQuestion);
+            startIndex = endIndex;
         }
         return names;
     }
@@ -258,5 +270,38 @@ public class Ava extends Agent {
         e.setSubject(subject);
         e.setHtmlText(htmlBody);
         EmailAdapterAPI.newEmail(e);
+    }
+
+    private List<Integer> employeesPerQuestionDistribution() {
+        List<Integer> employeesPerQuestionDistribution = new ArrayList<Integer>();
+        //int numOfOtherEmployees = otherEmployees.size();
+        int numOfOtherEmployees = 52;
+        int numOfQuestions = 1;
+        // Determining minimal number of questions
+        while (true) {
+            if ( (double) numOfOtherEmployees/ (double) numOfQuestions <= 10.0) {
+                break;
+            }
+            numOfQuestions += 1;
+        }
+        // Calculating number of employees per question
+        double employeesPerQuestion;
+        int employeesPerQuestionRounded;
+
+        while (numOfOtherEmployees > 0) {
+            employeesPerQuestion = (double) numOfOtherEmployees/ (double) numOfQuestions;
+
+            if (employeesPerQuestion % 1 != 0) {
+                employeesPerQuestionRounded = (int) (employeesPerQuestion + 1);
+            }
+            else {
+                employeesPerQuestionRounded = (int) (employeesPerQuestion);
+            }
+
+            employeesPerQuestionDistribution.add(employeesPerQuestionRounded);
+            numOfOtherEmployees = numOfOtherEmployees - employeesPerQuestionRounded;
+            numOfQuestions -= 1;
+        }
+        return employeesPerQuestionDistribution;
     }
 }
