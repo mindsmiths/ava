@@ -29,7 +29,7 @@ import com.mindsmiths.sdk.utils.templating.Templating;
 
 import utils.Settings;
 
-import models.AvaWeeklyStage;
+import models.AvaLunchCycleStage;
 import models.OnboardingStage;
 
 @Data
@@ -39,8 +39,7 @@ public class Ava extends Agent {
     private List<Days> availableDays = new ArrayList<>();
     private String matchName;
     private Days matchDay;
-    private Employee employee;
-    private AvaWeeklyStage weeklyStage = AvaWeeklyStage.FIND_AVAILABILITY;
+    private AvaLunchCycleStage lunchCycleStage = AvaLunchCycleStage.FIND_AVAILABILITY;
     private OnboardingStage onboardingStage;
 
     private Map<String, Employee> otherEmployees;
@@ -66,10 +65,10 @@ public class Ava extends Agent {
         ArmoryAPI.showScreens(getConnection("armory"), firstScreenId, screens);
     }
 
-    public void notWorkingHours() {
-        BaseTemplate notWorkingScreen = new TemplateGenerator()
+    public void showLunchInviteExpiredScreen() {
+        BaseTemplate lunchInviteExpiredScreen = new TemplateGenerator()
             .addComponent("title", new TitleComponent(Mitems.getText("weekly-core.message-about-not-working-hours-for-links.title")));
-        showScreen(notWorkingScreen);
+        showScreen(lunchInviteExpiredScreen);
     }
 
     public void chooseAvailableDaysScreen() {
@@ -87,7 +86,7 @@ public class Ava extends Agent {
         showScreen(daysScreen);
     }
 
-    public void showNotAvailable() {
+    public void showNotAvailableScreen() {
         BaseTemplate notAvailableScreen = new TemplateGenerator()
             .addComponent("title", new TitleComponent(Mitems.getText("weekly-core.title-for-person-who-is-not-available-any-day.title")));
         // implement free form where they have to explain why they are not available
@@ -108,7 +107,7 @@ public class Ava extends Agent {
     public void showFamiliarityQuizScreens() {
         Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
         String avaImagePath = Mitems.getText("onboarding.familiarity-quiz.ava-image-path");
-        Map<String, String> names = createMapNames();
+        Map<String, String> names = collectOtherEmployees();
 
         // Adding intro screen
         Option[] introButton = Mitems.getOptions("onboarding.familiarity-quiz.intro-button");
@@ -214,10 +213,14 @@ public class Ava extends Agent {
         showScreen(screen);
     }
 
-    private Map<String, String> createMapNames() {
+    private String getFullName(Employee employee) {
+        return employee.getFirstName() + " " + employee.getLastName();
+    }
+
+    private Map<String, String> collectOtherEmployees() {
         Map<String, String> names = new HashMap<>();
         for (Employee employee : otherEmployees.values()) {
-            names.put(employee.getFirstName() + " " + employee.getLastName(), employee.getId());
+            names.put(getFullName(employee), employee.getId());
         }
         return names;
     }

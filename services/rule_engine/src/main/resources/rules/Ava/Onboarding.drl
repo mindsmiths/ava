@@ -14,14 +14,8 @@ import com.mindsmiths.employeeManager.employees.Employee;
 import agents.Ava;
 import agents.CultureMaster;
 import models.OnboardingStage;
-import signals.AllEmployees;
-import models.AvaWeeklyStage;
 
-import signals.RequestAvailableDaysSignal;
-import signals.AvaAvailabilitySignal;
 import signals.AvaRegisteredSignal;
-import signals.MatchInfoSignal;
-
 
 rule "First contact"
     salience 100
@@ -30,7 +24,6 @@ rule "First contact"
         agent: Ava()
     then
         agent.send(CultureMaster.ID, new AvaRegisteredSignal(agent.getId()));
-        Log.info("Sent my id to CM " + agent.getId());
         delete(initialize);
 end
 

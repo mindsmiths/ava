@@ -6,7 +6,7 @@ import java.util.*;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import models.CultureMasterWeeklyStage;
+import models.CmLunchCycleStage;
 
 import com.mindsmiths.pairingalgorithm.PairingAlgorithmAPI;
 import com.mindsmiths.pairingalgorithm.AvaAvailability;
@@ -14,7 +14,7 @@ import com.mindsmiths.pairingalgorithm.Match;
 
 import signals.EmployeeUpdateSignal;
 import signals.AllEmployees;
-import signals.MatchInfoSignal;
+import signals.SendMatchesSignal;
 
 @Data
 @AllArgsConstructor
@@ -22,8 +22,7 @@ public class CultureMaster extends Agent {
     private List<AvaAvailability> avaAvailabilities = new ArrayList<>();
     private List<Match> allMatches = new ArrayList<>();
     private List<String> avaIDs = new ArrayList<>();
-    private CultureMasterWeeklyStage weeklyStage = CultureMasterWeeklyStage.COLLECT_AVA_AVAILABILITIES;
-    private List<Map<String, List<Integer>>> freeDays; // information about available days
+    private CmLunchCycleStage lunchCycleStage = CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES;
     private Map<String, Employee> employees = new HashMap<>();
 
     public static String ID = "CULTURE_MASTER";
@@ -51,15 +50,15 @@ public class CultureMaster extends Agent {
         this.allMatches = allMatches;
     }
 
-    public void sendMatchInfo() {
+    public void sendMatches() {
         for(String ava : avaIDs) {
             for(Match m: allMatches) {
                 if(ava.equals(m.getFirst())) {
-                    send(ava, new MatchInfoSignal(m.getSecond(), m.getDay()));
+                    send(ava, new SendMatchesSignal(m.getSecond(), m.getDay()));
                     break;
                 }
                 if(ava.equals(m.getSecond())) {
-                    send(ava, new MatchInfoSignal(m.getFirst(), m.getDay()));
+                    send(ava, new SendMatchesSignal(m.getFirst(), m.getDay()));
                     break;
                 }
             }

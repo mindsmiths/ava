@@ -13,7 +13,7 @@ import signals.RequestAvailableDaysSignal;
 import signals.AvaAvailabilitySignal;
 
 import agents.CultureMaster;
-import models.CultureMasterWeeklyStage;
+import models.CmLunchCycleStage;
 
 
 rule "First contact"
@@ -35,10 +35,10 @@ rule "Add New Ava Id"
         delete(signal);
 end
 
-rule "Accept Ava Availability"
+rule "Store Ava Availability"
     when
         signal: AvaAvailabilitySignal() from entry-point "signals"
-        agent: CultureMaster(weeklyStage == CultureMasterWeeklyStage.COLLECT_AVA_AVAILABILITIES)
+        agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES)
     then
         Log.info("Received some ava availability\n");
         modify(agent) {addAvaAvailability(signal.getAvaAvailability())};
@@ -50,26 +50,26 @@ end
 rule "Check That All Ava Availabilities Came"
     when
         Heartbeat() from entry-point "signals"
-        agent: CultureMaster(weeklyStage == CultureMasterWeeklyStage.COLLECT_AVA_AVAILABILITIES,
+        agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES,
                             avaIDs.size() == avaAvailabilities.size(),
                             !avaIDs.isEmpty())
     then
-        modify(agent) {setWeeklyStage(CultureMasterWeeklyStage.GENERATE_MATCHES)};
+        modify(agent) {setLunchCycleStage(CmLunchCycleStage.GENERATE_MATCHES)};
 end
 
 
 rule "Generate This Weeks Matches"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        agent: CultureMaster(weeklyStage == CultureMasterWeeklyStage.GENERATE_MATCHES)
+        agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.GENERATE_MATCHES)
     then
         Log.info("Generating matches....");
         Log.info("AvaIDs List: " + agent.getAvaIDs());
-        modify(agent) {setWeeklyStage(CultureMasterWeeklyStage.COLLECT_GENERATED_MATCHES)};
+        modify(agent) {setLunchCycleStage(CmLunchCycleStage.COLLECT_GENERATED_MATCHES)};
         agent.generateMatches();
 end
 
-rule "Accept Generated Matches"
+rule "Store Generated Matches"
     when
         matches: Matches() from entry-point "signals"
         agent: CultureMaster()
@@ -77,16 +77,16 @@ rule "Accept Generated Matches"
         modify(agent) {addMatches(matches.getAllMatches())};
         Log.info("---------------------rezultati pairinga---------------------");
         Log.info(matches.getAllMatches());
-        modify(agent) {setWeeklyStage(CultureMasterWeeklyStage.SEND_TO_AVAS)};
+        modify(agent) {setLunchCycleStage(CmLunchCycleStage.SEND_TO_AVAS)};
         delete(matches);
 end
 
 rule "Send Match Info To Avas"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        agent: CultureMaster(weeklyStage == CultureMasterWeeklyStage.SEND_TO_AVAS)
+        agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.SEND_TO_AVAS)
     then
-        agent.sendMatchInfo();
+        agent.sendMatches();
 end
 
 

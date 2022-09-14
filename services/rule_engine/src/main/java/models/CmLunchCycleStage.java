@@ -1,6 +1,6 @@
 package models;
 
-public enum CultureMasterWeeklyStage {
+public enum CmLunchCycleStage {
     COLLECT_AVA_AVAILABILITIES,
     GENERATE_MATCHES,
     COLLECT_GENERATED_MATCHES,
