@@ -16,7 +16,6 @@ import lombok.NoArgsConstructor;
 
 import com.mindsmiths.emailAdapter.EmailAdapterAPI;
 import com.mindsmiths.emailAdapter.SendEmailPayload;
-import com.mindsmiths.employeeManager.employees.Employee;
 import com.mindsmiths.mitems.Mitems;
 import com.mindsmiths.mitems.Option;
 import com.mindsmiths.ruleEngine.model.Agent;
@@ -34,7 +33,9 @@ import com.mindsmiths.armory.templates.BaseTemplate;
 import com.mindsmiths.armory.templates.TemplateGenerator;
 import com.mindsmiths.armory.components.CloudSelectComponent;
 
+import models.EmployeeProfile;
 import models.OnboardingStage;
+
 
 @Data
 @ToString(callSuper = true)
@@ -90,6 +91,7 @@ public class Ava extends Agent {
                         .addComponent(submitButton[0].getId(), new PrimarySubmitButtonComponent(
                                 submitButton[0].getId(), submitButton[0].getText(), nextQuestionTag)));
                 questionNum += 1;
+                
             } catch (Exception e) {
                 // Changing button value
                 String wrongQuestionTag = "question" + String.valueOf(questionNum - 1);
@@ -171,7 +173,7 @@ public class Ava extends Agent {
         send("CultureMaster", new DayChoiceSignal(freeDays));
     }
 
-    public void sendWelcomeEmail(Employee employee) throws IOException {
+    public void sendWelcomeEmail(EmployeeProfile employee) throws IOException {
         String subject = Mitems.getText("onboarding.welcome-email.subject");
         String description = Mitems.getText("onboarding.welcome-email.description");
         String htmlTemplate = String.join("", Files.readAllLines(Paths.get("EmailTemplate.html"), StandardCharsets.UTF_8));
@@ -190,7 +192,7 @@ public class Ava extends Agent {
         EmailAdapterAPI.newEmail(e);
     }
 
-    public void sendStatisticsEmail(Employee employee) throws IOException {
+    public void sendStatisticsEmail(EmployeeProfile employee) throws IOException {
         String subject = Mitems.getText("statistics.statistics-email.subject");
         String description = Mitems.getText("statistics.statistics-email.description");
         String htmlTemplate = String.join("", Files.readAllLines(Paths.get("EmailTemplate.html"), StandardCharsets.UTF_8));

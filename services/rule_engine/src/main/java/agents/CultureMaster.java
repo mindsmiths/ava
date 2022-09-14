@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import signals.EmployeeUpdateSignal;
 
+
 @Data
 @AllArgsConstructor
 public class CultureMaster extends Agent {
