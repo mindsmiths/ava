@@ -18,7 +18,6 @@ public class Runner extends RuleEngineService {
             Agents.createAgent(new agents.CultureMaster());
 
         addListener(Flow.class, DataUtils::save);
-        addListener(EmployeeProfile.class, DataUtils::save);
     }
 
     public static void main(String[] args) {

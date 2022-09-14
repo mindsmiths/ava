@@ -21,6 +21,7 @@ public class EmployeeProfile extends Employee {
         setFirstName(employee.getFirstName());
         setLastName(employee.getLastName());
         setEmail(employee.getEmail());
+        setActive(employee.getActive());
     }
 
     public EmployeeProfile(Map<String, String> personalAnswers, Map<String, Double> familiarity, String id, String firstName, String lastName) {
