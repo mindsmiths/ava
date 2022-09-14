@@ -1,12 +1,15 @@
 package com.mindsmiths.employeeManager.employees;
 
 import com.mindsmiths.sdk.core.db.DataModel;
+
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import java.io.Serializable;
 
+@AllArgsConstructor
 @Getter
 @Setter
 @ToString(callSuper = true)

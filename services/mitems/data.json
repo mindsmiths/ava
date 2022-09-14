@@ -74,7 +74,7 @@
           {
             "description": "Calendar invite text",
             "type": "TEXT",
-            "content": "This is invite for a meeting"
+            "content": "This is {{ firstName}} inviting {{ secondName }} to meeting."
           },
           {
             "description": "Description",

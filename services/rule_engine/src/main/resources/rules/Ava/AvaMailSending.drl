@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.mindsmiths.emailAdapter.EmailAdapterAPI;
 import com.mindsmiths.emailAdapter.SendEmailPayload;
+import com.mindsmiths.employeeManager.employees.Employee;
 import com.mindsmiths.ruleEngine.util.Agents;
 import com.mindsmiths.ruleEngine.model.Heartbeat;
 import com.mindsmiths.ruleEngine.util.Log;
@@ -50,7 +51,7 @@ rule "Non working hours"
          Log.info("*********");
 end
 
-/* rule "First weekly mail sending"
+/*rule "First weekly mail sending"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
         //eval(evaluateCronExpression("* * 8-17 ? * FRI *", ts, "Europe/Zagreb"))
@@ -77,7 +78,7 @@ end
         e.setSubject(subject);
         e.setHtmlText(htmlBody);
         EmailAdapterAPI.newEmail(e); 
-end */
+end*/
 
 rule "Match mail sending"
     when
@@ -93,6 +94,10 @@ rule "Match mail sending"
         Ava ava1 = new Ava();
         ava1.addConnection("email", "filipbacic08+1@gmail.com");
         agent.addConnection("email", "filipbacic08+2@gmail.com");
+        agent.setEmployees(Map.of(
+            agent.getId(), new Employee("1", "Nikola", "A", "a", false),
+            ava1.getId(), new Employee("2", "Filip", "B", "b", false)
+        ));
         Log.info("*********");
         Log.info(" I am matching mail! ");
         Log.info("*********");

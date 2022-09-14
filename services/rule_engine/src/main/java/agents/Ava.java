@@ -19,6 +19,7 @@ import com.mindsmiths.mitems.Mitems;
 import com.mindsmiths.mitems.Option;
 import com.mindsmiths.ruleEngine.model.Agent;
 import com.mindsmiths.sdk.utils.Utils;
+import com.mindsmiths.sdk.utils.templating.Templating;
 import com.mindsmiths.armory.ArmoryAPI;
 import com.mindsmiths.armory.components.DescriptionComponent;
 import com.mindsmiths.armory.components.ImageComponent;
@@ -30,6 +31,7 @@ import com.mindsmiths.armory.templates.TemplateGenerator;
 import com.mindsmiths.emailAdapter.AttachmentData;
 import com.mindsmiths.emailAdapter.EmailAdapterAPI;
 import com.mindsmiths.emailAdapter.SendEmailPayload;
+import com.mindsmiths.employeeManager.employees.Employee;
 import com.mindsmiths.armory.components.CloudSelectComponent;
 
 import models.OnboardingStage;
@@ -55,6 +57,7 @@ public class Ava extends Agent {
     OnboardingStage onboardingStage;
     private boolean workingHours = false;
     private Date matchedWithEmailSentAt;
+    private Map<String, Employee> employees;
 
     public Ava(String connectionName, String connectionId) {
         super(connectionName, connectionId);
@@ -208,7 +211,11 @@ public class Ava extends Agent {
             invite.getProperties().add(CalScale.GREGORIAN);
             invite.getProperties().add(Method.REQUEST);
 
-            String description = Mitems.getText("onboarding.matching-mail.calendar-invite-text");
+            String description = Templating.recursiveRender(Mitems.getText("onboarding.matching-mail.calendar-invite-text"), Map.of(
+                "firstName", employees.get(getId()).getFirstName(),
+                "secondName", employees.get(pair.getId()).getFirstName(),
+                "armoryUrl", "http://8000.workspace-ms-197475909.sandbox.mindsmiths.io/"
+            ));
 
             VEvent ev = new VEvent(new DateTime(new Date(122,8,13,12,0)),
                                    new DateTime(new Date(122,8,13,13,0)),
