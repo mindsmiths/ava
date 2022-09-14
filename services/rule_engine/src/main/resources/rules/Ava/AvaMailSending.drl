@@ -89,15 +89,9 @@ rule "Match mail sending"
             setMatchedWithEmailSentAt(ts)
         };
         Date matchingDate = new Date();
-        Log.info(matchingDate.toString());
 
-        Ava ava1 = new Ava();
-        ava1.addConnection("email", "filipbacic08+1@gmail.com");
         agent.addConnection("email", "filipbacic08+2@gmail.com");
-        agent.setEmployees(Map.of(
-            agent.getId(), new Employee("1", "Nikola", "A", "a", false),
-            ava1.getId(), new Employee("2", "Filip", "B", "b", false)
-        ));
+        
         Log.info("*********");
         Log.info(" I am matching mail! ");
         Log.info("*********");

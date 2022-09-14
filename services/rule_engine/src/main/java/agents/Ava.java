@@ -1,6 +1,7 @@
 package agents;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -57,7 +58,6 @@ public class Ava extends Agent {
     OnboardingStage onboardingStage;
     private boolean workingHours = false;
     private Date matchedWithEmailSentAt;
-    private Map<String, Employee> employees;
 
     public Ava(String connectionName, String connectionId) {
         super(connectionName, connectionId);
@@ -192,12 +192,28 @@ public class Ava extends Agent {
     }
 
     //ICS Calendar integration
+
+    public String getEmailBody() throws IOException {
+        String htmlTemplateMatching = String.join("", Files.readAllLines(Paths.get("EmailTemplateCalendar.html"), StandardCharsets.UTF_8));
+        String matchingMailBodyText = Mitems.getText("onboarding.matching-mail.matchingmailbodytext");
+        String matchingMailTitleText = Mitems.getText("onboarding.matching-mail.matchingmailtitletext");
+
+        String description = Templating.recursiveRender(htmlTemplateMatching, Map.of(
+            "biggerTitle", matchingMailTitleText,
+            "title", matchingMailBodyText,
+            "personName", "Filip",
+            "dayOfWeek", "Monday",
+            "armoryUrl", "http://8000.workspace-ms-197475909.sandbox.mindsmiths.io/"
+        ));
+
+        return description;
+    }
     
-    public void sendCalendarInvite(Date date, Ava pair) {
+    public void sendCalendarInvite(Date date, Ava pair) throws IOException {
         SendEmailPayload payload = new SendEmailPayload();
         payload.setRecipients(List.of(getConnection("email"), "fbacic@tvz.hr"));
         payload.setSubject("Invite: " + pair.getId().toString() + "on a meeting with you");
-        payload.setHtmlText("EmailTemplate.html"); // here goes HTML
+        payload.setHtmlText(getEmailBody()); // here goes HTML
         payload.setAttachments(List.of(new AttachmentData(getICSInvite(date, pair), "invite.ics")));
         EmailAdapterAPI.newEmail(payload);
         //Files.readAllLines(Paths.get("EmailTemplate.html"), StandardCharsets.UTF_8)
@@ -210,8 +226,8 @@ public class Ava extends Agent {
             invite.getProperties().add(Version.VERSION_2_0);
             invite.getProperties().add(CalScale.GREGORIAN);
             invite.getProperties().add(Method.REQUEST);
-
-            String description = Templating.recursiveRender(Mitems.getText("onboarding.matching-mail.calendar-invite-text"), Map.of(
+            
+            String description1 = Templating.recursiveRender(Mitems.getText("onboarding.matching-mail.calendar-invite-text"), Map.of(
                 "firstName", employees.get(getId()).getFirstName(),
                 "secondName", employees.get(pair.getId()).getFirstName(),
                 "armoryUrl", "http://8000.workspace-ms-197475909.sandbox.mindsmiths.io/"
@@ -219,7 +235,7 @@ public class Ava extends Agent {
 
             VEvent ev = new VEvent(new DateTime(new Date(122,8,13,12,0)),
                                    new DateTime(new Date(122,8,13,13,0)),
-                                   description);
+                                   description1);
             ev.getProperties().add(new net.fortuna.ical4j.model.property.Attendee("mailto:" + "filipbacic08@gmail"));
             ev.getProperties().add(new net.fortuna.ical4j.model.property.Attendee("mailto:" + "fbacic@tvz.hr")); 
             

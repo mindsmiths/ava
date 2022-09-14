@@ -67,11 +67,6 @@
         "name": "Matching mail",
         "elements": [
           {
-            "description": "",
-            "type": "TEXT",
-            "content": ""
-          },
-          {
             "description": "Calendar invite text",
             "type": "TEXT",
             "content": "This is {{ firstName}} inviting {{ secondName }} to meeting."
@@ -83,6 +78,21 @@
           },
           {
             "description": "SubjectName",
+            "type": "TEXT",
+            "content": "It's a match !"
+          },
+          {
+            "description": "matchingMailBodyText",
+            "type": "TEXT",
+            "content": "I've matched you with {{ personName }} for lunch on {{ dayOfWeek }}.\n\nI think you should get to know each other better."
+          },
+          {
+            "description": "matchingMailButtonText",
+            "type": "TEXT",
+            "content": "Add to calendar"
+          },
+          {
+            "description": "matchingMailTitleText",
             "type": "TEXT",
             "content": "It's a match !"
           },
