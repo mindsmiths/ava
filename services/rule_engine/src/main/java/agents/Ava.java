@@ -46,6 +46,7 @@ public class Ava extends Agent {
     private Map<String, Employee> otherEmployees;
     private boolean workingHours;
     private Date statsEmailLastSentAt;
+    int numOfQuestions;
 
     public Ava(String connectionName, String connectionId) {
         super(connectionName, connectionId);
@@ -124,7 +125,7 @@ public class Ava extends Agent {
         int questionNum = 1;
         Option[] submitButton = Mitems.getOptions("onboarding.familiarity-quiz.submit-button");
 
-        while (true) {
+        for (int i = 0 ; i < numOfQuestions ; i++) {
             String questionTag = "question" + String.valueOf(questionNum);
             String nextQuestionTag = "question" + String.valueOf(questionNum + 1);
             String answersTag = "answers" + String.valueOf(questionNum);
@@ -274,9 +275,8 @@ public class Ava extends Agent {
 
     private List<Integer> employeesPerQuestionDistribution() {
         List<Integer> employeesPerQuestionDistribution = new ArrayList<Integer>();
-        //int numOfOtherEmployees = otherEmployees.size();
-        int numOfOtherEmployees = 52;
-        int numOfQuestions = 1;
+        int numOfOtherEmployees = otherEmployees.size();
+        numOfQuestions = 1;
         // Determining minimal number of questions
         while (true) {
             if ( (double) numOfOtherEmployees/ (double) numOfQuestions <= 10.0) {
