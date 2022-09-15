@@ -9,7 +9,7 @@ global:
     PROJECT_SLUG: 'ava'
 
 
-    #ENVIRONMENT_NAME: {{ env.ENVIRONMENT_NAME }}
+    ENVIRONMENT_NAME: {{ env.ENVIRONMENT_NAME }}
     MODULE: '{{ env.MODULE | default("local", True) }}'
     LOG_LEVEL: DEBUG
 

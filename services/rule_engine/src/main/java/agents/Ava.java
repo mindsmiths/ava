@@ -39,7 +39,6 @@ public class Ava extends Agent {
     private Map<String, EmployeeProfile> otherEmployees;
     private boolean workingHours;
     private Date statsEmailLastSentAt;
-    int numOfQuestions;
 
     public Ava(String connectionName, String connectionId) {
         super(connectionName, connectionId);
@@ -118,7 +117,7 @@ public class Ava extends Agent {
         int questionNum = 1;
         String submitButton = Mitems.getText("onboarding.familiarity-quiz-questions.action");
 
-        while(true) {    
+        while(true) { 
             String questionTag = "question" + String.valueOf(questionNum);
             String nextQuestionTag = "question" + String.valueOf(questionNum + 1);
             String answersTag = "answers" + String.valueOf(questionNum);
@@ -268,14 +267,8 @@ public class Ava extends Agent {
     private List<Integer> employeesPerQuestionDistribution() {
         List<Integer> employeesPerQuestionDistribution = new ArrayList<Integer>();
         int numOfOtherEmployees = otherEmployees.size();
-        numOfQuestions = 1;
-        // Determining minimal number of questions
-        while (true) {
-            if ( (double) numOfOtherEmployees/ (double) numOfQuestions <= 10.0) {
-                break;
-            }
-            numOfQuestions += 1;
-        }
+        int numOfQuestions = (int) Math.ceil((double) numOfOtherEmployees / 10.0);
+        
         // Calculating number of employees per question
         double employeesPerQuestion;
         int employeesPerQuestionRounded;
@@ -284,10 +277,10 @@ public class Ava extends Agent {
             employeesPerQuestion = (double) numOfOtherEmployees/ (double) numOfQuestions;
 
             if (employeesPerQuestion % 1 != 0) {
-                employeesPerQuestionRounded = (int) (employeesPerQuestion + 1);
+                employeesPerQuestionRounded = (int) Math.ceil(employeesPerQuestion);
             }
             else {
-                employeesPerQuestionRounded = (int) (employeesPerQuestion);
+                employeesPerQuestionRounded = (int) Math.floor(employeesPerQuestion);
             }
 
             employeesPerQuestionDistribution.add(employeesPerQuestionRounded);
