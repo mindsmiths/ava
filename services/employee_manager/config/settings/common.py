@@ -161,7 +161,7 @@ LOGGING = forge_settings.LOGGING
 JET_SIDE_MENU_COMPACT = True
 JET_DEFAULT_THEME = 'light-violet'
 
-JET_INDEX_DASHBOARD = 'jet.dashboard.dashboard.DefaultIndexDashboard'
+JET_INDEX_DASHBOARD = 'dashboard.CustomIndexDashboard'
 
 try:
     import sentry_sdk
