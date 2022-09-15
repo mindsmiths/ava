@@ -29,6 +29,7 @@ import com.mindsmiths.armory.components.ImageComponent;
 import com.mindsmiths.armory.components.PrimarySubmitButtonComponent;
 import com.mindsmiths.armory.components.TextAreaComponent;
 import com.mindsmiths.armory.components.TitleComponent;
+import com.mindsmiths.armory.components.HeaderComponent;
 import com.mindsmiths.armory.templates.BaseTemplate;
 import com.mindsmiths.armory.templates.TemplateGenerator;
 import com.mindsmiths.armory.components.CloudSelectComponent;
@@ -84,6 +85,7 @@ public class Ava extends Agent {
             try {
                 String questionText = Mitems.getText("onboarding.familiarity-quiz." + questionTag);
                 screens.put(questionTag, new TemplateGenerator(questionTag)
+                        .addComponent("header", new HeaderComponent(null, questionNum > 1))
                         .addComponent("question", new TitleComponent(questionText))
                         .addComponent(answersTag, new CloudSelectComponent(answersTag, Map.of(
                                 "Tomislav Matić", "tomislav matić", "Emil Prpić", "emil pripić",
@@ -135,6 +137,7 @@ public class Ava extends Agent {
             try {
                 String text = Mitems.getText("onboarding.personal-quiz." + questionTag);
                 screens.put(questionTag, new TemplateGenerator(questionTag)
+                        .addComponent("header", new HeaderComponent(null, questionNum > 1))
                         .addComponent("question", new TitleComponent(text))
                         .addComponent(answersTag, new TextAreaComponent(answersTag, "Type your answer here", true))
                         .addComponent(submitButton[0].getId(), new PrimarySubmitButtonComponent(

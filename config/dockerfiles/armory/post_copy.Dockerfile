@@ -1,1 +1,0 @@
-COPY --from=0 /armory/dist services/armory/dist

@@ -1,21 +1,21 @@
 global:
   dependencies:
     python:
-      - forge-sdk==4.0.0a11
-      - forge-cli==4.0.0a25
+      - forge-sdk==4.0.0a12
+      - forge-cli==4.0.0a26
       - cecs==4.0.0a3
       - services/*.py
   env:
     PROJECT_SLUG: 'ava'
 
-
     ENVIRONMENT_NAME: {{ env.ENVIRONMENT_NAME }}
     MODULE: '{{ env.MODULE | default("local", True) }}'
-    LOG_LEVEL: DEBUG
+    LOG_LEVEL: INFO
 
     # Messaging
     PULSAR_URL: pulsar://pulsar-proxy.pulsar.svc.cluster.local:6650
     PULSAR_ENDPOINT_URL: http://pulsar-proxy.pulsar.svc.cluster.local
+
     # Databases
     MONGO_CLIENT_HOST: mongodb:27017
     MONGO_CLIENT_USERNAME: root
@@ -24,7 +24,9 @@ global:
     POSTGRES_CLIENT_PORT: '5432'
     POSTGRES_CLIENT_USERNAME: postgres
 
-    REDIS_URL: redis-master:6379
+    REDIS_CLIENT_HOST: redis-master
+    REDIS_CLIENT_PORT: 6379
+    # REDIS_URL: redis-master:6379
 
     BACKUP_CONTAINER_NAME: '{{ env.BACKUP_CONTAINER_NAME }}'
     BACKUPS_STORAGE_ACCOUNT_NAME: '{{ env.BACKUPS_STORAGE_ACCOUNT_NAME }}'
@@ -43,13 +45,13 @@ global:
 
   backups:
     mongo:
-      enabled: true
+      enabled: false
       cron: 3 5,17 * * *
     postgres:
-      enabled: true
+      enabled: false
       cron: 8 5,17 * * *
     redis:
-      enabled: true
+      enabled: false
       cron: 13 5,17 * * *
 
   cecs:
@@ -64,8 +66,6 @@ services:
     resources:
       cpu: 500m
       memory: 650Mi
-    dependencies:
-      - employee-manager
 
   heartbeat-scheduler:
     package: heartbeat
@@ -76,7 +76,7 @@ services:
     db:
       mongo: true
     dependencies:
-      - rule-engine-api==4.0.0a20
+      - rule-engine-api==4.0.0a21
     resources:
       cpu: 69m
       memory: 65Mi
@@ -88,14 +88,14 @@ services:
     db:
       mongo: true
     dependencies:
-      - rule-engine-api==4.0.0a20
+      - rule-engine-api==4.0.0a21
     resources:
       cpu: 84m
       memory: 94Mi
 
   mitems:
     type: django
-    version: 4.0.0a11
+    version: 4.0.0a12
     db:
       postgres: true
     image:
@@ -143,29 +143,6 @@ services:
       cpu: 50m
       memory: 75Mi
 
-  armory:
-    type: django
-    version: 4.0.0a14
-    command:
-      run: "daphne -b 0.0.0.0 armory.config.asgi:application"
-    db:
-      mongo: true
-      postgres: true
-    dependencies:
-      - channels==3.0.5
-      - channels-redis==3.3.1
-      - django==3.2.15
-      - daphne==3.0.2
-      - django-environ==0.8.1
-      - gunicorn==20.1.0
-      - websockets==10.1
-    env:
-      SITE_URL: '{{ env.ARMORY_URL }}'
-      INTERNAL_SITE_URL: "armory"
-    resources:
-      cpu: 50m
-      memory: 75Mi
-
   employee-manager:
     type: django
     db:
@@ -187,3 +164,26 @@ services:
     resources:
       cpu: 100m
       memory: 300Mi
+
+  armory:
+    type: django
+    version: 4.0.0a15
+    command:
+      run: "daphne -b 0.0.0.0 armory.config.asgi:application"
+    db:
+      mongo: true
+      postgres: true
+    dependencies:
+      - channels==3.0.5
+      - channels-redis==3.3.1
+      - django==3.2.15
+      - daphne==3.0.2
+      - django-environ==0.8.1
+      - gunicorn==20.1.0
+      - websockets==10.1
+    env:
+      SITE_URL: '{{ env.ARMORY_URL }}'
+      INTERNAL_SITE_URL: "armory"
+    resources:
+      cpu: 50m
+      memory: 75Mi

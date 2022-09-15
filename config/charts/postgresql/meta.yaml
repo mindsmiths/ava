@@ -1,4 +1,4 @@
-REPO_URL: https://charts.helm.sh/stable
-REPO_NAME: stable
+REPO_URL: https://charts.bitnami.com/bitnami
+REPO_NAME: bitnami
 CHART_NAME: postgresql
-CHART_VERSION: 7.3.0
+CHART_VERSION: 11.8.1

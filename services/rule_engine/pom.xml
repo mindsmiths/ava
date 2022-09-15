@@ -34,7 +34,7 @@
 		<dependency>
 			<groupId>com.mindsmiths</groupId>
 			<artifactId>rule-engine</artifactId>
-			<version>4.0.0a20</version>
+			<version>4.0.0a21</version>
 		</dependency>
 		<dependency>
 			<groupId>com.mindsmiths</groupId>
@@ -54,7 +54,7 @@
 		<dependency>
 			<groupId>com.mindsmiths</groupId>
 			<artifactId>armory-client</artifactId>
-			<version>4.0.0a12</version>
+			<version>4.0.0a15</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>

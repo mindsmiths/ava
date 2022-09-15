@@ -1,21 +1,22 @@
 global:
   env:
-    MONGO_CLIENT_HOST: '{{ env.MONGO_CLIENT_HOST | default("localhost:27017", true) }}'
-    MONGO_CLIENT_USERNAME: '{{ env.MONGO_CLIENT_USERNAME | default("", true) }}'
+    PULSAR_URL: {{ env.PULSAR_URL }}
+    PULSAR_ENDPOINT_URL: {{ env.PULSAR_ENDPOINT_URL }}
 
-    POSTGRES_CLIENT_HOST: '{{ env.POSTGRES_CLIENT_HOST | default("localhost", true) }}'
-    POSTGRES_CLIENT_PORT: '{{ env.POSTGRES_CLIENT_PORT | default("5432", true) }}'
-    POSTGRES_CLIENT_USERNAME: '{{ env.POSTGRES_CLIENT_USERNAME | default("postgres", true) }}'
+    MONGO_CLIENT_HOST: {{ env.MONGO_CLIENT_HOST }}
+    MONGO_CLIENT_USERNAME: {{ env.MONGO_CLIENT_USERNAME }}
 
-    REDIS_URL: '{{ env.REDIS_URL | default("localhost:6379", true) }}'
+    POSTGRES_CLIENT_HOST: {{ env.POSTGRES_CLIENT_HOST }}
+    POSTGRES_CLIENT_PORT: {{ env.POSTGRES_CLIENT_PORT }}
+    POSTGRES_CLIENT_USERNAME: {{ env.POSTGRES_CLIENT_USERNAME }}
 
-    PULSAR_URL: '{{ env.PULSAR_URL | default("pulsar://localhost:6650", true) }}'
+    REDIS_CLIENT_HOST: {{ env.REDIS_CLIENT_HOST }}
+    REDIS_CLIENT_PORT: {{ env.REDIS_CLIENT_PORT }}
 
   secrets:
-    MONGO_CLIENT_PASSWORD: '{{ env.MONGO_CLIENT_PASSWORD }}'
-
-    POSTGRES_CLIENT_PASSWORD: '{{ env.POSTGRES_CLIENT_PASSWORD | default("postgres", true) }}'
-
+    MONGO_CLIENT_PASSWORD: {{ env.MONGO_CLIENT_PASSWORD }}
+    POSTGRES_CLIENT_PASSWORD: {{ env.POSTGRES_CLIENT_PASSWORD }}
+    
 services:
   mitems:
     env:
