@@ -15,9 +15,9 @@ import java.io.Serializable;
 @AllArgsConstructor
 @DataModel(serviceName = "employee-manager")
 public class Employee implements Serializable {
-    private String id;
-    private String firstName;
-    private String lastName;
-    private String email;
-    private Boolean active;
+    String id;
+    String firstName;
+    String lastName;
+    String email;
+    Boolean active;
 }

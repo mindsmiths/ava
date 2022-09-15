@@ -8,8 +8,16 @@ import com.mindsmiths.ruleEngine.util.Agents;
 import com.mindsmiths.armory.events.UserConnectedEvent;
 import com.mindsmiths.armory.events.SubmitEvent;
 import com.mindsmiths.employeeManager.employees.Employee;
+
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+
 import agents.Ava;
+
+import models.EmployeeProfile;
 import models.OnboardingStage;
+
 
 rule "Send welcome email"
     when
@@ -18,7 +26,7 @@ rule "Send welcome email"
             workingHours == true,
             onboardingStage == null
         )
-        employee: Employee()
+        employee: EmployeeProfile()
     then
         agent.sendWelcomeEmail(employee);
         modify(agent) {
@@ -42,7 +50,19 @@ rule "Start familiarity quiz"
    when
         signal: SubmitEvent(getParamAsString("submit") == "finished-personal-quiz") from entry-point "signals"
         agent: Ava(onboardingStage == OnboardingStage.PERSONAL_QUIZ)
+        employee: EmployeeProfile()
    then
+        Map<String, String> personalAnswers = new HashMap<String, String>(
+            employee.getPersonalAnswers()
+        );
+        for (String paramId : signal.getParams().keySet())
+            if (paramId.startsWith("answers"))
+                personalAnswers.put(
+                    paramId.replace("answers", "question"),
+                    signal.getParamAsString(paramId)
+                );
+        modify(employee) { setPersonalAnswers(personalAnswers) };
+
         agent.showFamiliarityQuizScreens();
         modify(agent) {
             setOnboardingStage(OnboardingStage.FAMILIARITY_QUIZ)
@@ -64,8 +84,22 @@ rule "Finish onboarding"
         Heartbeat(ts: timestamp) from entry-point "signals"
         signal: SubmitEvent(getParamAsString("submit") == "finished-familiarity-quiz") from entry-point "signals"
         agent: Ava(onboardingStage == OnboardingStage.FAMILIARITY_QUIZ)
-        employee: Employee()
+        employee: EmployeeProfile()
    then
+        Map<String, Double> familiarity = new HashMap<String, Double>(
+            employee.getFamiliarity()
+        );
+        for (String paramId : signal.getParams().keySet()) 
+            if (paramId.startsWith("answers")) {
+                for (String em : (List<String>) signal.getParam(paramId)) {
+                    familiarity.put(
+                        em, familiarity.getOrDefault(em, 0.0) + 1.0
+                    );
+                }
+                
+            }
+        modify(employee) { setFamiliarity(familiarity) };
+
         agent.sendStatisticsEmail(employee);
         modify(agent) {
             setOnboardingStage(OnboardingStage.FINISHED),

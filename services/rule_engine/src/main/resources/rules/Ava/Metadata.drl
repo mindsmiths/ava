@@ -7,22 +7,22 @@ import com.mindsmiths.employeeManager.ManualTriggerEvent;
 import agents.Ava;
 
 
-rule "Working hours"
+rule "Set working hours"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
         eval(evaluateCronExpression("* * 8-17 ? * MON,TUE,WED,THU,FRI *", ts, "Europe/Zagreb"))
-        agent: Ava()
+        agent: Ava(workingHours != true)
     then
         modify(agent) {
             setWorkingHours(true)
         }
 end
 
-rule "Non working hours"
+rule "Set non working hours"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
         eval(!evaluateCronExpression("* * 8-17 ? * MON,TUE,WED,THU,FRI *", ts, "Europe/Zagreb"))
-        agent: Ava()
+        agent: Ava(workingHours != false)
     then
         modify(agent) {
             setWorkingHours(false)
