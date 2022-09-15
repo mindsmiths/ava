@@ -74,5 +74,3 @@ rule "Send match info to Avas"
     then
         agent.sendMatches();
 end
-
-

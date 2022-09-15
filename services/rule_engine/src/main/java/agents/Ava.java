@@ -101,7 +101,7 @@ public class Ava extends Agent {
     public void showFamiliarityQuizScreens() {
         Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
         String avaImagePath = Mitems.getText("onboarding.ava-image-path.path");
-        Map<String, String> names = getAllEmployeeNames();
+        List<Map<String, String>> names = getAllEmployeeNames();
 
         // Adding intro screen
         String introButton = Mitems.getText("onboarding.familiarity-quiz-intro.action");
@@ -117,7 +117,7 @@ public class Ava extends Agent {
         int questionNum = 1;
         String submitButton = Mitems.getText("onboarding.familiarity-quiz-questions.action");
 
-        while (true) {
+        while(true) { 
             String questionTag = "question" + String.valueOf(questionNum);
             String nextQuestionTag = "question" + String.valueOf(questionNum + 1);
             String answersTag = "answers" + String.valueOf(questionNum);
@@ -126,7 +126,7 @@ public class Ava extends Agent {
                 String questionText = Mitems.getText("onboarding.familiarity-quiz-questions." + questionTag);
                 screens.put(questionTag, new TemplateGenerator(questionTag)
                         .addComponent("question", new TitleComponent(questionText))
-                        .addComponent(answersTag, new CloudSelectComponent(answersTag, names))
+                        .addComponent(answersTag, new CloudSelectComponent(answersTag, names.get(questionNum - 1)))
                         .addComponent("submit", new PrimarySubmitButtonComponent(
                             "submit", submitButton, nextQuestionTag)));
                 questionNum += 1;
@@ -206,13 +206,22 @@ public class Ava extends Agent {
         showScreen(screen);
     }
 
+    private List<Map<String, String>> getAllEmployeeNames() {
+        List<Map<String, String>> names = new ArrayList<>();
+        List<Integer> employeesPerQuestionDistribution = employeesPerQuestionDistribution();
+        List<EmployeeProfile> employees = new ArrayList<>(otherEmployees.values());
 
+        int startIndex = 0;
+        int endIndex = 0;
+        for(int len : employeesPerQuestionDistribution) {
+            endIndex += len;
+            Map<String, String> namesPerQuestion = new HashMap<>();
 
-
-    private Map<String, String> getAllEmployeeNames() {
-        Map<String, String> names = new HashMap<>();
-        for (EmployeeProfile employee : otherEmployees.values()) {
-            names.put(employee.getFullName(), employee.getId());
+            for(EmployeeProfile employee : employees.subList(startIndex, endIndex)) {
+                namesPerQuestion.put(employee.getFullName(), employee.getId());
+            }
+            names.add(namesPerQuestion);
+            startIndex = endIndex;
         }
         return names;
     }
@@ -253,5 +262,31 @@ public class Ava extends Agent {
         e.setSubject(subject);
         e.setHtmlText(htmlBody);
         EmailAdapterAPI.newEmail(e);
+    }
+
+    private List<Integer> employeesPerQuestionDistribution() {
+        List<Integer> employeesPerQuestionDistribution = new ArrayList<Integer>();
+        int numOfOtherEmployees = otherEmployees.size();
+        int numOfQuestions = (int) Math.ceil((double) numOfOtherEmployees / 10.0);
+        
+        // Calculating number of employees per question
+        double employeesPerQuestion;
+        int employeesPerQuestionRounded;
+
+        while (numOfOtherEmployees > 0) {
+            employeesPerQuestion = (double) numOfOtherEmployees/ (double) numOfQuestions;
+
+            if (employeesPerQuestion % 1 != 0) {
+                employeesPerQuestionRounded = (int) Math.ceil(employeesPerQuestion);
+            }
+            else {
+                employeesPerQuestionRounded = (int) Math.floor(employeesPerQuestion);
+            }
+
+            employeesPerQuestionDistribution.add(employeesPerQuestionRounded);
+            numOfOtherEmployees = numOfOtherEmployees - employeesPerQuestionRounded;
+            numOfQuestions -= 1;
+        }
+        return employeesPerQuestionDistribution;
     }
 }
