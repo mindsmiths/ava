@@ -1,38 +1,28 @@
 package agents;
 
+import java.util.*;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
+import utils.Settings;
 
 import lombok.Data;
 import lombok.ToString;
 import lombok.NoArgsConstructor;
 
+import com.mindsmiths.armory.ArmoryAPI;
+import com.mindsmiths.armory.components.*;
+import com.mindsmiths.armory.templates.*;
 import com.mindsmiths.emailAdapter.EmailAdapterAPI;
 import com.mindsmiths.emailAdapter.SendEmailPayload;
 import com.mindsmiths.mitems.Mitems;
 import com.mindsmiths.mitems.Option;
 import com.mindsmiths.ruleEngine.model.Agent;
+import com.mindsmiths.pairingalgorithm.Days;
 import com.mindsmiths.sdk.utils.templating.Templating;
 
-import signals.DayChoiceSignal;
-import utils.Settings;
-import com.mindsmiths.armory.ArmoryAPI;
-import com.mindsmiths.armory.components.DescriptionComponent;
-import com.mindsmiths.armory.components.ImageComponent;
-import com.mindsmiths.armory.components.PrimarySubmitButtonComponent;
-import com.mindsmiths.armory.components.TextAreaComponent;
-import com.mindsmiths.armory.components.TitleComponent;
-import com.mindsmiths.armory.templates.BaseTemplate;
-import com.mindsmiths.armory.templates.TemplateGenerator;
-import com.mindsmiths.armory.components.CloudSelectComponent;
-
+import models.AvaLunchCycleStage;
 import models.EmployeeProfile;
 import models.OnboardingStage;
 
@@ -41,13 +31,24 @@ import models.OnboardingStage;
 @ToString(callSuper = true)
 @NoArgsConstructor
 public class Ava extends Agent {
+    private List<Days> availableDays = new ArrayList<>();
+    private String match;
+    private Days matchDay;
+    private AvaLunchCycleStage lunchCycleStage = AvaLunchCycleStage.FIND_AVAILABILITY;
     private OnboardingStage onboardingStage;
-
+    private Map<String, EmployeeProfile> otherEmployees;
     private boolean workingHours;
     private Date statsEmailLastSentAt;
 
     public Ava(String connectionName, String connectionId) {
         super(connectionName, connectionId);
+    }
+
+    public void updateAvailableDays(List<String> availableDaysStr) {
+        this.availableDays = new ArrayList<>();
+        for(String day: availableDaysStr) {
+            this.availableDays.add(Days.valueOf(day));
+        }
     }
 
     public void showScreen(BaseTemplate screen) {
@@ -58,23 +59,63 @@ public class Ava extends Agent {
         ArmoryAPI.showScreens(getConnection("armory"), firstScreenId, screens);
     }
 
+    public void showLunchInviteExpiredScreen() {
+        BaseTemplate lunchInviteExpiredScreen = new TemplateGenerator()
+            .addComponent("title", new TitleComponent(Mitems.getText("weekly-core.message-about-not-working-hours-for-links.title")));
+        showScreen(lunchInviteExpiredScreen);
+    }
+
+    public void chooseAvailableDaysScreen() {
+        Option[] days = Mitems.getOptions("weekly-core.days.each-day");
+        List<CloudSelectComponent.Option> options = new ArrayList<>();
+        
+        for(Option option: days)
+            options.add(new CloudSelectComponent.Option(option.getText(), option.getId(), true));
+
+        BaseTemplate daysScreen = new TemplateGenerator()
+            .addComponent("title", new TitleComponent(Mitems.getText("weekly-core.title-asking-for-available-days.title")))
+            .addComponent("text", new DescriptionComponent(Mitems.getText("weekly-core.description-asking-for-available-days.text")))
+            .addComponent("cloudSelect", new CloudSelectComponent("availableDays", options))
+            .addComponent("submit", new PrimarySubmitButtonComponent("submit", "confirmDays"));
+        showScreen(daysScreen);
+    }
+
+    public void showNotAvailableScreen() {
+        BaseTemplate notAvailableScreen = new TemplateGenerator()
+            .addComponent("title", new TitleComponent(Mitems.getText("weekly-core.title-for-person-who-is-not-available-any-day.title")));
+        // implement free form where they have to explain why they are not available
+        showScreen(notAvailableScreen);
+    }
+
+    public void confirmingDaysScreen() {
+        Map<String, BaseTemplate> screens = Map.of(
+            "confirmDaysScreen", new TemplateGenerator("confirmScreen")
+                .addComponent("title", new TitleComponent(Mitems.getText("weekly-core.confirmation-of-choosen-available-days.title")))
+                .addComponent("button", new PrimarySubmitButtonComponent("submit", "confirmDaysAndThanksScreen")),
+            "confirmDaysAndThanksScreen", new TemplateGenerator("confirmAndThanksScreen")
+                .addComponent("title", new TitleComponent(Mitems.getText("weekly-core.stay-tuned-second-confirmation-of-available-days.title")))
+        );
+        showScreens("confirmDaysScreen", screens);
+    }
+
     public void showFamiliarityQuizScreens() {
         Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
-        String avaImagePath = Mitems.getText("onboarding.familiarity-quiz.ava-image-path");
+        String avaImagePath = Mitems.getText("onboarding.ava-image-path.path");
+        Map<String, String> names = getAllEmployeeNames();
 
         // Adding intro screen
-        Option[] introButton = Mitems.getOptions("onboarding.familiarity-quiz.intro-button");
-        String introScreenTitle = Mitems.getText("onboarding.familiarity-quiz.intro-screen-title");
-        String introScreenDescription = Mitems.getText("onboarding.familiarity-quiz.intro-screen-description");
+        String introButton = Mitems.getText("onboarding.familiarity-quiz-intro.action");
+        String introScreenTitle = Mitems.getText("onboarding.familiarity-quiz-intro.title");
+        String introScreenDescription = Mitems.getText("onboarding.familiarity-quiz-intro.description");
 
         screens.put("introScreen", new TemplateGenerator()
                 .addComponent("image", new ImageComponent(avaImagePath))
                 .addComponent("title", new TitleComponent(introScreenTitle))
                 .addComponent("description", new DescriptionComponent(introScreenDescription))
-                .addComponent("submit", new PrimarySubmitButtonComponent(introButton[0].getText(), "question1")));
+                .addComponent("submit", new PrimarySubmitButtonComponent(introButton, "question1")));
         // Adding questions and final screen in familiarity quiz
         int questionNum = 1;
-        Option[] submitButton = Mitems.getOptions("onboarding.familiarity-quiz.submit-button");
+        String submitButton = Mitems.getText("onboarding.familiarity-quiz-questions.action");
 
         while (true) {
             String questionTag = "question" + String.valueOf(questionNum);
@@ -82,36 +123,35 @@ public class Ava extends Agent {
             String answersTag = "answers" + String.valueOf(questionNum);
 
             try {
-                String questionText = Mitems.getText("onboarding.familiarity-quiz." + questionTag);
+                String questionText = Mitems.getText("onboarding.familiarity-quiz-questions." + questionTag);
                 screens.put(questionTag, new TemplateGenerator(questionTag)
                         .addComponent("question", new TitleComponent(questionText))
-                        .addComponent(answersTag, new CloudSelectComponent(answersTag, Map.of(
-                                "Tomislav Matić", "tomislav matić", "Emil Prpić", "emil pripić",
-                                "Juraj Malenica", "juraj malenica", "Domagoj Blažanin", "domagoj blažanin")))
-                        .addComponent(submitButton[0].getId(), new PrimarySubmitButtonComponent(
-                                submitButton[0].getId(), submitButton[0].getText(), nextQuestionTag)));
+                        .addComponent(answersTag, new CloudSelectComponent(answersTag, names))
+                        .addComponent("submit", new PrimarySubmitButtonComponent(
+                            "submit", submitButton, nextQuestionTag)));
                 questionNum += 1;
                 
             } catch (Exception e) {
                 // Changing button value
                 String wrongQuestionTag = "question" + String.valueOf(questionNum - 1);
+
                 TemplateGenerator templateGenerator = (TemplateGenerator) screens.get(wrongQuestionTag);
                 PrimarySubmitButtonComponent buttonComponent = (PrimarySubmitButtonComponent) templateGenerator
                         .getComponents()
-                        .get(submitButton[0].getId());
+                        .get("submit");
                 buttonComponent.setValue("finishfamiliarityquiz");
 
-                Option[] familiarityQuizFinalButton = Mitems
-                        .getOptions("onboarding.familiarity-quiz.familiarity-quiz-final-button");
-                String finishFamiliarityQuizText = Mitems
-                        .getText("onboarding.familiarity-quiz.finish-familiarity-quiz-text");
+                String familiarityQuizFinalButton = Mitems
+                    .getText("onboarding.familiarity-quiz-goodbye.action");
+                String finishFamiliarityQuizText =  Mitems
+                    .getText("onboarding.familiarity-quiz-goodbye.text");
                 screens.put("finishfamiliarityquiz", new TemplateGenerator("finishfamiliarityquiz")
                         .addComponent("image", new ImageComponent(avaImagePath))
                         .addComponent("title", new TitleComponent(finishFamiliarityQuizText))
-                        .addComponent(familiarityQuizFinalButton[0].getId(), new PrimarySubmitButtonComponent(
-                                familiarityQuizFinalButton[0].getId(), familiarityQuizFinalButton[0].getText(),
+                        .addComponent("submit", new PrimarySubmitButtonComponent(
+                                "submit", familiarityQuizFinalButton,
                                 "finished-familiarity-quiz")));
-                String goodbyeScreen = Mitems.getText("onboarding.familiarity-quiz.goodbye-screen");
+                String goodbyeScreen =  Mitems.getText("onboarding.familiarity-quiz-goodbye.goodbye-screen");
                 screens.put("finished-familiarity-quiz", new TemplateGenerator("goodbye")
                         .addComponent("title", new TitleComponent(goodbyeScreen)));
                 break;
@@ -122,7 +162,7 @@ public class Ava extends Agent {
 
     public void showPersonalQuizScreens() {
         Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
-        String avaImagePath = Mitems.getText("onboarding.personal-quiz.ava-image-path");
+        String avaImagePath = Mitems.getText("onboarding.ava-image-path.path");
 
         // Adding questions and final screens
         int questionNum = 1;
@@ -130,15 +170,12 @@ public class Ava extends Agent {
             String questionTag = "question" + String.valueOf(questionNum);
             String nextQuestionTag = "question" + String.valueOf(questionNum + 1);
             String answersTag = "answers" + String.valueOf(questionNum);
-            Option[] submitButton = Mitems.getOptions("onboarding.personal-quiz.submit-button");
-
             try {
-                String text = Mitems.getText("onboarding.personal-quiz." + questionTag);
                 screens.put(questionTag, new TemplateGenerator(questionTag)
-                        .addComponent("question", new TitleComponent(text))
+                        .addComponent("question", new TitleComponent(Mitems.getText(String.format("onboarding.personal-quiz-%s.%s", questionTag, questionTag))))
                         .addComponent(answersTag, new TextAreaComponent(answersTag, "Type your answer here", true))
-                        .addComponent(submitButton[0].getId(), new PrimarySubmitButtonComponent(
-                                submitButton[0].getId(), submitButton[0].getText(), nextQuestionTag)));
+                        .addComponent("submit", new PrimarySubmitButtonComponent(
+                                "submit", Mitems.getText(String.format("onboarding.personal-quiz-%s.action", questionTag)), nextQuestionTag)));
                 questionNum += 1;
             } catch (Exception e) {
                 // Changing button value
@@ -146,11 +183,11 @@ public class Ava extends Agent {
                 TemplateGenerator templateGenerator = (TemplateGenerator) screens.get(wrongQuestionTag);
                 PrimarySubmitButtonComponent buttonComponent = (PrimarySubmitButtonComponent) templateGenerator
                         .getComponents()
-                        .get(submitButton[0].getId());
+                        .get("submit");
                 buttonComponent.setValue("finishpersonalquiz");
 
-                Option[] finishQuizButton = Mitems.getOptions("onboarding.personal-quiz.finish-quiz-button");
-                String finishPersonalQuiz = Mitems.getText("onboarding.personal-quiz.finish-personal-quiz");
+                Option[] finishQuizButton =  Mitems.getOptions("onboarding.finish-personal-quiz.button");
+                String finishPersonalQuiz = Mitems.getText("onboarding.finish-personal-quiz.text");
 
                 screens.put("finishpersonalquiz", new TemplateGenerator("finishpersonalquiz")
                         .addComponent("image", new ImageComponent(avaImagePath))
@@ -169,8 +206,16 @@ public class Ava extends Agent {
         showScreen(screen);
     }
 
-    public void sendData(ArrayList<Integer> freeDays) {
-        send("CultureMaster", new DayChoiceSignal(freeDays));
+    private String getFullName(EmployeeProfile employee) {
+        return employee.getFirstName() + " " + employee.getLastName();
+    }
+
+    private Map<String, String> getAllEmployeeNames() {
+        Map<String, String> names = new HashMap<>();
+        for (EmployeeProfile employee : otherEmployees.values()) {
+            names.put(getFullName(employee), employee.getId());
+        }
+        return names;
     }
 
     public void sendWelcomeEmail(EmployeeProfile employee) throws IOException {
@@ -210,5 +255,4 @@ public class Ava extends Agent {
         e.setHtmlText(htmlBody);
         EmailAdapterAPI.newEmail(e);
     }
- 
 }

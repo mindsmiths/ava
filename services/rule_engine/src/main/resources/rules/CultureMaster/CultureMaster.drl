@@ -12,8 +12,10 @@ rule "Add or update Ava data"
         agent: CultureMaster()
     then
         modify(agent) {
-            addOrUpdateEmployee(signal);
+            addOrUpdateEmployee(signal),
+            sendEmployeesToAva()
         };
+        Log.info("Added new Ava: " + signal.getEmployee());
         delete(signal);
 end
 
