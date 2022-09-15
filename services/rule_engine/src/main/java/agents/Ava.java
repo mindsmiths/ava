@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Random;
 import utils.Settings;
 
 import lombok.Data;
@@ -22,7 +23,7 @@ import com.mindsmiths.ruleEngine.model.Agent;
 import com.mindsmiths.pairingalgorithm.Days;
 import com.mindsmiths.sdk.utils.templating.Templating;
 
-import models.AvaLunchCycleStage;
+import models.AvaLunchCycleStage; 
 import models.EmployeeProfile;
 import models.OnboardingStage;
 
@@ -34,11 +35,18 @@ public class Ava extends Agent {
     private List<Days> availableDays = new ArrayList<>();
     private String match;
     private Days matchDay;
+    private Map<String, String> matchAnswers;
     private AvaLunchCycleStage lunchCycleStage = AvaLunchCycleStage.FIND_AVAILABILITY;
     private OnboardingStage onboardingStage;
     private Map<String, EmployeeProfile> otherEmployees;
     private boolean workingHours;
     private Date statsEmailLastSentAt;
+    private Map<String, String> personalGuess = new HashMap<String, String>();
+    private Integer numOfQuestions;
+    private Integer correct;
+    private Map<String, String> personalAnswers;
+    private List<String> listOfGuessingQuestions;
+    private List<String> listOfGuessingAnswers;
 
     public Ava(String connectionName, String connectionId) {
         super(connectionName, connectionId);
@@ -207,6 +215,58 @@ public class Ava extends Agent {
         BaseTemplate screen = new TemplateGenerator("goodbye").addComponent("title", new TitleComponent(goodbyeScreen));
         showScreen(screen);
     }
+    
+//-------------screens for guessing about a person--------------------------------------
+
+    public void guessingQuizScreen() {
+
+        List<String> keys = new ArrayList<String>(this.personalAnswers.keySet());
+        for (int i = 0; i < 2; i++) {
+            Random random = new Random();
+            String randomKey = keys.get(random.nextInt(keys.size()));
+            while (listOfGuessingQuestions.contains(randomKey)) {
+                randomKey = keys.get(random.nextInt(keys.size()));
+            }
+            listOfGuessingQuestions.add(randomKey);
+        }
+
+        BaseSubmitButtonComponent[] strArray1 = {new PrimarySubmitButtonComponent("crna", "guessingQuestion2"),
+        new PrimarySubmitButtonComponent("jesen", "guessingQuestion2"),
+        new PrimarySubmitButtonComponent(this.matchAnswers.get(listOfGuessingQuestions.get(0)), "guessingQuestion2")};
+        List<BaseSubmitButtonComponent> questions1 = Arrays.asList(strArray1);
+        Collections.shuffle(questions1);
+
+        BaseSubmitButtonComponent[] strArray2 = {new PrimarySubmitButtonComponent("ide", "guessingQuestion2"),
+        new PrimarySubmitButtonComponent("gas", "guessingQuestion2"),
+        new PrimarySubmitButtonComponent(this.matchAnswers.get(listOfGuessingQuestions.get(1)), "guessingQuestion2")};
+        List<BaseSubmitButtonComponent> questions2 = Arrays.asList(strArray2);
+        Collections.shuffle(questions2);
+
+        Map<String, BaseTemplate> screens = Map.of(
+            "introGuessingScreen", new TemplateGenerator("introScreen")
+                .addComponent("title", new TitleComponent(Mitems.getText("weekly-core.guessing-quiz-intro-screen-title.title")))
+                .addComponent("button", new PrimarySubmitButtonComponent(Mitems.getText("weekly-core.guessing-quiz-intro-screen-title.button"), "guessingQuestion1")),
+            "guessingQuestion1", new TemplateGenerator("guessingQuestion")
+                .addComponent("title", new TitleComponent(listOfGuessingQuestions.get(0)))
+                .addComponent("actionGroup1", new ActionGroupComponent(questions1)),
+            "guessingQuestion2", new TemplateGenerator("guessingQuestion")
+                .addComponent("title", new TitleComponent(listOfGuessingQuestions.get(1)))
+                .addComponent("actionGroup2", new ActionGroupComponent(questions2)),
+            "confirmingGuess", new TemplateGenerator("confirmScreen")
+                .addComponent("title", new TitleComponent(Mitems.getText("weekly-core.confirming-quiz-guesses.title")))
+                .addComponent("submit", new PrimarySubmitButtonComponent(Mitems.getText("weekly-core.confirming-quiz-guesses.button"), "confirmGuess"))
+        );
+        showScreens("introGuessingScreen", screens);
+    }
+
+    public void correctness() {
+        for (Map.Entry<String, String> entry : personalGuess.entrySet()) {
+            numOfQuestions++;
+            if (entry.getValue() == this.matchAnswers.get(entry.getKey()))
+                correct++;
+        }
+    }
+    //----------------------
 
     private String getFullName(EmployeeProfile employee) {
         return employee.getFirstName() + " " + employee.getLastName();

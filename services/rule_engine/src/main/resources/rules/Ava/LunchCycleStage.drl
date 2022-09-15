@@ -78,8 +78,33 @@ rule "Store match info"
         signal: SendMatchesSignal() from entry-point "signals"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.ACCEPT_MATCH_INFO)
     then
-        modify(agent) {setMatch(signal.getMatch()), setMatchDay(signal.getMatchDay())};
+        modify(agent) {setMatch(signal.getMatchName()), setMatchDay(signal.getMatchDay()), setMatchAnswers(signal.getMatchAnswers())};
         Log.info("I'm " + agent.getId() + " and my match is " + agent.getMatch() + " on " + agent.getMatchDay());
+        delete(signal);
+end
+
+rule "Starting guessing quiz"
+    when
+        signal: UserConnectedEvent(getParamAsString("trigger") == "start-guessing") from entry-point "signals"
+        agent: Ava()
+    then 
+        agent.guessingQuizScreen();
+        modify(agent) {setLunchCycleStage(AvaLunchCycleStage.GUESSING_QUIZ)};
+        delete(signal);
+end
+
+rule "Confirm quiz guesses"
+    when 
+        signal: SubmitEvent(getParamAsString("submit") == "confirmGuess") from entry-point "signals"
+        agent: Ava(lunchCycleStage == AvaLunchCycleStage.GUESSING_QUIZ) 
+    then
+        for (String paramId : signal.getParams().keySet())
+            if (paramId.startsWith("answers"))
+                agent.getPersonalGuess().put(
+                    paramId,
+                    signal.getParamAsString(paramId)
+                );
+        Log.info(agent.getCorrect()/agent.getNumOfQuestions());
         delete(signal);
 end
 

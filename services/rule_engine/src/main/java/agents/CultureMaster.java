@@ -54,13 +54,15 @@ public class CultureMaster extends Agent {
                 if(employee.getId().equals(m.getFirst())) {
                     send(employee.getId(), new SendMatchesSignal(employees.get(m.getSecond()).getFirstName() + " " +
                                                                  employees.get(m.getSecond()).getLastName(),
-                                                                 m.getDay()));
+                                                                 m.getDay(),
+                                                                 employees.get(m.getSecond()).getPersonalAnswers()));
                     break;
                 }
                 if(employee.getId().equals(m.getSecond())) {
                     send(employee.getId(), new SendMatchesSignal(employees.get(m.getFirst()).getFirstName() + " " +
                                                                  employees.get(m.getFirst()).getLastName(),
-                                                                 m.getDay()));
+                                                                 m.getDay(),
+                                                                 employees.get(m.getFirst()).getPersonalAnswers()));
                     break;
                 }
             }
