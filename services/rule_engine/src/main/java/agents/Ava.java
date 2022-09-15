@@ -19,7 +19,6 @@ import com.mindsmiths.emailAdapter.SendEmailPayload;
 import com.mindsmiths.mitems.Mitems;
 import com.mindsmiths.mitems.Option;
 import com.mindsmiths.ruleEngine.model.Agent;
-import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.pairingalgorithm.Days;
 import com.mindsmiths.sdk.utils.templating.Templating;
 
