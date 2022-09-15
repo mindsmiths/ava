@@ -29,9 +29,8 @@ rule "Store ava availability"
         signal: AvaAvailabilitySignal() from entry-point "signals"
         agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES)
     then
-        Log.info("Received some ava availability\n");
         modify(agent) {addAvaAvailability(signal.getAvaAvailability())};
-        Log.info(agent.getAvaAvailabilities());
+        Log.info("Storing availability: " + agent.getAvaAvailabilities());
         delete(signal);
 end
 
@@ -63,8 +62,7 @@ rule "Store generated matches"
         agent: CultureMaster()
     then
         modify(agent) {addMatches(matches.getAllMatches())};
-        Log.info("---------------------rezultati pairinga---------------------");
-        Log.info(matches.getAllMatches());
+        Log.info("Matches from pairing algorithm: " + matches.getAllMatches());
         modify(agent) {setLunchCycleStage(CmLunchCycleStage.SEND_TO_AVAS)};
         delete(matches);
 end

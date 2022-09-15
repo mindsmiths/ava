@@ -5,7 +5,6 @@ import com.mindsmiths.sdk.core.api.Signal;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.mindsmiths.employeeManager.employees.Employee;
 import models.EmployeeProfile;
 
 import lombok.AllArgsConstructor;

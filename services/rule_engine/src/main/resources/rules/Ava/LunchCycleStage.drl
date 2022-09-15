@@ -22,9 +22,9 @@ import models.OnboardingStage;
 rule "Lunch invite expired"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        eval(!evaluateCronExpression("* * 9-23 * * WED", ts, "Europe/Zagreb") 
-        || (!evaluateCronExpression("* * * * * THU", ts, "Europe/Zagreb"))
-        || (!evaluateCronExpression("* * 00-14 * * FRI", ts, "Europe/Zagreb")))
+        eval(!evaluateCronExpression("* * 9-23 * * WED", ts, "Europe/Zagreb") && 
+            !evaluateCronExpression("* * * * * THU", ts, "Europe/Zagreb") &&
+            !evaluateCronExpression("* * 00-14 * * FRI", ts, "Europe/Zagreb"))
         signal: UserConnectedEvent() from entry-point "signals"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY,
                    onboardingStage == OnboardingStage.FINISHED)

@@ -1,6 +1,5 @@
 package agents;
 
-import com.mindsmiths.employeeManager.employees.Employee;
 import com.mindsmiths.ruleEngine.model.Agent;
 import java.util.*;
 
@@ -48,18 +47,20 @@ public class CultureMaster extends Agent {
         this.allMatches = allMatches;
     }
 
+    private String getFullName(EmployeeProfile employee) {
+        return employee.getFirstName() + " " + employee.getLastName();
+    }
+    
     public void sendMatches() {
-        for(EmployeeProfile employee : employees.values()) {
+        for(String employeeKey : employees.keySet()) {
             for(Match m: allMatches) {
-                if(employee.getId().equals(m.getFirst())) {
-                    send(employee.getId(), new SendMatchesSignal(employees.get(m.getSecond()).getFirstName() + " " +
-                                                                 employees.get(m.getSecond()).getLastName(),
+                if(employeeKey.equals(m.getFirst())) {
+                    send(employeeKey, new SendMatchesSignal(getFullName(employees.get(m.getSecond())),
                                                                  m.getDay()));
                     break;
                 }
-                if(employee.getId().equals(m.getSecond())) {
-                    send(employee.getId(), new SendMatchesSignal(employees.get(m.getFirst()).getFirstName() + " " +
-                                                                 employees.get(m.getFirst()).getLastName(),
+                if(employeeKey.equals(m.getSecond())) {
+                    send(employeeKey, new SendMatchesSignal(getFullName(employees.get(m.getFirst())),
                                                                  m.getDay()));
                     break;
                 }

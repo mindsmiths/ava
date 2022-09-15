@@ -101,7 +101,7 @@ public class Ava extends Agent {
     public void showFamiliarityQuizScreens() {
         Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
         String avaImagePath = Mitems.getText("onboarding.familiarity-quiz.ava-image-path");
-        Map<String, String> names = collectOtherEmployees();
+        Map<String, String> names = getAllEmployeeNames();
 
         // Adding intro screen
         Option[] introButton = Mitems.getOptions("onboarding.familiarity-quiz.intro-button");
@@ -161,7 +161,7 @@ public class Ava extends Agent {
 
     public void showPersonalQuizScreens() {
         Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
-        String avaImagePath = Mitems.getText("onboarding.personal-quiz.ava-image-path");
+        String avaImagePath = Mitems.getText("onboarding.ava-image-path.path");
 
         // Adding questions and final screens
         int questionNum = 1;
@@ -169,15 +169,12 @@ public class Ava extends Agent {
             String questionTag = "question" + String.valueOf(questionNum);
             String nextQuestionTag = "question" + String.valueOf(questionNum + 1);
             String answersTag = "answers" + String.valueOf(questionNum);
-            Option[] submitButton = Mitems.getOptions("onboarding.personal-quiz.submit-button");
-
             try {
-                String text = Mitems.getText("onboarding.personal-quiz." + questionTag);
                 screens.put(questionTag, new TemplateGenerator(questionTag)
-                        .addComponent("question", new TitleComponent(text))
+                        .addComponent("question", new TitleComponent(Mitems.getText(String.format("onboarding.personal-quiz-%s.%s", questionTag, questionTag))))
                         .addComponent(answersTag, new TextAreaComponent(answersTag, "Type your answer here", true))
-                        .addComponent(submitButton[0].getId(), new PrimarySubmitButtonComponent(
-                                submitButton[0].getId(), submitButton[0].getText(), nextQuestionTag)));
+                        .addComponent("submit", new PrimarySubmitButtonComponent(
+                                "submit", Mitems.getText(String.format("onboarding.personal-quiz-%s.action", questionTag)), nextQuestionTag)));
                 questionNum += 1;
             } catch (Exception e) {
                 // Changing button value
@@ -185,11 +182,11 @@ public class Ava extends Agent {
                 TemplateGenerator templateGenerator = (TemplateGenerator) screens.get(wrongQuestionTag);
                 PrimarySubmitButtonComponent buttonComponent = (PrimarySubmitButtonComponent) templateGenerator
                         .getComponents()
-                        .get(submitButton[0].getId());
+                        .get("submit");
                 buttonComponent.setValue("finishpersonalquiz");
 
-                Option[] finishQuizButton = Mitems.getOptions("onboarding.personal-quiz.finish-quiz-button");
-                String finishPersonalQuiz = Mitems.getText("onboarding.personal-quiz.finish-personal-quiz");
+                Option[] finishQuizButton =  Mitems.getOptions("onboarding.finish-personal-quiz.button");
+                String finishPersonalQuiz = Mitems.getText("onboarding.finish-personal-quiz.text");
 
                 screens.put("finishpersonalquiz", new TemplateGenerator("finishpersonalquiz")
                         .addComponent("image", new ImageComponent(avaImagePath))
@@ -212,7 +209,7 @@ public class Ava extends Agent {
         return employee.getFirstName() + " " + employee.getLastName();
     }
 
-    private Map<String, String> collectOtherEmployees() {
+    private Map<String, String> getAllEmployeeNames() {
         Map<String, String> names = new HashMap<>();
         for (EmployeeProfile employee : otherEmployees.values()) {
             names.put(getFullName(employee), employee.getId());
