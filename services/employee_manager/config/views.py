@@ -1,7 +1,8 @@
 from django.shortcuts import redirect
-from rule_engine.api import RuleEngineAPI
-from forge.core.api.events import Signal
 from django.contrib import messages
+
+from forge.core.api.events import Signal
+from rule_engine.api import RuleEngineAPI
 
 
 def home(request):
