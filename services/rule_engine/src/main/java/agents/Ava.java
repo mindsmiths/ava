@@ -210,6 +210,10 @@ public class Ava extends Agent {
         return employee.getFirstName() + " " + employee.getLastName();
     }
 
+    public void updateMatch(String id) {
+        this.match = getFullName(otherEmployees.get(id));
+    }
+
     private Map<String, String> getAllEmployeeNames() {
         Map<String, String> names = new HashMap<>();
         for (EmployeeProfile employee : otherEmployees.values()) {

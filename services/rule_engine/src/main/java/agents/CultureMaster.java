@@ -46,22 +46,16 @@ public class CultureMaster extends Agent {
     public void addMatches(List<Match> allMatches) {
         this.allMatches = allMatches;
     }
-
-    private String getFullName(EmployeeProfile employee) {
-        return employee.getFirstName() + " " + employee.getLastName();
-    }
     
     public void sendMatches() {
         for(String employeeKey : employees.keySet()) {
             for(Match m: allMatches) {
                 if(employeeKey.equals(m.getFirst())) {
-                    send(employeeKey, new SendMatchesSignal(getFullName(employees.get(m.getSecond())),
-                                                                 m.getDay()));
+                    send(employeeKey, new SendMatchesSignal(m.getSecond(), m.getDay()));
                     break;
                 }
                 if(employeeKey.equals(m.getSecond())) {
-                    send(employeeKey, new SendMatchesSignal(getFullName(employees.get(m.getFirst())),
-                                                                 m.getDay()));
+                    send(employeeKey, new SendMatchesSignal(m.getFirst(), m.getDay()));
                     break;
                 }
             }
