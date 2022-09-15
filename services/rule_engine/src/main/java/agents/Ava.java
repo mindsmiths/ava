@@ -125,7 +125,8 @@ public class Ava extends Agent {
         int questionNum = 1;
         Option[] submitButton = Mitems.getOptions("onboarding.familiarity-quiz.submit-button");
 
-        for (int i = 0 ; i < numOfQuestions ; i++) {
+        //for (int i = 0 ; i < numOfQuestions ; i++) {
+        while(true) {    
             String questionTag = "question" + String.valueOf(questionNum);
             String nextQuestionTag = "question" + String.valueOf(questionNum + 1);
             String answersTag = "answers" + String.valueOf(questionNum);
