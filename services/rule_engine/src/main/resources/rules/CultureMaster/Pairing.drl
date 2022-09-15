@@ -8,12 +8,10 @@ import com.mindsmiths.ruleEngine.util.Agents;
 import com.mindsmiths.ruleEngine.model.Initialize;
 import com.mindsmiths.pairingalgorithm.Matches;
 
-import signals.AvaRegisteredSignal;
-import signals.RequestAvailableDaysSignal;
 import signals.AvaAvailabilitySignal;
 
 import agents.CultureMaster;
-import models.CultureMasterWeeklyStage;
+import models.CmLunchCycleStage;
 
 
 rule "First contact"
@@ -26,65 +24,53 @@ rule "First contact"
         delete(initialize);
 end
 
-rule "Add New Ava Id"
-    when
-        signal: AvaRegisteredSignal() from entry-point "signals"
-        agent: CultureMaster()
-    then
-        modify(agent) {addNewAva(signal.getAvaId())};
-        delete(signal);
-end
-
-rule "Accept Ava Availability"
+rule "Store ava availability"
     when
         signal: AvaAvailabilitySignal() from entry-point "signals"
-        agent: CultureMaster(weeklyStage == CultureMasterWeeklyStage.COLLECT_AVA_AVAILABILITIES)
+        agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES)
     then
-        Log.info("Received some ava availability\n");
         modify(agent) {addAvaAvailability(signal.getAvaAvailability())};
-        Log.info(agent.getAvaAvailabilities());
+        Log.info("Storing availability: " + agent.getAvaAvailabilities());
         delete(signal);
 end
 
 
-rule "Check That All Ava Availabilities Came"
+rule "Check that all ava availabilities came"
     when
         Heartbeat() from entry-point "signals"
-        agent: CultureMaster(weeklyStage == CultureMasterWeeklyStage.COLLECT_AVA_AVAILABILITIES,
-                            avaIDs.size() == avaAvailabilities.size(),
-                            !avaIDs.isEmpty())
+        agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES,
+                            employees.size() == avaAvailabilities.size(),
+                            !employees.isEmpty())
     then
-        modify(agent) {setWeeklyStage(CultureMasterWeeklyStage.GENERATE_MATCHES)};
+        modify(agent) {setLunchCycleStage(CmLunchCycleStage.GENERATE_MATCHES)};
 end
 
 
-rule "Generate This Weeks Matches"
+rule "Generate this weeks matches"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        agent: CultureMaster(weeklyStage == CultureMasterWeeklyStage.GENERATE_MATCHES)
+        agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.GENERATE_MATCHES)
     then
         Log.info("Generating matches....");
-        Log.info("AvaIDs List: " + agent.getAvaIDs());
-        modify(agent) {setWeeklyStage(CultureMasterWeeklyStage.COLLECT_GENERATED_MATCHES)};
+        modify(agent) {setLunchCycleStage(CmLunchCycleStage.COLLECT_GENERATED_MATCHES)};
         agent.generateMatches();
 end
 
-rule "Accept Generated Matches"
+rule "Store generated matches"
     when
         matches: Matches() from entry-point "signals"
         agent: CultureMaster()
     then
         modify(agent) {addMatches(matches.getAllMatches())};
-        Log.info("---------------------rezultati pairinga---------------------");
-        Log.info(matches.getAllMatches());
-        modify(agent) {setWeeklyStage(CultureMasterWeeklyStage.SEND_TO_AVAS)};
+        Log.info("Matches from pairing algorithm: " + matches.getAllMatches());
+        modify(agent) {setLunchCycleStage(CmLunchCycleStage.SEND_TO_AVAS)};
         delete(matches);
 end
 
-rule "Send Match Info To Avas"
+rule "Send match info to Avas"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        agent: CultureMaster(weeklyStage == CultureMasterWeeklyStage.SEND_TO_AVAS)
+        agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.SEND_TO_AVAS)
     then
-        agent.sendMatchInfo();
+        agent.sendMatches();
 end

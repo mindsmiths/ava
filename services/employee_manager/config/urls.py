@@ -12,6 +12,7 @@ from . import views
 urlpatterns = [
     path('jet/', include('jet.urls', 'jet')),  # Django JET URLS
     path('jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),  # Django JET dashboard URLS
+    path('trigger/<trigger_type>', views.trigger),
     url(settings.ADMIN_URL, admin.site.urls),
     url('', views.home),
     # Your stuff: custom urls includes go here

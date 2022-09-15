@@ -1,12 +1,11 @@
 package agents;
 
-import com.mindsmiths.employeeManager.employees.Employee;
 import com.mindsmiths.ruleEngine.model.Agent;
 import java.util.*;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import models.CultureMasterWeeklyStage;
+import models.CmLunchCycleStage;
 
 import com.mindsmiths.pairingalgorithm.PairingAlgorithmAPI;
 import com.mindsmiths.pairingalgorithm.AvaAvailability;
@@ -14,25 +13,22 @@ import com.mindsmiths.pairingalgorithm.Match;
 
 import signals.EmployeeUpdateSignal;
 import signals.AllEmployees;
-import signals.MatchInfoSignal;
+import signals.SendMatchesSignal;
+
+import models.EmployeeProfile;
+
 
 @Data
 @AllArgsConstructor
 public class CultureMaster extends Agent {
     private List<AvaAvailability> avaAvailabilities = new ArrayList<>();
     private List<Match> allMatches = new ArrayList<>();
-    private List<String> avaIDs = new ArrayList<>();
-    private CultureMasterWeeklyStage weeklyStage = CultureMasterWeeklyStage.COLLECT_AVA_AVAILABILITIES;
-    private List<Map<String, List<Integer>>> freeDays; // information about available days
-    private Map<String, Employee> employees = new HashMap<>();
+    private CmLunchCycleStage lunchCycleStage = CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES;
+    private Map<String, EmployeeProfile> employees = new HashMap<>();
 
     public static String ID = "CULTURE_MASTER";
     public CultureMaster() {
         id = ID;
-    }
-
-    public void addNewAva(String newAva) {
-        avaIDs.add(newAva);
     }
 
     public void addAvaAvailability(AvaAvailability avaAvailability) {
@@ -51,15 +47,21 @@ public class CultureMaster extends Agent {
         this.allMatches = allMatches;
     }
 
-    public void sendMatchInfo() {
-        for(String ava : avaIDs) {
+    private String getFullName(EmployeeProfile employee) {
+        return employee.getFirstName() + " " + employee.getLastName();
+    }
+    
+    public void sendMatches() {
+        for(String employeeKey : employees.keySet()) {
             for(Match m: allMatches) {
-                if(ava.equals(m.getFirst())) {
-                    send(ava, new MatchInfoSignal(m.getSecond(), m.getDay()));
+                if(employeeKey.equals(m.getFirst())) {
+                    send(employeeKey, new SendMatchesSignal(getFullName(employees.get(m.getSecond())),
+                                                                 m.getDay()));
                     break;
                 }
-                if(ava.equals(m.getSecond())) {
-                    send(ava, new MatchInfoSignal(m.getFirst(), m.getDay()));
+                if(employeeKey.equals(m.getSecond())) {
+                    send(employeeKey, new SendMatchesSignal(getFullName(employees.get(m.getFirst())),
+                                                                 m.getDay()));
                     break;
                 }
             }

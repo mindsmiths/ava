@@ -11,7 +11,7 @@ global:
 
     #ENVIRONMENT_NAME: {{ env.ENVIRONMENT_NAME }}
     MODULE: '{{ env.MODULE | default("local", True) }}'
-    LOG_LEVEL: INFO
+    LOG_LEVEL: DEBUG
 
     # Messaging
     PULSAR_URL: pulsar://pulsar-proxy.pulsar.svc.cluster.local:6650
@@ -72,7 +72,7 @@ services:
     type: python
     version: 4.0.0a4
     env:
-      HEARTBEAT_CYCLE: 5
+      HEARTBEAT_CYCLE: 30
     db:
       mongo: true
     dependencies:
@@ -185,6 +185,7 @@ services:
       - django-import-export==2.8.0
       - psycopg2-binary==2.9.3
       - gunicorn==20.1.0
+      - rule-engine-api==4.0.0a20
     env:
       DJANGO_SUPERUSER_USERNAME: admin
       DJANGO_SUPERUSER_PASSWORD: '{{ env.EMPLOYEE_MANAGER_ADMIN_PASSWORD | default("admin") }}'

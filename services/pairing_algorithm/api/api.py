@@ -1,5 +1,4 @@
 from typing import List
-from typing import Set
 from enum import Enum
 
 from forge.core.models import ExtendableModel
@@ -15,7 +14,7 @@ class Days(str, Enum):
 
 class AvaAvailability(ExtendableModel):
     agentId: str
-    availableDays: Set[Days]
+    availableDays: List[Days]
 
 
 class Match(ExtendableModel):

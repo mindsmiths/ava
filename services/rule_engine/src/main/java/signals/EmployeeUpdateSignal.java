@@ -1,17 +1,19 @@
 package signals;
 
 import com.mindsmiths.sdk.core.api.Signal;
-import com.mindsmiths.employeeManager.employees.Employee;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import models.EmployeeProfile;
+
+
 @NoArgsConstructor
 @Data
 public class EmployeeUpdateSignal extends Signal {
-    private Employee employee;
+    private EmployeeProfile employee;
 
-    public EmployeeUpdateSignal (Employee employee){
-        this.employee = new Employee(employee.getId(), employee.getFirstName(), employee.getLastName(), null, null);
+    public EmployeeUpdateSignal (EmployeeProfile employee){
+        this.employee = new EmployeeProfile(employee.getPersonalAnswers(), employee.getFamiliarity(), employee.getId(), employee.getFirstName(), employee.getLastName());
     }
 }

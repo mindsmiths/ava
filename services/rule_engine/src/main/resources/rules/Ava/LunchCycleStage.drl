@@ -13,74 +13,73 @@ import agents.Ava;
 import agents.CultureMaster;
 
 import signals.AvaAvailabilitySignal;
-import signals.MatchInfoSignal;
+import signals.SendMatchesSignal;
 
-import models.AvaWeeklyStage;
+import models.AvaLunchCycleStage;
 import models.OnboardingStage;
 
 
-// revert the conditions
-rule "Non working hours message"
+rule "Lunch invite expired"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        eval(evaluateCronExpression("* * 9-23 * * WED", ts, "Europe/Zagreb") 
-        || (evaluateCronExpression("* * * * * THU", ts, "Europe/Zagreb"))
-        || (evaluateCronExpression("* * 00-14 * * FRI", ts, "Europe/Zagreb")))
+        eval(!evaluateCronExpression("* * 9-23 * * WED", ts, "Europe/Zagreb") && 
+            !evaluateCronExpression("* * * * * THU", ts, "Europe/Zagreb") &&
+            !evaluateCronExpression("* * 00-14 * * FRI", ts, "Europe/Zagreb"))
         signal: UserConnectedEvent() from entry-point "signals"
-        agent: Ava(weeklyStage == AvaWeeklyStage.FIND_AVAILABILITY,
+        agent: Ava(lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY,
                    onboardingStage == OnboardingStage.FINISHED)
     then 
-        agent.notWorkingHours();
+        agent.showLunchInviteExpiredScreen();
         delete(signal);
 end
 
 rule "Ask for available days"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        eval(!evaluateCronExpression("* * 9-23 * * WED", ts, "Europe/Zagreb") 
-        || (!evaluateCronExpression("* * * * * THU", ts, "Europe/Zagreb"))
-        || (!evaluateCronExpression("* * 00-14 * * FRI", ts, "Europe/Zagreb")))
+        eval(evaluateCronExpression("* * 9-23 * * WED", ts, "Europe/Zagreb") 
+        || (evaluateCronExpression("* * * * * THU", ts, "Europe/Zagreb"))
+        || (evaluateCronExpression("* * 00-14 * * FRI", ts, "Europe/Zagreb")))
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-weekly-core") from entry-point "signals"
-        agent: Ava(weeklyStage == AvaWeeklyStage.FIND_AVAILABILITY,
+        agent: Ava(lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY,
                    onboardingStage == OnboardingStage.FINISHED)
     then 
         // what if person decides to exit this screen without answering, now we can't get back because we are in the next stage
-        modify(agent) {setWeeklyStage(AvaWeeklyStage.FORWARD_AVAILABILITY)}
+        modify(agent) {setLunchCycleStage(AvaLunchCycleStage.FORWARD_AVAILABILITY)}
         agent.chooseAvailableDaysScreen();
         delete(signal);
 end
 
-rule "Proceed to person is not available"
+rule "Handle employee not available"
     when 
         signal: SubmitEvent((getParamAsString("submit") == "confirmDays") && (signal.getParam("availableDays") == [])) from entry-point "signals"
-        agent: Ava(weeklyStage == AvaWeeklyStage.FORWARD_AVAILABILITY)
+        agent: Ava(lunchCycleStage == AvaLunchCycleStage.FORWARD_AVAILABILITY)
     then
-        agent.showNotAvailable();
+        agent.showNotAvailableScreen();
         modify(agent) {updateAvailableDays((ArrayList<String>)(signal.getParam("availableDays")))};
         agent.send(CultureMaster.ID, new AvaAvailabilitySignal(new AvaAvailability(agent.getId(), agent.getAvailableDays()))); 
-        modify(agent) {setWeeklyStage(AvaWeeklyStage.ACCEPT_MATCH_INFO)};
+        modify(agent) {setLunchCycleStage(AvaLunchCycleStage.ACCEPT_MATCH_INFO)};
         delete(signal);
 end
 
 rule "Confirm days"
     when
         signal: SubmitEvent(getParamAsString("submit") == "confirmDays") from entry-point "signals"  
-        agent: Ava(weeklyStage == AvaWeeklyStage.FORWARD_AVAILABILITY)
+        agent: Ava(lunchCycleStage == AvaLunchCycleStage.FORWARD_AVAILABILITY)
     then
         agent.confirmingDaysScreen();
         modify(agent) {updateAvailableDays((ArrayList<String>)(signal.getParam("availableDays")))};
         agent.send(CultureMaster.ID, new AvaAvailabilitySignal(new AvaAvailability(agent.getId(), agent.getAvailableDays())));
-        modify(agent) {setWeeklyStage(AvaWeeklyStage.ACCEPT_MATCH_INFO)};
+        modify(agent) {setLunchCycleStage(AvaLunchCycleStage.ACCEPT_MATCH_INFO)};
         delete(signal);
 end
 
-rule "Accept Match Info"
+rule "Store match info"
     when
-        signal: MatchInfoSignal() from entry-point "signals"
-        agent: Ava(weeklyStage == AvaWeeklyStage.ACCEPT_MATCH_INFO)
+        signal: SendMatchesSignal() from entry-point "signals"
+        agent: Ava(lunchCycleStage == AvaLunchCycleStage.ACCEPT_MATCH_INFO)
     then
-        modify(agent) {setMatchName(signal.getMatchName()), setMatchDay(signal.getMatchDay())};
-        Log.info("I'm " + agent.getId() + " and my match is " + agent.getMatchName() + " on " + agent.getMatchDay());
+        modify(agent) {setMatch(signal.getMatch()), setMatchDay(signal.getMatchDay())};
+        Log.info("I'm " + agent.getId() + " and my match is " + agent.getMatch() + " on " + agent.getMatchDay());
         delete(signal);
 end
 

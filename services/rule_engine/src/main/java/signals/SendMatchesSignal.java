@@ -10,7 +10,7 @@ import com.mindsmiths.sdk.core.api.Signal;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MatchInfoSignal extends Signal {
-    private String matchName;
+public class SendMatchesSignal extends Signal {
+    private String match;
     private Days matchDay;
 }
