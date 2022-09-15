@@ -2,6 +2,7 @@ package rules.CultureMaster;
 
 import agents.CultureMaster;
 import signals.EmployeeUpdateSignal;
+import com.mindsmiths.employeeManager.ManualTriggerEvent;
 import com.mindsmiths.ruleEngine.util.Log;
 
 
@@ -14,4 +15,31 @@ rule "Add or update Ava data"
             addOrUpdateEmployee(signal);
         };
         delete(signal);
+end
+
+rule "Trigger lunch cycle"
+    when
+        signal: ManualTriggerEvent(triggerType == "lunch_cycle") from entry-point "signals"
+        agent: CultureMaster()
+    then
+        Log.info("CultureMaster: triggered lunch cycle from dashboard");
+        // trigger lunch cycle
+end
+
+rule "Trigger lunch pairing"
+    when
+        signal: ManualTriggerEvent(triggerType == "lunch_pairing") from entry-point "signals"
+        agent: CultureMaster()
+    then
+        Log.info("CultureMaster: triggered lunch pairing from dashboard");
+        // trigger lunch pairing
+end
+
+rule "Trigger familiarity quiz"
+    when
+        signal: ManualTriggerEvent(triggerType == "familiarity_quiz") from entry-point "signals"
+        agent: CultureMaster()
+    then
+        Log.info("CultureMaster: triggered familiarity quiz from dashboard");
+        // trigger quiz
 end

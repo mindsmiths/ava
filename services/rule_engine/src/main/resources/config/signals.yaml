@@ -18,3 +18,8 @@ com.mindsmiths.employeeManager.employees.Employee:
     connectionName: employeeId
     connectionField: id
     agentType: agents.Ava
+com.mindsmiths.employeeManager.ManualTriggerEvent:
+  - !GetOrCreateAgentByConnection
+    connectionName: employeeId
+    connectionField: id
+    agentType: agents.Ava
