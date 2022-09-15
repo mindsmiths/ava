@@ -14,47 +14,12 @@
         ]
       },
       {
-        "name": "Familiarity Quiz",
+        "name": "Familiarity Quiz questions",
         "elements": [
           {
-            "description": "Ava image path",
+            "description": "Action",
             "type": "TEXT",
-            "content": "/public/Ava.png"
-          },
-          {
-            "description": "Familiarity quiz final button",
-            "type": "OPTIONS",
-            "content": "[{\"text\":\"Bye now!\",\"id\":\"submit\"}]"
-          },
-          {
-            "description": "Finish familiarity quiz text",
-            "type": "TEXT",
-            "content": "You did a great job, it’s time I let you go back to work 😁\n\nYou can expect an email from me in the near future, I will let you and the team know how you stand in terms of connectivity and start matching you guys for work lunches.\n"
-          },
-          {
-            "description": "Goodbye screen",
-            "type": "TEXT",
-            "content": "You are the best 😘"
-          },
-          {
-            "description": "Intro button",
-            "type": "OPTIONS",
-            "content": "[{\"text\":\"Let's see\",\"id\":\"submit\"}]"
-          },
-          {
-            "description": "Intro screen description",
-            "type": "TEXT",
-            "content": "I will show you a list of names, feel free to choose those you know better than others.\nYou can choose more than one person.\n\nYou can also decide to not choose anyone if you feel like you don’t know anyone on the list that well.\n"
-          },
-          {
-            "description": "Intro screen title",
-            "type": "TEXT",
-            "content": "Who do you know better?"
-          },
-          {
-            "description": "Submit button",
-            "type": "OPTIONS",
-            "content": "[{\"text\":\"Submit\",\"id\":\"submit\"}]"
+            "content": "Submit"
           },
           {
             "description": "question1",
@@ -75,6 +40,46 @@
             "description": "question4",
             "type": "TEXT",
             "content": "With whom of the following do you talk on daily basis?"
+          }
+        ]
+      },
+      {
+        "name": "Familiarity quiz goodbye",
+        "elements": [
+          {
+            "description": "Action",
+            "type": "TEXT",
+            "content": "Bye now!"
+          },
+          {
+            "description": "Goodbye screen",
+            "type": "TEXT",
+            "content": "You are the best 😘"
+          },
+          {
+            "description": "Text",
+            "type": "TEXT",
+            "content": "You did a great job, it’s time I let you go back to work 😁\n\nYou can expect an email from me in the near future, I will let you and the team know how you stand in terms of connectivity and start matching you guys for work lunches.\n"
+          }
+        ]
+      },
+      {
+        "name": "Familiarity quiz intro",
+        "elements": [
+          {
+            "description": "Action",
+            "type": "TEXT",
+            "content": "Let's see"
+          },
+          {
+            "description": "Description",
+            "type": "TEXT",
+            "content": "I will show you a list of names, feel free to choose those you know better than others.\nYou can choose more than one person.\n\nYou can also decide to not choose anyone if you feel like you don’t know anyone on the list that well.\n"
+          },
+          {
+            "description": "Title",
+            "type": "TEXT",
+            "content": "Who do you know better?"
           }
         ]
       },
