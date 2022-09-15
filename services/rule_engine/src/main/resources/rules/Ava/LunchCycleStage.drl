@@ -77,9 +77,12 @@ rule "Store match info"
     when
         signal: SendMatchesSignal() from entry-point "signals"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.ACCEPT_MATCH_INFO)
+        profile: EmployeeProfile()
     then
         modify(agent) {setMatch(signal.getMatch()), setMatchDay(signal.getMatchDay())};
-        Log.info("I'm " + agent.getId() + " and my match is " + agent.getMatch() + " on " + agent.getMatchDay());
+        Log.info("I'm " + profile.getFirstName() + " and my match is " +
+                agent.getOtherEmployees().get(signal.getMatch()).getFullName() +
+                " on " + agent.getMatchDay());
         delete(signal);
 end
 

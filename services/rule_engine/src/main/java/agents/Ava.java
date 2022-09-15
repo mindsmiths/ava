@@ -206,14 +206,13 @@ public class Ava extends Agent {
         showScreen(screen);
     }
 
-    private String getFullName(EmployeeProfile employee) {
-        return employee.getFirstName() + " " + employee.getLastName();
-    }
+
+
 
     private Map<String, String> getAllEmployeeNames() {
         Map<String, String> names = new HashMap<>();
         for (EmployeeProfile employee : otherEmployees.values()) {
-            names.put(getFullName(employee), employee.getId());
+            names.put(employee.getFullName(), employee.getId());
         }
         return names;
     }
