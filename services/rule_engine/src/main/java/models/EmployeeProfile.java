@@ -31,4 +31,8 @@ public class EmployeeProfile extends Employee {
         this.personalAnswers = personalAnswers;
         this.familiarity = familiarity;
     }
+
+    public String getFullName() {
+        return getFirstName() + " " + getLastName();
+    }
 }

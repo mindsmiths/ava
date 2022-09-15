@@ -219,16 +219,12 @@ public class Ava extends Agent {
             Map<String, String> namesPerQuestion = new HashMap<>();
 
             for(EmployeeProfile employee : employees.subList(startIndex, endIndex)) {
-                namesPerQuestion.put(getFullName(employee), employee.getId());
+                namesPerQuestion.put(employee.getFullName(), employee.getId());
             }
             names.add(namesPerQuestion);
             startIndex = endIndex;
         }
         return names;
-    }
-
-    private String getFullName(EmployeeProfile employee) {
-        return employee.getFirstName() + " " + employee.getLastName();
     }
 
     public void sendWelcomeEmail(EmployeeProfile employee) throws IOException {
