@@ -2,6 +2,7 @@ package rules.Ava;
 
 import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
 import com.mindsmiths.ruleEngine.model.Heartbeat;
+import com.mindsmiths.employeeManager.ManualTriggerEvent;
 
 import agents.Ava;
 import com.mindsmiths.ruleEngine.util.Log;
@@ -26,4 +27,31 @@ rule "Set non working hours"
         modify(agent) {
             setWorkingHours(false)
         }
+end
+
+rule "Trigger lunch cycle"
+    when
+        signal: ManualTriggerEvent(triggerType == "lunch_cycle") from entry-point "signals"
+        agent: Ava()
+    then
+        Log.info("Ava: triggered lunch cycle from dashboard");
+        // trigger lunch cycle
+end
+
+rule "Trigger lunch pairing"
+    when
+        signal: ManualTriggerEvent(triggerType == "lunch_pairing") from entry-point "signals"
+        agent: Ava()
+    then
+        Log.info("Ava: triggered lunch pairing from dashboard");
+        // trigger lunch pairing
+end
+
+rule "Trigger familiarity quiz"
+    when
+        signal: ManualTriggerEvent(triggerType == "familiarity_quiz") from entry-point "signals"
+        agent: Ava()
+    then
+        Log.info("Ava: triggered familiarity quiz from dashboard");
+        // trigger quiz
 end
