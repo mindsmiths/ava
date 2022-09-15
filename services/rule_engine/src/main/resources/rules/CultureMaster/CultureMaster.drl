@@ -2,7 +2,7 @@ package rules.CultureMaster;
 
 import agents.CultureMaster;
 import signals.EmployeeUpdateSignal;
-import signals.ManualTriggerEvent;
+import com.mindsmiths.employeeManager.ManualTriggerEvent;
 import com.mindsmiths.ruleEngine.util.Log;
 
 
@@ -22,7 +22,7 @@ rule "Trigger lunch cycle"
         signal: ManualTriggerEvent(triggerType == "lunch_cycle") from entry-point "signals"
         agent: CultureMaster()
     then
-        Log.info("triggered lunch cycle from dashboard");
+        Log.info("CultureMaster: triggered lunch cycle from dashboard");
         // trigger lunch cycle
 end
 
@@ -31,7 +31,7 @@ rule "Trigger lunch pairing"
         signal: ManualTriggerEvent(triggerType == "lunch_pairing") from entry-point "signals"
         agent: CultureMaster()
     then
-        Log.info("triggered lunch pairing from dashboard");
+        Log.info("CultureMaster: triggered lunch pairing from dashboard");
         // trigger lunch pairing
 end
 
@@ -40,6 +40,6 @@ rule "Trigger familiarity quiz"
         signal: ManualTriggerEvent(triggerType == "familiarity_quiz") from entry-point "signals"
         agent: CultureMaster()
     then
-        Log.info("triggered familiarity quiz from dashboard");
+        Log.info("CultureMaster: triggered familiarity quiz from dashboard");
         // trigger quiz
 end

@@ -2,6 +2,7 @@ package rules.Ava;
 
 import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
 import com.mindsmiths.ruleEngine.model.Heartbeat;
+import com.mindsmiths.employeeManager.ManualTriggerEvent;
 
 import agents.Ava;
 
@@ -9,7 +10,7 @@ import agents.Ava;
 rule "Working hours"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        eval(evaluateCronExpression("* * 8-17 ? * MON,TUE,WED,TUE,FRI *", ts, "Europe/Zagreb"))
+        eval(evaluateCronExpression("* * 8-17 ? * MON,TUE,WED,THU,FRI *", ts, "Europe/Zagreb"))
         agent: Ava()
     then
         modify(agent) {
@@ -20,10 +21,37 @@ end
 rule "Non working hours"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        eval(!evaluateCronExpression("* * 8-17 ? * MON,TUE,WED,TUE,FRI *", ts, "Europe/Zagreb"))
+        eval(!evaluateCronExpression("* * 8-17 ? * MON,TUE,WED,THU,FRI *", ts, "Europe/Zagreb"))
         agent: Ava()
     then
         modify(agent) {
             setWorkingHours(false)
         }
+end
+
+rule "Trigger lunch cycle"
+    when
+        signal: ManualTriggerEvent(triggerType == "lunch_cycle") from entry-point "signals"
+        agent: Ava()
+    then
+        Log.info("Ava: triggered lunch cycle from dashboard");
+        // trigger lunch cycle
+end
+
+rule "Trigger lunch pairing"
+    when
+        signal: ManualTriggerEvent(triggerType == "lunch_pairing") from entry-point "signals"
+        agent: Ava()
+    then
+        Log.info("Ava: triggered lunch pairing from dashboard");
+        // trigger lunch pairing
+end
+
+rule "Trigger familiarity quiz"
+    when
+        signal: ManualTriggerEvent(triggerType == "familiarity_quiz") from entry-point "signals"
+        agent: Ava()
+    then
+        Log.info("Ava: triggered familiarity quiz from dashboard");
+        // trigger quiz
 end
