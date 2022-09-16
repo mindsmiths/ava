@@ -10,7 +10,7 @@ global:
 
     ENVIRONMENT_NAME: {{ env.ENVIRONMENT_NAME }}
     MODULE: '{{ env.MODULE | default("local", True) }}'
-    LOG_LEVEL: INFO
+    LOG_LEVEL: DEBUG
 
     # Messaging
     PULSAR_URL: pulsar://pulsar-proxy.pulsar.svc.cluster.local:6650
@@ -26,7 +26,6 @@ global:
 
     REDIS_CLIENT_HOST: redis-master
     REDIS_CLIENT_PORT: 6379
-    # REDIS_URL: redis-master:6379
 
     BACKUP_CONTAINER_NAME: '{{ env.BACKUP_CONTAINER_NAME }}'
     BACKUPS_STORAGE_ACCOUNT_NAME: '{{ env.BACKUPS_STORAGE_ACCOUNT_NAME }}'
