@@ -39,16 +39,16 @@ rule "Store num of silos"
         signal: SilosInfoSignal() from entry-point "signals"
         agent: Ava()
     then
-        modify(agent) {setNumOfSilos(signal.getNumOfSilos())};
+        modify(agent) {setSilosCount(signal.getSilosCount())};
         delete(signal);
 end
 
 
-rule "Connect stats screens with email"
+rule "Show stats screens"
    when
         signal: UserConnectedEvent(getParamAsString("trigger") == "show-stats") from entry-point "signals"
         agent: Ava()
    then
-        agent.showEmployeeNumberScreen();
+        agent.showStatisticsScreens();
         delete(signal);
 end

@@ -53,6 +53,6 @@ rule "Send number of silos"
         signal: NumOfSilosSignal() from entry-point "signals"
         agent: CultureMaster()
     then
-        agent.send(signal.getId(), new SilosInfoSignal(agent.numOfSilos()));
+        agent.send(signal.getId(), new SilosInfoSignal(agent.calculateSilosCount()));
         delete(signal);
 end

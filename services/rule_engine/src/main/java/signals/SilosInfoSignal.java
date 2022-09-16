@@ -10,5 +10,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 public class SilosInfoSignal extends Signal {
-    private int numOfSilos;
+    private int silosCount;
+    private int silosRisk;
+
+    public SilosInfoSignal(int silosCount) {
+        this.silosCount = silosCount;
+    }
 }
