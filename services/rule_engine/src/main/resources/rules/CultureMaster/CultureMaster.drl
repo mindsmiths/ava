@@ -26,6 +26,7 @@ rule "Trigger lunch cycle for CultureMaster"
     then
         Log.info("CultureMaster: triggered lunch cycle from dashboard");
         modify(agent) { setLunchCycleStage(CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES)};
+        delete(signal);
 end
 
 rule "Trigger lunch pairing for CultureMaster"
