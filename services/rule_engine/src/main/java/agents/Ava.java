@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import utils.Settings;
 
 import lombok.Data;
 import lombok.ToString;
@@ -22,6 +21,7 @@ import com.mindsmiths.ruleEngine.model.Agent;
 import com.mindsmiths.pairingalgorithm.Days;
 import com.mindsmiths.sdk.utils.templating.Templating;
 
+import utils.Settings;
 import models.AvaLunchCycleStage;
 import models.EmployeeProfile;
 import models.OnboardingStage;
@@ -110,7 +110,7 @@ public class Ava extends Agent {
     public void showFamiliarityQuizScreens() {
         Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
         String avaImagePath = Mitems.getText("onboarding.ava-image-path.path");
-        Map<String, String> names = getAllEmployeeNames();
+        List<Map<String, String>> names = getAllEmployeeNames();
 
         // Adding intro screen
         String introButton = Mitems.getText("onboarding.familiarity-quiz-intro.action");
@@ -126,7 +126,7 @@ public class Ava extends Agent {
         int questionNum = 1;
         String submitButton = Mitems.getText("onboarding.familiarity-quiz-questions.action");
 
-        while (true) {
+        while(true) { 
             String questionTag = "question" + String.valueOf(questionNum);
             String nextQuestionTag = "question" + String.valueOf(questionNum + 1);
             String answersTag = "answers" + String.valueOf(questionNum);
@@ -134,8 +134,9 @@ public class Ava extends Agent {
             try {
                 String questionText = Mitems.getText("onboarding.familiarity-quiz-questions." + questionTag);
                 screens.put(questionTag, new TemplateGenerator(questionTag)
+                        .addComponent("header", new HeaderComponent(null, questionNum > 1))
                         .addComponent("question", new TitleComponent(questionText))
-                        .addComponent(answersTag, new CloudSelectComponent(answersTag, names))
+                        .addComponent(answersTag, new CloudSelectComponent(answersTag, names.get(questionNum - 1)))
                         .addComponent("submit", new PrimarySubmitButtonComponent(
                                 "submit", submitButton, nextQuestionTag)));
                 questionNum += 1;
@@ -219,14 +220,22 @@ public class Ava extends Agent {
         showScreen(screen);
     }
 
-    private String getFullName(EmployeeProfile employee) {
-        return employee.getFirstName() + " " + employee.getLastName();
-    }
+    private List<Map<String, String>> getAllEmployeeNames() {
+        List<Map<String, String>> names = new ArrayList<>();
+        List<Integer> employeesPerQuestionDistribution = employeesPerQuestionDistribution();
+        List<EmployeeProfile> employees = new ArrayList<>(otherEmployees.values());
 
-    private Map<String, String> getAllEmployeeNames() {
-        Map<String, String> names = new HashMap<>();
-        for (EmployeeProfile employee : otherEmployees.values()) {
-            names.put(getFullName(employee), employee.getId());
+        int startIndex = 0;
+        int endIndex = 0;
+        for(int len : employeesPerQuestionDistribution) {
+            endIndex += len;
+            Map<String, String> namesPerQuestion = new HashMap<>();
+
+            for(EmployeeProfile employee : employees.subList(startIndex, endIndex)) {
+                namesPerQuestion.put(employee.getFullName(), employee.getId());
+            }
+            names.add(namesPerQuestion);
+            startIndex = endIndex;
         }
         return names;
     }
@@ -305,5 +314,48 @@ public class Ava extends Agent {
                 .addComponent("description", new TitleComponent(finalScreenTitle)));
 
         showScreens("employeeNumberScreen", screens);
+    private List<Integer> employeesPerQuestionDistribution() {
+        List<Integer> employeesPerQuestionDistribution = new ArrayList<Integer>();
+        int numOfOtherEmployees = otherEmployees.size();
+        int numOfQuestions = (int) Math.ceil((double) numOfOtherEmployees / 10.0);
+        
+        // Calculating number of employees per question
+        double employeesPerQuestion;
+        int employeesPerQuestionRounded;
+
+        while (numOfOtherEmployees > 0) {
+            employeesPerQuestion = (double) numOfOtherEmployees/ (double) numOfQuestions;
+
+            if (employeesPerQuestion % 1 != 0) {
+                employeesPerQuestionRounded = (int) Math.ceil(employeesPerQuestion);
+            }
+            else {
+                employeesPerQuestionRounded = (int) Math.floor(employeesPerQuestion);
+            }
+
+            employeesPerQuestionDistribution.add(employeesPerQuestionRounded);
+            numOfOtherEmployees = numOfOtherEmployees - employeesPerQuestionRounded;
+            numOfQuestions -= 1;
+        }
+        return employeesPerQuestionDistribution;
+    }
+    
+    public void sendWeeklyEmail(EmployeeProfile employee) throws IOException {
+        String subject = Mitems.getText("weekly-core.weekly-email.subject");
+        String description = Mitems.getText("weekly-core.weekly-email.description");
+        String htmlTemplate = String.join("", Files.readAllLines(Paths.get("EmailTemplate.html"), StandardCharsets.UTF_8));
+
+        String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
+            "description", description,
+            "callToAction", Mitems.getText("weekly-core.weekly-email.button"),
+            "firstName", employee.getFirstName(),
+            "armoryUrl", String.format("%s/%s?trigger=start-weekly-core", Settings.ARMORY_SITE_URL, getConnection("armory"))
+        ));
+
+        SendEmailPayload e = new SendEmailPayload();
+        e.setRecipients(List.of(getConnection("email")));
+        e.setSubject(subject);
+        e.setHtmlText(htmlBody);
+        EmailAdapterAPI.newEmail(e);
     }
 }

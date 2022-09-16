@@ -354,6 +354,26 @@
             "content": "Sorry to hear that :(\nHope to see you next week"
           }
         ]
+      },
+      {
+        "name": "Weekly Email",
+        "elements": [
+          {
+            "description": "Button",
+            "type": "TEXT",
+            "content": "Let's see"
+          },
+          {
+            "description": "Description",
+            "type": "TEXT",
+            "content": "Choose when you want to go on a lunch"
+          },
+          {
+            "description": "Subject",
+            "type": "TEXT",
+            "content": "Weekly intro email"
+          }
+        ]
       }
     ]
   }
