@@ -1,0 +1,46 @@
+package rules.CultureMaster;
+
+import java.lang.string.*; 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.mindsmiths.emailAdapter.EmailAdapterAPI;
+import com.mindsmiths.emailAdapter.SendEmailPayload;
+import com.mindsmiths.ruleEngine.util.Agents;
+import com.mindsmiths.ruleEngine.model.Heartbeat;
+import com.mindsmiths.ruleEngine.util.Log;
+import com.mindsmiths.sdk.utils.templating.Templating;
+import com.mindsmiths.mitems.Mitems;
+import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
+
+import agents.CultureMaster;
+
+
+rule "Working hours"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        eval(evaluateCronExpression("* * 8-17 ? * MON-FRI *", ts, "Europe/Zagreb"))
+        agent: CultureMaster()
+    then
+        modify(agent) {
+            setWorkingHours(true)
+        }
+end
+
+rule "Non working hours"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        eval(!evaluateCronExpression("* * 8-17 ? * MON-FRI *", ts, "Europe/Zagreb"))
+        agent: CultureMaster()
+    then
+        modify(agent) {
+            setWorkingHours(false)
+        }
+end
+
+

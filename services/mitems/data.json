@@ -1,335 +1,355 @@
 [
-  {
-    "title": "Onboarding",
-    "description": "",
-    "items": [
-      {
-        "name": "Ava image path",
-        "elements": [
-          {
-            "description": "Path",
-            "type": "TEXT",
-            "content": "/public/Ava.png"
-          }
-        ]
-      },
-      {
-        "name": "Familiarity Quiz questions",
-        "elements": [
-          {
-            "description": "Action",
-            "type": "TEXT",
-            "content": "Submit"
-          },
-          {
-            "description": "question1",
-            "type": "TEXT",
-            "content": "Who of the following do you know best?"
-          },
-          {
-            "description": "question2",
-            "type": "TEXT",
-            "content": "Who of the following do you know best?"
-          },
-          {
-            "description": "question3",
-            "type": "TEXT",
-            "content": "With whom of the following do you cooperate often?"
-          },
-          {
-            "description": "question4",
-            "type": "TEXT",
-            "content": "With whom of the following do you talk on daily basis?"
-          }
-        ]
-      },
-      {
-        "name": "Familiarity quiz goodbye",
-        "elements": [
-          {
-            "description": "Action",
-            "type": "TEXT",
-            "content": "Bye now!"
-          },
-          {
-            "description": "Goodbye screen",
-            "type": "TEXT",
-            "content": "You are the best 😘"
-          },
-          {
-            "description": "Text",
-            "type": "TEXT",
-            "content": "You did a great job, it’s time I let you go back to work 😁\n\nYou can expect an email from me in the near future, I will let you and the team know how you stand in terms of connectivity and start matching you guys for work lunches.\n"
-          }
-        ]
-      },
-      {
-        "name": "Familiarity quiz intro",
-        "elements": [
-          {
-            "description": "Action",
-            "type": "TEXT",
-            "content": "Let's see"
-          },
-          {
-            "description": "Description",
-            "type": "TEXT",
-            "content": "I will show you a list of names, feel free to choose those you know better than others.\nYou can choose more than one person.\n\nYou can also decide to not choose anyone if you feel like you don’t know anyone on the list that well.\n"
-          },
-          {
-            "description": "Title",
-            "type": "TEXT",
-            "content": "Who do you know better?"
-          }
-        ]
-      },
-      {
-        "name": "Finish personal quiz",
-        "elements": [
-          {
-            "description": "Button",
-            "type": "OPTIONS",
-            "content": "[{\"text\":\"Great, let's do it\",\"id\":\"submit\"}]"
-          },
-          {
-            "description": "Text",
-            "type": "TEXT",
-            "content": "This was great, you’re such an interesting person! Thank you 🥳\n\nNow let’s see how connected you are to others in your organization!"
-          }
-        ]
-      },
-      {
-        "name": "Personal quiz question1",
-        "elements": [
-          {
-            "description": "Action",
-            "type": "TEXT",
-            "content": "Submit"
-          },
-          {
-            "description": "question1",
-            "type": "TEXT",
-            "content": "🌴When do you feel most productive?"
-          }
-        ]
-      },
-      {
-        "name": "Personal quiz question2",
-        "elements": [
-          {
-            "description": "Action",
-            "type": "TEXT",
-            "content": "Submit"
-          },
-          {
-            "description": "question2",
-            "type": "TEXT",
-            "content": "💃Have you ever binge watched a good show? Name the first that comes to mind."
-          }
-        ]
-      },
-      {
-        "name": "Personal quiz question3",
-        "elements": [
-          {
-            "description": "Action",
-            "type": "TEXT",
-            "content": "Submit"
-          },
-          {
-            "description": "question3",
-            "type": "TEXT",
-            "content": "🌴Name one song that you could listen on repeat."
-          }
-        ]
-      },
-      {
-        "name": "Personal quiz question4",
-        "elements": [
-          {
-            "description": "Action",
-            "type": "TEXT",
-            "content": "Submit"
-          },
-          {
-            "description": "question4",
-            "type": "TEXT",
-            "content": "🌴Describe your version of the perfect work lunch."
-          }
-        ]
-      },
-      {
-        "name": "Welcome email",
-        "elements": [
-          {
-            "description": "Action",
-            "type": "TEXT",
-            "content": "Let's start"
-          },
-          {
-            "description": "Description",
-            "type": "HTML",
-            "content": "<p><span style=\"font-weight: 400;\">Dear all,</span></p>\n<p><span style=\"font-weight: 400;\">Thanks for the warm welcome! I&rsquo;m so looking forward to working with all of you and help you get to know each other a little bit better.</span></p>\n<p><span style=\"font-weight: 400;\">When team members are working in silos, they cannot collaborate effectively, which can lead to missed deadlines, subpar work, poor communication, and general feelings of frustration.</span></p>\n<p><span style=\"font-weight: 400;\">To avoid this, we will encourage communication and collaboration, promote knowledge sharing and encourage networking.&nbsp;</span></p>\n<p><span style=\"font-weight: 400;\">How? Easy, I will do all the work and guide you all the way.</span></p>"
-          },
-          {
-            "description": "Subject",
-            "type": "TEXT",
-            "content": "Welcome onboard!"
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "title": "Statistics",
-    "description": "Flow which displays statistics about company silos to users",
-    "items": [
-      {
-        "name": "Statistics email",
-        "elements": [
-          {
-            "description": "Action",
-            "type": "TEXT",
-            "content": "Let me see!!!"
-          },
-          {
-            "description": "Description",
-            "type": "HTML",
-            "content": "<p>Dear {{ firstName }},</p>\n<p><span style=\"font-weight: 400;\">Thank you for taking the time to help me analyze our individual relations and learn more about you.</span></p>\n<p><span style=\"font-weight: 400;\">Based on your feedback I was able to identify our current level of exposure to risk of knowledge silos.</span></p>\n<p><span style=\"font-weight: 400;\">Take a look at where we stand right now, we will work together to break the silos and observe our impact on the trend in the future.</span></p>"
-          },
-          {
-            "description": "Subject",
-            "type": "TEXT",
-            "content": "Statistics"
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "title": "Weekly core",
-    "description": "Weekly loop",
-    "items": [
-      {
-        "name": "Confirmation of choosen available days",
-        "elements": [
-          {
-            "description": "Title",
-            "type": "TEXT",
-            "content": "Okay great, I’ll send you an email when I catch up with others :)"
-          }
-        ]
-      },
-      {
-        "name": "Confirming quiz guesses",
-        "elements": [
-          {
-            "description": "Button",
-            "type": "TEXT",
-            "content": "Okay"
-          },
-          {
-            "description": "Title",
-            "type": "TEXT",
-            "content": "Okay great! I'll send Melissa's answers to my other AI assistant who'll try to guess what kind of person she is."
-          }
-        ]
-      },
-      {
-        "name": "Days",
-        "elements": [
-          {
-            "description": "Each day",
-            "type": "OPTIONS",
-            "content": "[{\"text\":\"Mon\",\"id\":\"MON\"},{\"text\":\"Tue\",\"id\":\"TUE\"},{\"text\":\"Wed\",\"id\":\"WED\"},{\"text\":\"Thu\",\"id\":\"THU\"},{\"text\":\"Fri\",\"id\":\"FRI\"}]"
-          }
-        ]
-      },
-      {
-        "name": "Description asking for available days",
-        "elements": [
-          {
-            "description": "Text",
-            "type": "TEXT",
-            "content": "I’m glad you are in for a lunch!\nLet’s choose a lunch day first. \n\nYou can choose what suits you best."
-          }
-        ]
-      },
-      {
-        "name": "Guessing options",
-        "elements": [
-          {
-            "description": "Options",
-            "type": "OPTIONS",
-            "content": "[{\"text\":\"The Joker\",\"id\":\"0\"},{\"text\":\"The Godfather\",\"id\":\"1\"},{\"text\":\"Her\",\"id\":\"2\"},{\"text\":\"Maldivi\",\"id\":\"3\"},{\"text\":\"Petrinja\",\"id\":\"4\"},{\"text\":\"Vienna\",\"id\":\"5\"}]"
-          }
-        ]
-      },
-      {
-        "name": "Guessing questions",
-        "elements": [
-          {
-            "description": "Questions",
-            "type": "OPTIONS",
-            "content": "[{\"text\":\"Last movie Melissa watched is\",\"id\":\"0\"},{\"text\":\"Last place Melissa has visited is\",\"id\":\"1\"}]"
-          }
-        ]
-      },
-      {
-        "name": "Guessing quiz intro screen title",
-        "elements": [
-          {
-            "description": "Button",
-            "type": "TEXT",
-            "content": "Let's start!"
-          },
-          {
-            "description": "Title",
-            "type": "TEXT",
-            "content": "Okay! I prepared 2 questions about Melissa. Ready to start?"
-          }
-        ]
-      },
-      {
-        "name": "Message about not working hours for links",
-        "elements": [
-          {
-            "description": "Title",
-            "type": "TEXT",
-            "content": "Sorry, time has passed. Better luck next time ;)"
-          }
-        ]
-      },
-      {
-        "name": "Stay tuned second confirmation of available days",
-        "elements": [
-          {
-            "description": "Title",
-            "type": "TEXT",
-            "content": "You’re welcome. Stay tuned for the lunch :)"
-          }
-        ]
-      },
-      {
-        "name": "Title asking for available days",
-        "elements": [
-          {
-            "description": "Title",
-            "type": "TEXT",
-            "content": "When works best?"
-          }
-        ]
-      },
-      {
-        "name": "Title for person who is not available any day",
-        "elements": [
-          {
-            "description": "Title",
-            "type": "TEXT",
-            "content": "Sorry to hear that :(\nHope to see you next week"
-          }
-        ]
-      }
-    ]
-  }
-]
+    {
+      "title": "Onboarding",
+      "description": "",
+      "items": [
+        {
+            "name": "Matching mail",
+            "elements": [
+              {
+                "description": "calendarInviteText",
+                "type": "TEXT",
+                "content": "{{ firstName }} is going to lunch with {{ secondName }}"
+              },
+              {
+                "description": "matchingMailBodyText",
+                "type": "TEXT",
+                "content": "I've matched you with {{ personName }} for lunch on {{ lunchDay }}.\n\nShe works in your company and I think you two should get to know each other better.\n\nI booked the time in your calendar.\n\nAva"
+              },
+              {
+                "description": "matchingMailTitleText",
+                "type": "TEXT",
+                "content": "It's a match !"
+              }
+            ]
+        },
+        {
+          "name": "Ava image path",
+          "elements": [
+            {
+              "description": "Path",
+              "type": "TEXT",
+              "content": "/public/Ava.png"
+            }
+          ]
+        },
+        {
+          "name": "Familiarity Quiz questions",
+          "elements": [
+            {
+              "description": "Action",
+              "type": "TEXT",
+              "content": "Submit"
+            },
+            {
+              "description": "question1",
+              "type": "TEXT",
+              "content": "Who of the following do you know best?"
+            },
+            {
+              "description": "question2",
+              "type": "TEXT",
+              "content": "Who of the following do you know best?"
+            },
+            {
+              "description": "question3",
+              "type": "TEXT",
+              "content": "With whom of the following do you cooperate often?"
+            },
+            {
+              "description": "question4",
+              "type": "TEXT",
+              "content": "With whom of the following do you talk on daily basis?"
+            }
+          ]
+        },
+        {
+          "name": "Familiarity quiz goodbye",
+          "elements": [
+            {
+              "description": "Action",
+              "type": "TEXT",
+              "content": "Bye now!"
+            },
+            {
+              "description": "Goodbye screen",
+              "type": "TEXT",
+              "content": "You are the best 😘"
+            },
+            {
+              "description": "Text",
+              "type": "TEXT",
+              "content": "You did a great job, it’s time I let you go back to work 😁\n\nYou can expect an email from me in the near future, I will let you and the team know how you stand in terms of connectivity and start matching you guys for work lunches.\n"
+            }
+          ]
+        },
+        {
+          "name": "Familiarity quiz intro",
+          "elements": [
+            {
+              "description": "Action",
+              "type": "TEXT",
+              "content": "Let's see"
+            },
+            {
+              "description": "Description",
+              "type": "TEXT",
+              "content": "I will show you a list of names, feel free to choose those you know better than others.\nYou can choose more than one person.\n\nYou can also decide to not choose anyone if you feel like you don’t know anyone on the list that well.\n"
+            },
+            {
+              "description": "Title",
+              "type": "TEXT",
+              "content": "Who do you know better?"
+            }
+          ]
+        },
+        {
+          "name": "Finish personal quiz",
+          "elements": [
+            {
+              "description": "Button",
+              "type": "OPTIONS",
+              "content": "[{\"text\":\"Great, let's do it\",\"id\":\"submit\"}]"
+            },
+            {
+              "description": "Text",
+              "type": "TEXT",
+              "content": "This was great, you’re such an interesting person! Thank you 🥳\n\nNow let’s see how connected you are to others in your organization!"
+            }
+          ]
+        },
+        {
+          "name": "Personal quiz question1",
+          "elements": [
+            {
+              "description": "Action",
+              "type": "TEXT",
+              "content": "Submit"
+            },
+            {
+              "description": "question1",
+              "type": "TEXT",
+              "content": "🌴When do you feel most productive?"
+            }
+          ]
+        },
+        {
+          "name": "Personal quiz question2",
+          "elements": [
+            {
+              "description": "Action",
+              "type": "TEXT",
+              "content": "Submit"
+            },
+            {
+              "description": "question2",
+              "type": "TEXT",
+              "content": "💃Have you ever binge watched a good show? Name the first that comes to mind."
+            }
+          ]
+        },
+        {
+          "name": "Personal quiz question3",
+          "elements": [
+            {
+              "description": "Action",
+              "type": "TEXT",
+              "content": "Submit"
+            },
+            {
+              "description": "question3",
+              "type": "TEXT",
+              "content": "🌴Name one song that you could listen on repeat."
+            }
+          ]
+        },
+        {
+          "name": "Personal quiz question4",
+          "elements": [
+            {
+              "description": "Action",
+              "type": "TEXT",
+              "content": "Submit"
+            },
+            {
+              "description": "question4",
+              "type": "TEXT",
+              "content": "🌴Describe your version of the perfect work lunch."
+            }
+          ]
+        },
+        {
+          "name": "Welcome email",
+          "elements": [
+            {
+              "description": "Action",
+              "type": "TEXT",
+              "content": "Let's start"
+            },
+            {
+              "description": "Description",
+              "type": "HTML",
+              "content": "<p><span style=\"font-weight: 400;\">Dear all,</span></p>\n<p><span style=\"font-weight: 400;\">Thanks for the warm welcome! I&rsquo;m so looking forward to working with all of you and help you get to know each other a little bit better.</span></p>\n<p><span style=\"font-weight: 400;\">When team members are working in silos, they cannot collaborate effectively, which can lead to missed deadlines, subpar work, poor communication, and general feelings of frustration.</span></p>\n<p><span style=\"font-weight: 400;\">To avoid this, we will encourage communication and collaboration, promote knowledge sharing and encourage networking.&nbsp;</span></p>\n<p><span style=\"font-weight: 400;\">How? Easy, I will do all the work and guide you all the way.</span></p>"
+            },
+            {
+              "description": "Subject",
+              "type": "TEXT",
+              "content": "Welcome onboard!"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Statistics",
+      "description": "Flow which displays statistics about company silos to users",
+      "items": [
+        {
+          "name": "Statistics email",
+          "elements": [
+            {
+              "description": "Action",
+              "type": "TEXT",
+              "content": "Let me see!!!"
+            },
+            {
+              "description": "Description",
+              "type": "HTML",
+              "content": "<p>Dear {{ firstName }},</p>\n<p><span style=\"font-weight: 400;\">Thank you for taking the time to help me analyze our individual relations and learn more about you.</span></p>\n<p><span style=\"font-weight: 400;\">Based on your feedback I was able to identify our current level of exposure to risk of knowledge silos.</span></p>\n<p><span style=\"font-weight: 400;\">Take a look at where we stand right now, we will work together to break the silos and observe our impact on the trend in the future.</span></p>"
+            },
+            {
+              "description": "Subject",
+              "type": "TEXT",
+              "content": "Statistics"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Weekly core",
+      "description": "Weekly loop",
+      "items": [
+        {
+          "name": "Confirmation of choosen available days",
+          "elements": [
+            {
+              "description": "Title",
+              "type": "TEXT",
+              "content": "Okay great, I’ll send you an email when I catch up with others :)"
+            }
+          ]
+        },
+        {
+          "name": "Confirming quiz guesses",
+          "elements": [
+            {
+              "description": "Button",
+              "type": "TEXT",
+              "content": "Okay"
+            },
+            {
+              "description": "Title",
+              "type": "TEXT",
+              "content": "Okay great! I'll send Melissa's answers to my other AI assistant who'll try to guess what kind of person she is."
+            }
+          ]
+        },
+        {
+          "name": "Days",
+          "elements": [
+            {
+              "description": "Each day",
+              "type": "OPTIONS",
+              "content": "[{\"text\":\"Mon\",\"id\":\"MON\"},{\"text\":\"Tue\",\"id\":\"TUE\"},{\"text\":\"Wed\",\"id\":\"WED\"},{\"text\":\"Thu\",\"id\":\"THU\"},{\"text\":\"Fri\",\"id\":\"FRI\"}]"
+            }
+          ]
+        },
+        {
+          "name": "Description asking for available days",
+          "elements": [
+            {
+              "description": "Text",
+              "type": "TEXT",
+              "content": "I’m glad you are in for a lunch!\nLet’s choose a lunch day first. \n\nYou can choose what suits you best."
+            }
+          ]
+        },
+        {
+          "name": "Guessing options",
+          "elements": [
+            {
+              "description": "Options",
+              "type": "OPTIONS",
+              "content": "[{\"text\":\"The Joker\",\"id\":\"0\"},{\"text\":\"The Godfather\",\"id\":\"1\"},{\"text\":\"Her\",\"id\":\"2\"},{\"text\":\"Maldivi\",\"id\":\"3\"},{\"text\":\"Petrinja\",\"id\":\"4\"},{\"text\":\"Vienna\",\"id\":\"5\"}]"
+            }
+          ]
+        },
+        {
+          "name": "Guessing questions",
+          "elements": [
+            {
+              "description": "Questions",
+              "type": "OPTIONS",
+              "content": "[{\"text\":\"Last movie Melissa watched is\",\"id\":\"0\"},{\"text\":\"Last place Melissa has visited is\",\"id\":\"1\"}]"
+            }
+          ]
+        },
+        {
+          "name": "Guessing quiz intro screen title",
+          "elements": [
+            {
+              "description": "Button",
+              "type": "TEXT",
+              "content": "Let's start!"
+            },
+            {
+              "description": "Title",
+              "type": "TEXT",
+              "content": "Okay! I prepared 2 questions about Melissa. Ready to start?"
+            }
+          ]
+        },
+        {
+          "name": "Message about not working hours for links",
+          "elements": [
+            {
+              "description": "Title",
+              "type": "TEXT",
+              "content": "Sorry, time has passed. Better luck next time ;)"
+            }
+          ]
+        },
+        {
+          "name": "Stay tuned second confirmation of available days",
+          "elements": [
+            {
+              "description": "Title",
+              "type": "TEXT",
+              "content": "You’re welcome. Stay tuned for the lunch :)"
+            }
+          ]
+        },
+        {
+          "name": "Title asking for available days",
+          "elements": [
+            {
+              "description": "Title",
+              "type": "TEXT",
+              "content": "When works best?"
+            }
+          ]
+        },
+        {
+          "name": "Title for person who is not available any day",
+          "elements": [
+            {
+              "description": "Title",
+              "type": "TEXT",
+              "content": "Sorry to hear that :(\nHope to see you next week"
+            }
+          ]
+        }
+      ]
+    }
+  ]

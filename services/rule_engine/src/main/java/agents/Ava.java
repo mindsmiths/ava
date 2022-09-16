@@ -1,6 +1,7 @@
 package agents;
 
 import java.util.*;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -24,7 +25,32 @@ import com.mindsmiths.sdk.utils.templating.Templating;
 
 import models.AvaLunchCycleStage;
 import models.EmployeeProfile;
+import com.mindsmiths.employeeManager.employees.Employee;
+import com.mindsmiths.mitems.Mitems;
+import com.mindsmiths.mitems.Option;
+import com.mindsmiths.ruleEngine.model.Agent;
+import com.mindsmiths.ruleEngine.util.Log;
+import com.mindsmiths.pairingalgorithm.Days;
+import com.mindsmiths.emailAdapter.AttachmentData;
+import com.mindsmiths.emailAdapter.EmailAdapterAPI;
+import com.mindsmiths.emailAdapter.SendEmailPayload;
+import com.mindsmiths.sdk.utils.templating.Templating;
+import utils.Settings;
+
 import models.OnboardingStage;
+import net.fortuna.ical4j.data.CalendarOutputter;
+import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Property;
+import net.fortuna.ical4j.model.PropertyList;
+import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.property.CalScale;
+import net.fortuna.ical4j.model.property.Description;
+import net.fortuna.ical4j.model.property.Method;
+import net.fortuna.ical4j.model.property.Organizer;
+import net.fortuna.ical4j.model.property.ProdId;
+import net.fortuna.ical4j.model.property.Summary;
+import net.fortuna.ical4j.model.property.Version;
 
 
 @Data
@@ -35,10 +61,12 @@ public class Ava extends Agent {
     private String match;
     private Days matchDay;
     private AvaLunchCycleStage lunchCycleStage = AvaLunchCycleStage.FIND_AVAILABILITY;
+    private Employee employee;
     private OnboardingStage onboardingStage;
     private Map<String, EmployeeProfile> otherEmployees;
     private boolean workingHours;
     private Date statsEmailLastSentAt;
+    private Date matchedWithEmailSentAt;
 
     public Ava(String connectionName, String connectionId) {
         super(connectionName, connectionId);
@@ -226,7 +254,25 @@ public class Ava extends Agent {
         return names;
     }
 
-    public void sendWelcomeEmail(EmployeeProfile employee) throws IOException {
+    public void sendPairingMail() throws IOException {
+        String subject = Mitems.getText("onboarding.welcome-email.subject");
+        String description = Mitems.getText("onboarding.welcome-email.description");
+        String htmlTemplate = String.join("", Files.readAllLines(Paths.get("EmailTemplate.html"), StandardCharsets.UTF_8));
+
+        String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
+            "description", description,
+            "callToAction", "Let's go",
+            "armoryUrl", String.format("%s/%s?trigger=start-weekly-core", Settings.ARMORY_SITE_URL, getConnection("armory"))
+        ));
+
+        SendEmailPayload e = new SendEmailPayload();
+        e.setRecipients(List.of(getConnection("email")));
+        e.setSubject(subject);
+        e.setHtmlText(htmlBody);
+        EmailAdapterAPI.newEmail(e); 
+    }
+
+    public void sendWelcomeEmail(Employee employee) throws IOException {
         String subject = Mitems.getText("onboarding.welcome-email.subject");
         String description = Mitems.getText("onboarding.welcome-email.description");
         String htmlTemplate = String.join("", Files.readAllLines(Paths.get("EmailTemplate.html"), StandardCharsets.UTF_8));
@@ -289,4 +335,95 @@ public class Ava extends Agent {
         }
         return employeesPerQuestionDistribution;
     }
+    //ICS Calendar integration
+
+    public static java.util.Calendar nextDayOfWeek(java.util.Calendar now, int dow) {
+        int diff = dow - now.get(java.util.Calendar.DAY_OF_WEEK);
+        if (diff <= 0) {
+            diff += 7;
+        }
+        now.add(java.util.Calendar.DAY_OF_MONTH, diff);
+        return now;
+    }
+
+    public String renderEmailBody(Days days, Employee otherEmployee) throws IOException {
+        String htmlTemplateMatching = String.join("", Files.readAllLines(Paths.get("EmailTemplateCalendar.html"), StandardCharsets.UTF_8));
+        String matchingMailBodyText = Mitems.getText("onboarding.matching-mail.matchingmailbodytext");
+        String matchingMailTitleText = Mitems.getText("onboarding.matching-mail.matchingmailtitletext");
+
+        String description = Templating.recursiveRender(htmlTemplateMatching, Map.of(
+            "biggerTitle", matchingMailTitleText,
+            "title", matchingMailBodyText,
+            "personName", otherEmployee.getFirstName(),
+            "lunchDay", days.toString(),
+            "armoryUrl", "http://8000.workspace-ms-197475909.sandbox.mindsmiths.io/"
+        ));
+
+        return description;
+    }
+    
+    public void sendCalendarInvite(Days days, Employee currentEmployee, Employee otherEmployee) throws IOException {
+        if(currentEmployee == null || otherEmployee == null)
+            throw new RuntimeException("Ava.sendCalendarInvite called with null arguments!");
+        Log.info("Sending emails to " + currentEmployee.getEmail() + " and " + otherEmployee.getEmail());
+        SendEmailPayload payload = new SendEmailPayload();
+        payload.setRecipients(List.of(currentEmployee.getEmail()));
+        payload.setSubject("Invite: " + otherEmployee.getFirstName() + " on a meeting with you");
+        payload.setHtmlText(renderEmailBody(days, otherEmployee)); // here goes HTML
+        payload.setAttachments(List.of(new AttachmentData(getICSInvite(days, currentEmployee, otherEmployee), "invite.ics")));
+        EmailAdapterAPI.newEmail(payload);
+    }
+
+    private byte[] getICSInvite(Days day, Employee currentEmployee, Employee otherEmployee) {
+        try {
+            Calendar invite = new Calendar();
+            invite.getProperties().add(new ProdId("Ava"));
+            invite.getProperties().add(Version.VERSION_2_0);
+            invite.getProperties().add(CalScale.GREGORIAN);
+            invite.getProperties().add(Method.REQUEST);
+            
+            String description1 = Templating.recursiveRender(Mitems.getText("onboarding.matching-mail.calendarinvitetext"), Map.of(
+                "firstName", currentEmployee.getFirstName(),
+                "secondName", otherEmployee.getFirstName(),
+                "armoryUrl", ""
+            ));
+            
+            int chosenDay = Map.of(
+                Days.MON, java.util.Calendar.MONDAY,
+                Days.TUE, java.util.Calendar.TUESDAY,
+                Days.WED, java.util.Calendar.WEDNESDAY,
+                Days.THU, java.util.Calendar.THURSDAY,
+                Days.FRI, java.util.Calendar.FRIDAY
+            ).get(day);
+
+            java.util.Calendar now = java.util.Calendar.getInstance();
+            java.util.Calendar sunday = nextDayOfWeek(now, java.util.Calendar.SUNDAY);
+
+            java.util.Calendar lunchCalendarDate = nextDayOfWeek(sunday, chosenDay);
+            lunchCalendarDate.set(java.util.Calendar.HOUR_OF_DAY, 12);
+
+            java.util.Calendar lunchCalendarDatePlusHour = nextDayOfWeek(sunday, chosenDay);
+            lunchCalendarDatePlusHour.set(java.util.Calendar.HOUR_OF_DAY, 13);
+
+            VEvent ev = new VEvent(new DateTime(lunchCalendarDate.getTime()),
+                                   new DateTime(lunchCalendarDatePlusHour.getTime()),
+                                   description1);
+            ev.getProperties().add(new net.fortuna.ical4j.model.property.Attendee("mailto:" + currentEmployee.getEmail()));
+            ev.getProperties().add(new net.fortuna.ical4j.model.property.Attendee("mailto:" + otherEmployee.getEmail())); 
+            
+            invite.getComponents().add(ev);
+
+            // output to bytes
+            // don't touch
+            ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+            CalendarOutputter out = new CalendarOutputter();
+            out.output(invite, byteOut);
+            return byteOut.toByteArray();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // ICS Calendar integration - end
+ 
 }

@@ -5,6 +5,7 @@ import java.util.*;
 import com.mindsmiths.armory.events.UserConnectedEvent
 import com.mindsmiths.armory.events.SubmitEvent
 import com.mindsmiths.ruleEngine.model.Heartbeat;
+import com.mindsmiths.ruleEngine.util.Agents;
 import com.mindsmiths.pairingalgorithm.Days;
 import com.mindsmiths.pairingalgorithm.AvaAvailability;
 import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
@@ -32,6 +33,20 @@ rule "Lunch invite expired"
         agent.showLunchInviteExpiredScreen();
         delete(signal);
 end
+
+rule "First weekly mail sending"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        eval(evaluateCronExpression("* * 8-17 ? * FRI *", ts, "Europe/Zagreb"))
+        agent: Ava(lunchCycleStage == AvaLunchCycleStage.MAIL_SENDING,
+                   onboardingStage == OnboardingStage.FINISHED)
+    then
+        modify(agent) {
+            setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY)
+        }
+        agent.sendPairingMail();
+end
+
 
 rule "Ask for available days"
     when
@@ -79,11 +94,16 @@ rule "Store match info"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.ACCEPT_MATCH_INFO)
         profile: EmployeeProfile()
     then
-        modify(agent) {setMatch(signal.getMatch()), setMatchDay(signal.getMatchDay())};
+        modify(agent) {setMatch(signal.getMatch()), setMatchDay(signal.getMatchDay()),
+                       setLunchCycleStage(AvaLunchCycleStage.MAIL_SENDING) };
         Log.info("I'm " + profile.getFirstName() + " and my match is " +
                 agent.getOtherEmployees().get(signal.getMatch()).getFullName() +
                 " on " + agent.getMatchDay());
-        delete(signal);
+        Log.info(agent.getOtherEmployees());
+        Log.info(signal.getMatch());
+        Log.info((Employee)(agent.getOtherEmployees().get(signal.getMatch())));
+        agent.sendCalendarInvite(signal.getMatchDay(), profile, agent.getOtherEmployees().get(signal.getMatch()));
+        delete(signal);   
 end
 
 

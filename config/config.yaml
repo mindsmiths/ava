@@ -11,7 +11,7 @@ global:
 
     ENVIRONMENT_NAME: {{ env.ENVIRONMENT_NAME }}
     MODULE: '{{ env.MODULE | default("local", True) }}'
-    LOG_LEVEL: DEBUG
+    LOG_LEVEL: INFO
 
     # Messaging
     PULSAR_URL: pulsar://pulsar-proxy.pulsar.svc.cluster.local:6650
@@ -153,7 +153,7 @@ services:
 
   armory:
     type: django
-    version: 4.0.0a14
+    version: 4.0.0a15
     command:
       run: "daphne -b 0.0.0.0 armory.config.asgi:application"
     db:

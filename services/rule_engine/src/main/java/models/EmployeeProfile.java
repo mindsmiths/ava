@@ -24,10 +24,11 @@ public class EmployeeProfile extends Employee {
         setActive(employee.getActive());
     }
 
-    public EmployeeProfile(Map<String, String> personalAnswers, Map<String, Double> familiarity, String id, String firstName, String lastName) {
+    public EmployeeProfile(Map<String, String> personalAnswers, Map<String, Double> familiarity, String id, String firstName, String lastName, String email) {
         this.setId(id);
         this.setFirstName(firstName);
         this.setLastName(lastName);
+        this.setEmail(email);
         this.personalAnswers = personalAnswers;
         this.familiarity = familiarity;
     }
