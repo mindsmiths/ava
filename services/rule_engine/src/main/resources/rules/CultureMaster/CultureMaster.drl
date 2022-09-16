@@ -19,22 +19,16 @@ rule "Add or update Ava data"
         delete(signal);
 end
 
-rule "Trigger lunch cycle"
-    when
-        signal: ManualTriggerEvent(triggerType == "lunch_cycle") from entry-point "signals"
-        agent: CultureMaster()
-    then
-        Log.info("CultureMaster: triggered lunch cycle from dashboard");
-        // trigger lunch cycle
-end
-
 rule "Trigger lunch pairing"
     when
         signal: ManualTriggerEvent(triggerType == "lunch_pairing") from entry-point "signals"
         agent: CultureMaster()
     then
         Log.info("CultureMaster: triggered lunch pairing from dashboard");
-        // trigger lunch pairing
+        Log.info("Generating matches....");
+        modify(agent) {setLunchCycleStage(CmLunchCycleStage.COLLECT_GENERATED_MATCHES)};
+        agent.generateMatches();
+        delete(signal);
 end
 
 rule "Trigger familiarity quiz"

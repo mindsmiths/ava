@@ -2,10 +2,14 @@ package rules.Ava;
 
 import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
 import com.mindsmiths.ruleEngine.model.Heartbeat;
+import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.employeeManager.ManualTriggerEvent;
 
 import agents.Ava;
-import com.mindsmiths.ruleEngine.util.Log;
+
+import models.AvaLunchCycleStage;
+import models.OnboardingStage;
+
 
 rule "Set working hours"
     when
@@ -33,18 +37,13 @@ rule "Trigger lunch cycle"
     when
         signal: ManualTriggerEvent(triggerType == "lunch_cycle") from entry-point "signals"
         agent: Ava()
+        employee: EmployeeProfile()
     then
         Log.info("Ava: triggered lunch cycle from dashboard");
-        // trigger lunch cycle
-end
-
-rule "Trigger lunch pairing"
-    when
-        signal: ManualTriggerEvent(triggerType == "lunch_pairing") from entry-point "signals"
-        agent: Ava()
-    then
-        Log.info("Ava: triggered lunch pairing from dashboard");
-        // trigger lunch pairing
+        modify(agent) {setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY),
+                       setOnboardingStage(OnboardingStage.FINISHED)};
+        agent.sendWeeklyEmail(employee);
+        delete(signal);            
 end
 
 rule "Trigger familiarity quiz"
