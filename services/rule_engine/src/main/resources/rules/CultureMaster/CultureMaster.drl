@@ -48,7 +48,7 @@ rule "Trigger familiarity quiz"
         // trigger quiz
 end
 
-rule "Juraj smisli ime"
+rule "Send number of silos"
     when
         signal: NumOfSilosSignal() from entry-point "signals"
         agent: CultureMaster()

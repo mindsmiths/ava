@@ -39,7 +39,6 @@ rule "Store num of silos"
         signal: SilosInfoSignal() from entry-point "signals"
         agent: Ava()
     then
-        Log.info("primio num of silos:" + signal.getNumOfSilos());
         modify(agent) {setNumOfSilos(signal.getNumOfSilos())};
         delete(signal);
 end

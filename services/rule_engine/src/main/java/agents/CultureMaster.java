@@ -83,15 +83,16 @@ public class CultureMaster extends Agent {
 
         Double[][] matrix = new Double[employees.values().size()][employees.values().size()]; //weight matrix
         int[][] binaryMatrix = new int[employees.values().size()][employees.values().size()]; // binary matrix
-        int i = 0, j = 0;
+        
         List<String> list = new LinkedList<>();
         int limit=3;
 
-        for(i=0;i<employees.values().size();i++){
-            for(j=0;j<employees.values().size();j++){
+        for(int i=0;i<employees.values().size();i++){
+            for(int j=0;j<employees.values().size();j++){
                 matrix[i][j]=0.0;
             }
         }
+        int i = 0, j = 0;
 
         for (EmployeeProfile employee : employees.values()) {
             for(Map.Entry<String, Double> entry : employee.getFamiliarity().entrySet()){
@@ -103,9 +104,9 @@ public class CultureMaster extends Agent {
 
                 matrix[i][j] = entry.getValue();
                 if( matrix[i][j]>limit)
-                binaryMatrix[i][j]=1;
+                    binaryMatrix[i][j]=1;
                 else 
-                binaryMatrix[i][j]=0;
+                    binaryMatrix[i][j]=0;
                 j++;
             }
             if(i==employees.values().size()-1){
@@ -121,9 +122,9 @@ public class CultureMaster extends Agent {
             for(j=0;j<employees.values().size();j++){
                 Double avg=(matrix[i][j]+matrix[j][i])/2;
                 if(avg>=limit)
-                binaryMatrix[i][j]=1;
+                    binaryMatrix[i][j]=1;
                 else
-                binaryMatrix[i][j]=0;
+                    binaryMatrix[i][j]=0;
             }
 
         }
@@ -162,12 +163,13 @@ public class CultureMaster extends Agent {
 
 
         String risk="";
-        if(score<=0.1){
+        if (score<=0.1) {
             risk="low";
-
-        }else if(score<0.15){
+        } else if(score<0.15) {
             risk="moderate";
-        }else risk="high";
+        } else {
+            risk="high";
+        }
         return risk;
     }
 }
