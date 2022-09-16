@@ -12,6 +12,7 @@ global:
 
     REDIS_CLIENT_HOST: '{{ env.REDIS_CLIENT_HOST |  default("localhost", true) }}'
     REDIS_CLIENT_PORT: '{{ env.REDIS_CLIENT_PORT |  default("6379", true) }}'
+    REDIS_URL: redis-master:6379
 
   secrets:
     MONGO_CLIENT_PASSWORD: '{{ env.MONGO_CLIENT_PASSWORD }}'
