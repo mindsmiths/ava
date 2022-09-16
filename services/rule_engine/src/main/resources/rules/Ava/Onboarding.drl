@@ -1,19 +1,21 @@
 package rules.Ava;
 
-import com.mindsmiths.sdk.utils.templating.*;
-import com.mindsmiths.ruleEngine.util.Agents;
-import com.mindsmiths.ruleEngine.model.Initialize;
 import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.ruleEngine.util.Agents;
+import com.mindsmiths.ruleEngine.model.Initialize;
+
 import com.mindsmiths.armory.events.UserConnectedEvent;
 import com.mindsmiths.armory.events.SubmitEvent;
+
+import com.mindsmiths.sdk.utils.templating.*;
+
 import com.mindsmiths.employeeManager.employees.Employee;
 
+import agents.Ava;
+import agents.CultureMaster;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
-
-import agents.Ava;
 
 import models.EmployeeProfile;
 import models.OnboardingStage;

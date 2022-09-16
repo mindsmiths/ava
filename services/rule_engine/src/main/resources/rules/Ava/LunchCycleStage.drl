@@ -1,0 +1,89 @@
+package rules.Ava;
+
+import java.util.*;
+
+import com.mindsmiths.armory.events.UserConnectedEvent
+import com.mindsmiths.armory.events.SubmitEvent
+import com.mindsmiths.ruleEngine.model.Heartbeat;
+import com.mindsmiths.pairingalgorithm.Days;
+import com.mindsmiths.pairingalgorithm.AvaAvailability;
+import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
+
+import agents.Ava;
+import agents.CultureMaster;
+
+import signals.AvaAvailabilitySignal;
+import signals.SendMatchesSignal;
+
+import models.AvaLunchCycleStage;
+import models.OnboardingStage;
+
+
+rule "Lunch invite expired"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        eval(!evaluateCronExpression("* * 9-23 * * WED", ts, "Europe/Zagreb") && 
+            !evaluateCronExpression("* * * * * THU", ts, "Europe/Zagreb") &&
+            !evaluateCronExpression("* * 00-14 * * FRI", ts, "Europe/Zagreb"))
+        signal: UserConnectedEvent() from entry-point "signals"
+        agent: Ava(lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY,
+                   onboardingStage == OnboardingStage.FINISHED)
+    then 
+        agent.showLunchInviteExpiredScreen();
+        delete(signal);
+end
+
+rule "Ask for available days"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        eval(evaluateCronExpression("* * 9-23 * * WED", ts, "Europe/Zagreb") 
+        || (evaluateCronExpression("* * * * * THU", ts, "Europe/Zagreb"))
+        || (evaluateCronExpression("* * 00-14 * * FRI", ts, "Europe/Zagreb")))
+        signal: UserConnectedEvent(getParamAsString("trigger") == "start-weekly-core") from entry-point "signals"
+        agent: Ava(lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY,
+                   onboardingStage == OnboardingStage.FINISHED)
+    then 
+        // what if person decides to exit this screen without answering, now we can't get back because we are in the next stage
+        modify(agent) {setLunchCycleStage(AvaLunchCycleStage.FORWARD_AVAILABILITY)}
+        agent.chooseAvailableDaysScreen();
+        delete(signal);
+end
+
+rule "Handle employee not available"
+    when 
+        signal: SubmitEvent((getParamAsString("submit") == "confirmDays") && (signal.getParam("availableDays") == [])) from entry-point "signals"
+        agent: Ava(lunchCycleStage == AvaLunchCycleStage.FORWARD_AVAILABILITY)
+    then
+        agent.showNotAvailableScreen();
+        modify(agent) {updateAvailableDays((ArrayList<String>)(signal.getParam("availableDays")))};
+        agent.send(CultureMaster.ID, new AvaAvailabilitySignal(new AvaAvailability(agent.getId(), agent.getAvailableDays()))); 
+        modify(agent) {setLunchCycleStage(AvaLunchCycleStage.ACCEPT_MATCH_INFO)};
+        delete(signal);
+end
+
+rule "Confirm days"
+    when
+        signal: SubmitEvent(getParamAsString("submit") == "confirmDays") from entry-point "signals"  
+        agent: Ava(lunchCycleStage == AvaLunchCycleStage.FORWARD_AVAILABILITY)
+    then
+        agent.confirmingDaysScreen();
+        modify(agent) {updateAvailableDays((ArrayList<String>)(signal.getParam("availableDays")))};
+        agent.send(CultureMaster.ID, new AvaAvailabilitySignal(new AvaAvailability(agent.getId(), agent.getAvailableDays())));
+        modify(agent) {setLunchCycleStage(AvaLunchCycleStage.ACCEPT_MATCH_INFO)};
+        delete(signal);
+end
+
+rule "Store match info"
+    when
+        signal: SendMatchesSignal() from entry-point "signals"
+        agent: Ava(lunchCycleStage == AvaLunchCycleStage.ACCEPT_MATCH_INFO)
+        profile: EmployeeProfile()
+    then
+        modify(agent) {setMatch(signal.getMatch()), setMatchDay(signal.getMatchDay())};
+        Log.info("I'm " + profile.getFirstName() + " and my match is " +
+                agent.getOtherEmployees().get(signal.getMatch()).getFullName() +
+                " on " + agent.getMatchDay());
+        delete(signal);
+end
+
+

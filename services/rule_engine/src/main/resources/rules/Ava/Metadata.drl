@@ -5,7 +5,7 @@ import com.mindsmiths.ruleEngine.model.Heartbeat;
 import com.mindsmiths.employeeManager.ManualTriggerEvent;
 
 import agents.Ava;
-
+import com.mindsmiths.ruleEngine.util.Log;
 
 rule "Set working hours"
     when
