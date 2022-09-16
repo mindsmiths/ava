@@ -1,4 +1,4 @@
-REPO_URL: https://charts.helm.sh/stable
-REPO_NAME: stable
+REPO_URL: https://charts.bitnami.com/bitnami
+REPO_NAME: bitnami
 CHART_NAME: mongodb
-CHART_VERSION: 7.8.8
+CHART_VERSION: 13.1.2

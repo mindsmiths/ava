@@ -1,6 +1,7 @@
 enabled: true
 fullnameOverride: mongodb
-mongodbRootPassword: '{{ env.MONGO_CLIENT_PASSWORD }}'
+auth:
+  rootPassword: '{{ env.MONGO_CLIENT_PASSWORD }}'
 resources:
   requests:
     cpu: 58m

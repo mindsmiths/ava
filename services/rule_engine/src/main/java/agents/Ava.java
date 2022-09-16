@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import utils.Settings;
 
 import lombok.Data;
 import lombok.ToString;
@@ -22,6 +21,7 @@ import com.mindsmiths.ruleEngine.model.Agent;
 import com.mindsmiths.pairingalgorithm.Days;
 import com.mindsmiths.sdk.utils.templating.Templating;
 
+import utils.Settings;
 import models.AvaLunchCycleStage;
 import models.EmployeeProfile;
 import models.OnboardingStage;
@@ -125,6 +125,7 @@ public class Ava extends Agent {
             try {
                 String questionText = Mitems.getText("onboarding.familiarity-quiz-questions." + questionTag);
                 screens.put(questionTag, new TemplateGenerator(questionTag)
+                        .addComponent("header", new HeaderComponent(null, questionNum > 1))
                         .addComponent("question", new TitleComponent(questionText))
                         .addComponent(answersTag, new CloudSelectComponent(answersTag, names.get(questionNum - 1)))
                         .addComponent("submit", new PrimarySubmitButtonComponent(
@@ -172,6 +173,7 @@ public class Ava extends Agent {
             String answersTag = "answers" + String.valueOf(questionNum);
             try {
                 screens.put(questionTag, new TemplateGenerator(questionTag)
+                        .addComponent("header", new HeaderComponent(null, questionNum > 1))
                         .addComponent("question", new TitleComponent(Mitems.getText(String.format("onboarding.personal-quiz-%s.%s", questionTag, questionTag))))
                         .addComponent(answersTag, new TextAreaComponent(answersTag, "Type your answer here", true))
                         .addComponent("submit", new PrimarySubmitButtonComponent(
@@ -289,7 +291,7 @@ public class Ava extends Agent {
         }
         return employeesPerQuestionDistribution;
     }
-
+    
     public void sendWeeklyEmail(EmployeeProfile employee) throws IOException {
         String subject = Mitems.getText("weekly-core.weekly-email.subject");
         String description = Mitems.getText("weekly-core.weekly-email.description");
