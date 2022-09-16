@@ -289,4 +289,23 @@ public class Ava extends Agent {
         }
         return employeesPerQuestionDistribution;
     }
+
+    public void sendWeeklyEmail(EmployeeProfile employee) throws IOException {
+        String subject = Mitems.getText("weekly-core.weekly-email.subject");
+        String description = Mitems.getText("weekly-core.weekly-email.description");
+        String htmlTemplate = String.join("", Files.readAllLines(Paths.get("EmailTemplate.html"), StandardCharsets.UTF_8));
+
+        String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
+            "description", description,
+            "callToAction", Mitems.getText("weekly-core.weekly-email.button"),
+            "firstName", employee.getFirstName(),
+            "armoryUrl", String.format("%s/%s?trigger=start-weekly-core", Settings.ARMORY_SITE_URL, getConnection("armory"))
+        ));
+
+        SendEmailPayload e = new SendEmailPayload();
+        e.setRecipients(List.of(getConnection("email")));
+        e.setSubject(subject);
+        e.setHtmlText(htmlBody);
+        EmailAdapterAPI.newEmail(e);
+    }
 }
