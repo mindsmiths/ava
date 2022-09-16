@@ -48,7 +48,7 @@ end
 rule "Trigger lunch pairing for Ava"
     when
         signal: ManualTriggerEvent(triggerType == "lunch_pairing") from entry-point "signals"
-        agent: Ava()
+        agent: Ava(onboardingStage == OnboardingStage.FINISHED)
     then
         Log.info("Ava: triggered lunch pairing from dashboard");
         modify(agent) {setLunchCycleStage(AvaLunchCycleStage.FORWARD_AVAILABILITY)};
