@@ -33,16 +33,25 @@ rule "Set non working hours"
         }
 end
 
-rule "Trigger lunch cycle"
+rule "Trigger lunch cycle for Ava"
     when
         signal: ManualTriggerEvent(triggerType == "lunch_cycle") from entry-point "signals"
-        agent: Ava()
+        agent: Ava(onboardingStage == OnboardingStage.FINISHED)
         employee: EmployeeProfile()
     then
         Log.info("Ava: triggered lunch cycle from dashboard");
-        modify(agent) {setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY),
-                       setOnboardingStage(OnboardingStage.FINISHED)};
+        modify(agent) {setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY)};
         agent.sendWeeklyEmail(employee);
+        delete(signal);            
+end
+
+rule "Trigger lunch pairing for Ava"
+    when
+        signal: ManualTriggerEvent(triggerType == "lunch_pairing") from entry-point "signals"
+        agent: Ava()
+    then
+        Log.info("Ava: triggered lunch pairing from dashboard");
+        modify(agent) {setLunchCycleStage(AvaLunchCycleStage.FORWARD_AVAILABILITY)};
         delete(signal);            
 end
 
