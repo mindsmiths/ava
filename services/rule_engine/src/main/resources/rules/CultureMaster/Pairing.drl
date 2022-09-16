@@ -1,0 +1,76 @@
+package rules.CultureMaster;
+
+import java.util.Date;
+
+import com.mindsmiths.ruleEngine.util.Log;
+import com.mindsmiths.ruleEngine.model.Heartbeat;
+import com.mindsmiths.ruleEngine.util.Agents;
+import com.mindsmiths.ruleEngine.model.Initialize;
+import com.mindsmiths.pairingalgorithm.Matches;
+
+import signals.AvaAvailabilitySignal;
+
+import agents.CultureMaster;
+import models.CmLunchCycleStage;
+
+
+rule "First contact"
+    salience 100
+    when
+        initialize: Initialize() from entry-point "agent-created"
+        agent: CultureMaster()
+    then
+        Log.info("Created new CultureMaster agent.");
+        delete(initialize);
+end
+
+rule "Store ava availability"
+    when
+        signal: AvaAvailabilitySignal() from entry-point "signals"
+        agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES)
+    then
+        modify(agent) {addAvaAvailability(signal.getAvaAvailability())};
+        Log.info("Storing availability: " + agent.getAvaAvailabilities());
+        delete(signal);
+end
+
+
+rule "Check that all ava availabilities came"
+    when
+        Heartbeat() from entry-point "signals"
+        agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES,
+                            employees.size() == avaAvailabilities.size(),
+                            !employees.isEmpty())
+    then
+        modify(agent) {setLunchCycleStage(CmLunchCycleStage.GENERATE_MATCHES)};
+end
+
+
+rule "Generate this weeks matches"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.GENERATE_MATCHES)
+    then
+        Log.info("Generating matches....");
+        modify(agent) {setLunchCycleStage(CmLunchCycleStage.COLLECT_GENERATED_MATCHES)};
+        agent.generateMatches();
+end
+
+rule "Store generated matches"
+    when
+        matches: Matches() from entry-point "signals"
+        agent: CultureMaster()
+    then
+        modify(agent) {addMatches(matches.getAllMatches())};
+        Log.info("Matches from pairing algorithm: " + matches.getAllMatches());
+        modify(agent) {setLunchCycleStage(CmLunchCycleStage.SEND_TO_AVAS)};
+        delete(matches);
+end
+
+rule "Send match info to Avas"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.SEND_TO_AVAS)
+    then
+        agent.sendMatches();
+end

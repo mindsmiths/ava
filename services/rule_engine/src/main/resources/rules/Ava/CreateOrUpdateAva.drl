@@ -1,11 +1,14 @@
 package rules.Ava;
 
+import java.util.HashMap;
+import java.util.Map;
 import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.employeeManager.employees.Employee;
 import com.mindsmiths.sdk.utils.Utils;
 import com.mindsmiths.ruleEngine.util.Agents;
 
 import signals.EmployeeUpdateSignal;
+import signals.AllEmployees;
 
 import agents.CultureMaster;
 import agents.Ava;
@@ -44,4 +47,17 @@ rule "Update existing employee"
             setActive(newEmployee.getActive())
         };
         agent.send(CultureMaster.ID, new EmployeeUpdateSignal(profile));
+end
+
+rule "Save or update all employees"
+    when
+        signal: AllEmployees() from entry-point "signals"
+        agent: Ava()
+    then
+        Map<String, EmployeeProfile> allEmployees = new HashMap<>(signal.getAllEmployees());
+        allEmployees.remove(agent.getId());
+        modify (agent) {
+            setOtherEmployees(allEmployees)
+        };
+        delete(signal);
 end
