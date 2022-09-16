@@ -9,10 +9,14 @@ import com.mindsmiths.employeeManager.employees.Employee;
 import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
 
 import agents.Ava;
+import agents.CultureMaster;
+
+import signals.NumOfSilosSignal;
+import signals.SilosInfoSignal;
 
 import models.EmployeeProfile;
 
-
+// this never triggers?
 rule "Send stats email"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
@@ -26,5 +30,26 @@ rule "Send stats email"
         modify(agent) {
             setStatsEmailLastSentAt(ts)
         };
+        agent.send(CultureMaster.ID, new NumOfSilosSignal(agent.getId()));
         agent.sendStatisticsEmail(employee);
+end
+
+rule "Store num of silos"
+    when
+        signal: SilosInfoSignal() from entry-point "signals"
+        agent: Ava()
+    then
+        Log.info("primio num of silos:" + signal.getNumOfSilos());
+        modify(agent) {setNumOfSilos(signal.getNumOfSilos())};
+        delete(signal);
+end
+
+
+rule "Connect stats screens with email"
+   when
+        signal: UserConnectedEvent(getParamAsString("trigger") == "show-stats") from entry-point "signals"
+        agent: Ava()
+   then
+        agent.showEmployeeNumberScreen();
+        delete(signal);
 end
