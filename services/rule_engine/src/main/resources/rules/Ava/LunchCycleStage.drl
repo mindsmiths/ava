@@ -25,7 +25,7 @@ rule "Lunch invite expired"
         eval(!evaluateCronExpression("* * 9-23 * * WED", ts, "Europe/Zagreb") && 
             !evaluateCronExpression("* * * * * THU", ts, "Europe/Zagreb") &&
             !evaluateCronExpression("* * 00-14 * * FRI", ts, "Europe/Zagreb"))
-        signal: UserConnectedEvent() from entry-point "signals"
+        signal: UserConnectedEvent(getParamAsString("trigger") == "start-weekly-core") from entry-point "signals"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY,
                    onboardingStage == OnboardingStage.FINISHED)
     then 

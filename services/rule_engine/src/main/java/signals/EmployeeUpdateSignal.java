@@ -13,7 +13,8 @@ import models.EmployeeProfile;
 public class EmployeeUpdateSignal extends Signal {
     private EmployeeProfile employee;
 
-    public EmployeeUpdateSignal (EmployeeProfile employee){
-        this.employee = new EmployeeProfile(employee.getPersonalAnswers(), employee.getFamiliarity(), employee.getId(), employee.getFirstName(), employee.getLastName());
+    public EmployeeUpdateSignal(EmployeeProfile employee) {
+        this.employee = new EmployeeProfile(employee.getPersonalAnswers(), employee.getFamiliarity(), employee.getId(),
+                employee.getFirstName(), employee.getLastName());
     }
 }
