@@ -103,7 +103,7 @@ public class CultureMaster extends Agent {
                 }
 
                 matrix[i][j] = entry.getValue();
-                if( matrix[i][j]>limit)
+                if(matrix[i][j]>limit)
                     binaryMatrix[i][j]=1;
                 else 
                     binaryMatrix[i][j]=0;
@@ -163,13 +163,13 @@ public class CultureMaster extends Agent {
 
 
         String risk="";
-        if (score<=0.1) {
+        if(score<=0.1)
             risk="low";
-        } else if(score<0.15) {
+        else if(score<0.15)
             risk="moderate";
-        } else {
+        else 
             risk="high";
-        }
+        
         return risk;
     }
 }
