@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import utils.Settings;
 
 import lombok.Data;
 import lombok.ToString;
@@ -22,20 +21,7 @@ import com.mindsmiths.ruleEngine.model.Agent;
 import com.mindsmiths.pairingalgorithm.Days;
 import com.mindsmiths.sdk.utils.templating.Templating;
 
-
-import signals.DayChoiceSignal;
 import utils.Settings;
-import com.mindsmiths.armory.ArmoryAPI;
-import com.mindsmiths.armory.components.DescriptionComponent;
-import com.mindsmiths.armory.components.ImageComponent;
-import com.mindsmiths.armory.components.PrimarySubmitButtonComponent;
-import com.mindsmiths.armory.components.TextAreaComponent;
-import com.mindsmiths.armory.components.TitleComponent;
-import com.mindsmiths.armory.components.HeaderComponent;
-import com.mindsmiths.armory.templates.BaseTemplate;
-import com.mindsmiths.armory.templates.TemplateGenerator;
-import com.mindsmiths.armory.components.CloudSelectComponent;
-
 import models.AvaLunchCycleStage;
 import models.EmployeeProfile;
 import models.OnboardingStage;
@@ -305,7 +291,7 @@ public class Ava extends Agent {
         }
         return employeesPerQuestionDistribution;
     }
-
+    
     public void sendWeeklyEmail(EmployeeProfile employee) throws IOException {
         String subject = Mitems.getText("weekly-core.weekly-email.subject");
         String description = Mitems.getText("weekly-core.weekly-email.description");
