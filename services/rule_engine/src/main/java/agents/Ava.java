@@ -1,30 +1,40 @@
 package agents;
 
-import java.util.*;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
-import lombok.Data;
-import lombok.ToString;
-import lombok.NoArgsConstructor;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.mindsmiths.armory.ArmoryAPI;
-import com.mindsmiths.armory.components.*;
-import com.mindsmiths.armory.templates.*;
+import com.mindsmiths.armory.components.CloudSelectComponent;
+import com.mindsmiths.armory.components.DescriptionComponent;
+import com.mindsmiths.armory.components.HeaderComponent;
+import com.mindsmiths.armory.components.ImageComponent;
+import com.mindsmiths.armory.components.PrimarySubmitButtonComponent;
+import com.mindsmiths.armory.components.TextAreaComponent;
+import com.mindsmiths.armory.components.TitleComponent;
+import com.mindsmiths.armory.templates.BaseTemplate;
+import com.mindsmiths.armory.templates.TemplateGenerator;
 import com.mindsmiths.emailAdapter.EmailAdapterAPI;
 import com.mindsmiths.emailAdapter.SendEmailPayload;
 import com.mindsmiths.mitems.Mitems;
 import com.mindsmiths.mitems.Option;
-import com.mindsmiths.ruleEngine.model.Agent;
 import com.mindsmiths.pairingalgorithm.Days;
+import com.mindsmiths.ruleEngine.model.Agent;
 import com.mindsmiths.sdk.utils.templating.Templating;
 
-import utils.Settings;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import models.AvaLunchCycleStage;
 import models.EmployeeProfile;
 import models.OnboardingStage;
+import utils.Settings;
 
 @Data
 @ToString(callSuper = true)
@@ -314,6 +324,9 @@ public class Ava extends Agent {
                 .addComponent("description", new TitleComponent(finalScreenTitle)));
 
         showScreens("employeeNumberScreen", screens);
+
+    }
+    
     private List<Integer> employeesPerQuestionDistribution() {
         List<Integer> employeesPerQuestionDistribution = new ArrayList<Integer>();
         int numOfOtherEmployees = otherEmployees.size();
