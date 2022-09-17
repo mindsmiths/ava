@@ -14,8 +14,8 @@
   },
   "dependencies": {
     "armory-sdk": "4.0.15",
-    "vue": "^2.6.11",
-    "sass-loader": "^10.2.0"
+    "sass-loader": "^10.2.0",
+    "vue": "^2.6.11"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
