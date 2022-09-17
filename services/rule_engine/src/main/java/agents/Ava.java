@@ -292,34 +292,36 @@ public class Ava extends Agent {
 
     public void showStatisticsScreens() {
         Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
-        // String nextButton = ;
+        String employeeScreenButton = Mitems.getText("statistics.employee-screen.button");
         String employeeNumberScreenDescription = Mitems
-                .getText("statistics.stats-screens.employee-number-screen-description");
+                .getText("statistics.employee-screen.description");
         String employeeNumberScreenNumber = String.format("%d", otherEmployees.values().size() + 1);
 
         screens.put("employeeNumberScreen", new TemplateGenerator()
                 .addComponent("title", new DescriptionComponent(employeeNumberScreenDescription))
                 .addComponent("description", new TitleComponent(employeeNumberScreenNumber))
-                .addComponent("submit", new PrimarySubmitButtonComponent("Next", "silosNumberScreen")));
+                .addComponent("submit", new PrimarySubmitButtonComponent(employeeScreenButton, "silosNumberScreen")));
 
+        String silosScreenButton = Mitems.getText("statistics.silos-screen.button");
         String silosNumberScreenDescription = Mitems
-                .getText("statistics.stats-screens.silos-number-screen-description");
+                .getText("statistics.silos-screen.description");
         String silosNumberScreenNumber = String.format("%d", 3);
 
         screens.put("silosNumberScreen", new TemplateGenerator()
                 .addComponent("title", new DescriptionComponent(silosNumberScreenDescription))
                 .addComponent("description", new TitleComponent(silosNumberScreenNumber))
-                .addComponent("submit", new PrimarySubmitButtonComponent("Next", "riskScreen")));
+                .addComponent("submit", new PrimarySubmitButtonComponent(silosScreenButton, "riskScreen")));
 
-        String riskScreenDescription = Mitems.getText("statistics.stats-screens.risk-screen-description");
+        String riskScreenButton = Mitems.getText("statistics.risk-screen.button");
+        String riskScreenDescription = Mitems.getText("statistics.risk-screen.description");
         String riskScreenTitle = "moderate";
 
         screens.put("riskScreen", new TemplateGenerator()
                 .addComponent("title", new DescriptionComponent(riskScreenDescription))
                 .addComponent("description", new TitleComponent(riskScreenTitle))
-                .addComponent("submit", new PrimarySubmitButtonComponent("Close", "finalScreen")));
+                .addComponent("submit", new PrimarySubmitButtonComponent(riskScreenButton, "finalScreen")));
 
-        String finalScreenTitle = Mitems.getText("statistics.stats-screens.final-screen-title");
+        String finalScreenTitle = Mitems.getText("statistics.final-screen.description");
         screens.put("finalScreen", new TemplateGenerator()
                 .addComponent("description", new TitleComponent(finalScreenTitle)));
 
