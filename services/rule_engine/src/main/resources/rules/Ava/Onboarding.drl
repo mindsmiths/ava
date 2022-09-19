@@ -20,7 +20,6 @@ import java.util.HashMap;
 import models.EmployeeProfile;
 import models.OnboardingStage;
 
-import signals.NumOfSilosSignal;
 
 rule "Send welcome email"
     when
@@ -41,6 +40,53 @@ rule "Start and reconnect familiarity quiz"
    when
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-onboarding") from entry-point "signals"
         agent: Ava(onboardingStage in (OnboardingStage.EMAIL_SENT, OnboardingStage.FAMILIARITY_QUIZ))
+   then
+        agent.showPersonalQuizScreens();
+        modify(agent) {
+            setOnboardingStage(OnboardingStage.PERSONAL_QUIZ)
+        };
+        delete(signal);
+end
+
+rule "Start familiarity quiz"
+   when
+        signal: SubmitEvent(getParamAsString("submit") == "finished-personal-quiz") from entry-point "signals"
+        agent: Ava(onboardingStage == OnboardingStage.PERSONAL_QUIZ)
+        employee: EmployeeProfile()
+   then
+        Map<String, String> personalAnswers = new HashMap<String, String>(
+            employee.getPersonalAnswers()
+        );
+        for (String paramId : signal.getParams().keySet())
+            if (paramId.startsWith("answers"))
+                personalAnswers.put(
+                    paramId.replace("answers", "question"),
+                    signal.getParamAsString(paramId)
+                );
+        modify(employee) { setPersonalAnswers(personalAnswers) };
+
+        agent.showFamiliarityQuizScreens();
+        modify(agent) {
+            setOnboardingStage(OnboardingStage.FAMILIARITY_QUIZ)
+        };
+        agent.send(CultureMaster.ID, new EmployeeUpdateSignal(employee));
+        delete(signal);
+end
+
+rule "Reconnect familiarity quiz"
+   when
+        signal: UserConnectedEvent(getParamAsString("trigger") == "start-onboarding") from entry-point "signals"
+        agent: Ava(onboardingStage == OnboardingStage.FAMILIARITY_QUIZ)
+   then
+        agent.showFamiliarityQuizScreens();
+        delete(signal);
+end
+
+rule "Finish onboarding"
+   when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        signal: SubmitEvent(getParamAsString("submit") == "finished-familiarity-quiz") from entry-point "signals"
+        agent: Ava(onboardingStage == OnboardingStage.FAMILIARITY_QUIZ)
         employee: EmployeeProfile()
    then
         Map<String, Double> familiarity = new HashMap<String, Double>(
@@ -106,7 +152,7 @@ rule "Finish onboarding"
             setOnboardingStage(OnboardingStage.FINISHED),
             setStatsEmailLastSentAt(ts)
         };
-        agent.send(CultureMaster.ID, new NumOfSilosSignal(agent.getId()));
+        agent.send(CultureMaster.ID, new EmployeeUpdateSignal(employee));
         delete(signal);
 end
 
