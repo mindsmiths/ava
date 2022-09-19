@@ -17,4 +17,6 @@ import lombok.NoArgsConstructor;
 @Data
 public class AllEmployees extends Signal {
     private Map<String, EmployeeProfile> allEmployees = new HashMap<>();
+    private int silosCount;
+    private String silosRisk;
 }

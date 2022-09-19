@@ -23,6 +23,10 @@ class CustomIndexDashboard(Dashboard):
                     'title': _('Trigger familiarity quiz'),
                     'url': '/trigger/familiarity_quiz',
                 },
+                {
+                    'title': _('Trigger statistics email'),
+                    'url': '/trigger/statistics_email',
+                },
             ],
             column=0,
             order=0

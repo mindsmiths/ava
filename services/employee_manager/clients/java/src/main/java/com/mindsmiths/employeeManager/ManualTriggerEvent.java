@@ -15,7 +15,7 @@ import com.mindsmiths.sdk.core.db.DataModel;
 @ToString(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@DataModel(serviceName = "employee-manager")
+@DataModel(serviceName = "employee_manager")
 public class ManualTriggerEvent extends Signal {
     String triggerType;    
 }
