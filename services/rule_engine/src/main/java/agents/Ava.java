@@ -373,8 +373,8 @@ public class Ava extends Agent {
             throw new RuntimeException("Ava.sendCalendarInvite called with null arguments!");
         
         String subject = Templating.recursiveRender(Mitems.getText("weekly-core.matching-mail.subject"), Map.of(
-                "otherName", otherEmployee.getFirstName(),
-                "myName", currentEmployee.getFirstName()
+                "employeeName", otherEmployee.getFirstName(),
+                "day", dayHelperFunction(days)
         ));
     
         SendEmailPayload payload = new SendEmailPayload();
@@ -425,13 +425,15 @@ public class Ava extends Agent {
 
             Log.info(lunchCalendarDate);
 
+            // "Lunch with " + otherEmployee.getFirstName() + " on " + dayHelperFunction(day)
+
             java.util.Calendar lunchCalendarDatePlusHour = (java.util.Calendar) lunchCalendarDate.clone();
             lunchCalendarDatePlusHour.set(java.util.Calendar.HOUR_OF_DAY, 13);
             Log.info(lunchCalendarDatePlusHour);
 
             VEvent ev = new VEvent(new DateTime(lunchCalendarDate.getTime()),
                                    new DateTime(lunchCalendarDatePlusHour.getTime()),
-                                   "Lunch with " + otherEmployee.getFirstName() + " on " + dayHelperFunction(day));
+                                   "Ava lunch: " + currentEmployee.getFirstName() + "-" + otherEmployee.getFirstName());
             ev.getProperties().add(new net.fortuna.ical4j.model.property.Attendee("mailto:" + currentEmployee.getEmail()));
             ev.getProperties().add(new net.fortuna.ical4j.model.property.Attendee("mailto:" + otherEmployee.getEmail())); 
             

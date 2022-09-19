@@ -301,7 +301,7 @@
           {
             "description": "Subject",
             "type": "TEXT",
-            "content": "Ava lunch: {{ myName }} - {{ otherName }}"
+            "content": "Lunch with {{ employeeName }} on {{ day }}"
           },
           {
             "description": "Title",
