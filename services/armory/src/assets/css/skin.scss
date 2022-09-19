@@ -19,6 +19,22 @@ body {
 .CloudSelectComponent {
     color: rgb(0, 0, 0);
     text-align: center;
+
+    div.field {
+        place-content: center;
+    }
+    
+    label.checkbox {
+        background-color: #ffffff;
+        color: #c0392b;
+        border-color: #c0392b;
+    }
+    
+    label.checkbox.is-primary {
+        background-color: #7DD86F;
+        color: #ffffff;
+        border-color: #7DD86F;
+    }
 }
 
 #image {

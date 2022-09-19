@@ -60,3 +60,12 @@ rule "Send number of silos"
         agent.send(signal.getId(), new SilosInfoSignal(agent.calculateSilosCount()));
         delete(signal);
 end
+
+rule "Trigger statistics email"
+    when
+        signal: ManualTriggerEvent(triggerType == "statistics_email") from entry-point "signals"
+        agent: CultureMaster()
+    then
+        Log.info("CultureMaster: triggered statistics email from dashboard");
+        // trigger mail
+end
