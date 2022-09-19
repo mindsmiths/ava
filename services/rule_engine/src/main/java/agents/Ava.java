@@ -136,7 +136,7 @@ public class Ava extends Agent {
         int questionNum = 1;
         String submitButton = Mitems.getText("onboarding.familiarity-quiz-questions.action");
 
-        while(true) { 
+        while (true) {
             String questionTag = "question" + String.valueOf(questionNum);
             String nextQuestionTag = "question" + String.valueOf(questionNum + 1);
             String answersTag = "answers" + String.valueOf(questionNum);
@@ -237,11 +237,11 @@ public class Ava extends Agent {
 
         int startIndex = 0;
         int endIndex = 0;
-        for(int len : employeesPerQuestionDistribution) {
+        for (int len : employeesPerQuestionDistribution) {
             endIndex += len;
             Map<String, String> namesPerQuestion = new HashMap<>();
 
-            for(EmployeeProfile employee : employees.subList(startIndex, endIndex)) {
+            for (EmployeeProfile employee : employees.subList(startIndex, endIndex)) {
                 namesPerQuestion.put(employee.getFullName(), employee.getId());
             }
             names.add(namesPerQuestion);
@@ -292,8 +292,8 @@ public class Ava extends Agent {
 
     public void showStatisticsScreens() {
         Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
-        
-        String employeeScreenButton= Mitems.getText("statistics.employee-number-screen.button");
+
+        String employeeScreenButton = Mitems.getText("statistics.employee-number-screen.button");
         String employeeNumberScreenDescription = Mitems
                 .getText("statistics.employee-number-screen.description");
         String employeeNumberScreenNumber = String.format("%d", otherEmployees.values().size() + 1);
@@ -303,7 +303,7 @@ public class Ava extends Agent {
                 .addComponent("description", new TitleComponent(employeeNumberScreenNumber))
                 .addComponent("submit", new PrimarySubmitButtonComponent(employeeScreenButton, "silosNumberScreen")));
 
-        String silosScreenButton= Mitems.getText("statistics.silos-number-screen.button");
+        String silosScreenButton = Mitems.getText("statistics.silos-number-screen.button");
         String silosNumberScreenDescription = Mitems
                 .getText("statistics.silos-number-screen.description");
         String silosNumberScreenNumber = String.format("%d", 3);
@@ -312,8 +312,8 @@ public class Ava extends Agent {
                 .addComponent("title", new DescriptionComponent(silosNumberScreenDescription))
                 .addComponent("description", new TitleComponent(silosNumberScreenNumber))
                 .addComponent("submit", new PrimarySubmitButtonComponent(silosScreenButton, "riskScreen")));
-        
-        String riskScreenButton= Mitems.getText("statistics.risk-screen.button");
+
+        String riskScreenButton = Mitems.getText("statistics.risk-screen.button");
         String riskScreenDescription = Mitems.getText("statistics.risk-screen.description");
         String riskScreenTitle = "moderate";
 
@@ -329,23 +329,22 @@ public class Ava extends Agent {
         showScreens("employeeNumberScreen", screens);
 
     }
-    
+
     private List<Integer> employeesPerQuestionDistribution() {
         List<Integer> employeesPerQuestionDistribution = new ArrayList<Integer>();
         int numOfOtherEmployees = otherEmployees.size();
         int numOfQuestions = (int) Math.ceil((double) numOfOtherEmployees / 10.0);
-        
+
         // Calculating number of employees per question
         double employeesPerQuestion;
         int employeesPerQuestionRounded;
 
         while (numOfOtherEmployees > 0) {
-            employeesPerQuestion = (double) numOfOtherEmployees/ (double) numOfQuestions;
+            employeesPerQuestion = (double) numOfOtherEmployees / (double) numOfQuestions;
 
             if (employeesPerQuestion % 1 != 0) {
                 employeesPerQuestionRounded = (int) Math.ceil(employeesPerQuestion);
-            }
-            else {
+            } else {
                 employeesPerQuestionRounded = (int) Math.floor(employeesPerQuestion);
             }
 
@@ -355,18 +354,19 @@ public class Ava extends Agent {
         }
         return employeesPerQuestionDistribution;
     }
-    
+
     public void sendWeeklyEmail(EmployeeProfile employee) throws IOException {
         String subject = Mitems.getText("weekly-core.weekly-email.subject");
         String description = Mitems.getText("weekly-core.weekly-email.description");
-        String htmlTemplate = String.join("", Files.readAllLines(Paths.get("EmailTemplate.html"), StandardCharsets.UTF_8));
+        String htmlTemplate = String.join("",
+                Files.readAllLines(Paths.get("EmailTemplate.html"), StandardCharsets.UTF_8));
 
         String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
-            "description", description,
-            "callToAction", Mitems.getText("weekly-core.weekly-email.button"),
-            "firstName", employee.getFirstName(),
-            "armoryUrl", String.format("%s/%s?trigger=start-weekly-core", Settings.ARMORY_SITE_URL, getConnection("armory"))
-        ));
+                "description", description,
+                "callToAction", Mitems.getText("weekly-core.weekly-email.button"),
+                "firstName", employee.getFirstName(),
+                "armoryUrl",
+                String.format("%s/%s?trigger=start-weekly-core", Settings.ARMORY_SITE_URL, getConnection("armory"))));
 
         SendEmailPayload e = new SendEmailPayload();
         e.setRecipients(List.of(getConnection("email")));
