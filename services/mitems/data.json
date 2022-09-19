@@ -24,22 +24,22 @@
           {
             "description": "question1",
             "type": "TEXT",
-            "content": "Who of the following do you know best?"
+            "content": "Who of the following do you know very well?"
           },
           {
             "description": "question2",
             "type": "TEXT",
-            "content": "Who of the following do you know best?"
+            "content": "Who of the following do you know very well?"
           },
           {
             "description": "question3",
             "type": "TEXT",
-            "content": "With whom of the following do you cooperate often?"
+            "content": "Who of the following do you know very well?"
           },
           {
             "description": "question4",
             "type": "TEXT",
-            "content": "With whom of the following do you talk on daily basis?"
+            "content": "Who of the following do you know very well?"
           }
         ]
       },
@@ -94,7 +94,7 @@
           {
             "description": "Text",
             "type": "TEXT",
-            "content": "This was great, you’re such an interesting person! Thank you 🥳\n\nNow let’s see how connected you are to others in your organization!"
+            "content": "Love it!\nThank you 🥳\n\nNow let’s see how connected you are to others in your organization!\n"
           }
         ]
       },
@@ -109,7 +109,7 @@
           {
             "description": "question1",
             "type": "TEXT",
-            "content": "🌴When do you feel most productive?"
+            "content": "🙌What’s your favorite part of your job?"
           }
         ]
       },
@@ -124,7 +124,7 @@
           {
             "description": "question2",
             "type": "TEXT",
-            "content": "💃Have you ever binge watched a good show? Name the first that comes to mind."
+            "content": "📺 Have you ever binge watched a good show? Name the first that comes to mind."
           }
         ]
       },
@@ -139,7 +139,7 @@
           {
             "description": "question3",
             "type": "TEXT",
-            "content": "🌴Name one song that you could listen on repeat."
+            "content": "🎧Name one song that you could listen on repeat."
           }
         ]
       },
@@ -154,7 +154,22 @@
           {
             "description": "question4",
             "type": "TEXT",
-            "content": "🌴Describe your version of the perfect work lunch."
+            "content": "💪How do you stay motivated?"
+          }
+        ]
+      },
+      {
+        "name": "Personal quiz question5",
+        "elements": [
+          {
+            "description": "Action",
+            "type": "TEXT",
+            "content": "Submit"
+          },
+          {
+            "description": "question5",
+            "type": "TEXT",
+            "content": "🌴How do you like to spend time outside of work?"
           }
         ]
       },
@@ -169,7 +184,7 @@
           {
             "description": "Description",
             "type": "HTML",
-            "content": "<p><span style=\"font-weight: 400;\">Dear all,</span></p>\n<p><span style=\"font-weight: 400;\">Thanks for the warm welcome! I&rsquo;m so looking forward to working with all of you and help you get to know each other a little bit better.</span></p>\n<p><span style=\"font-weight: 400;\">When team members are working in silos, they cannot collaborate effectively, which can lead to missed deadlines, subpar work, poor communication, and general feelings of frustration.</span></p>\n<p><span style=\"font-weight: 400;\">To avoid this, we will encourage communication and collaboration, promote knowledge sharing and encourage networking.&nbsp;</span></p>\n<p><span style=\"font-weight: 400;\">How? Easy, I will do all the work and guide you all the way.</span></p>"
+            "content": "<p><span style=\"font-weight: 400;\">Dear {{ firstName }},</span></p>\n<p><span style=\"font-weight: 400;\">Thanks for the warm welcome! I&rsquo;m so looking forward to working with all of you and help you get to know each other a little bit better.</span></p>\n<p><span style=\"font-weight: 400;\">When team members are working in silos, they cannot collaborate effectively, which can lead to missed deadlines, subpar work, poor communication, and general feelings of frustration.</span></p>\n<p><span style=\"font-weight: 400;\">To avoid this, we will encourage communication and collaboration, promote knowledge sharing and encourage networking.&nbsp;</span></p>\n<p><span style=\"font-weight: 400;\">How? Easy, I will do all the work and guide you all the way.</span></p>"
           },
           {
             "description": "Subject",
@@ -184,6 +199,61 @@
     "title": "Statistics",
     "description": "Flow which displays statistics about company silos to users",
     "items": [
+      {
+        "name": "Employee number screen",
+        "elements": [
+          {
+            "description": "button",
+            "type": "TEXT",
+            "content": "Next"
+          },
+          {
+            "description": "description",
+            "type": "TEXT",
+            "content": "Total number of employees that participated in the latest familiarity quiz:"
+          }
+        ]
+      },
+      {
+        "name": "Final screen",
+        "elements": [
+          {
+            "description": "Title",
+            "type": "TEXT",
+            "content": "Bye now. You are the best!"
+          }
+        ]
+      },
+      {
+        "name": "Risk screen",
+        "elements": [
+          {
+            "description": "button",
+            "type": "TEXT",
+            "content": "Next"
+          },
+          {
+            "description": "description",
+            "type": "TEXT",
+            "content": "Our current level of exposure to risk of knowledge silos:"
+          }
+        ]
+      },
+      {
+        "name": "Silos number screen",
+        "elements": [
+          {
+            "description": "button",
+            "type": "TEXT",
+            "content": "Next"
+          },
+          {
+            "description": "description",
+            "type": "TEXT",
+            "content": "Total number of potential silos identified:"
+          }
+        ]
+      },
       {
         "name": "Statistics email",
         "elements": [
@@ -241,7 +311,7 @@
           {
             "description": "Each day",
             "type": "OPTIONS",
-            "content": "[{\"text\":\"Mon\",\"id\":\"MON\"},{\"text\":\"Tue\",\"id\":\"TUE\"},{\"text\":\"Wed\",\"id\":\"WED\"},{\"text\":\"Thu\",\"id\":\"THU\"},{\"text\":\"Fri\",\"id\":\"FRI\"}]"
+            "content": "[{\"text\":\"Monday\",\"id\":\"MON\"},{\"text\":\"Tuesday\",\"id\":\"TUE\"},{\"text\":\"Wednesday\",\"id\":\"WED\"},{\"text\":\"Thursday\",\"id\":\"THU\"},{\"text\":\"Friday\",\"id\":\"FRI\"}]"
           }
         ]
       },

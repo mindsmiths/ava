@@ -9,9 +9,12 @@ import com.mindsmiths.employeeManager.employees.Employee;
 import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
 
 import agents.Ava;
+import agents.CultureMaster;
+
+import signals.NumOfSilosSignal;
+import signals.SilosInfoSignal;
 
 import models.EmployeeProfile;
-
 
 rule "Send stats email"
     when
@@ -26,5 +29,25 @@ rule "Send stats email"
         modify(agent) {
             setStatsEmailLastSentAt(ts)
         };
+        agent.send(CultureMaster.ID, new NumOfSilosSignal(agent.getId()));
         agent.sendStatisticsEmail(employee);
+end
+
+rule "Store num of silos"
+    when
+        signal: SilosInfoSignal() from entry-point "signals"
+        agent: Ava()
+    then
+        modify(agent) {setSilosCount(signal.getSilosCount())};
+        delete(signal);
+end
+
+
+rule "Show stats screens"
+   when
+        signal: UserConnectedEvent(getParamAsString("trigger") == "show-stats") from entry-point "signals"
+        agent: Ava()
+   then
+        agent.showStatisticsScreens();
+        delete(signal);
 end

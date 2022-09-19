@@ -20,6 +20,8 @@ import java.util.HashMap;
 import models.EmployeeProfile;
 import models.OnboardingStage;
 
+import signals.NumOfSilosSignal;
+
 
 rule "Send welcome email"
     when
@@ -107,6 +109,7 @@ rule "Finish onboarding"
             setOnboardingStage(OnboardingStage.FINISHED),
             setStatsEmailLastSentAt(ts)
         };
+        agent.send(CultureMaster.ID, new NumOfSilosSignal(agent.getId()));
         delete(signal);
 end
 
