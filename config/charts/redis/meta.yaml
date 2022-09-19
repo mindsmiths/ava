@@ -1,4 +1,4 @@
-REPO_URL: https://charts.helm.sh/stable
-REPO_NAME: stable
+REPO_URL: https://charts.bitnami.com/bitnami
+REPO_NAME: bitnami
 CHART_NAME: redis
-CHART_VERSION: 10.5.7
+CHART_VERSION: 17.1.2

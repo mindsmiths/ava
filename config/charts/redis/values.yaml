@@ -2,8 +2,11 @@ enabled: true
 usePassword: false
 cluster:
   enabled: false
-  slaveCount: 2
+  slaveCount: 0
+auth:
+  enabled: false
 master:
+  disableCommands: []
   resources:
     requests:
       cpu: 50m
@@ -15,15 +18,6 @@ master:
       operator: "Equal"
       value: '{{ env.CI_PROJECT_NAME }}-{{ env.CI_COMMIT_REF_SLUG }}'
       effect: "NoSchedule"
-slave:
-  resources:
-    requests:
-      cpu: 25m
-      memory: 100Mi
-  nodeSelector:
-    project: {{ env.CI_PROJECT_NAME }}-{{ env.CI_COMMIT_REF_SLUG }}
-  tolerations:
-    - key: "project"
-      operator: "Equal"
-      value: '{{ env.CI_PROJECT_NAME }}-{{ env.CI_COMMIT_REF_SLUG }}'
-      effect: "NoSchedule"
+replica:
+  enabled: false
+  replicaCount: 0

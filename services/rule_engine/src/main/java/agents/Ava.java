@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import utils.Settings;
 
 import lombok.Data;
 import lombok.ToString;
@@ -23,6 +22,7 @@ import com.mindsmiths.ruleEngine.model.Agent;
 import com.mindsmiths.pairingalgorithm.Days;
 import com.mindsmiths.sdk.utils.templating.Templating;
 
+import utils.Settings;
 import models.AvaLunchCycleStage;
 import models.EmployeeProfile;
 import com.mindsmiths.employeeManager.employees.Employee;
@@ -153,6 +153,7 @@ public class Ava extends Agent {
             try {
                 String questionText = Mitems.getText("onboarding.familiarity-quiz-questions." + questionTag);
                 screens.put(questionTag, new TemplateGenerator(questionTag)
+                        .addComponent("header", new HeaderComponent(null, questionNum > 1))
                         .addComponent("question", new TitleComponent(questionText))
                         .addComponent(answersTag, new CloudSelectComponent(answersTag, names.get(questionNum - 1)))
                         .addComponent("submit", new PrimarySubmitButtonComponent(
@@ -200,6 +201,7 @@ public class Ava extends Agent {
             String answersTag = "answers" + String.valueOf(questionNum);
             try {
                 screens.put(questionTag, new TemplateGenerator(questionTag)
+                        .addComponent("header", new HeaderComponent(null, questionNum > 1))
                         .addComponent("question", new TitleComponent(Mitems.getText(String.format("onboarding.personal-quiz-%s.%s", questionTag, questionTag))))
                         .addComponent(answersTag, new TextAreaComponent(answersTag, "Type your answer here", true))
                         .addComponent("submit", new PrimarySubmitButtonComponent(
@@ -335,7 +337,25 @@ public class Ava extends Agent {
         }
         return employeesPerQuestionDistribution;
     }
-    //ICS Calendar integration
+
+    public void sendWeeklyEmail(EmployeeProfile employee) throws IOException {
+        String subject = Mitems.getText("weekly-core.weekly-email.subject");
+        String description = Mitems.getText("weekly-core.weekly-email.description");
+        String htmlTemplate = String.join("", Files.readAllLines(Paths.get("EmailTemplate.html"), StandardCharsets.UTF_8));
+
+        String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
+            "description", description,
+            "callToAction", Mitems.getText("weekly-core.weekly-email.button"),
+            "firstName", employee.getFirstName(),
+            "armoryUrl", String.format("%s/%s?trigger=start-weekly-core", Settings.ARMORY_SITE_URL, getConnection("armory"))
+        ));
+
+        SendEmailPayload e = new SendEmailPayload();
+        e.setRecipients(List.of(getConnection("email")));
+        e.setSubject(subject);
+        e.setHtmlText(htmlBody);
+        EmailAdapterAPI.newEmail(e);
+    }
 
     public static java.util.Calendar nextDayOfWeek(java.util.Calendar now, int dow) {
         int diff = dow - now.get(java.util.Calendar.DAY_OF_WEEK);
@@ -423,7 +443,4 @@ public class Ava extends Agent {
             throw new RuntimeException(e);
         }
     }
-
-    // ICS Calendar integration - end
- 
 }
