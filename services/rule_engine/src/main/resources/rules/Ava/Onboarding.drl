@@ -20,7 +20,6 @@ import java.util.HashMap;
 import models.EmployeeProfile;
 import models.OnboardingStage;
 
-import signals.NumOfSilosSignal;
 
 
 rule "Send welcome email"
@@ -71,6 +70,7 @@ rule "Start familiarity quiz"
         modify(agent) {
             setOnboardingStage(OnboardingStage.FAMILIARITY_QUIZ)
         };
+        agent.send(CultureMaster.ID, new EmployeeUpdateSignal(employee));
         delete(signal);
 end
 
@@ -109,7 +109,7 @@ rule "Finish onboarding"
             setOnboardingStage(OnboardingStage.FINISHED),
             setStatsEmailLastSentAt(ts)
         };
-        agent.send(CultureMaster.ID, new NumOfSilosSignal(agent.getId()));
+        agent.send(CultureMaster.ID, new EmployeeUpdateSignal(employee));
         delete(signal);
 end
 

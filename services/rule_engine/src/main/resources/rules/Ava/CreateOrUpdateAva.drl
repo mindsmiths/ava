@@ -57,7 +57,9 @@ rule "Save or update all employees"
         Map<String, EmployeeProfile> allEmployees = new HashMap<>(signal.getAllEmployees());
         allEmployees.remove(agent.getId());
         modify (agent) {
-            setOtherEmployees(allEmployees)
+            setOtherEmployees(allEmployees),
+            setSilosCount(signal.getSilosCount()),
+            setSilosRisk(signal.getSilosRisk())
         };
         delete(signal);
 end
