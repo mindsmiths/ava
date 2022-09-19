@@ -119,7 +119,7 @@ public class CultureMaster extends Agent {
         for (i = 0; i < employees.values().size(); i++) {
             for (j = 0; j < employees.values().size(); j++) {
                 Double sum = (matrix[i][j] + matrix[j][i]);
-                binaryMatrix[i][j] = (sum >= limit);
+                binaryMatrix[i][j] = sum >= limit;
             }
         }
         return binaryMatrix;
