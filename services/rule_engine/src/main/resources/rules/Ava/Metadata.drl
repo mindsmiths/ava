@@ -63,3 +63,12 @@ rule "Trigger familiarity quiz"
         Log.info("Ava: triggered familiarity quiz from dashboard");
         // trigger quiz
 end
+
+rule "Trigger statistics email"
+    when
+        signal: ManualTriggerEvent(triggerType == "statistics_email") from entry-point "signals"
+        agent: Ava()
+    then
+        Log.info("Ava: triggered statistics email from dashboard");
+        // trigger mail
+end

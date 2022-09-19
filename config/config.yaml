@@ -65,6 +65,9 @@ services:
     resources:
       cpu: 500m
       memory: 650Mi
+    dependencies:
+      - pairing-algorithm
+      - employee-manager
 
   heartbeat-scheduler:
     package: heartbeat
