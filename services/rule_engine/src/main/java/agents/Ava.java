@@ -49,7 +49,7 @@ public class Ava extends Agent {
     private boolean workingHours;
     private Date statsEmailLastSentAt;
     private int silosCount;
-    private int silosRisk;
+    private String silosRisk;
 
     public Ava(String connectionName, String connectionId) {
         super(connectionName, connectionId);
@@ -292,32 +292,34 @@ public class Ava extends Agent {
 
     public void showStatisticsScreens() {
         Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
-
+        int questionNum = 1;
         String employeeScreenButton = Mitems.getText("statistics.employee-number-screen.button");
         String employeeNumberScreenDescription = Mitems
                 .getText("statistics.employee-number-screen.description");
         String employeeNumberScreenNumber = String.format("%d", otherEmployees.values().size() + 1);
 
         screens.put("employeeNumberScreen", new TemplateGenerator()
+                .addComponent("header", new HeaderComponent(null, questionNum > 1))
                 .addComponent("title", new DescriptionComponent(employeeNumberScreenDescription))
                 .addComponent("description", new TitleComponent(employeeNumberScreenNumber))
                 .addComponent("submit", new PrimarySubmitButtonComponent(employeeScreenButton, "silosNumberScreen")));
-
+        questionNum += 1;
         String silosScreenButton = Mitems.getText("statistics.silos-number-screen.button");
         String silosNumberScreenDescription = Mitems
                 .getText("statistics.silos-number-screen.description");
-        String silosNumberScreenNumber = String.format("%d", 3);
+        String silosNumberScreenNumber = String.format("%d", silosCount);
 
         screens.put("silosNumberScreen", new TemplateGenerator()
+                .addComponent("header", new HeaderComponent(null, questionNum > 1))
                 .addComponent("title", new DescriptionComponent(silosNumberScreenDescription))
                 .addComponent("description", new TitleComponent(silosNumberScreenNumber))
                 .addComponent("submit", new PrimarySubmitButtonComponent(silosScreenButton, "riskScreen")));
-
         String riskScreenButton = Mitems.getText("statistics.risk-screen.button");
-        String riskScreenDescriptiotan = Mitems.getText("statistics.risk-screen.description");
+        String riskScreenDescription = Mitems.getText("statistics.risk-screen.description");
         String riskScreenTitle = "moderate";
 
         screens.put("riskScreen", new TemplateGenerator()
+                .addComponent("header", new HeaderComponent(null, questionNum > 1))
                 .addComponent("title", new DescriptionComponent(riskScreenDescription))
                 .addComponent("description", new TitleComponent(riskScreenTitle))
                 .addComponent("submit", new PrimarySubmitButtonComponent(riskScreenButton, "finalScreen")));
