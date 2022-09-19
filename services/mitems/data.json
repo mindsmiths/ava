@@ -49,17 +49,17 @@
           {
             "description": "Action",
             "type": "TEXT",
-            "content": "Bye now!"
-          },
-          {
-            "description": "Goodbye screen",
-            "type": "TEXT",
-            "content": "You are the best 😘"
+            "content": "Sure, let’s go"
           },
           {
             "description": "Text",
             "type": "TEXT",
-            "content": "You did a great job, it’s time I let you go back to work 😁\n\nYou can expect an email from me in the near future, I will let you and the team know how you stand in terms of connectivity and start matching you guys for work lunches.\n"
+            "content": "You did a great job and don’t worry about the absolute accuracy of your answers because it’s not important. \n\nNow let me get to know YOU a bit better."
+          },
+          {
+            "description": "Title",
+            "type": "TEXT",
+            "content": "Well done!"
           }
         ]
       },
@@ -74,7 +74,7 @@
           {
             "description": "Description",
             "type": "TEXT",
-            "content": "I will show you a list of names, feel free to choose those you know better than others.\nYou can choose more than one person.\n\nYou can also decide to not choose anyone if you feel like you don’t know anyone on the list that well.\n"
+            "content": "I will show you a list of names, feel free to choose those you know better than others.\n\nYou can choose more than one person.\n\nYou can also decide to not choose anyone if you feel like you don’t know anyone on the list that well."
           },
           {
             "description": "Title",
@@ -92,9 +92,34 @@
             "content": "[{\"text\":\"Great, let's do it\",\"id\":\"submit\"}]"
           },
           {
+            "description": "Goodbye screen",
+            "type": "TEXT",
+            "content": "You are the best 😘"
+          },
+          {
             "description": "Text",
             "type": "TEXT",
-            "content": "Love it!\nThank you 🥳\n\nNow let’s see how connected you are to others in your organization!\n"
+            "content": "I feel we have so much in common. 🤗\n\nThank you, that’s it 🥳"
+          }
+        ]
+      },
+      {
+        "name": "Personal quiz intro",
+        "elements": [
+          {
+            "description": "Action",
+            "type": "TEXT",
+            "content": "START"
+          },
+          {
+            "description": "Description",
+            "type": "TEXT",
+            "content": "Feel free to answer as much or as little as you want, write the first thing that comes to mind."
+          },
+          {
+            "description": "Title",
+            "type": "TEXT",
+            "content": "Just a few questions"
           }
         ]
       },
@@ -109,7 +134,7 @@
           {
             "description": "question1",
             "type": "TEXT",
-            "content": "🙌What’s your favorite part of your job?"
+            "content": "🌏If you could live anywhere, where would it be?"
           }
         ]
       },
@@ -124,7 +149,7 @@
           {
             "description": "question2",
             "type": "TEXT",
-            "content": "📺 Have you ever binge watched a good show? Name the first that comes to mind."
+            "content": "📺 Have you ever binge watched something? What was it?"
           }
         ]
       },
@@ -154,7 +179,7 @@
           {
             "description": "question4",
             "type": "TEXT",
-            "content": "💪How do you stay motivated?"
+            "content": "🥘What’s your favorite type of food for lunch?"
           }
         ]
       },
@@ -169,7 +194,22 @@
           {
             "description": "question5",
             "type": "TEXT",
-            "content": "🌴How do you like to spend time outside of work?"
+            "content": "🌴Describe your favorite type of holiday."
+          }
+        ]
+      },
+      {
+        "name": "Personal quiz question6",
+        "elements": [
+          {
+            "description": "Action",
+            "type": "TEXT",
+            "content": "Submit"
+          },
+          {
+            "description": "question6",
+            "type": "TEXT",
+            "content": "📕What was your favorite subject in school?"
           }
         ]
       },
@@ -179,12 +219,12 @@
           {
             "description": "Action",
             "type": "TEXT",
-            "content": "Let's start"
+            "content": "Let's go"
           },
           {
             "description": "Description",
             "type": "HTML",
-            "content": "<p><span style=\"font-weight: 400;\">Dear {{ firstName }},</span></p>\n<p><span style=\"font-weight: 400;\">Thanks for the warm welcome! I&rsquo;m so looking forward to working with all of you and help you get to know each other a little bit better.</span></p>\n<p><span style=\"font-weight: 400;\">When team members are working in silos, they cannot collaborate effectively, which can lead to missed deadlines, subpar work, poor communication, and general feelings of frustration.</span></p>\n<p><span style=\"font-weight: 400;\">To avoid this, we will encourage communication and collaboration, promote knowledge sharing and encourage networking.&nbsp;</span></p>\n<p><span style=\"font-weight: 400;\">How? Easy, I will do all the work and guide you all the way.</span></p>"
+            "content": "<p><span style=\"font-weight: 400;\">Dear {{ firstName }},</span></p>\n<p><span style=\"font-weight: 400;\">When team members are working in silos, they cannot collaborate effectively, which can lead to missed deadlines, subpar work, poor communication, and general feelings of frustration.</span></p>\n<p><span style=\"font-weight: 400;\">To avoid this, we will encourage communication and collaboration, promote knowledge sharing and encourage networking.&nbsp;</span></p>\n<p><span style=\"font-weight: 400;\">How? Easy, I will do all the work and guide you all the way.</span></p>"
           },
           {
             "description": "Subject",
