@@ -215,6 +215,31 @@
         ]
       },
       {
+        "name": "Final screen",
+        "elements": [
+          {
+            "description": "Title",
+            "type": "TEXT",
+            "content": "Bye now. You are the best!"
+          }
+        ]
+      },
+      {
+        "name": "Risk screen",
+        "elements": [
+          {
+            "description": "button",
+            "type": "TEXT",
+            "content": "Close"
+          },
+          {
+            "description": "description",
+            "type": "TEXT",
+            "content": "Our current level of exposure to risk of knowledge silos:"
+          }
+        ]
+      },
+      {
         "name": "Silos number screen",
         "elements": [
           {
@@ -246,31 +271,6 @@
             "description": "Subject",
             "type": "TEXT",
             "content": "Statistics"
-          }
-        ]
-      },
-      {
-        "name": "Stats screens",
-        "elements": [
-          {
-            "description": "Employee number screen description",
-            "type": "TEXT",
-            "content": "Total number of employees that participated in the latest familiarity quiz:"
-          },
-          {
-            "description": "Final screen title",
-            "type": "TEXT",
-            "content": "Bye now. You are the best!"
-          },
-          {
-            "description": "Risk screen description",
-            "type": "TEXT",
-            "content": "Our current level of exposure to risk of knowledge silos:"
-          },
-          {
-            "description": "Silos number screen description",
-            "type": "TEXT",
-            "content": "Total number of potential silos identified:"
           }
         ]
       }
