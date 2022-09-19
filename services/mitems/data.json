@@ -230,7 +230,7 @@
           {
             "description": "button",
             "type": "TEXT",
-            "content": "Close"
+            "content": "Next"
           },
           {
             "description": "description",

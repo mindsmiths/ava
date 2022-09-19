@@ -1,4 +1,4 @@
-global:
+igglobal:
   dependencies:
     python:
       - forge-sdk==4.0.0a12
@@ -10,7 +10,7 @@ global:
 
     ENVIRONMENT_NAME: {{ env.ENVIRONMENT_NAME }}
     MODULE: '{{ env.MODULE | default("local", True) }}'
-    LOG_LEVEL: INFO
+    LOG_LEVEL: DEBUG
 
     # Messaging
     PULSAR_URL: pulsar://pulsar-proxy.pulsar.svc.cluster.local:6650

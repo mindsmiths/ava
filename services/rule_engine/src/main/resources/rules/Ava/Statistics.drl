@@ -16,7 +16,6 @@ import signals.SilosInfoSignal;
 
 import models.EmployeeProfile;
 
-// this never triggers?
 rule "Send stats email"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"

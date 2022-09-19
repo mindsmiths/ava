@@ -314,7 +314,7 @@ public class Ava extends Agent {
                 .addComponent("submit", new PrimarySubmitButtonComponent(silosScreenButton, "riskScreen")));
 
         String riskScreenButton = Mitems.getText("statistics.risk-screen.button");
-        String riskScreenDescription = Mitems.getText("statistics.risk-screen.description");
+        String riskScreenDescriptiotan = Mitems.getText("statistics.risk-screen.description");
         String riskScreenTitle = "moderate";
 
         screens.put("riskScreen", new TemplateGenerator()
