@@ -49,3 +49,12 @@ rule "Trigger familiarity quiz"
         Log.info("CultureMaster: triggered familiarity quiz from dashboard");
         // trigger quiz
 end
+
+rule "Trigger statistics email"
+    when
+        signal: ManualTriggerEvent(triggerType == "statistics_email") from entry-point "signals"
+        agent: CultureMaster()
+    then
+        Log.info("CultureMaster: triggered statistics email from dashboard");
+        // trigger mail
+end
