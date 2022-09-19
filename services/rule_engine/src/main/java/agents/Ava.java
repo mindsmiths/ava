@@ -19,39 +19,24 @@ import com.mindsmiths.emailAdapter.SendEmailPayload;
 import com.mindsmiths.mitems.Mitems;
 import com.mindsmiths.mitems.Option;
 import com.mindsmiths.ruleEngine.model.Agent;
-import com.mindsmiths.pairingalgorithm.Days;
-import com.mindsmiths.sdk.utils.templating.Templating;
-
-import utils.Settings;
-import models.AvaLunchCycleStage;
-import models.EmployeeProfile;
-import com.mindsmiths.employeeManager.employees.Employee;
-import com.mindsmiths.mitems.Mitems;
-import com.mindsmiths.mitems.Option;
-import com.mindsmiths.ruleEngine.model.Agent;
 import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.pairingalgorithm.Days;
-import com.mindsmiths.emailAdapter.AttachmentData;
-import com.mindsmiths.emailAdapter.EmailAdapterAPI;
-import com.mindsmiths.emailAdapter.SendEmailPayload;
 import com.mindsmiths.sdk.utils.templating.Templating;
-import utils.Settings;
+import com.mindsmiths.employeeManager.employees.Employee;
+import com.mindsmiths.emailAdapter.AttachmentData;
 
-import models.OnboardingStage;
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.DateTime;
-import net.fortuna.ical4j.model.Property;
-import net.fortuna.ical4j.model.PropertyList;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.CalScale;
-import net.fortuna.ical4j.model.property.Description;
 import net.fortuna.ical4j.model.property.Method;
-import net.fortuna.ical4j.model.property.Organizer;
 import net.fortuna.ical4j.model.property.ProdId;
-import net.fortuna.ical4j.model.property.Summary;
 import net.fortuna.ical4j.model.property.Version;
-
+import models.AvaLunchCycleStage;
+import models.EmployeeProfile;
+import models.OnboardingStage;
+import utils.Settings;
 
 @Data
 @ToString(callSuper = true)
@@ -357,6 +342,23 @@ public class Ava extends Agent {
         EmailAdapterAPI.newEmail(e);
     }
 
+    public String dayHelperFunction(Days days) {
+        switch (days.toString()) {
+            case "MON":
+                return "Monday";
+            case "TUE":
+                return "Tuesday";
+            case "WED":
+                return "Wednesday";
+            case "THU":
+                return "Thursday";
+            case "FRI":
+                return "Friday";
+            default:
+                return "unkown";
+        }
+    }
+
     public static java.util.Calendar nextDayOfWeek(java.util.Calendar now, int dow) {
         int diff = dow - now.get(java.util.Calendar.DAY_OF_WEEK);
         if (diff <= 0) {
@@ -365,33 +367,36 @@ public class Ava extends Agent {
         now.add(java.util.Calendar.DAY_OF_MONTH, diff);
         return now;
     }
+    
+    public void sendCalendarInvite(Days days, EmployeeProfile currentEmployee, EmployeeProfile otherEmployee) throws IOException {
+        if(currentEmployee == null || otherEmployee == null)
+            throw new RuntimeException("Ava.sendCalendarInvite called with null arguments!");
+        
+        String subject = Templating.recursiveRender(Mitems.getText("weekly-core.matching-mail.subject"), Map.of(
+                "otherName", otherEmployee.getFirstName(),
+                "myName", currentEmployee.getFirstName()
+        ));
+    
+        SendEmailPayload payload = new SendEmailPayload();
+        payload.setRecipients(List.of(currentEmployee.getEmail()));
+        payload.setSubject(subject);
+        payload.setHtmlText(renderEmailBody(days, currentEmployee, otherEmployee)); // here goes HTML
+        payload.setAttachments(List.of(new AttachmentData(getICSInvite(days, currentEmployee, otherEmployee), "invite.ics")));
+        EmailAdapterAPI.newEmail(payload);
+    }
 
-    public String renderEmailBody(Days days, Employee otherEmployee) throws IOException {
-        String htmlTemplateMatching = String.join("", Files.readAllLines(Paths.get("EmailTemplateCalendar.html"), StandardCharsets.UTF_8));
-        String matchingMailBodyText = Mitems.getText("onboarding.matching-mail.matchingmailbodytext");
-        String matchingMailTitleText = Mitems.getText("onboarding.matching-mail.matchingmailtitletext");
-
-        String description = Templating.recursiveRender(htmlTemplateMatching, Map.of(
-            "biggerTitle", matchingMailTitleText,
-            "title", matchingMailBodyText,
-            "personName", otherEmployee.getFirstName(),
-            "lunchDay", days.toString(),
-            "armoryUrl", "http://8000.workspace-ms-197475909.sandbox.mindsmiths.io/"
+    public String renderEmailBody(Days days, EmployeeProfile currentEmployee, EmployeeProfile otherEmployee) throws IOException {
+        String template = String.join("", Files.readAllLines(Paths.get("EmailTemplateCalendar.html"), StandardCharsets.UTF_8));
+        String description = Templating.recursiveRender(template, Map.of(
+            "title", Mitems.getText("weekly-core.matching-mail.title"),
+            "description", Mitems.getText("weekly-core.matching-mail.description"),
+            "otherName", otherEmployee.getFirstName(),
+            "fullName", otherEmployee.getFullName(),
+            "myName", currentEmployee.getFirstName(),
+            "lunchDay", dayHelperFunction(days)
         ));
 
         return description;
-    }
-    
-    public void sendCalendarInvite(Days days, Employee currentEmployee, Employee otherEmployee) throws IOException {
-        if(currentEmployee == null || otherEmployee == null)
-            throw new RuntimeException("Ava.sendCalendarInvite called with null arguments!");
-        Log.info("Sending emails to " + currentEmployee.getEmail() + " and " + otherEmployee.getEmail());
-        SendEmailPayload payload = new SendEmailPayload();
-        payload.setRecipients(List.of(currentEmployee.getEmail()));
-        payload.setSubject("Invite: " + otherEmployee.getFirstName() + " on a meeting with you");
-        payload.setHtmlText(renderEmailBody(days, otherEmployee)); // here goes HTML
-        payload.setAttachments(List.of(new AttachmentData(getICSInvite(days, currentEmployee, otherEmployee), "invite.ics")));
-        EmailAdapterAPI.newEmail(payload);
     }
 
     private byte[] getICSInvite(Days day, Employee currentEmployee, Employee otherEmployee) {
@@ -402,12 +407,6 @@ public class Ava extends Agent {
             invite.getProperties().add(CalScale.GREGORIAN);
             invite.getProperties().add(Method.REQUEST);
             
-            String description1 = Templating.recursiveRender(Mitems.getText("onboarding.matching-mail.calendarinvitetext"), Map.of(
-                "firstName", currentEmployee.getFirstName(),
-                "secondName", otherEmployee.getFirstName(),
-                "armoryUrl", ""
-            ));
-            
             int chosenDay = Map.of(
                 Days.MON, java.util.Calendar.MONDAY,
                 Days.TUE, java.util.Calendar.TUESDAY,
@@ -417,24 +416,27 @@ public class Ava extends Agent {
             ).get(day);
 
             java.util.Calendar now = java.util.Calendar.getInstance();
-            java.util.Calendar sunday = nextDayOfWeek(now, java.util.Calendar.SUNDAY);
+            java.util.Calendar saturday = nextDayOfWeek(now, java.util.Calendar.SATURDAY);
 
-            java.util.Calendar lunchCalendarDate = nextDayOfWeek(sunday, chosenDay);
+            java.util.Calendar lunchCalendarDate = nextDayOfWeek(saturday, chosenDay);
             lunchCalendarDate.set(java.util.Calendar.HOUR_OF_DAY, 12);
+            lunchCalendarDate.set(java.util.Calendar.MINUTE, 0);
+            lunchCalendarDate.set(java.util.Calendar.SECOND, 0);
 
-            java.util.Calendar lunchCalendarDatePlusHour = nextDayOfWeek(sunday, chosenDay);
+            Log.info(lunchCalendarDate);
+
+            java.util.Calendar lunchCalendarDatePlusHour = (java.util.Calendar) lunchCalendarDate.clone();
             lunchCalendarDatePlusHour.set(java.util.Calendar.HOUR_OF_DAY, 13);
+            Log.info(lunchCalendarDatePlusHour);
 
             VEvent ev = new VEvent(new DateTime(lunchCalendarDate.getTime()),
                                    new DateTime(lunchCalendarDatePlusHour.getTime()),
-                                   description1);
+                                   "Lunch with " + otherEmployee.getFirstName() + " on " + dayHelperFunction(day));
             ev.getProperties().add(new net.fortuna.ical4j.model.property.Attendee("mailto:" + currentEmployee.getEmail()));
             ev.getProperties().add(new net.fortuna.ical4j.model.property.Attendee("mailto:" + otherEmployee.getEmail())); 
             
             invite.getComponents().add(ev);
 
-            // output to bytes
-            // don't touch
             ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
             CalendarOutputter out = new CalendarOutputter();
             out.output(invite, byteOut);
