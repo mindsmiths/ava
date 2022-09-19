@@ -22,7 +22,6 @@ import models.OnboardingStage;
 
 import signals.NumOfSilosSignal;
 
-
 rule "Send welcome email"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
