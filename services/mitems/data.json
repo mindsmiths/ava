@@ -200,6 +200,36 @@
     "description": "Flow which displays statistics about company silos to users",
     "items": [
       {
+        "name": "Employee number screen",
+        "elements": [
+          {
+            "description": "button",
+            "type": "TEXT",
+            "content": "Next"
+          },
+          {
+            "description": "description",
+            "type": "TEXT",
+            "content": "Total number of employees that participated in the latest familiarity quiz:"
+          }
+        ]
+      },
+      {
+        "name": "Silos number screen",
+        "elements": [
+          {
+            "description": "button",
+            "type": "TEXT",
+            "content": "Next"
+          },
+          {
+            "description": "description",
+            "type": "TEXT",
+            "content": "Total number of potential silos identified:"
+          }
+        ]
+      },
+      {
         "name": "Statistics email",
         "elements": [
           {

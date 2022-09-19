@@ -292,7 +292,7 @@ public class Ava extends Agent {
 
     public void showStatisticsScreens() {
         Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
-        // String nextButton = ;
+        
         String employeeNumberScreenDescription = Mitems
                 .getText("statistics.stats-screens.employee-number-screen-description");
         String employeeNumberScreenNumber = String.format("%d", otherEmployees.values().size() + 1);
