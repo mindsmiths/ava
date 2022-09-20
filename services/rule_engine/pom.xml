@@ -39,7 +39,7 @@
 		<dependency>
 			<groupId>com.mindsmiths</groupId>
 			<artifactId>mitems-client</artifactId>
-			<version>4.0.0a10</version>
+			<version>4.0.0a11</version>
 		</dependency>
 		<dependency>
 			<groupId>com.mindsmiths</groupId>
@@ -60,6 +60,16 @@
 			<groupId>com.mindsmiths</groupId>
 			<artifactId>armory-client</artifactId>
 			<version>4.0.0a15</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.12.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mnode.ical4j</groupId>
+			<artifactId>ical4j</artifactId>
+			<version>3.2.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
