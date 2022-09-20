@@ -515,7 +515,7 @@ public class Ava extends Agent {
 
     public String renderMatchmakingEmail(Days days, EmployeeProfile currentEmployee, EmployeeProfile otherEmployee) throws IOException {
         String htmlTemplate = new String(Objects.requireNonNull(
-            getClass().getClassLoader().getResourceAsStream("emailTemplates/EmailTemplate.html")).readAllBytes()
+            getClass().getClassLoader().getResourceAsStream("emailTemplates/EmailTemplateCalendar.html")).readAllBytes()
     );
         return Templating.recursiveRender(htmlTemplate, Map.of(
             "title", Mitems.getText("weekly-core.matching-mail.title"),
