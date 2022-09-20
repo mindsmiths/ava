@@ -342,21 +342,13 @@ public class Ava extends Agent {
         EmailAdapterAPI.newEmail(e);
     }
 
-    public String dayHelperFunction(Days days) {
-        switch (days.toString()) {
-            case "MON":
-                return "Monday";
-            case "TUE":
-                return "Tuesday";
-            case "WED":
-                return "Wednesday";
-            case "THU":
-                return "Thursday";
-            case "FRI":
-                return "Friday";
-            default:
-                return "unkown";
-        }
+    public String daysToPrettyString(Days days) {
+        for(Option option: Mitems.getOptions("weekly-core.days.each-day")) {
+            if(days.toString().equals(option.getId())) {
+                return option.getText();
+            } 
+        }       
+        return "Unknown";
     }
 
     public static java.util.Calendar nextDayOfWeek(java.util.Calendar now, int dow) {
@@ -374,7 +366,7 @@ public class Ava extends Agent {
         
         String subject = Templating.recursiveRender(Mitems.getText("weekly-core.matching-mail.subject"), Map.of(
                 "employeeName", otherEmployee.getFirstName(),
-                "day", dayHelperFunction(days)
+                "day", daysToPrettyString(days)
         ));
     
         SendEmailPayload payload = new SendEmailPayload();
@@ -393,7 +385,7 @@ public class Ava extends Agent {
             "otherName", otherEmployee.getFirstName(),
             "fullName", otherEmployee.getFullName(),
             "myName", currentEmployee.getFirstName(),
-            "lunchDay", dayHelperFunction(days)
+            "lunchDay", daysToPrettyString(days)
         ));
 
         return description;

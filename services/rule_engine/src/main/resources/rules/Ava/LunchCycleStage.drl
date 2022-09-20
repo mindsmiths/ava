@@ -21,10 +21,9 @@ import models.OnboardingStage;
 
 
 rule "Lunch invite expired"
-    enabled false
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        eval(!evaluateCronExpression("* * 9-23 * * MON", ts, "Europe/Zagreb") && 
+        eval(!evaluateCronExpression("* * 9-23 * * WED", ts, "Europe/Zagreb") && 
             !evaluateCronExpression("* * * * * THU", ts, "Europe/Zagreb") &&
             !evaluateCronExpression("* * 00-14 * * FRI", ts, "Europe/Zagreb"))
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-weekly-core") from entry-point "signals"
@@ -35,11 +34,11 @@ rule "Lunch invite expired"
         delete(signal);
 end
 
-rule "First weekly mail sending"
+rule "Send available days e-mail"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        eval(evaluateCronExpression("* * 8-17 ? * MON,FRI *", ts, "Europe/Zagreb"))
-        agent: Ava(lunchCycleStage == AvaLunchCycleStage.MAIL_SENDING,
+        eval(evaluateCronExpression("* * 8-17 ? * MON *", ts, "Europe/Zagreb"))
+        agent: Ava(lunchCycleStage == AvaLunchCycleStage.LUNCH_MAIL_SENDING,
                    onboardingStage == OnboardingStage.FINISHED)
     then
         modify(agent) {
@@ -50,12 +49,11 @@ end
 
 
 rule "Ask for available days"
-    when/**
+    when
         Heartbeat(ts: timestamp) from entry-point "signals"
         eval(evaluateCronExpression("* * 9-23 * * WED", ts, "Europe/Zagreb") 
         || (evaluateCronExpression("* * * * * THU", ts, "Europe/Zagreb"))
-        || (evaluateCronExpression("* * 00-14 * * FRI", ts, "Europe/Zagreb"))
-        || (evaluateCronExpression("* * 00-18 * * MON", ts, "Europe/Zagreb")))**/
+        || (evaluateCronExpression("* * 00-18 * * MON", ts, "Europe/Zagreb")))
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-weekly-core") from entry-point "signals"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY,
                    onboardingStage == OnboardingStage.FINISHED)
@@ -96,14 +94,9 @@ rule "Store match info"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.ACCEPT_MATCH_INFO)
         profile: EmployeeProfile()
     then
-        modify(agent) {setMatch(signal.getMatch()), setMatchDay(signal.getMatchDay()),
-                       setLunchCycleStage(AvaLunchCycleStage.MAIL_SENDING) };
-        Log.info("I'm " + profile.getFirstName() + " and my match is " +
-                agent.getOtherEmployees().get(signal.getMatch()).getFullName() +
-                " on " + agent.getMatchDay());
-        Log.info(agent.getOtherEmployees());
-        Log.info(signal.getMatch());
-        Log.info((Employee)(agent.getOtherEmployees().get(signal.getMatch())));
+        modify(agent) { setMatch(signal.getMatch()), 
+                        setMatchDay(signal.getMatchDay()),
+                        setLunchCycleStage(AvaLunchCycleStage.LUNCH_MAIL_SENDING) };
         agent.sendCalendarInvite(signal.getMatchDay(), profile, agent.getOtherEmployees().get(signal.getMatch()));
         delete(signal);   
 end

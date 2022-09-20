@@ -110,11 +110,9 @@ rule "Finish onboarding"
 
         agent.sendStatisticsEmail(employee);
 
-        Log.info("Familiarity quiz finished.");
-
         modify(agent) {
             setOnboardingStage(OnboardingStage.FINISHED),
-            setLunchCycleStage(AvaLunchCycleStage.MAIL_SENDING),
+            setLunchCycleStage(AvaLunchCycleStage.LUNCH_MAIL_SENDING),
             setStatsEmailLastSentAt(ts)
         };
         delete(signal);

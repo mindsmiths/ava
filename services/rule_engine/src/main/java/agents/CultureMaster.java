@@ -24,10 +24,6 @@ public class CultureMaster extends Agent {
     private List<Match> allMatches = new ArrayList<>();
     private CmLunchCycleStage lunchCycleStage = CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES;
     private Map<String, EmployeeProfile> employees = new HashMap<>();
-    private List<String> avaIDs = new ArrayList<>();
-    private List<Map<String, List<Integer>>> freeDays; // information about available days
-    private boolean workingHours = false;
-    private boolean firstMailSent = false;
 
     public static String ID = "CULTURE_MASTER";
     public CultureMaster() {

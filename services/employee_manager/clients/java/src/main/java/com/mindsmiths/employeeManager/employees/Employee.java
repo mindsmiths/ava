@@ -4,9 +4,8 @@ import com.mindsmiths.sdk.core.db.DataModel;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import lombok.Setter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import java.io.Serializable;
 

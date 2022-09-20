@@ -21,7 +21,7 @@ import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
 import agents.CultureMaster;
 
 
-rule "Working hours"
+rule "Set working hours for CultureMaster"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
         eval(evaluateCronExpression("* * 8-17 ? * MON-FRI *", ts, "Europe/Zagreb"))
@@ -32,7 +32,7 @@ rule "Working hours"
         }
 end
 
-rule "Non working hours"
+rule "Set non-working hours for CultureMaster"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
         eval(!evaluateCronExpression("* * 8-17 ? * MON-FRI *", ts, "Europe/Zagreb"))
