@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -34,6 +35,7 @@ import lombok.ToString;
 import models.AvaLunchCycleStage;
 import models.EmployeeProfile;
 import models.OnboardingStage;
+import models.Neuron;
 import utils.Settings;
 
 @Data
@@ -50,9 +52,46 @@ public class Ava extends Agent {
     private Date statsEmailLastSentAt;
     private int silosCount;
     private int silosRisk;
+    // a map of how strong MY connections are to other employees
+    private Map<String, Neuron> connectionStrengths = new HashMap<>();
+
+    public static final double CONNECTION_NEURON_CAPACITY = 100;
+    public static final double CONNECTION_NEURON_RESISTANCE = 0.05;
 
     public Ava(String connectionName, String connectionId) {
         super(connectionName, connectionId);
+    }
+
+    // trigger whenever new Ava is onboarded in CreateOrUpdateAva, "Save or update all employees"
+    public void addConnectionStrengths() {
+        for(String avaId : this.otherEmployees.keySet()) {
+            if(!connectionStrengths.containsKey(otherEmployees.get(avaId).getId())) {
+                connectionStrengths.put(otherEmployees.get(avaId).getId(), new Neuron(CONNECTION_NEURON_RESISTANCE, CONNECTION_NEURON_CAPACITY));
+            }
+        }
+    }
+
+    // if user picked employee in familiarity quiz, charge that connection to the max value
+    // trigger after familiarity quiz is over in Onboarding, "Finish onboarding"
+    public void chargeConnectionNeurons(EmployeeProfile employeeProfile) {
+        for(Map.Entry<String, Double> entry : employeeProfile.getFamiliarity().entrySet()) {
+            if(entry.getValue() != 0) {
+                this.connectionStrengths.get(entry.getKey()).setValue(CONNECTION_NEURON_CAPACITY);
+            }
+        }
+    }
+
+    public Neuron getConnectionNeuron(String avaId) {
+        return this.connectionStrengths.get(avaId);
+    }
+
+    // decrease the strength of connection with time (days)
+    // trigger every week in LunchCycleStage, "Ask for available days"
+    public void decayConnectionNeurons() {
+        for(String avaId : this.otherEmployees.keySet()) {
+            long daysPassed = ChronoUnit.DAYS.between(getConnectionNeuron(avaId).getLastUpdatedAt().toInstant(), new Date().toInstant());
+            getConnectionNeuron(avaId).decay(daysPassed/1000.);
+        }
     }
 
     public void updateAvailableDays(List<String> availableDaysStr) {

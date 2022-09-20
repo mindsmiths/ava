@@ -103,8 +103,11 @@ rule "Finish onboarding"
                 
             }
         modify(employee) { setFamiliarity(familiarity) };
-
         agent.sendStatisticsEmail(employee);
+        // update neurons according to the results of the quiz
+        modify(agent) {chargeConnectionNeurons(employee)};
+        // test to see if connections strengths works
+        Log.info("I'm " + employee.getFirstName() + "and my connectionStrengths map is " + agent.getConnectionStrengths());
         modify(agent) {
             setOnboardingStage(OnboardingStage.FINISHED),
             setStatsEmailLastSentAt(ts)

@@ -46,6 +46,7 @@ rule "Ask for available days"
         // what if person decides to exit this screen without answering, now we can't get back because we are in the next stage
         modify(agent) {setLunchCycleStage(AvaLunchCycleStage.FORWARD_AVAILABILITY)}
         agent.chooseAvailableDaysScreen();
+        modify(agent) {decayConnectionNeurons()}
         delete(signal);
 end
 
@@ -65,6 +66,7 @@ rule "Confirm days"
     when
         signal: SubmitEvent(getParamAsString("submit") == "confirmDays") from entry-point "signals"  
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.FORWARD_AVAILABILITY)
+        profile: EmployeeProfile()
     then
         agent.confirmingDaysScreen();
         modify(agent) {updateAvailableDays((ArrayList<String>)(signal.getParam("availableDays")))};

@@ -1,5 +1,4 @@
 import logging
-from typing import Set
 from typing import List
 
 from forge.conf import settings as forge_settings
@@ -17,7 +16,7 @@ class PairingAlgorithm(BaseService):
 
     @api
     def generate_pairs(self,
-                       avaAvailabilities: List[AvaAvailability]) -> Matches:
+                       avaAvailabilities: List[AvaAvailability]) -> Matches:            
         all_matches: List[Match] = []
         already_added = set()
 
