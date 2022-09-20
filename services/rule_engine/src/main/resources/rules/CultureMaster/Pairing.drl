@@ -8,6 +8,7 @@ import com.mindsmiths.ruleEngine.util.Agents;
 import com.mindsmiths.ruleEngine.model.Initialize;
 import com.mindsmiths.pairingalgorithm.Matches;
 
+import signals.ConnectionsStrengthSignal;
 import signals.AvaAvailabilitySignal;
 
 import agents.CultureMaster;
@@ -24,7 +25,7 @@ rule "First contact"
         delete(initialize);
 end
 
-rule "Store ava availability"
+rule "Store Ava availability"
     when
         signal: AvaAvailabilitySignal() from entry-point "signals"
         agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES)
@@ -34,6 +35,15 @@ rule "Store ava availability"
         delete(signal);
 end
 
+rule "Store Ava connections strengths"
+    when
+        signal: ConnectionsStrengthSignal() from entry-point "signals"
+        agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES)
+    then
+        modify(agent) {getAvaConnectionStrengths().put(signal.getEmployeeId(), signal.getConnectionStrengths())};   
+        Log.info("Storing connection strengths: " + agent.getAvaConnectionStrengths());
+        delete(signal);
+end
 
 rule "Check that all ava availabilities came"
     when

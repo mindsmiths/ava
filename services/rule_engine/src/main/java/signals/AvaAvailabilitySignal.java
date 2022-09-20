@@ -7,9 +7,11 @@ import lombok.NoArgsConstructor;
 import com.mindsmiths.sdk.core.api.Signal;
 import com.mindsmiths.pairingalgorithm.AvaAvailability;
 
+import models.Neuron;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class AvaAvailabilitySignal extends Signal {
-    AvaAvailability avaAvailability;
+    private AvaAvailability avaAvailability;
 }

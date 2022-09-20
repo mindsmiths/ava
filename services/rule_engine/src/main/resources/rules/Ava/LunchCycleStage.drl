@@ -14,6 +14,7 @@ import agents.CultureMaster;
 
 import signals.AvaAvailabilitySignal;
 import signals.SendMatchesSignal;
+import signals.ConnectionsStrengthSignal;
 
 import models.AvaLunchCycleStage;
 import models.OnboardingStage;
@@ -71,6 +72,7 @@ rule "Confirm days"
         agent.confirmingDaysScreen();
         modify(agent) {updateAvailableDays((ArrayList<String>)(signal.getParam("availableDays")))};
         agent.send(CultureMaster.ID, new AvaAvailabilitySignal(new AvaAvailability(agent.getId(), agent.getAvailableDays())));
+        agent.send(CultureMaster.ID, new ConnectionsStrengthSignal(profile.getId(), agent.getConnectionStrengths()));
         modify(agent) {setLunchCycleStage(AvaLunchCycleStage.ACCEPT_MATCH_INFO)};
         delete(signal);
 end
