@@ -50,6 +50,7 @@ public class Ava extends Agent {
     private Date statsEmailLastSentAt;
     private int silosCount;
     private String silosRisk;
+    private Boolean manualTrigger = false;
 
     public Ava(String connectionName, String connectionId) {
         super(connectionName, connectionId);

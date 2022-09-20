@@ -27,7 +27,8 @@ rule "Lunch invite expired"
             !evaluateCronExpression("* * 00-14 * * FRI", ts, "Europe/Zagreb"))
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-weekly-core") from entry-point "signals"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY,
-                   onboardingStage == OnboardingStage.FINISHED)
+                   onboardingStage == OnboardingStage.FINISHED,
+                   manualTrigger == false)
     then 
         agent.showLunchInviteExpiredScreen();
         delete(signal);
@@ -41,7 +42,8 @@ rule "Ask for available days"
         || (evaluateCronExpression("* * 00-14 * * FRI", ts, "Europe/Zagreb")))
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-weekly-core") from entry-point "signals"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY,
-                   onboardingStage == OnboardingStage.FINISHED)
+                   onboardingStage == OnboardingStage.FINISHED,
+                   manualTrigger == false)
     then 
         // what if person decides to exit this screen without answering, now we can't get back because we are in the next stage
         modify(agent) {setLunchCycleStage(AvaLunchCycleStage.FORWARD_AVAILABILITY)}
@@ -85,5 +87,3 @@ rule "Store match info"
                 " on " + agent.getMatchDay());
         delete(signal);
 end
-
-
