@@ -86,7 +86,7 @@ end
 rule "Finish onboarding"
    when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        signal: SubmitEvent(getParamAsString("submit") == "finished-personal-quiz") from entry-point "signals"
+        signal: SubmitEvent(getParamAsString("submit") == "finishpersonalquiz") from entry-point "signals"
         agent: Ava(onboardingStage == OnboardingStage.PERSONAL_QUIZ)
         employee: EmployeeProfile()
    then
