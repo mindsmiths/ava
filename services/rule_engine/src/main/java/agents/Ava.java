@@ -144,7 +144,7 @@ public class Ava extends Agent {
             try {
                 String questionText = Mitems.getText("onboarding.familiarity-quiz-questions." + questionTag);
                 screens.put(questionTag, new TemplateGenerator(questionTag)
-                        .addComponent("header", new HeaderComponent(null, questionNum > 1))
+                        .addComponent("header", new HeaderComponent(null, true))
                         .addComponent("question", new TitleComponent(questionText))
                         .addComponent(answersTag, new CloudSelectComponent(answersTag, names.get(questionNum - 1)))
                         .addComponent("submit", new PrimarySubmitButtonComponent(
@@ -166,6 +166,7 @@ public class Ava extends Agent {
                 String finishFamiliarityQuizText = Mitems
                         .getText("onboarding.familiarity-quiz-goodbye.text");
                 screens.put("finishfamiliarityquiz", new TemplateGenerator("finishfamiliarityquiz")
+                        .addComponent("header", new HeaderComponent(null, true))
                         .addComponent("image", new ImageComponent(avaImagePath))
                         .addComponent("title", new TitleComponent(finishFamiliarityQuizText))
                         .addComponent("submit", new PrimarySubmitButtonComponent(
@@ -198,6 +199,7 @@ public class Ava extends Agent {
             String answersTag = "answers" + String.valueOf(questionNum);
             try {
                 screens.put(questionTag, new TemplateGenerator(questionTag)
+                        .addComponent("header", new HeaderComponent(null, true))
                         .addComponent("question",
                                 new TitleComponent(Mitems.getText(
                                         String.format("onboarding.personal-quiz-%s.%s", questionTag, questionTag))))
