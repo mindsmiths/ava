@@ -34,6 +34,7 @@ import lombok.ToString;
 import models.AvaLunchCycleStage;
 import models.EmployeeProfile;
 import models.OnboardingStage;
+import models.MonthlyCoreStage;
 import utils.Settings;
 
 @Data
@@ -45,6 +46,7 @@ public class Ava extends Agent {
     private Days matchDay;
     private AvaLunchCycleStage lunchCycleStage = AvaLunchCycleStage.FIND_AVAILABILITY;
     private OnboardingStage onboardingStage;
+    private MonthlyCoreStage monthlyCoreStage;
     private Map<String, EmployeeProfile> otherEmployees;
     private boolean workingHours;
     private Date statsEmailLastSentAt;
@@ -226,7 +228,7 @@ public class Ava extends Agent {
                                 "submit", finishQuizButton[0].getText(), "finished-personal-quiz")));
                 String goodbyeScreen = Mitems.getText("onboarding.finish-personal-quiz.goodbye-screen");
                 screens.put("finished-personal-quiz", new TemplateGenerator("goodbye")
-                       .addComponent("title", new TitleComponent(goodbyeScreen)));
+                        .addComponent("title", new TitleComponent(goodbyeScreen)));
                 break;
             }
         }
@@ -277,6 +279,81 @@ public class Ava extends Agent {
         e.setSubject(subject);
         e.setHtmlText(htmlBody);
         EmailAdapterAPI.newEmail(e);
+    }
+
+    public void sendMonthlyCoreEmail(EmployeeProfile employee) throws IOException {
+        String subject = Mitems.getText("monthly-core.welcome-email.subject");
+        String description = Mitems.getText("monthly-core.welcome-email.description");
+        String htmlTemplate = String.join("",
+                Files.readAllLines(Paths.get("EmailTemplate.html"), StandardCharsets.UTF_8));
+
+        String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
+                "description", description,
+                "callToAction", Mitems.getText("monthly-core.welcome-email.action"),
+                "firstName", employee.getFirstName(),
+                "armoryUrl",
+                String.format("%s/%s?trigger=start-monthlyCore", Settings.ARMORY_SITE_URL, getConnection("armory"))));
+
+        SendEmailPayload e = new SendEmailPayload();
+        e.setRecipients(List.of(getConnection("email")));
+        e.setSubject(subject);
+        e.setHtmlText(htmlBody);
+        EmailAdapterAPI.newEmail(e);
+    }
+
+    public void showMonthlyQuizScreens() {
+        Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
+        String avaImagePath = Mitems.getText("monthly-core.ava-image-path.path");
+        List<Map<String, String>> names = getAllEmployeeNames();
+
+        // Adding intro screen
+        String introButton = Mitems.getText("monthly-core.familiarity-quiz-intro.action");
+        String introScreenTitle = Mitems.getText("monthly-core.familiarity-quiz-intro.title");
+        String introScreenDescription = Mitems.getText("monthly-core.familiarity-quiz-intro.description");
+
+        screens.put("introScreen", new TemplateGenerator()
+                .addComponent("image", new ImageComponent(avaImagePath))
+                .addComponent("title", new TitleComponent(introScreenTitle))
+                .addComponent("description", new DescriptionComponent(introScreenDescription))
+                .addComponent("submit", new PrimarySubmitButtonComponent(introButton, "question1")));
+        // Adding questions and final screen in familiarity quiz
+        int questionNum = 1;
+        String submitButton = Mitems.getText("monthly-core.familiarity-quiz-questions.action");
+
+        while (true) {
+            String questionTag = "question" + String.valueOf(questionNum);
+            String nextQuestionTag = "question" + String.valueOf(questionNum + 1);
+            String answersTag = "answers" + String.valueOf(questionNum);
+
+            try {
+                String questionText = Mitems.getText("monthly-core.familiarity-quiz-questions." + questionTag);
+                screens.put(questionTag, new TemplateGenerator(questionTag)
+                        .addComponent("header", new HeaderComponent(null, questionNum > 1))
+                        .addComponent("question", new TitleComponent(questionText))
+                        .addComponent(answersTag, new CloudSelectComponent(answersTag, names.get(questionNum - 1)))
+                        .addComponent("submit", new PrimarySubmitButtonComponent(
+                                "submit", submitButton, nextQuestionTag)));
+                questionNum += 1;
+
+            } catch (Exception e) {
+                // Changing button value
+                String wrongQuestionTag = "question" + String.valueOf(questionNum - 1);
+
+                TemplateGenerator templateGenerator = (TemplateGenerator) screens.get(wrongQuestionTag);
+                PrimarySubmitButtonComponent buttonComponent = (PrimarySubmitButtonComponent) templateGenerator
+                        .getComponents()
+                        .get("submit");
+                buttonComponent.setValue("finishmonthlyquiz");
+
+                String finishFamiliarityQuizText = Mitems
+                        .getText("monthly-core.familiarity-quiz-goodbye.text");
+                screens.put("finishmonthlyquiz", new TemplateGenerator("finishmonthlyquiz")
+
+                        .addComponent("title", new TitleComponent(finishFamiliarityQuizText)));
+                break;
+            }
+        }
+        showScreens("introScreen", screens);
     }
 
     public void sendStatisticsEmail(EmployeeProfile employee) throws IOException {
