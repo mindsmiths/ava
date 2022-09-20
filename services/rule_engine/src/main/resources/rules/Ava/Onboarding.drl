@@ -16,6 +16,12 @@ import agents.CultureMaster;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import models.OnboardingStage;
+import signals.AllEmployees;
+import models.AvaLunchCycleStage;
+
+import signals.AvaAvailabilitySignal;
+import signals.EmployeeUpdateSignal;
 
 import models.EmployeeProfile;
 import models.OnboardingStage;
@@ -102,6 +108,7 @@ rule "Finish onboarding"
         modify(employee) { setPersonalAnswers(personalAnswers) };
         modify(agent) {
             setOnboardingStage(OnboardingStage.FINISHED),
+            setLunchCycleStage(AvaLunchCycleStage.LUNCH_MAIL_SENDING),
             setStatsEmailLastSentAt(ts)
         };
         agent.send(CultureMaster.ID, new EmployeeUpdateSignal(employee));

@@ -12,7 +12,7 @@ import models.OnboardingStage;
 rule "Trigger lunch cycle for Ava"
     when
         signal: ManualTriggerEvent(triggerType == "lunch_cycle") from entry-point "signals"
-        agent: Ava(onboardingStage == OnboardingStage.FINISHED)
+        agent: Ava(onboardingStage == OnboardingStage.STATS_SENT)
         employee: EmployeeProfile()
     then
         Log.info("Ava: triggered lunch cycle from dashboard");
@@ -27,7 +27,7 @@ end
 rule "Trigger lunch pairing for Ava"
     when
         signal: ManualTriggerEvent(triggerType == "lunch_pairing") from entry-point "signals"
-        agent: Ava(onboardingStage == OnboardingStage.FINISHED)
+        agent: Ava(onboardingStage == OnboardingStage.STATS_SENT)
     then
         Log.info("Ava: triggered lunch pairing from dashboard");
         modify(agent) {setLunchCycleStage(AvaLunchCycleStage.FORWARD_AVAILABILITY)};
@@ -46,12 +46,12 @@ end
 rule "Trigger statistics email"
     when
         signal: ManualTriggerEvent(triggerType == "statistics_email") from entry-point "signals"
-        agent: Ava()
+        agent: Ava(onboardingStage == OnboardingStage.FINISHED)
         employee: EmployeeProfile()
     then
         Log.info("Ava: triggered statistics email from dashboard");
         agent.sendStatisticsEmail(employee);
-        // trigger mail
+        modify(agent) {setOnboardingStage(OnboardingStage.STATS_SENT)};
 end
 
 rule "Ask for available days manually"
@@ -59,7 +59,7 @@ rule "Ask for available days manually"
         Heartbeat(ts: timestamp) from entry-point "signals"
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-weekly-core") from entry-point "signals"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY,
-                   onboardingStage == OnboardingStage.FINISHED,
+                   onboardingStage == OnboardingStage.STATS_SENT,
                    manualTrigger == true)
     then 
         // what if person decides to exit this screen without answering, now we can't get back because we are in the next stage
@@ -69,4 +69,19 @@ rule "Ask for available days manually"
         }
         agent.chooseAvailableDaysScreen();
         delete(signal);
+end
+
+rule "Send available days e-mail manually"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        agent: Ava(lunchCycleStage == AvaLunchCycleStage.LUNCH_MAIL_SENDING,
+                   onboardingStage == OnboardingStage.STATS_SENT,
+                   manualTrigger == true
+                   )
+    then
+        modify(agent) {
+            setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY),
+            setManualTrigger(false)
+        }
+        agent.sendPairingMail();
 end

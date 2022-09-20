@@ -5,6 +5,7 @@ import java.util.*;
 import com.mindsmiths.armory.events.UserConnectedEvent
 import com.mindsmiths.armory.events.SubmitEvent
 import com.mindsmiths.ruleEngine.model.Heartbeat;
+import com.mindsmiths.ruleEngine.util.Agents;
 import com.mindsmiths.pairingalgorithm.Days;
 import com.mindsmiths.pairingalgorithm.AvaAvailability;
 import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
@@ -27,11 +28,26 @@ rule "Lunch invite expired"
             !evaluateCronExpression("* * 00-14 * * FRI", ts, "Europe/Zagreb"))
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-weekly-core") from entry-point "signals"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY,
-                   onboardingStage == OnboardingStage.FINISHED,
+                   onboardingStage == OnboardingStage.STATS_SENT,
                    manualTrigger == false)
     then 
         agent.showLunchInviteExpiredScreen();
         delete(signal);
+end
+
+rule "Send available days e-mail"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        eval(evaluateCronExpression("* * 8-17 ? * MON *", ts, "Europe/Zagreb"))
+        agent: Ava(lunchCycleStage == AvaLunchCycleStage.LUNCH_MAIL_SENDING,
+                   onboardingStage == OnboardingStage.STATS_SENT,
+                   manualTrigger == false
+                   )
+    then
+        modify(agent) {
+            setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY)
+        }
+        agent.sendPairingMail();
 end
 
 rule "Ask for available days"
@@ -39,10 +55,10 @@ rule "Ask for available days"
         Heartbeat(ts: timestamp) from entry-point "signals"
         eval(evaluateCronExpression("* * 9-23 * * WED", ts, "Europe/Zagreb") 
         || (evaluateCronExpression("* * * * * THU", ts, "Europe/Zagreb"))
-        || (evaluateCronExpression("* * 00-14 * * FRI", ts, "Europe/Zagreb")))
+        || (evaluateCronExpression("* * 00-18 * * MON", ts, "Europe/Zagreb")))
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-weekly-core") from entry-point "signals"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY,
-                   onboardingStage == OnboardingStage.FINISHED,
+                   onboardingStage == OnboardingStage.STATS_SENT,
                    manualTrigger == false)
     then 
         // what if person decides to exit this screen without answering, now we can't get back because we are in the next stage
@@ -78,12 +94,16 @@ end
 rule "Store match info"
     when
         signal: SendMatchesSignal() from entry-point "signals"
-        agent: Ava(lunchCycleStage == AvaLunchCycleStage.ACCEPT_MATCH_INFO)
+        agent: Ava(
+            lunchCycleStage == AvaLunchCycleStage.ACCEPT_MATCH_INFO)
         profile: EmployeeProfile()
     then
-        modify(agent) {setMatch(signal.getMatch()), setMatchDay(signal.getMatchDay())};
+        modify(agent) { setMatch(signal.getMatch()), 
+                        setMatchDay(signal.getMatchDay()),
+                        setLunchCycleStage(AvaLunchCycleStage.LUNCH_MAIL_SENDING) };
         Log.info("I'm " + profile.getFirstName() + " and my match is " +
                 agent.getOtherEmployees().get(signal.getMatch()).getFullName() +
                 " on " + agent.getMatchDay());
-        delete(signal);
+        agent.sendCalendarInvite(signal.getMatchDay(), profile, agent.getOtherEmployees().get(signal.getMatch()));
+        delete(signal);   
 end
