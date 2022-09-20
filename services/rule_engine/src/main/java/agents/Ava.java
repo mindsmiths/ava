@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import com.mindsmiths.armory.ArmoryAPI;
 import com.mindsmiths.armory.components.CloudSelectComponent;
@@ -264,9 +265,9 @@ public class Ava extends Agent {
     public void sendWelcomeEmail(EmployeeProfile employee) throws IOException {
         String subject = Mitems.getText("onboarding.welcome-email.subject");
         String description = Mitems.getText("onboarding.welcome-email.description");
-        String htmlTemplate = String.join("",
-                Files.readAllLines(Paths.get("EmailTemplate.html"), StandardCharsets.UTF_8));
-
+        String htmlTemplate = new String(Objects.requireNonNull(
+                getClass().getClassLoader().getResourceAsStream("emailTemplates/EmailTemplate.html")).readAllBytes()
+        );
         String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
                 "description", description,
                 "callToAction", Mitems.getText("onboarding.welcome-email.action"),
@@ -284,15 +285,16 @@ public class Ava extends Agent {
     public void sendMonthlyCoreEmail(EmployeeProfile employee) throws IOException {
         String subject = Mitems.getText("monthly-core.welcome-email.subject");
         String description = Mitems.getText("monthly-core.welcome-email.description");
-        String htmlTemplate = String.join("",
-                Files.readAllLines(Paths.get("EmailTemplate.html"), StandardCharsets.UTF_8));
+        String htmlTemplate = new String(Objects.requireNonNull(
+                getClass().getClassLoader().getResourceAsStream("emailTemplates/EmailTemplate.html")).readAllBytes()
+        );
 
         String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
                 "description", description,
                 "callToAction", Mitems.getText("monthly-core.welcome-email.action"),
                 "firstName", employee.getFirstName(),
                 "armoryUrl",
-                String.format("%s/%s?trigger=start-monthlyCore", Settings.ARMORY_SITE_URL, getConnection("armory"))));
+                String.format("%s/%s?trigger=start-monthly-Core", Settings.ARMORY_SITE_URL, getConnection("armory"))));
 
         SendEmailPayload e = new SendEmailPayload();
         e.setRecipients(List.of(getConnection("email")));
@@ -353,15 +355,16 @@ public class Ava extends Agent {
                 break;
             }
         }
-        
+
         showScreens("introScreen", screens);
     }
 
     public void sendStatisticsEmail(EmployeeProfile employee) throws IOException {
         String subject = Mitems.getText("statistics.statistics-email.subject");
         String description = Mitems.getText("statistics.statistics-email.description");
-        String htmlTemplate = String.join("",
-                Files.readAllLines(Paths.get("EmailTemplate.html"), StandardCharsets.UTF_8));
+        String htmlTemplate = new String(Objects.requireNonNull(
+                getClass().getClassLoader().getResourceAsStream("emailTemplates/EmailTemplate.html")).readAllBytes()
+        );
 
         String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
                 "description", description,
@@ -444,8 +447,9 @@ public class Ava extends Agent {
     public void sendWeeklyEmail(EmployeeProfile employee) throws IOException {
         String subject = Mitems.getText("weekly-core.weekly-email.subject");
         String description = Mitems.getText("weekly-core.weekly-email.description");
-        String htmlTemplate = String.join("",
-                Files.readAllLines(Paths.get("EmailTemplate.html"), StandardCharsets.UTF_8));
+        String htmlTemplate = new String(Objects.requireNonNull(
+                getClass().getClassLoader().getResourceAsStream("emailTemplates/EmailTemplate.html")).readAllBytes()
+        );
 
         String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
                 "description", description,

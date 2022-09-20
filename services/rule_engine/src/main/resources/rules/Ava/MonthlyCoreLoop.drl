@@ -33,7 +33,7 @@ end
 
 rule "Start and reconnect Monthly quiz"
    when
-        signal: UserConnectedEvent(getParamAsString("trigger") == "start-monthlyCore") from entry-point "signals"
+        signal: UserConnectedEvent(getParamAsString("trigger") == "start-monthly-Core") from entry-point "signals"
         agent: Ava(monthlyCoreStage in (MonthlyCoreStage.EMAIL_SENT, MonthlyCoreStage.FAMILIARITY_QUIZ))
         employee: EmployeeProfile()
    then
