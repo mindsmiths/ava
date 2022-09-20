@@ -282,6 +282,15 @@ public class Ava extends Agent {
         EmailAdapterAPI.newEmail(e);
     }
 
+    public boolean checkAllFamiliarityAnswers(){
+        for (EmployeeProfile employee : otherEmployees.values()) {
+            if (employee.getFamiliarity().isEmpty()){
+                return false;
+            }
+        }
+        return true;
+    }
+
     public void sendStatisticsEmail(EmployeeProfile employee) throws IOException {
         String subject = Mitems.getText("statistics.statistics-email.subject");
         String description = Mitems.getText("statistics.statistics-email.description");

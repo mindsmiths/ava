@@ -100,7 +100,6 @@ rule "Finish onboarding"
                     signal.getParamAsString(paramId)
                 );
         modify(employee) { setPersonalAnswers(personalAnswers) };
-        agent.sendStatisticsEmail(employee);
         modify(agent) {
             setOnboardingStage(OnboardingStage.FINISHED),
             setStatsEmailLastSentAt(ts)
@@ -116,4 +115,16 @@ rule "Reconnect final screen"
    then
         agent.showFinalScreen();
         delete(signal);
+end
+
+rule "Send statistics email"
+    when
+        agent: Ava(
+            onboardingStage == OnboardingStage.FINISHED,
+            checkAllFamiliarityAnswers() == true
+            )
+        employee: EmployeeProfile()
+    then
+        agent.sendStatisticsEmail(employee);
+        modify(agent) {setOnboardingStage(OnboardingStage.STATS_SENT)};
 end

@@ -47,8 +47,10 @@ rule "Trigger statistics email"
     when
         signal: ManualTriggerEvent(triggerType == "statistics_email") from entry-point "signals"
         agent: Ava()
+        employee: EmployeeProfile()
     then
         Log.info("Ava: triggered statistics email from dashboard");
+        agent.sendStatisticsEmail(employee);
         // trigger mail
 end
 
