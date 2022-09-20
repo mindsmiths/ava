@@ -59,7 +59,7 @@ end
 rule "Store generated matches"
     when
         matches: Matches() from entry-point "signals"
-        agent: CultureMaster()
+        agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.COLLECT_GENERATED_MATCHES)
     then
         modify(agent) {addMatches(matches.getAllMatches())};
         Log.info("Matches from pairing algorithm: " + matches.getAllMatches());
@@ -73,6 +73,8 @@ rule "Send match info to Avas"
         agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.SEND_TO_AVAS)
     then
         agent.sendMatches();
-        agent.clearAvaAvailabilities();
-        modify(agent) {setLunchCycleStage(CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES)};
+        modify(agent) {
+            setLunchCycleStage(CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES),
+            clearAvaAvailabilities()
+        };
 end

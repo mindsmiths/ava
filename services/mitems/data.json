@@ -497,6 +497,31 @@
         ]
       },
       {
+        "name": "Matching mail",
+        "elements": [
+          {
+            "description": "Description",
+            "type": "TEXT",
+            "content": "I've matched you with {{ fullName}} for lunch on {{ lunchDay }}.\n\nShe works in your company and I think you two should get to know each other better.\n\nI booked the time in your calendar.\n\nAva"
+          },
+          {
+            "description": "Subject",
+            "type": "TEXT",
+            "content": "Lunch with {{ employeeName }} on {{ day }}"
+          },
+          {
+            "description": "Calendar event",
+            "type": "TEXT",
+            "content": "Ava lunch: {{ firstName }} - {{ secondName }}"
+          },
+          {
+            "description": "Title",
+            "type": "TEXT",
+            "content": "It's a match!"
+          }
+        ]
+      },
+      {
         "name": "Message about not working hours for links",
         "elements": [
           {
