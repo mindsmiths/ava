@@ -22,9 +22,7 @@ import com.mindsmiths.emailAdapter.SendEmailPayload;
 import com.mindsmiths.mitems.Mitems;
 import com.mindsmiths.mitems.Option;
 import com.mindsmiths.ruleEngine.model.Agent;
-import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.pairingalgorithm.Days;
-import com.mindsmiths.ruleEngine.model.Agent;
 import com.mindsmiths.sdk.utils.templating.Templating;
 import com.mindsmiths.employeeManager.employees.Employee;
 import com.mindsmiths.emailAdapter.AttachmentData;
@@ -55,7 +53,6 @@ public class Ava extends Agent {
     private String match;
     private Days matchDay;
     private AvaLunchCycleStage lunchCycleStage = AvaLunchCycleStage.FIND_AVAILABILITY;
-    private Employee employee;
     private OnboardingStage onboardingStage;
     private Map<String, EmployeeProfile> otherEmployees;
     private boolean workingHours;
@@ -290,7 +287,7 @@ public class Ava extends Agent {
         EmailAdapterAPI.newEmail(e); 
     }
 
-    public void sendWelcomeEmail(Employee employee) throws IOException {
+    public void sendWelcomeEmail(EmployeeProfile employee) throws IOException {
         String subject = Mitems.getText("onboarding.welcome-email.subject");
         String description = Mitems.getText("onboarding.welcome-email.description");
         String htmlTemplate = String.join("",
@@ -413,24 +410,6 @@ public class Ava extends Agent {
         e.setHtmlText(htmlBody);
         EmailAdapterAPI.newEmail(e);
     }
-
-    public String daysToPrettyString(Days days) {
-        for(Option option: Mitems.getOptions("weekly-core.days.each-day")) {
-            if(days.toString().equals(option.getId())) {
-                return option.getText();
-            } 
-        }       
-        return "Unknown";
-    }
-
-    public static java.util.Calendar nextDayOfWeek(java.util.Calendar now, int dow) {
-        int diff = dow - now.get(java.util.Calendar.DAY_OF_WEEK);
-        if (diff <= 0) {
-            diff += 7;
-        }
-        now.add(java.util.Calendar.DAY_OF_MONTH, diff);
-        return now;
-    }
     
     public void sendCalendarInvite(Days days, EmployeeProfile currentEmployee, EmployeeProfile otherEmployee) throws IOException {
         if(currentEmployee == null || otherEmployee == null)
@@ -444,14 +423,14 @@ public class Ava extends Agent {
         SendEmailPayload payload = new SendEmailPayload();
         payload.setRecipients(List.of(currentEmployee.getEmail()));
         payload.setSubject(subject);
-        payload.setHtmlText(renderEmailBody(days, currentEmployee, otherEmployee)); // here goes HTML
+        payload.setHtmlText(renderMatchmakingEmail(days, currentEmployee, otherEmployee)); // here goes HTML
         payload.setAttachments(List.of(new AttachmentData(getICSInvite(days, currentEmployee, otherEmployee), "invite.ics")));
         EmailAdapterAPI.newEmail(payload);
     }
 
-    public String renderEmailBody(Days days, EmployeeProfile currentEmployee, EmployeeProfile otherEmployee) throws IOException {
+    public String renderMatchmakingEmail(Days days, EmployeeProfile currentEmployee, EmployeeProfile otherEmployee) throws IOException {
         String template = String.join("", Files.readAllLines(Paths.get("EmailTemplateCalendar.html"), StandardCharsets.UTF_8));
-        String description = Templating.recursiveRender(template, Map.of(
+        return Templating.recursiveRender(template, Map.of(
             "title", Mitems.getText("weekly-core.matching-mail.title"),
             "description", Mitems.getText("weekly-core.matching-mail.description"),
             "otherName", otherEmployee.getFirstName(),
@@ -459,8 +438,6 @@ public class Ava extends Agent {
             "myName", currentEmployee.getFirstName(),
             "lunchDay", daysToPrettyString(days)
         ));
-
-        return description;
     }
 
     private byte[] getICSInvite(Days day, Employee currentEmployee, Employee otherEmployee) {
@@ -487,17 +464,19 @@ public class Ava extends Agent {
             lunchCalendarDate.set(java.util.Calendar.MINUTE, 0);
             lunchCalendarDate.set(java.util.Calendar.SECOND, 0);
 
-            Log.info(lunchCalendarDate);
-
-            // "Lunch with " + otherEmployee.getFirstName() + " on " + dayHelperFunction(day)
-
             java.util.Calendar lunchCalendarDatePlusHour = (java.util.Calendar) lunchCalendarDate.clone();
             lunchCalendarDatePlusHour.set(java.util.Calendar.HOUR_OF_DAY, 13);
-            Log.info(lunchCalendarDatePlusHour);
 
+            String calendarEventName = Templating.recursiveRender(
+                Mitems.getText("weekly-core.matching-mail.calendar-event"),
+                Map.of(
+                    "firstName", currentEmployee.getFirstName(),
+                    "secondName", otherEmployee.getFirstName()
+                )
+            );
             VEvent ev = new VEvent(new DateTime(lunchCalendarDate.getTime()),
                                    new DateTime(lunchCalendarDatePlusHour.getTime()),
-                                   "Ava lunch: " + currentEmployee.getFirstName() + "-" + otherEmployee.getFirstName());
+                                   calendarEventName);
             ev.getProperties().add(new net.fortuna.ical4j.model.property.Attendee("mailto:" + currentEmployee.getEmail()));
             ev.getProperties().add(new net.fortuna.ical4j.model.property.Attendee("mailto:" + otherEmployee.getEmail())); 
             
@@ -510,5 +489,23 @@ public class Ava extends Agent {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public String daysToPrettyString(Days days) {
+        for(Option option: Mitems.getOptions("weekly-core.days.each-day")) {
+            if(days.toString().equals(option.getId())) {
+                return option.getText();
+            } 
+        }       
+        return "Unknown";
+    }
+
+    public static java.util.Calendar nextDayOfWeek(java.util.Calendar now, int dow) {
+        int diff = dow - now.get(java.util.Calendar.DAY_OF_WEEK);
+        if (diff <= 0) {
+            diff += 7;
+        }
+        now.add(java.util.Calendar.DAY_OF_MONTH, diff);
+        return now;
     }
 }

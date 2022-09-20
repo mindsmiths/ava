@@ -414,6 +414,11 @@
             "content": "Lunch with {{ employeeName }} on {{ day }}"
           },
           {
+            "description": "Calendar event",
+            "type": "TEXT",
+            "content": "Ava lunch: {{ firstName }} - {{ secondName }}"
+          },
+          {
             "description": "Title",
             "type": "TEXT",
             "content": "It's a match!"
