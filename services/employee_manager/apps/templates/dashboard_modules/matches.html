@@ -1,1 +1,26 @@
-<div>Hello World</div>
+<table>
+    <thead>
+        <tr>
+            <th>First employee</th>
+            <th>Second employee</th>
+            <th>Day</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    {% for week in module.children %}
+        {% if week %}
+            {% for match in week %}
+            <tr {% if forloop.first %}style="border-top:2px dotted #8d70ca" {% endif %}>
+                <td> {{ match.first_employee }} </td>
+                <td> {{ match.second_employee }} </td>
+                <td> {{ match.day }} </td>
+                <td> {{ match.date }} </td>
+            </tr>
+            {% endfor %}
+        {% endif %}
+    {% empty %}
+    <td>
+        No matches to show
+    </td>
+    {% endfor %}
+</table>

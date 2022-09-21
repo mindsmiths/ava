@@ -5,6 +5,9 @@ import signals.EmployeeUpdateSignal;
 import com.mindsmiths.employeeManager.ManualTriggerEvent;
 import com.mindsmiths.ruleEngine.util.Log;
 import models.CmLunchCycleStage;
+import java.util.Date; 
+
+import com.mindsmiths.employeeManager.EmployeeManagerAPI
 
 rule "Add or update Ava data"
     when
@@ -57,4 +60,6 @@ rule "Trigger statistics email"
     then
         Log.info("CultureMaster: triggered statistics email from dashboard");
         // trigger mail
+        Log.info("sending create match to eventdashboardapi from CM.drl");
+        EmployeeManagerAPI.createMatch("1", "2", new Date(), "tuesday"); // TODO:
 end

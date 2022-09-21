@@ -2,14 +2,15 @@ from django.utils.translation import ugettext_lazy as _
 from jet.dashboard import modules
 from jet.dashboard.dashboard import Dashboard
 
-from . import dashboard_modules
+from apps import dashboard_modules
 
 
 class CustomIndexDashboard(Dashboard):
     columns = 3
 
     def init_with_context(self, context):
-        self.available_children.extend([modules.LinkList, dashboard_modules.MatchesModule])
+        self.available_children.extend([modules.LinkList,
+                                        dashboard_modules.MatchesModule])
         self.children.extend([
             dashboard_modules.MatchesModule(),
             modules.LinkList(
