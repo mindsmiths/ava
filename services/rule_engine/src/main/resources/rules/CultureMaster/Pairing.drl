@@ -61,6 +61,8 @@ rule "Generate this weeks matches"
         Heartbeat(ts: timestamp) from entry-point "signals"
         agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.GENERATE_MATCHES)
     then
+        //modify(agent) {createCompatibilityMatrix()}
+        Log.info("This weeks compatibility matrix: " + agent.getCompatibility());
         Log.info("Generating matches....");
         modify(agent) {setLunchCycleStage(CmLunchCycleStage.COLLECT_GENERATED_MATCHES)};
         agent.generateMatches();

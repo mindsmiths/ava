@@ -86,9 +86,11 @@ rule "Store match info"
         profile: EmployeeProfile()
     then
         modify(agent) {setMatch(signal.getMatch()), setMatchDay(signal.getMatchDay())};
+        modify(agent) {getMatchHistory().add(agent.getOtherEmployees().get(signal.getMatch()).getId())}
         Log.info("I'm " + profile.getFirstName() + " and my match is " +
                 agent.getOtherEmployees().get(signal.getMatch()).getFullName() +
                 " on " + agent.getMatchDay());
+        Log.info("My match history: " + agent.getMatchHistory());
         delete(signal);
 end
 

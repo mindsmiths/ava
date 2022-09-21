@@ -25,6 +25,7 @@ public class CultureMaster extends Agent {
     private CmLunchCycleStage lunchCycleStage = CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES;
     private Map<String, EmployeeProfile> employees = new HashMap<>();
     private Map<String, Map<String, Double>> avaConnectionStrengths = new HashMap<>();
+    private Double[][] compatibility;
 
     public static String ID = "CULTURE_MASTER";
 
@@ -156,4 +157,20 @@ public class CultureMaster extends Agent {
 
         return risk;
     }
+
+    public void createCompatibilityMatrix() {
+        this.compatibility = new Double[this.avaConnectionStrengths.size()][this.avaConnectionStrengths.size()];
+        for(int i=0; i<this.avaConnectionStrengths.size(); i++) {
+            for(int j=0; j<this.avaConnectionStrengths.size(); j++) {
+                this.compatibility[i][j] = 0.;
+            }
+        }
+
+        for(String employeeId : avaConnectionStrengths.keySet()) {
+            for(Map.Entry<String, Double> entry : avaConnectionStrengths.get(employeeId).entrySet()) {
+                this.compatibility[Integer.valueOf(employeeId)-1][Integer.valueOf(entry.getKey())-1] = entry.getValue();
+            }
+        }
+    }
+
 }

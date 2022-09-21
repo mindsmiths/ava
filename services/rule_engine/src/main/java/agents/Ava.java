@@ -44,8 +44,9 @@ import utils.Settings;
 @NoArgsConstructor
 public class Ava extends Agent {
     private List<Days> availableDays = new ArrayList<>();
-    private String match;
+    private String match; //avaId
     private Days matchDay;
+    private List<String> matchHistory = new ArrayList<>();
     private AvaLunchCycleStage lunchCycleStage = AvaLunchCycleStage.FIND_AVAILABILITY;
     private OnboardingStage onboardingStage;
     private Map<String, EmployeeProfile> otherEmployees;
