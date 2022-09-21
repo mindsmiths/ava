@@ -128,7 +128,7 @@ public class Ava extends Agent {
                 .addComponent(
                     "title", 
                     new TitleComponent(
-                        Mitems.getText("weekly-core.confirmation-of-choosen-available-days.title")
+                        Mitems.getHTML("weekly-core.confirmation-of-choosen-available-days.title")
                     )
                 )
                 .addComponent(
@@ -155,7 +155,7 @@ public class Ava extends Agent {
         // Adding intro screen
         String introButton = Mitems.getText("onboarding.familiarity-quiz-intro.action");
         String introScreenTitle = Mitems.getText("onboarding.familiarity-quiz-intro.title");
-        String introScreenDescription = Mitems.getText("onboarding.familiarity-quiz-intro.description");
+        String introScreenDescription = Mitems.getHTML("onboarding.familiarity-quiz-intro.description");
 
         screens.put("introScreen", new TemplateGenerator()
                 .addComponent("image", new ImageComponent(avaImagePath))
@@ -194,7 +194,7 @@ public class Ava extends Agent {
                 String familiarityQuizFinalButton = Mitems
                         .getText("onboarding.familiarity-quiz-goodbye.action");
                 String finishFamiliarityQuizText = Mitems
-                        .getText("onboarding.familiarity-quiz-goodbye.text");
+                        .getHTML("onboarding.familiarity-quiz-goodbye.text");
                 String finishFamiliarityQuizTitle = Mitems
                         .getText("onboarding.familiarity-quiz-goodbye.title");
                 screens.put("finishfamiliarityquiz", new TemplateGenerator("finishfamiliarityquiz")
@@ -252,7 +252,7 @@ public class Ava extends Agent {
                 buttonComponent.setValue("finishpersonalquiz");
 
                 Option[] finishQuizButton = Mitems.getOptions("onboarding.finish-personal-quiz.button");
-                String finishPersonalQuiz = Mitems.getText("onboarding.finish-personal-quiz.text");
+                String finishPersonalQuiz = Mitems.getHTML("onboarding.finish-personal-quiz.text");
 
                 screens.put("finishpersonalquiz", new TemplateGenerator("finishpersonalquiz")
                         .addComponent("image", new ImageComponent(avaImagePath))
@@ -489,10 +489,10 @@ public class Ava extends Agent {
         );
 
         String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
-                "text", Mitems.getText("weekly-core.weekly-email.button1"),
+                "text", Mitems.getHTML("weekly-core.weekly-email.description"),
                 "firstName", employee.getFirstName(),
-                "button1", Mitems.getText("weekly-core.weekly-email.button2"),
-                "button2", Mitems.getText("weekly-core.weekly-email.description"),
+                "button1", Mitems.getText("weekly-core.weekly-email.button1"),
+                "button2", Mitems.getText("weekly-core.weekly-email.button2"),
                 "armoryUrl", String.format("%s/%s?trigger=start-weekly-core", Settings.ARMORY_SITE_URL, getConnection("armory"))));
 
         SendEmailPayload e = new SendEmailPayload();
@@ -525,7 +525,7 @@ public class Ava extends Agent {
     );
         return Templating.recursiveRender(htmlTemplate, Map.of(
             "title", Mitems.getText("weekly-core.matching-mail.title"),
-            "description", Mitems.getText("weekly-core.matching-mail.description"),
+            "description", Mitems.getHTML("weekly-core.matching-mail.description"),
             "otherName", otherEmployee.getFirstName(),
             "fullName", otherEmployee.getFullName(),
             "myName", currentEmployee.getFirstName(),

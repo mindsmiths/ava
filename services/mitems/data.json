@@ -149,8 +149,8 @@
           },
           {
             "description": "Text",
-            "type": "TEXT",
-            "content": "You did a great job and don’t worry about the absolute accuracy of your answers because it is not important. \n\nNow let me get to know YOU a bit better."
+            "type": "HTML",
+            "content": "<p>You did a great job and don&rsquo;t worry about the absolute accuracy of your answers because it is not important.</p>\n<p>Now let me get to know YOU a bit better.</p>"
           },
           {
             "description": "Title",
@@ -169,8 +169,8 @@
           },
           {
             "description": "Description",
-            "type": "TEXT",
-            "content": "I will show you a list of names, feel free to choose those you know better than others.\n\nYou can choose more than one person.\n\nYou can also decide not to choose anyone if you don’t feel like you know anyone on the list that well.\n"
+            "type": "HTML",
+            "content": "<p>I will show you a list of names, feel free to choose those you know better than others.</p>\n<p>You can choose more than one person.</p>\n<p>You can also decide not to choose anyone if you don&rsquo;t feel like you know anyone on the list that well.</p>"
           },
           {
             "description": "Title",
@@ -194,8 +194,8 @@
           },
           {
             "description": "Text",
-            "type": "TEXT",
-            "content": "That’s it!\n\nNow it’s up to me to analyze everything.\n\nYou can expect an email from me soon.\n"
+            "type": "HTML",
+            "content": "<p>That&rsquo;s it!</p>\n<p>Now it&rsquo;s up to me to analyze everything.</p>\n<p>You can expect an email from me soon.</p>"
           }
         ]
       },
@@ -426,8 +426,8 @@
           },
           {
             "description": "Title",
-            "type": "TEXT",
-            "content": "Gotcha! \n\nI’ll send you an email when I catch up with the others :)\n"
+            "type": "HTML",
+            "content": "<p>Gotcha!</p>\n<p>I&rsquo;ll send you an email when I catch up with the others :)</p>"
           }
         ]
       },
@@ -511,8 +511,8 @@
           },
           {
             "description": "Description",
-            "type": "TEXT",
-            "content": "I've matched you with {{ fullName}} for lunch on {{ lunchDay }}.\n\nShe works in your company and I think you two should get to know each other better.\n\nI booked the time in your calendar.\n\nAva"
+            "type": "HTML",
+            "content": "<p>I've matched you with {{ fullName}} for lunch on {{ lunchDay }}.</p>\n<p>Your colleague works in your company and I think you two should get to know each other better.</p>\n<p>I booked the time in your calendar.</p>\n<p>Ava</p>"
           },
           {
             "description": "Subject",
@@ -581,8 +581,8 @@
           },
           {
             "description": "Description",
-            "type": "TEXT",
-            "content": "Dear {{ firstName }},\n\nIt's time to start getting to know your colleagues better. I will match you with someone interesting from your organization to spend quality time over lunch.\n\nLet's start by picking the days that suit you best next week."
+            "type": "HTML",
+            "content": "<p>Dear {{ firstName }},</p>\n<p>It's time to start getting to know your colleagues better. I will match you with someone interesting from your organization to spend quality time over lunch.</p>\n<p>Let's start by picking the days that suit you best next week.</p>"
           },
           {
             "description": "Subject",
