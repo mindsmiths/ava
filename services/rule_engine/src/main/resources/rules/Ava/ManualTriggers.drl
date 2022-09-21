@@ -19,11 +19,7 @@ rule "Trigger lunch cycle for Ava"
         employee: EmployeeProfile()
     then
         Log.info("Ava: triggered lunch cycle from dashboard");
-        modify(agent) {
-            setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY),
-            setManualTrigger(true)            
-        };
-        agent.sendWeeklyEmail(employee);
+        modify(agent) {setManualTrigger(true)};
         delete(signal);            
 end
 

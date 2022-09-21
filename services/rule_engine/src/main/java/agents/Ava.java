@@ -65,7 +65,7 @@ public class Ava extends Agent {
     private Date matchedWithEmailSentAt;
     private int silosCount;
     private String silosRisk;
-    private Boolean manualTrigger = false;
+    private boolean manualTrigger;
 
     public Ava(String connectionName, String connectionId) {
         super(connectionName, connectionId);
@@ -301,7 +301,8 @@ public class Ava extends Agent {
     }
 
     public boolean allEmployeesFinishedOnboarding(){
-        return otherEmployees.values().stream().allMatch(e -> (e.getOnboardingStage() == OnboardingStage.STATS_EMAIL)
+        return otherEmployees.values().stream().allMatch(e -> 
+            (e.getOnboardingStage() == OnboardingStage.STATS_EMAIL)
             || (e.getOnboardingStage() == OnboardingStage.FINISHED)
         );
     }
