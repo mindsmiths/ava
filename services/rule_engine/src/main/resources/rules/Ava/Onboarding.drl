@@ -16,10 +16,15 @@ import agents.CultureMaster;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import models.OnboardingStage;
+import signals.AllEmployees;
+import models.AvaLunchCycleStage;
+
+import signals.AvaAvailabilitySignal;
+import signals.EmployeeUpdateSignal;
 
 import models.EmployeeProfile;
 import models.OnboardingStage;
-
 
 
 rule "Send welcome email"
@@ -37,11 +42,36 @@ rule "Send welcome email"
         };
 end
 
-rule "Start and reconnect personal quiz"
+rule "Start and reconnect familiarity quiz"
    when
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-onboarding") from entry-point "signals"
-        agent: Ava(onboardingStage in (OnboardingStage.EMAIL_SENT, OnboardingStage.PERSONAL_QUIZ))
+        agent: Ava(onboardingStage in (OnboardingStage.EMAIL_SENT, OnboardingStage.FAMILIARITY_QUIZ))
    then
+        agent.showFamiliarityQuizScreens();
+        modify(agent) {
+            setOnboardingStage(OnboardingStage.FAMILIARITY_QUIZ)
+        };
+        delete(signal);
+end
+
+rule "Start personal quiz"
+   when
+        signal: SubmitEvent(getParamAsString("submit") == "finished-familiarity-quiz") from entry-point "signals"
+        agent: Ava(onboardingStage == OnboardingStage.FAMILIARITY_QUIZ)
+        employee: EmployeeProfile()
+   then 
+        Map<String, Double> familiarity = new HashMap<String, Double>(
+            employee.getFamiliarity()
+        );
+        for (String paramId : signal.getParams().keySet()) 
+            if (paramId.startsWith("answers")) {
+                for (String em : (List<String>) signal.getParam(paramId)) {
+                    familiarity.put(
+                        em, familiarity.getOrDefault(em, 0.0) + 1.0
+                    );
+                } 
+            }
+        modify(employee) { setFamiliarity(familiarity) };
         agent.showPersonalQuizScreens();
         modify(agent) {
             setOnboardingStage(OnboardingStage.PERSONAL_QUIZ)
@@ -49,8 +79,19 @@ rule "Start and reconnect personal quiz"
         delete(signal);
 end
 
-rule "Start familiarity quiz"
+rule "Reconnect personal quiz"
    when
+        signal: UserConnectedEvent(getParamAsString("trigger") == "start-onboarding") from entry-point "signals"
+        agent: Ava(onboardingStage == OnboardingStage.PERSONAL_QUIZ)
+   then
+        agent.showPersonalQuizScreens();
+        delete(signal);
+end
+
+
+rule "Finish onboarding"
+   when
+        Heartbeat(ts: timestamp) from entry-point "signals"
         signal: SubmitEvent(getParamAsString("submit") == "finished-personal-quiz") from entry-point "signals"
         agent: Ava(onboardingStage == OnboardingStage.PERSONAL_QUIZ)
         employee: EmployeeProfile()
@@ -65,48 +106,11 @@ rule "Start familiarity quiz"
                     signal.getParamAsString(paramId)
                 );
         modify(employee) { setPersonalAnswers(personalAnswers) };
-
-        agent.showFamiliarityQuizScreens();
-        modify(agent) {
-            setOnboardingStage(OnboardingStage.FAMILIARITY_QUIZ)
-        };
-        agent.send(CultureMaster.ID, new EmployeeUpdateSignal(employee));
-        delete(signal);
-end
-
-rule "Reconnect familiarity quiz"
-   when
-        signal: UserConnectedEvent(getParamAsString("trigger") == "start-onboarding") from entry-point "signals"
-        agent: Ava(onboardingStage == OnboardingStage.FAMILIARITY_QUIZ)
-   then
-        agent.showFamiliarityQuizScreens();
-        delete(signal);
-end
-
-rule "Finish onboarding"
-   when
-        Heartbeat(ts: timestamp) from entry-point "signals"
-        signal: SubmitEvent(getParamAsString("submit") == "finished-familiarity-quiz") from entry-point "signals"
-        agent: Ava(onboardingStage == OnboardingStage.FAMILIARITY_QUIZ)
-        employee: EmployeeProfile()
-   then
-        Map<String, Double> familiarity = new HashMap<String, Double>(
-            employee.getFamiliarity()
-        );
-        for (String paramId : signal.getParams().keySet()) 
-            if (paramId.startsWith("answers")) {
-                for (String em : (List<String>) signal.getParam(paramId)) {
-                    familiarity.put(
-                        em, familiarity.getOrDefault(em, 0.0) + 1.0
-                    );
-                }
-                
-            }
-        modify(employee) { setFamiliarity(familiarity) };
-
         agent.sendStatisticsEmail(employee);
+
         modify(agent) {
             setOnboardingStage(OnboardingStage.FINISHED),
+            setLunchCycleStage(AvaLunchCycleStage.LUNCH_MAIL_SENDING),
             setStatsEmailLastSentAt(ts)
         };
         agent.send(CultureMaster.ID, new EmployeeUpdateSignal(employee));
