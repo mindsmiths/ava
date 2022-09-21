@@ -27,6 +27,7 @@ import com.mindsmiths.mitems.Mitems;
 import com.mindsmiths.mitems.Option;
 import com.mindsmiths.pairingalgorithm.Days;
 import com.mindsmiths.ruleEngine.model.Agent;
+import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.sdk.utils.templating.Templating;
 
 import lombok.Data;
@@ -81,17 +82,29 @@ public class Ava extends Agent {
         }
     }
 
-    public Neuron getConnectionNeuron(String avaId) {
-        return this.connectionStrengths.get(avaId);
+    public Neuron getConnectionNeuron(String employeeId) {
+        return this.connectionStrengths.get(employeeId);
     }
 
     // decrease the strength of connection with time (days)
     // trigger every week in LunchCycleStage, "Ask for available days"
     public void decayConnectionNeurons() {
         for(String avaId : this.otherEmployees.keySet()) {
-            long daysPassed = ChronoUnit.DAYS.between(getConnectionNeuron(avaId).getLastUpdatedAt().toInstant(), new Date().toInstant());
-            getConnectionNeuron(avaId).decay(daysPassed/1000.);
+            Log.info("Decaying SPECIFIC neuron with employee id: " + otherEmployees.get(avaId).getId());
+            long daysPassed = ChronoUnit.DAYS.between(getConnectionNeuron(otherEmployees.get(avaId).getId()).getLastUpdatedAt().toInstant(),
+                                                      new Date().toInstant());
+            getConnectionNeuron(otherEmployees.get(avaId).getId()).decay(daysPassed/1000.);
         }
+    }
+
+    // convert map values from Neuron to Double
+    // used when sending data to CultureMaster
+    public Map<String, Double> getConnectionStrengthAsValue() {
+        Map<String, Double> m = new HashMap<>();
+        for(Map.Entry<String, Neuron> entry : connectionStrengths.entrySet()) {
+            m.put(entry.getKey(), entry.getValue().getValue());
+        }
+        return m;
     }
 
     public void updateAvailableDays(List<String> availableDaysStr) {

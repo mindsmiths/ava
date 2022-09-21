@@ -16,7 +16,6 @@ import signals.AllEmployees;
 import signals.SendMatchesSignal;
 
 import models.EmployeeProfile;
-import models.Neuron;
 
 @Data
 @AllArgsConstructor
@@ -25,7 +24,7 @@ public class CultureMaster extends Agent {
     private List<Match> allMatches = new ArrayList<>();
     private CmLunchCycleStage lunchCycleStage = CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES;
     private Map<String, EmployeeProfile> employees = new HashMap<>();
-    private Map<String, Map<String, Neuron>> avaConnectionStrengths = new HashMap<>();
+    private Map<String, Map<String, Double>> avaConnectionStrengths = new HashMap<>();
 
     public static String ID = "CULTURE_MASTER";
 

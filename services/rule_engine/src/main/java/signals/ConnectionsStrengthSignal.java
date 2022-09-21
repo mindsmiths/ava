@@ -9,12 +9,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import models.Neuron;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ConnectionsStrengthSignal extends Signal {
     private String employeeId;
-    private Map<String, Neuron> connectionStrengths = new HashMap<>();
+    private Map<String, Double> connectionStrengths = new HashMap<>();
 }

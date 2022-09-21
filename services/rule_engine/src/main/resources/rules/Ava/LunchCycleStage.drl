@@ -43,10 +43,12 @@ rule "Ask for available days"
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-weekly-core") from entry-point "signals"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY,
                    onboardingStage == OnboardingStage.FINISHED)
+        employee: EmployeeProfile()
     then 
         // what if person decides to exit this screen without answering, now we can't get back because we are in the next stage
         modify(agent) {setLunchCycleStage(AvaLunchCycleStage.FORWARD_AVAILABILITY)}
         agent.chooseAvailableDaysScreen();
+        Log.info("Decaying connection strength neurons for: " + employee.getFullName());
         modify(agent) {decayConnectionNeurons()}
         delete(signal);
 end
@@ -72,7 +74,7 @@ rule "Confirm days"
         agent.confirmingDaysScreen();
         modify(agent) {updateAvailableDays((ArrayList<String>)(signal.getParam("availableDays")))};
         agent.send(CultureMaster.ID, new AvaAvailabilitySignal(new AvaAvailability(agent.getId(), agent.getAvailableDays())));
-        agent.send(CultureMaster.ID, new ConnectionsStrengthSignal(profile.getId(), agent.getConnectionStrengths()));
+        agent.send(CultureMaster.ID, new ConnectionsStrengthSignal(profile.getId(), agent.getConnectionStrengthAsValue()));
         modify(agent) {setLunchCycleStage(AvaLunchCycleStage.ACCEPT_MATCH_INFO)};
         delete(signal);
 end
