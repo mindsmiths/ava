@@ -26,7 +26,6 @@ import signals.EmployeeUpdateSignal;
 import models.EmployeeProfile;
 import models.OnboardingStage;
 
-
 rule "Send welcome email"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
@@ -63,7 +62,7 @@ rule "Start personal quiz"
         Map<String, Double> familiarity = new HashMap<String, Double>(
             employee.getFamiliarity()
         );
-        for (String paramId : signal.getParams().keySet()) 
+        for (String paramId : signal.getParams().keySet()){
             if (paramId.startsWith("answers")) {
                 for (String em : (List<String>) signal.getParam(paramId)) {
                     familiarity.put(
@@ -71,7 +70,11 @@ rule "Start personal quiz"
                     );
                 } 
             }
-        modify(employee) { setFamiliarity(familiarity) };
+        }    
+       
+        modify(employee) { 
+            setFamiliarity(familiarity)
+        };
         agent.showPersonalQuizScreens();
         modify(agent) {
             setOnboardingStage(OnboardingStage.PERSONAL_QUIZ)
@@ -87,7 +90,6 @@ rule "Reconnect personal quiz"
         agent.showPersonalQuizScreens();
         delete(signal);
 end
-
 
 rule "Finish onboarding"
    when
@@ -105,7 +107,10 @@ rule "Finish onboarding"
                     paramId.replace("answers", "question"),
                     signal.getParamAsString(paramId)
                 );
-        modify(employee) { setPersonalAnswers(personalAnswers) };
+        modify(employee) {
+            setPersonalAnswers(personalAnswers),
+            setOnboardingStage(OnboardingStage.FINISHED) 
+        };
         modify(agent) {
             setOnboardingStage(OnboardingStage.FINISHED),
             setLunchCycleStage(AvaLunchCycleStage.LUNCH_MAIL_SENDING),
@@ -128,9 +133,9 @@ rule "Send statistics email"
     when
         agent: Ava(
             onboardingStage == OnboardingStage.FINISHED,
-            checkAllFamiliarityAnswers() == true
+            checkAllOnboardingStages() == true
             )
-        employee: EmployeeProfile()
+        employee: EmployeeProfile(onboardingStage == OnboardingStage.FINISHED)
     then
         agent.sendStatisticsEmail(employee);
         modify(agent) {setOnboardingStage(OnboardingStage.STATS_SENT)};

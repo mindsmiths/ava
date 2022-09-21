@@ -12,7 +12,10 @@ import models.OnboardingStage;
 rule "Trigger lunch cycle for Ava"
     when
         signal: ManualTriggerEvent(triggerType == "lunch_cycle") from entry-point "signals"
-        agent: Ava(onboardingStage == OnboardingStage.STATS_SENT)
+        agent: Ava(
+            lunchCycleStage == AvaLunchCycleStage.LUNCH_MAIL_SENDING,
+            onboardingStage == OnboardingStage.STATS_SENT
+            )
         employee: EmployeeProfile()
     then
         Log.info("Ava: triggered lunch cycle from dashboard");
@@ -27,11 +30,10 @@ end
 rule "Trigger lunch pairing for Ava"
     when
         signal: ManualTriggerEvent(triggerType == "lunch_pairing") from entry-point "signals"
-        agent: Ava(onboardingStage == OnboardingStage.STATS_SENT)
+        agent: Ava()
     then
         Log.info("Ava: triggered lunch pairing from dashboard");
-        modify(agent) {setLunchCycleStage(AvaLunchCycleStage.FORWARD_AVAILABILITY)};
-        delete(signal);            
+        delete(signal);        
 end
 
 rule "Trigger familiarity quiz"
@@ -69,19 +71,4 @@ rule "Ask for available days manually"
         }
         agent.chooseAvailableDaysScreen();
         delete(signal);
-end
-
-rule "Send available days e-mail manually"
-    when
-        Heartbeat(ts: timestamp) from entry-point "signals"
-        agent: Ava(lunchCycleStage == AvaLunchCycleStage.LUNCH_MAIL_SENDING,
-                   onboardingStage == OnboardingStage.STATS_SENT,
-                   manualTrigger == true
-                   )
-    then
-        modify(agent) {
-            setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY),
-            setManualTrigger(false)
-        }
-        agent.sendPairingMail();
 end

@@ -310,9 +310,9 @@ public class Ava extends Agent {
         EmailAdapterAPI.newEmail(e);
     }
 
-    public boolean checkAllFamiliarityAnswers(){
+    public boolean checkAllOnboardingStages(){
         for (EmployeeProfile employee : otherEmployees.values()) {
-            if (employee.getFamiliarity().isEmpty()){
+            if (employee.getOnboardingStage() != OnboardingStage.FINISHED){
                 return false;
             }
         }
