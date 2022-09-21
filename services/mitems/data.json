@@ -183,17 +183,17 @@
         "name": "Finish personal quiz",
         "elements": [
           {
-            "description": "",
-            "type": "TEXT",
-            "content": ""
-          },
-          {
             "description": "Button",
             "type": "OPTIONS",
             "content": "[{\"text\":\"Great, till later\",\"id\":\"submit\"}]"
           },
           {
             "description": "Goodbye screen",
+            "type": "TEXT",
+            "content": "That’s it!\n\nNow it’s up to me to analyze everything.\n\nYou can expect an email from me soon.\n"
+          },
+          {
+            "description": "Text",
             "type": "TEXT",
             "content": "That’s it!\n\nNow it’s up to me to analyze everything.\n\nYou can expect an email from me soon.\n"
           }

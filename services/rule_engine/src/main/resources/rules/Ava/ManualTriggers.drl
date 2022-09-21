@@ -27,15 +27,6 @@ rule "Trigger lunch cycle for Ava"
         delete(signal);            
 end
 
-rule "Trigger lunch pairing for Ava"
-    when
-        signal: ManualTriggerEvent(triggerType == "lunch_pairing") from entry-point "signals"
-        agent: Ava()
-    then
-        Log.info("Ava: triggered lunch pairing from dashboard");
-        delete(signal);        
-end
-
 rule "Trigger familiarity quiz"
     when
         signal: ManualTriggerEvent(triggerType == "familiarity_quiz") from entry-point "signals"
@@ -54,21 +45,4 @@ rule "Trigger statistics email"
         Log.info("Ava: triggered statistics email from dashboard");
         agent.sendStatisticsEmail(employee);
         modify(agent) {setOnboardingStage(OnboardingStage.FINISHED)};
-end
-
-rule "Ask for available days manually"
-    when
-        Heartbeat(ts: timestamp) from entry-point "signals"
-        signal: UserConnectedEvent(getParamAsString("trigger") == "start-weekly-core") from entry-point "signals"
-        agent: Ava(lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY,
-                   onboardingStage == OnboardingStage.FINISHED,
-                   manualTrigger == true)
-    then 
-        // what if person decides to exit this screen without answering, now we can't get back because we are in the next stage
-        modify(agent) {
-            setLunchCycleStage(AvaLunchCycleStage.FORWARD_AVAILABILITY),
-            setManualTrigger(false)
-        }
-        agent.chooseAvailableDaysScreen();
-        delete(signal);
 end
