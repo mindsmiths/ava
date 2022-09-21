@@ -24,7 +24,7 @@ rule "Send available days email"
         Heartbeat(ts: timestamp) from entry-point "signals"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.LUNCH_MAIL_SENDING,
                    onboardingStage == OnboardingStage.FINISHED)
-        eval(evaluateCronExpression("* * 8-10 ? * WED *", ts, "Europe/Zagreb")
+        eval(evaluateCronExpression("* * 8-17 ? * WED *", ts, "Europe/Zagreb")
             || (agent.getManualTrigger() == true))
         employee: EmployeeProfile()
     then
@@ -40,7 +40,7 @@ rule "Ask for available days"
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-weekly-core") from entry-point "signals"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY,
                    onboardingStage == OnboardingStage.FINISHED)
-        eval(evaluateCronExpression("* * 9-10 * * WED", ts, "Europe/Zagreb") 
+        eval(evaluateCronExpression("* * 9-23 * * WED", ts, "Europe/Zagreb") 
             || (evaluateCronExpression("* * * * * THU", ts, "Europe/Zagreb"))
             || (evaluateCronExpression("* * 00-18 * * MON", ts, "Europe/Zagreb"))
             || (agent.getManualTrigger() == true))
