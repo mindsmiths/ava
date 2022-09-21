@@ -181,10 +181,13 @@ public class Ava extends Agent {
                         .getText("onboarding.familiarity-quiz-goodbye.action");
                 String finishFamiliarityQuizText = Mitems
                         .getText("onboarding.familiarity-quiz-goodbye.text");
+                String finishFamiliarityQuizTitle = Mitems
+                        .getText("onboarding.familiarity-quiz-goodbye.title");
                 screens.put("finishfamiliarityquiz", new TemplateGenerator("finishfamiliarityquiz")
                         .addComponent("header", new HeaderComponent(null, true))
                         .addComponent("image", new ImageComponent(avaImagePath))
-                        .addComponent("title", new TitleComponent(finishFamiliarityQuizText))
+                        .addComponent("title", new TitleComponent(finishFamiliarityQuizTitle))
+                        .addComponent("description", new DescriptionComponent(finishFamiliarityQuizText))
                         .addComponent("submit", new PrimarySubmitButtonComponent(
                                 "submit", familiarityQuizFinalButton,
                                 "finished-familiarity-quiz")));
