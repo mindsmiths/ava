@@ -109,10 +109,10 @@ rule "Finish onboarding"
                 );
         modify(employee) {
             setPersonalAnswers(personalAnswers),
-            setOnboardingStage(OnboardingStage.FINISHED) 
+            setOnboardingStage(OnboardingStage.STATS_EMAIL) 
         };
         modify(agent) {
-            setOnboardingStage(OnboardingStage.FINISHED),
+            setOnboardingStage(OnboardingStage.STATS_EMAIL),
             setLunchCycleStage(AvaLunchCycleStage.LUNCH_MAIL_SENDING),
             setStatsEmailLastSentAt(ts)
         };
@@ -123,7 +123,7 @@ end
 rule "Reconnect final screen"
    when
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-onboarding") from entry-point "signals"
-        agent: Ava(onboardingStage == OnboardingStage.FINISHED)
+        agent: Ava(onboardingStage in (OnboardingStage.STATS_EMAIL, OnboardingStage.FINISHED))
    then
         agent.showFinalScreen();
         delete(signal);
@@ -132,11 +132,11 @@ end
 rule "Send statistics email"
     when
         agent: Ava(
-            onboardingStage == OnboardingStage.FINISHED,
-            checkAllOnboardingStages() == true
-            )
-        employee: EmployeeProfile(onboardingStage == OnboardingStage.FINISHED)
+            onboardingStage == OnboardingStage.STATS_EMAIL,
+            allEmployeesFinishedOnboarding() == true
+        )
+        employee: EmployeeProfile()
     then
         agent.sendStatisticsEmail(employee);
-        modify(agent) {setOnboardingStage(OnboardingStage.STATS_SENT)};
+        modify(agent) {setOnboardingStage(OnboardingStage.FINISHED)};
 end

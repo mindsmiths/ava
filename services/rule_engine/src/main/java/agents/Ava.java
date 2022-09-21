@@ -277,25 +277,6 @@ public class Ava extends Agent {
         return names;
     }
 
-    public void sendPairingMail() throws IOException {
-        String subject = Mitems.getText("onboarding.welcome-email.subject");
-        String description = Mitems.getText("onboarding.welcome-email.description");
-        String htmlTemplate = new String(Objects.requireNonNull(
-                getClass().getClassLoader().getResourceAsStream("emailTemplates/EmailTemplate.html")).readAllBytes()
-        );
-        String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
-            "description", description,
-            "callToAction", "Let's go",
-            "armoryUrl", String.format("%s/%s?trigger=start-weekly-core", Settings.ARMORY_SITE_URL, getConnection("armory"))
-        ));
-
-        SendEmailPayload e = new SendEmailPayload();
-        e.setRecipients(List.of(getConnection("email")));
-        e.setSubject(subject);
-        e.setHtmlText(htmlBody);
-        EmailAdapterAPI.newEmail(e); 
-    }
-
     public void sendWelcomeEmail(EmployeeProfile employee) throws IOException {
         String subject = Mitems.getText("onboarding.welcome-email.subject");
         String description = Mitems.getText("onboarding.welcome-email.description");
@@ -316,13 +297,10 @@ public class Ava extends Agent {
         EmailAdapterAPI.newEmail(e);
     }
 
-    public boolean checkAllOnboardingStages(){
-        for (EmployeeProfile employee : otherEmployees.values()) {
-            if (employee.getOnboardingStage() != OnboardingStage.FINISHED){
-                return false;
-            }
-        }
-        return true;
+    public boolean allEmployeesFinishedOnboarding(){
+        return otherEmployees.values().stream().allMatch(e -> (e.getOnboardingStage() == OnboardingStage.STATS_EMAIL)
+            || (e.getOnboardingStage() == OnboardingStage.FINISHED)
+        );
     }
 
     public void sendMonthlyCoreEmail(EmployeeProfile employee) throws IOException {

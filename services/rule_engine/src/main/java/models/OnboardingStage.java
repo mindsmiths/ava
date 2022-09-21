@@ -4,6 +4,6 @@ public enum OnboardingStage {
     EMAIL_SENT,
     FAMILIARITY_QUIZ,
     PERSONAL_QUIZ,
-    FINISHED,
-    STATS_SENT;
+    STATS_EMAIL,
+    FINISHED;
 }

@@ -14,7 +14,7 @@ rule "Trigger lunch cycle for Ava"
         signal: ManualTriggerEvent(triggerType == "lunch_cycle") from entry-point "signals"
         agent: Ava(
             lunchCycleStage == AvaLunchCycleStage.LUNCH_MAIL_SENDING,
-            onboardingStage == OnboardingStage.STATS_SENT
+            onboardingStage == OnboardingStage.FINISHED
             )
         employee: EmployeeProfile()
     then
@@ -48,12 +48,12 @@ end
 rule "Trigger statistics email"
     when
         signal: ManualTriggerEvent(triggerType == "statistics_email") from entry-point "signals"
-        agent: Ava(onboardingStage == OnboardingStage.FINISHED)
+        agent: Ava(onboardingStage == OnboardingStage.STATS_EMAIL)
         employee: EmployeeProfile()
     then
         Log.info("Ava: triggered statistics email from dashboard");
         agent.sendStatisticsEmail(employee);
-        modify(agent) {setOnboardingStage(OnboardingStage.STATS_SENT)};
+        modify(agent) {setOnboardingStage(OnboardingStage.FINISHED)};
 end
 
 rule "Ask for available days manually"
@@ -61,7 +61,7 @@ rule "Ask for available days manually"
         Heartbeat(ts: timestamp) from entry-point "signals"
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-weekly-core") from entry-point "signals"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY,
-                   onboardingStage == OnboardingStage.STATS_SENT,
+                   onboardingStage == OnboardingStage.FINISHED,
                    manualTrigger == true)
     then 
         // what if person decides to exit this screen without answering, now we can't get back because we are in the next stage
