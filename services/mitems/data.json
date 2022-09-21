@@ -1,5 +1,101 @@
 [
   {
+    "title": "Monthly core",
+    "description": "",
+    "items": [
+      {
+        "name": "Ava image path",
+        "elements": [
+          {
+            "description": "Path",
+            "type": "TEXT",
+            "content": "/public/Ava.png"
+          }
+        ]
+      },
+      {
+        "name": "Familiarity Quiz questions",
+        "elements": [
+          {
+            "description": "Action",
+            "type": "TEXT",
+            "content": "Submit"
+          },
+          {
+            "description": "question1",
+            "type": "TEXT",
+            "content": "Who of the following do you know very well?"
+          },
+          {
+            "description": "question2",
+            "type": "TEXT",
+            "content": "Who of the following do you know very well?"
+          },
+          {
+            "description": "question3",
+            "type": "TEXT",
+            "content": "Who of the following do you know very well?"
+          },
+          {
+            "description": "question4",
+            "type": "TEXT",
+            "content": "Who of the following do you know very well?"
+          }
+        ]
+      },
+      {
+        "name": "Familiarity quiz goodbye",
+        "elements": [
+          {
+            "description": "Text",
+            "type": "TEXT",
+            "content": "You are the best 😘"
+          }
+        ]
+      },
+      {
+        "name": "Familiarity quiz intro",
+        "elements": [
+          {
+            "description": "Action",
+            "type": "TEXT",
+            "content": "Let's see"
+          },
+          {
+            "description": "Description",
+            "type": "TEXT",
+            "content": "I will show you a list of names, feel free to choose those you know better than others.\n\nYou can choose more than one person.\n\nYou can also decide to not choose anyone if you feel like you don’t know anyone on the list that well."
+          },
+          {
+            "description": "Title",
+            "type": "TEXT",
+            "content": "Who do you know better?"
+          }
+        ]
+      },
+      {
+        "name": "Welcome email",
+        "elements": [
+          {
+            "description": "Action",
+            "type": "TEXT",
+            "content": "Let's go"
+          },
+          {
+            "description": "Description",
+            "type": "HTML",
+            "content": "<p>Hope you had a good chance of getting to know your collegues this past month. Let's start our monthly check up and see who you know better</p>"
+          },
+          {
+            "description": "Subject",
+            "type": "TEXT",
+            "content": "Monthly check up!"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "title": "Onboarding",
     "description": "",
     "items": [
