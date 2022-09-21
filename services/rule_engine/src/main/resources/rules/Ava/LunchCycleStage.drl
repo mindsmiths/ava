@@ -1,6 +1,8 @@
 package rules.Ava;
 
 import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.mindsmiths.armory.events.UserConnectedEvent
 import com.mindsmiths.armory.events.SubmitEvent
@@ -18,7 +20,7 @@ import signals.SendMatchesSignal;
 
 import models.AvaLunchCycleStage;
 import models.OnboardingStage;
-
+import models.LunchReminderStage;
 
 rule "Lunch invite expired"
     when
@@ -37,14 +39,50 @@ end
 rule "Send available days e-mail"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        eval(evaluateCronExpression("* * 8-17 ? * MON *", ts, "Europe/Zagreb"))
+        eval(evaluateCronExpression("* * 9 ? * WED *", ts, "Europe/Zagreb"))
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.LUNCH_MAIL_SENDING,
                    onboardingStage == OnboardingStage.FINISHED)
+        employee: EmployeeProfile()
     then
         modify(agent) {
-            setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY)
+            setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY),
+            setLunchReminderStage(LunchReminderStage.EMAIL_SENT)
         }
-        agent.sendPairingMail();
+        agent.sendWeeklyEmail(employee);
+end
+
+rule "Send first reminder e-mail"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        eval(evaluateCronExpression("* * 11 ? * THU *", ts, "Europe/Zagreb"))
+        agent: Ava(lunchCycleStage == AvaLunchCycleStage.LUNCH_MAIL_SENDING,
+                   onboardingStage == OnboardingStage.FINISHED,
+                   lunchReminderStage != LunchReminderStage.USER_RESPONDED)
+        employee: EmployeeProfile() 
+    then
+        modify(agent) {
+            setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY),
+            setLunchReminderStage(LunchReminderStage.FIRST_REMINDER)
+        }
+        agent.sendWeeklyEmail(employee);
+
+        
+end
+
+rule "Send second reminder e-mail"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        eval(evaluateCronExpression("* * 13 ? * FRI *", ts, "Europe/Zagreb"))
+        agent: Ava(lunchCycleStage == AvaLunchCycleStage.LUNCH_MAIL_SENDING,
+                   onboardingStage == OnboardingStage.FINISHED,
+                   lunchReminderStage != LunchReminderStage.USER_RESPONDED)
+        employee: EmployeeProfile()
+    then
+        modify(agent) {
+            setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY),
+            setLunchReminderStage(LunchReminderStage.SECOND_REMINDER)
+        }
+        agent.sendWeeklyEmail(employee);
 end
 
 
@@ -84,7 +122,23 @@ rule "Confirm days"
         agent.confirmingDaysScreen();
         modify(agent) {updateAvailableDays((ArrayList<String>)(signal.getParam("availableDays")))};
         agent.send(CultureMaster.ID, new AvaAvailabilitySignal(new AvaAvailability(agent.getId(), agent.getAvailableDays())));
-        modify(agent) {setLunchCycleStage(AvaLunchCycleStage.ACCEPT_MATCH_INFO)};
+        modify(agent) { setLunchCycleStage(AvaLunchCycleStage.ACCEPT_MATCH_INFO),
+                        setLunchReminderStage(LunchReminderStage.USER_RESPONDED)
+                        };
+        delete(signal);
+end
+
+rule "Finish lunch decline form"
+   when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        signal: SubmitEvent(getParamAsString("Submit") == "finished-lunch-decline-form") from entry-point "signals"
+        agent: Ava(lunchReminderStage != LunchReminderStage.USER_RESPONDED)
+   then
+        for (String paramId : signal.getParams().keySet())
+            if (paramId.startsWith("answer")){
+                modify(agent) { getLunchDeclineReasons().add(signal.getParamAsString(paramId));
+                        };
+            }
         delete(signal);
 end
 

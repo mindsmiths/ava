@@ -17,7 +17,7 @@ import models.MonthlyCoreStage;
 rule "Send monthly core email"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        //eval(evaluateCronExpression("* * * ? * 2#1 *", ts, "Europe/Zagreb"))
+        //eval(evaluateCronExpression("* * 10 ? * 2#1 *", ts, "Europe/Zagreb"))
         agent: Ava(
             workingHours == true,
             monthlyCoreStage == null

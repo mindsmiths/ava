@@ -462,6 +462,21 @@
         ]
       },
       {
+        "name": "First reminder email",
+        "elements": [
+          {
+            "description": "Description",
+            "type": "HTML",
+            "content": "<p><span style=\"font-weight: 400;\">Dear {{ firstName }},</span></p>\n<p>You haven't picked your preffered days, please hurry up because I will start matching people for lunch.</p>"
+          },
+          {
+            "description": "Subject",
+            "type": "TEXT",
+            "content": "Ava reminder"
+          }
+        ]
+      },
+      {
         "name": "Guessing options",
         "elements": [
           {
@@ -500,6 +515,11 @@
         "name": "Matching mail",
         "elements": [
           {
+            "description": "Calendar event",
+            "type": "TEXT",
+            "content": "Ava lunch: {{ firstName }} - {{ secondName }}"
+          },
+          {
             "description": "Description",
             "type": "TEXT",
             "content": "I've matched you with {{ fullName}} for lunch on {{ lunchDay }}.\n\nShe works in your company and I think you two should get to know each other better.\n\nI booked the time in your calendar.\n\nAva"
@@ -508,11 +528,6 @@
             "description": "Subject",
             "type": "TEXT",
             "content": "Lunch with {{ employeeName }} on {{ day }}"
-          },
-          {
-            "description": "Calendar event",
-            "type": "TEXT",
-            "content": "Ava lunch: {{ firstName }} - {{ secondName }}"
           },
           {
             "description": "Title",
@@ -528,6 +543,21 @@
             "description": "Title",
             "type": "TEXT",
             "content": "Sorry, time has passed. Better luck next time ;)"
+          }
+        ]
+      },
+      {
+        "name": "Second reminder email",
+        "elements": [
+          {
+            "description": "Description",
+            "type": "HTML",
+            "content": "<p><span style=\"font-weight: 400;\">Dear {{ firstName }},</span></p>\n<p>This is your last chance to pick a preferred day for your lunch meeting with an interesting colleague next week.</p>\n<p>If you don't make a pick in the next hour, I will match you randomly on any day next week</p>"
+          },
+          {
+            "description": "Subject",
+            "type": "TEXT",
+            "content": "Ava reminder"
           }
         ]
       },
@@ -567,12 +597,12 @@
           {
             "description": "Button",
             "type": "TEXT",
-            "content": "Let's see"
+            "content": "Let me pick the best days"
           },
           {
             "description": "Description",
-            "type": "TEXT",
-            "content": "Choose when you want to go on a lunch"
+            "type": "HTML",
+            "content": "<p><span style=\"font-weight: 400;\">Dear {{ firstName }},</span></p>\n<p><span style=\"font-weight: 400;\">It's time to start getting to know your colleagues better. I will match you with someone interesting from your organization to spend quality time with over lunch.</span></p>\n<p><span style=\"font-weight: 400;\">Let's start by picking the days that suit you best next week,</span></p>"
           },
           {
             "description": "Subject",
