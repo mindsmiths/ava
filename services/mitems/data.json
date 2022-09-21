@@ -420,9 +420,14 @@
         "name": "Confirmation of choosen available days",
         "elements": [
           {
+            "description": "Button",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"Submit\",\"id\":\"confirmDaysAndThanksScreen\"}]"
+          },
+          {
             "description": "Title",
             "type": "TEXT",
-            "content": "Okay great, I’ll send you an email when I catch up with others :)"
+            "content": "Gotcha! \n\nI’ll send you an email when I catch up with the others :)\n"
           }
         ]
       },
@@ -457,7 +462,7 @@
           {
             "description": "Text",
             "type": "TEXT",
-            "content": "I’m glad you are in for a lunch!\nLet’s choose a lunch day first. \n\nYou can choose what suits you best."
+            "content": "Choose one or more days that you’re free for lunch\n"
           }
         ]
       },

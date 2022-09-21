@@ -119,16 +119,30 @@ public class Ava extends Agent {
     }
 
     public void confirmingDaysScreen() {
+        Option buttonOption = Mitems.getOptions("weekly-core.confirmation-of-choosen-available-days.button")[0];
+
         Map<String, BaseTemplate> screens = Map.of(
-                "confirmDaysScreen", new TemplateGenerator("confirmScreen")
-                        .addComponent("title",
-                                new TitleComponent(
-                                        Mitems.getText("weekly-core.confirmation-of-choosen-available-days.title")))
-                        .addComponent("button",
-                                new PrimarySubmitButtonComponent("submit", "confirmDaysAndThanksScreen")),
-                "confirmDaysAndThanksScreen", new TemplateGenerator("confirmAndThanksScreen")
-                        .addComponent("title", new TitleComponent(
-                                Mitems.getText("weekly-core.stay-tuned-second-confirmation-of-available-days.title"))));
+            "confirmDaysScreen", 
+            new TemplateGenerator("confirmScreen")
+                .addComponent(
+                    "title", 
+                    new TitleComponent(
+                        Mitems.getText("weekly-core.confirmation-of-choosen-available-days.title")
+                    )
+                )
+                .addComponent(
+                    "button",
+                    new PrimarySubmitButtonComponent(buttonOption.getText(), buttonOption.getId())
+                ),
+            "confirmDaysAndThanksScreen",
+            new TemplateGenerator("confirmAndThanksScreen")
+                .addComponent(
+                    "title",
+                    new TitleComponent(
+                        Mitems.getText("weekly-core.stay-tuned-second-confirmation-of-available-days.title")
+                    )
+                )
+        );
         showScreens("confirmDaysScreen", screens);
     }
 
