@@ -493,15 +493,16 @@ public class Ava extends Agent {
                 .readAllBytes());
 
         String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
-                "text", Mitems.getText("weekly-core.weekly-email.button1"),
+                "text", description,
                 "firstName", employee.getFirstName(),
-                "button1", Mitems.getText("weekly-core.weekly-email.button2"),
-                "button2", Mitems.getText("weekly-core.weekly-email.description"),
-                "armoryUrl", String.format("%s/%s?trigger=start-weekly-core", Settings.ARMORY_SITE_URL, getConnection("armory"))));
+                "button1", Mitems.getText("weekly-core.weekly-email.button1"),
+                "button2", Mitems.getText("weekly-core.weekly-email.button2"),
+                "armoryUrl1", String.format("%s/%s?trigger=start-weekly-core", Settings.ARMORY_SITE_URL, getConnection("armory")),
+                "armoryUrl2", String.format("%s/%s?trigger=start-lunch-decline-reason-screen", Settings.ARMORY_SITE_URL, getConnection("armory"))));
 
         SendEmailPayload e = new SendEmailPayload();
         e.setRecipients(List.of(getConnection("email")));
-        e.setSubject(Mitems.getText("weekly-core.weekly-email.subject"));
+        e.setSubject(subject);
         e.setHtmlText(htmlBody);
         EmailAdapterAPI.newEmail(e);
     }

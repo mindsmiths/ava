@@ -606,8 +606,8 @@
           },
           {
             "description": "Description",
-            "type": "TEXT",
-            "content": "Dear {{ firstName }},\n\nIt's time to start getting to know your colleagues better. I will match you with someone interesting from your organization to spend quality time over lunch.\n\nLet's start by picking the days that suit you best next week."
+            "type": "HTML",
+            "content": "<p>Dear {{ firstName }},</p>\n<p>It's time to start getting to know your colleagues better. I will match you with someone interesting from your organization to spend quality time over lunch. Let's start by picking the days that suit you best next week.</p>"
           },
           {
             "description": "Subject",

@@ -128,6 +128,17 @@ rule "Confirm days"
         delete(signal);
 end
 
+rule "Lunch decline reason screen"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        signal: UserConnectedEvent(getParamAsString("trigger") == "start-lunch-decline-reason-screen") from entry-point "signals"
+        agent: Ava(lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY,
+                   onboardingStage == OnboardingStage.FINISHED)
+    then 
+        agent.showLunchDeclineReasonScreen();
+        delete(signal);
+end
+
 rule "Finish lunch decline form"
    when
         Heartbeat(ts: timestamp) from entry-point "signals"
@@ -139,6 +150,10 @@ rule "Finish lunch decline form"
                 modify(agent) { getLunchDeclineReasons().add(signal.getParamAsString(paramId));
                         };
             }
+        for(String reason:agent.getLunchDeclineReasons()){
+             Log.info(reason);
+        }
+       
         delete(signal);
 end
 
