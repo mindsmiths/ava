@@ -34,7 +34,6 @@ rule "Store ava availability"
         delete(signal);
 end
 
-
 rule "Check that all ava availabilities came"
     when
         Heartbeat() from entry-point "signals"
@@ -44,7 +43,6 @@ rule "Check that all ava availabilities came"
     then
         modify(agent) {setLunchCycleStage(CmLunchCycleStage.GENERATE_MATCHES)};
 end
-
 
 rule "Generate this weeks matches"
     when

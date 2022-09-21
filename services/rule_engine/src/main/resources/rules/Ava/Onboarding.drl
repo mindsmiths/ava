@@ -26,7 +26,6 @@ import signals.EmployeeUpdateSignal;
 import models.EmployeeProfile;
 import models.OnboardingStage;
 
-
 rule "Send welcome email"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
@@ -63,7 +62,7 @@ rule "Start personal quiz"
         Map<String, Double> familiarity = new HashMap<String, Double>(
             employee.getFamiliarity()
         );
-        for (String paramId : signal.getParams().keySet()) 
+        for (String paramId : signal.getParams().keySet()){
             if (paramId.startsWith("answers")) {
                 for (String em : (List<String>) signal.getParam(paramId)) {
                     familiarity.put(
@@ -71,7 +70,11 @@ rule "Start personal quiz"
                     );
                 } 
             }
-        modify(employee) { setFamiliarity(familiarity) };
+        }    
+       
+        modify(employee) { 
+            setFamiliarity(familiarity)
+        };
         agent.showPersonalQuizScreens();
         modify(agent) {
             setOnboardingStage(OnboardingStage.PERSONAL_QUIZ)
@@ -88,11 +91,10 @@ rule "Reconnect personal quiz"
         delete(signal);
 end
 
-
 rule "Finish onboarding"
    when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        signal: SubmitEvent(getParamAsString("submit") == "finished-personal-quiz") from entry-point "signals"
+        signal: SubmitEvent(getParamAsString("submit") == "finishpersonalquiz") from entry-point "signals"
         agent: Ava(onboardingStage == OnboardingStage.PERSONAL_QUIZ)
         employee: EmployeeProfile()
    then
@@ -105,11 +107,12 @@ rule "Finish onboarding"
                     paramId.replace("answers", "question"),
                     signal.getParamAsString(paramId)
                 );
-        modify(employee) { setPersonalAnswers(personalAnswers) };
-        agent.sendStatisticsEmail(employee);
-
+        modify(employee) {
+            setPersonalAnswers(personalAnswers),
+            setOnboardingStage(OnboardingStage.STATS_EMAIL) 
+        };
         modify(agent) {
-            setOnboardingStage(OnboardingStage.FINISHED),
+            setOnboardingStage(OnboardingStage.STATS_EMAIL),
             setLunchCycleStage(AvaLunchCycleStage.LUNCH_MAIL_SENDING),
             setStatsEmailLastSentAt(ts)
         };
@@ -120,8 +123,20 @@ end
 rule "Reconnect final screen"
    when
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-onboarding") from entry-point "signals"
-        agent: Ava(onboardingStage == OnboardingStage.FINISHED)
+        agent: Ava(onboardingStage in (OnboardingStage.STATS_EMAIL, OnboardingStage.FINISHED))
    then
         agent.showFinalScreen();
         delete(signal);
+end
+
+rule "Send statistics email"
+    when
+        agent: Ava(
+            onboardingStage == OnboardingStage.STATS_EMAIL,
+            allEmployeesFinishedOnboarding() == true
+        )
+        employee: EmployeeProfile()
+    then
+        agent.sendStatisticsEmail(employee);
+        modify(agent) {setOnboardingStage(OnboardingStage.FINISHED)};
 end
