@@ -90,7 +90,7 @@ rule "Store match info"
         delete(signal);   
 end
 
-rule "Revert Ava lunch cycle stage"
+rule "Reset Ava lunch cycle stage"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.ACCEPT_MATCH_INFO)
