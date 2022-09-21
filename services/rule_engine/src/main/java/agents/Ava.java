@@ -3,9 +3,12 @@ package agents;
 import java.util.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import com.mindsmiths.armory.ArmoryAPI;
 import com.mindsmiths.armory.components.CloudSelectComponent;
@@ -43,6 +46,7 @@ import lombok.ToString;
 import models.AvaLunchCycleStage;
 import models.EmployeeProfile;
 import models.OnboardingStage;
+import models.MonthlyCoreStage;
 import utils.Settings;
 
 @Data
@@ -54,6 +58,7 @@ public class Ava extends Agent {
     private Days matchDay;
     private AvaLunchCycleStage lunchCycleStage = AvaLunchCycleStage.FIND_AVAILABILITY;
     private OnboardingStage onboardingStage;
+    private MonthlyCoreStage monthlyCoreStage;
     private Map<String, EmployeeProfile> otherEmployees;
     private boolean workingHours;
     private Date statsEmailLastSentAt;
@@ -236,7 +241,7 @@ public class Ava extends Agent {
                                 "submit", finishQuizButton[0].getText(), "finished-personal-quiz")));
                 String goodbyeScreen = Mitems.getText("onboarding.finish-personal-quiz.goodbye-screen");
                 screens.put("finished-personal-quiz", new TemplateGenerator("goodbye")
-                       .addComponent("title", new TitleComponent(goodbyeScreen)));
+                        .addComponent("title", new TitleComponent(goodbyeScreen)));
                 break;
             }
         }
@@ -272,8 +277,9 @@ public class Ava extends Agent {
     public void sendPairingMail() throws IOException {
         String subject = Mitems.getText("onboarding.welcome-email.subject");
         String description = Mitems.getText("onboarding.welcome-email.description");
-        String htmlTemplate = String.join("", Files.readAllLines(Paths.get("EmailTemplate.html"), StandardCharsets.UTF_8));
-
+        String htmlTemplate = new String(Objects.requireNonNull(
+                getClass().getClassLoader().getResourceAsStream("emailTemplates/EmailTemplate.html")).readAllBytes()
+        );
         String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
             "description", description,
             "callToAction", "Let's go",
@@ -290,9 +296,9 @@ public class Ava extends Agent {
     public void sendWelcomeEmail(EmployeeProfile employee) throws IOException {
         String subject = Mitems.getText("onboarding.welcome-email.subject");
         String description = Mitems.getText("onboarding.welcome-email.description");
-        String htmlTemplate = String.join("",
-                Files.readAllLines(Paths.get("EmailTemplate.html"), StandardCharsets.UTF_8));
-
+        String htmlTemplate = new String(Objects.requireNonNull(
+                getClass().getClassLoader().getResourceAsStream("emailTemplates/EmailTemplate.html")).readAllBytes()
+        );
         String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
                 "description", description,
                 "callToAction", Mitems.getText("onboarding.welcome-email.action"),
@@ -307,11 +313,89 @@ public class Ava extends Agent {
         EmailAdapterAPI.newEmail(e);
     }
 
+    public void sendMonthlyCoreEmail(EmployeeProfile employee) throws IOException {
+        String subject = Mitems.getText("monthly-core.welcome-email.subject");
+        String description = Mitems.getText("monthly-core.welcome-email.description");
+        String htmlTemplate = new String(Objects.requireNonNull(
+                getClass().getClassLoader().getResourceAsStream("emailTemplates/EmailTemplate.html")).readAllBytes()
+        );
+
+        String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
+                "description", description,
+                "callToAction", Mitems.getText("monthly-core.welcome-email.action"),
+                "firstName", employee.getFirstName(),
+                "armoryUrl",
+                String.format("%s/%s?trigger=start-monthly-Core", Settings.ARMORY_SITE_URL, getConnection("armory"))));
+
+        SendEmailPayload e = new SendEmailPayload();
+        e.setRecipients(List.of(getConnection("email")));
+        e.setSubject(subject);
+        e.setHtmlText(htmlBody);
+        EmailAdapterAPI.newEmail(e);
+    }
+
+    public void showMonthlyQuizScreens() {
+        Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
+        String avaImagePath = Mitems.getText("monthly-core.ava-image-path.path");
+        List<Map<String, String>> names = getAllEmployeeNames();
+
+        // Adding intro screen
+        String introButton = Mitems.getText("monthly-core.familiarity-quiz-intro.action");
+        String introScreenTitle = Mitems.getText("monthly-core.familiarity-quiz-intro.title");
+        String introScreenDescription = Mitems.getText("monthly-core.familiarity-quiz-intro.description");
+
+        screens.put("introScreen", new TemplateGenerator()
+                .addComponent("image", new ImageComponent(avaImagePath))
+                .addComponent("title", new TitleComponent(introScreenTitle))
+                .addComponent("description", new DescriptionComponent(introScreenDescription))
+                .addComponent("submit", new PrimarySubmitButtonComponent(introButton, "question1")));
+        // Adding questions and final screen in familiarity quiz
+        int questionNum = 1;
+        String submitButton = Mitems.getText("monthly-core.familiarity-quiz-questions.action");
+
+        while (true) {
+            String questionTag = "question" + String.valueOf(questionNum);
+            String nextQuestionTag = "question" + String.valueOf(questionNum + 1);
+            String answersTag = "answers" + String.valueOf(questionNum);
+
+            try {
+                String questionText = Mitems.getText("monthly-core.familiarity-quiz-questions." + questionTag);
+                screens.put(questionTag, new TemplateGenerator(questionTag)
+                        .addComponent("header", new HeaderComponent(null, questionNum > 1))
+                        .addComponent("question", new TitleComponent(questionText))
+                        .addComponent(answersTag, new CloudSelectComponent(answersTag, names.get(questionNum - 1)))
+                        .addComponent("submit", new PrimarySubmitButtonComponent(
+                                "submit", submitButton, nextQuestionTag)));
+                questionNum += 1;
+
+            } catch (Exception e) {
+                // Changing button value
+                String wrongQuestionTag = "question" + String.valueOf(questionNum - 1);
+
+                TemplateGenerator templateGenerator = (TemplateGenerator) screens.get(wrongQuestionTag);
+                PrimarySubmitButtonComponent buttonComponent = (PrimarySubmitButtonComponent) templateGenerator
+                        .getComponents()
+                        .get("submit");
+                buttonComponent.setValue("finishmonthlyquiz");
+
+                String finishFamiliarityQuizText = Mitems
+                        .getText("monthly-core.familiarity-quiz-goodbye.text");
+                screens.put("finishmonthlyquiz", new TemplateGenerator("finishmonthlyquiz")
+
+                        .addComponent("title", new TitleComponent(finishFamiliarityQuizText)));
+                break;
+            }
+        }
+
+        showScreens("introScreen", screens);
+    }
+
     public void sendStatisticsEmail(EmployeeProfile employee) throws IOException {
         String subject = Mitems.getText("statistics.statistics-email.subject");
         String description = Mitems.getText("statistics.statistics-email.description");
-        String htmlTemplate = String.join("",
-                Files.readAllLines(Paths.get("EmailTemplate.html"), StandardCharsets.UTF_8));
+        String htmlTemplate = new String(Objects.requireNonNull(
+                getClass().getClassLoader().getResourceAsStream("emailTemplates/EmailTemplate.html")).readAllBytes()
+        );
 
         String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
                 "description", description,
@@ -394,8 +478,9 @@ public class Ava extends Agent {
     public void sendWeeklyEmail(EmployeeProfile employee) throws IOException {
         String subject = Mitems.getText("weekly-core.weekly-email.subject");
         String description = Mitems.getText("weekly-core.weekly-email.description");
-        String htmlTemplate = String.join("",
-                Files.readAllLines(Paths.get("EmailTemplate.html"), StandardCharsets.UTF_8));
+        String htmlTemplate = new String(Objects.requireNonNull(
+                getClass().getClassLoader().getResourceAsStream("emailTemplates/EmailTemplate.html")).readAllBytes()
+        );
 
         String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
                 "description", description,
@@ -429,8 +514,10 @@ public class Ava extends Agent {
     }
 
     public String renderMatchmakingEmail(Days days, EmployeeProfile currentEmployee, EmployeeProfile otherEmployee) throws IOException {
-        String template = String.join("", Files.readAllLines(Paths.get("EmailTemplateCalendar.html"), StandardCharsets.UTF_8));
-        return Templating.recursiveRender(template, Map.of(
+        String htmlTemplate = new String(Objects.requireNonNull(
+            getClass().getClassLoader().getResourceAsStream("emailTemplates/EmailTemplateCalendar.html")).readAllBytes()
+    );
+        return Templating.recursiveRender(htmlTemplate, Map.of(
             "title", Mitems.getText("weekly-core.matching-mail.title"),
             "description", Mitems.getText("weekly-core.matching-mail.description"),
             "otherName", otherEmployee.getFirstName(),
