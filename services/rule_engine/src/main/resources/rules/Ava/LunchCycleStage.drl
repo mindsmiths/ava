@@ -19,47 +19,35 @@ import signals.SendMatchesSignal;
 import models.AvaLunchCycleStage;
 import models.OnboardingStage;
 
-
-rule "Lunch invite expired"
+rule "Send available days email"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        eval(!evaluateCronExpression("* * 9-23 * * WED", ts, "Europe/Zagreb") && 
-            !evaluateCronExpression("* * * * * THU", ts, "Europe/Zagreb") &&
-            !evaluateCronExpression("* * 00-14 * * FRI", ts, "Europe/Zagreb"))
-        signal: UserConnectedEvent(getParamAsString("trigger") == "start-weekly-core") from entry-point "signals"
-        agent: Ava(lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY,
-                   onboardingStage == OnboardingStage.FINISHED)
-    then 
-        agent.showLunchInviteExpiredScreen();
-        delete(signal);
-end
-
-rule "Send available days e-mail"
-    when
-        Heartbeat(ts: timestamp) from entry-point "signals"
-        eval(evaluateCronExpression("* * 8-17 ? * MON *", ts, "Europe/Zagreb"))
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.LUNCH_MAIL_SENDING,
                    onboardingStage == OnboardingStage.FINISHED)
+        eval(evaluateCronExpression("* * 8-17 ? * WED *", ts, "Europe/Zagreb")
+            || (agent.getManualTrigger() == true))
+        employee: EmployeeProfile()
     then
-        modify(agent) {
-            setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY)
-        }
-        agent.sendPairingMail();
+        modify(agent) {setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY)}
+        agent.sendWeeklyEmail(employee);
 end
-
 
 rule "Ask for available days"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        eval(evaluateCronExpression("* * 9-23 * * WED", ts, "Europe/Zagreb") 
-        || (evaluateCronExpression("* * * * * THU", ts, "Europe/Zagreb"))
-        || (evaluateCronExpression("* * 00-18 * * MON", ts, "Europe/Zagreb")))
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-weekly-core") from entry-point "signals"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY,
                    onboardingStage == OnboardingStage.FINISHED)
+        eval(evaluateCronExpression("* * 9-23 * * WED", ts, "Europe/Zagreb") 
+            || (evaluateCronExpression("* * * * * THU", ts, "Europe/Zagreb"))
+            || (evaluateCronExpression("* * 00-18 * * MON", ts, "Europe/Zagreb"))
+            || (agent.getManualTrigger() == true))
     then 
         // what if person decides to exit this screen without answering, now we can't get back because we are in the next stage
-        modify(agent) {setLunchCycleStage(AvaLunchCycleStage.FORWARD_AVAILABILITY)}
+        modify(agent) {
+            setLunchCycleStage(AvaLunchCycleStage.FORWARD_AVAILABILITY),
+            setManualTrigger(false)
+        };
         agent.chooseAvailableDaysScreen();
         delete(signal);
 end
@@ -71,7 +59,7 @@ rule "Handle employee not available"
     then
         agent.showNotAvailableScreen();
         modify(agent) {updateAvailableDays((ArrayList<String>)(signal.getParam("availableDays")))};
-        agent.send(CultureMaster.ID, new AvaAvailabilitySignal(new AvaAvailability(agent.getId(), agent.getAvailableDays()))); 
+        agent.send(CultureMaster.ID, new AvaAvailabilitySignal(new AvaAvailability(agent.getId(),agent.getAvailableDays()))); 
         modify(agent) {setLunchCycleStage(AvaLunchCycleStage.ACCEPT_MATCH_INFO)};
         delete(signal);
 end
@@ -94,11 +82,34 @@ rule "Store match info"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.ACCEPT_MATCH_INFO)
         profile: EmployeeProfile()
     then
-        modify(agent) { setMatch(signal.getMatch()), 
-                        setMatchDay(signal.getMatchDay()),
-                        setLunchCycleStage(AvaLunchCycleStage.LUNCH_MAIL_SENDING) };
+        modify(agent) {
+            setMatch(signal.getMatch()), 
+            setMatchDay(signal.getMatchDay())
+        };
         agent.sendCalendarInvite(signal.getMatchDay(), profile, agent.getOtherEmployees().get(signal.getMatch()));
         delete(signal);   
 end
 
+rule "Reset Ava lunch cycle stage"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        agent: Ava(lunchCycleStage == AvaLunchCycleStage.ACCEPT_MATCH_INFO)
+        eval(evaluateCronExpression("* * 8-17 ? * SUN *", ts, "Europe/Zagreb"))
+    then
+        modify(agent) {setLunchCycleStage(AvaLunchCycleStage.LUNCH_MAIL_SENDING)};
+end
 
+rule "Lunch invite expired"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        eval(!evaluateCronExpression("* * 9-23 * * WED", ts, "Europe/Zagreb") && 
+            !evaluateCronExpression("* * * * * THU", ts, "Europe/Zagreb") &&
+            !evaluateCronExpression("* * 00-14 * * FRI", ts, "Europe/Zagreb"))
+        signal: UserConnectedEvent(getParamAsString("trigger") == "start-weekly-core") from entry-point "signals"
+        agent: Ava(lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY,
+                   onboardingStage == OnboardingStage.FINISHED,
+                   manualTrigger == false)
+    then 
+        agent.showLunchInviteExpiredScreen();
+        delete(signal);
+end

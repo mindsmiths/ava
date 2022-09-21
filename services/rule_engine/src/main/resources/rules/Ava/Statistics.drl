@@ -13,7 +13,7 @@ import agents.CultureMaster;
 
 import models.EmployeeProfile;
 
-rule "Send stats email"
+rule "Send stats email monthly"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
         eval(evaluateCronExpression("* * * ? * 2#1 *", ts, "Europe/Zagreb"))

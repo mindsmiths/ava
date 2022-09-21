@@ -65,6 +65,7 @@ public class Ava extends Agent {
     private Date matchedWithEmailSentAt;
     private int silosCount;
     private String silosRisk;
+    private boolean manualTrigger;
 
     public Ava(String connectionName, String connectionId) {
         super(connectionName, connectionId);
@@ -159,7 +160,7 @@ public class Ava extends Agent {
             try {
                 String questionText = Mitems.getText("onboarding.familiarity-quiz-questions." + questionTag);
                 screens.put(questionTag, new TemplateGenerator(questionTag)
-                        .addComponent("header", new HeaderComponent(null, questionNum > 1))
+                        .addComponent("header", new HeaderComponent(null, true))
                         .addComponent("question", new TitleComponent(questionText))
                         .addComponent(answersTag, new CloudSelectComponent(answersTag, names.get(questionNum - 1)))
                         .addComponent("submit", new PrimarySubmitButtonComponent(
@@ -180,9 +181,13 @@ public class Ava extends Agent {
                         .getText("onboarding.familiarity-quiz-goodbye.action");
                 String finishFamiliarityQuizText = Mitems
                         .getText("onboarding.familiarity-quiz-goodbye.text");
+                String finishFamiliarityQuizTitle = Mitems
+                        .getText("onboarding.familiarity-quiz-goodbye.title");
                 screens.put("finishfamiliarityquiz", new TemplateGenerator("finishfamiliarityquiz")
+                        .addComponent("header", new HeaderComponent(null, true))
                         .addComponent("image", new ImageComponent(avaImagePath))
-                        .addComponent("title", new TitleComponent(finishFamiliarityQuizText))
+                        .addComponent("title", new TitleComponent(finishFamiliarityQuizTitle))
+                        .addComponent("description", new DescriptionComponent(finishFamiliarityQuizText))
                         .addComponent("submit", new PrimarySubmitButtonComponent(
                                 "submit", familiarityQuizFinalButton,
                                 "finished-familiarity-quiz")));
@@ -213,6 +218,7 @@ public class Ava extends Agent {
             String answersTag = "answers" + String.valueOf(questionNum);
             try {
                 screens.put(questionTag, new TemplateGenerator(questionTag)
+                        .addComponent("header", new HeaderComponent(null, true))
                         .addComponent("question",
                                 new TitleComponent(Mitems.getText(
                                         String.format("onboarding.personal-quiz-%s.%s", questionTag, questionTag))))
@@ -274,25 +280,6 @@ public class Ava extends Agent {
         return names;
     }
 
-    public void sendPairingMail() throws IOException {
-        String subject = Mitems.getText("onboarding.welcome-email.subject");
-        String description = Mitems.getText("onboarding.welcome-email.description");
-        String htmlTemplate = new String(Objects.requireNonNull(
-                getClass().getClassLoader().getResourceAsStream("emailTemplates/EmailTemplate.html")).readAllBytes()
-        );
-        String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
-            "description", description,
-            "callToAction", "Let's go",
-            "armoryUrl", String.format("%s/%s?trigger=start-weekly-core", Settings.ARMORY_SITE_URL, getConnection("armory"))
-        ));
-
-        SendEmailPayload e = new SendEmailPayload();
-        e.setRecipients(List.of(getConnection("email")));
-        e.setSubject(subject);
-        e.setHtmlText(htmlBody);
-        EmailAdapterAPI.newEmail(e); 
-    }
-
     public void sendWelcomeEmail(EmployeeProfile employee) throws IOException {
         String subject = Mitems.getText("onboarding.welcome-email.subject");
         String description = Mitems.getText("onboarding.welcome-email.description");
@@ -311,6 +298,13 @@ public class Ava extends Agent {
         e.setSubject(subject);
         e.setHtmlText(htmlBody);
         EmailAdapterAPI.newEmail(e);
+    }
+
+    public boolean allEmployeesFinishedOnboarding(){
+        return otherEmployees.values().stream().allMatch(e -> 
+            (e.getOnboardingStage() == OnboardingStage.STATS_EMAIL)
+            || (e.getOnboardingStage() == OnboardingStage.FINISHED)
+        );
     }
 
     public void sendMonthlyCoreEmail(EmployeeProfile employee) throws IOException {
