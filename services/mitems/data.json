@@ -24,22 +24,22 @@
           {
             "description": "question1",
             "type": "TEXT",
-            "content": "Who of the following do you know very well?"
+            "content": "Who do you know very well?"
           },
           {
             "description": "question2",
             "type": "TEXT",
-            "content": "Who of the following do you know very well?"
+            "content": "Who do you know very well?"
           },
           {
             "description": "question3",
             "type": "TEXT",
-            "content": "Who of the following do you know very well?"
+            "content": "Who do you know very well?"
           },
           {
             "description": "question4",
             "type": "TEXT",
-            "content": "Who of the following do you know very well?"
+            "content": "Who do you know very well?"
           }
         ]
       },
@@ -54,7 +54,7 @@
           {
             "description": "Text",
             "type": "TEXT",
-            "content": "You did a great job and don’t worry about the absolute accuracy of your answers because it’s not important. \n\nNow let me get to know YOU a bit better."
+            "content": "You did a great job and don’t worry about the absolute accuracy of your answers because it is not important. \n\nNow let me get to know YOU a bit better."
           },
           {
             "description": "Title",
@@ -74,12 +74,12 @@
           {
             "description": "Description",
             "type": "TEXT",
-            "content": "I will show you a list of names, feel free to choose those you know better than others.\n\nYou can choose more than one person.\n\nYou can also decide to not choose anyone if you feel like you don’t know anyone on the list that well."
+            "content": "I will show you a list of names, feel free to choose those you know better than others.\n\nYou can choose more than one person.\n\nYou can also decide not to choose anyone if you don’t feel like you know anyone on the list that well.\n"
           },
           {
             "description": "Title",
             "type": "TEXT",
-            "content": "Who do you know better?"
+            "content": "Who do you know very well?"
           }
         ]
       },
@@ -87,19 +87,19 @@
         "name": "Finish personal quiz",
         "elements": [
           {
+            "description": "",
+            "type": "TEXT",
+            "content": ""
+          },
+          {
             "description": "Button",
             "type": "OPTIONS",
-            "content": "[{\"text\":\"Great, let's do it\",\"id\":\"submit\"}]"
+            "content": "[{\"text\":\"Great, till later\",\"id\":\"submit\"}]"
           },
           {
             "description": "Goodbye screen",
             "type": "TEXT",
-            "content": "You are the best 😘"
-          },
-          {
-            "description": "Text",
-            "type": "TEXT",
-            "content": "I feel we have so much in common. 🤗\n\nThank you, that’s it 🥳"
+            "content": "That’s it!\n\nNow it’s up to me to analyze everything.\n\nYou can expect an email from me soon.\n"
           }
         ]
       },
@@ -114,7 +114,7 @@
           {
             "description": "Description",
             "type": "TEXT",
-            "content": "Feel free to answer as much or as little as you want, write the first thing that comes to mind."
+            "content": "Feel free to answer as much or as little as you want and write the first thing that comes to your mind."
           },
           {
             "description": "Title",
@@ -224,7 +224,7 @@
           {
             "description": "Description",
             "type": "HTML",
-            "content": "<p><span style=\"font-weight: 400;\">Dear {{ firstName }},</span></p>\n<p><span style=\"font-weight: 400;\">When team members are working in silos, they cannot collaborate effectively, which can lead to missed deadlines, subpar work, poor communication, and general feelings of frustration.</span></p>\n<p><span style=\"font-weight: 400;\">To avoid this, we will encourage communication and collaboration, promote knowledge sharing and encourage networking.&nbsp;</span></p>\n<p><span style=\"font-weight: 400;\">How? Easy, I will do all the work and guide you all the way.</span></p>"
+            "content": "<p><span style=\"font-weight: 400;\">Dear {{ firstName }},</span></p>\n<p><span style=\"font-weight: 400;\">When team members are working in silos, they cannot collaborate effectively, which can lead to missed deadlines, subpar work, poor communication and general feelings of frustration.</span></p>\n<p><span style=\"font-weight: 400;\">To avoid this, we will encourage communication and collaboration, promote knowledge sharing and encourage networking.&nbsp;</span></p>\n<p><span style=\"font-weight: 400;\">How? Easy, I will do all the work and guide you all the way.</span></p>"
           },
           {
             "description": "Subject",
@@ -404,6 +404,11 @@
         "name": "Matching mail",
         "elements": [
           {
+            "description": "Calendar event",
+            "type": "TEXT",
+            "content": "Ava lunch: {{ firstName }} - {{ secondName }}"
+          },
+          {
             "description": "Description",
             "type": "TEXT",
             "content": "I've matched you with {{ fullName}} for lunch on {{ lunchDay }}.\n\nShe works in your company and I think you two should get to know each other better.\n\nI booked the time in your calendar.\n\nAva"
@@ -412,11 +417,6 @@
             "description": "Subject",
             "type": "TEXT",
             "content": "Lunch with {{ employeeName }} on {{ day }}"
-          },
-          {
-            "description": "Calendar event",
-            "type": "TEXT",
-            "content": "Ava lunch: {{ firstName }} - {{ secondName }}"
           },
           {
             "description": "Title",
