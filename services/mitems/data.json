@@ -565,19 +565,24 @@
         "name": "Weekly Email",
         "elements": [
           {
-            "description": "Button",
+            "description": "Button1",
             "type": "TEXT",
-            "content": "Let's see"
+            "content": "Let me pick the best days"
+          },
+          {
+            "description": "Button2",
+            "type": "TEXT",
+            "content": "Next week's no good for me"
           },
           {
             "description": "Description",
             "type": "TEXT",
-            "content": "Choose when you want to go on a lunch"
+            "content": "Dear {{ firstName }},\n\nIt's time to start getting to know your colleagues better. I will match you with someone interesting from your organization to spend quality time over lunch.\n\nLet's start by picking the days that suit you best next week."
           },
           {
             "description": "Subject",
             "type": "TEXT",
-            "content": "Weekly intro email"
+            "content": "It's lunch time!"
           }
         ]
       }

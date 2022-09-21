@@ -469,22 +469,20 @@ public class Ava extends Agent {
     }
 
     public void sendWeeklyEmail(EmployeeProfile employee) throws IOException {
-        String subject = Mitems.getText("weekly-core.weekly-email.subject");
-        String description = Mitems.getText("weekly-core.weekly-email.description");
         String htmlTemplate = new String(Objects.requireNonNull(
-                getClass().getClassLoader().getResourceAsStream("emailTemplates/EmailTemplate.html")).readAllBytes()
+                getClass().getClassLoader().getResourceAsStream("emailTemplates/FirstWeeklyEmailTemplate.html")).readAllBytes()
         );
 
         String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
-                "description", description,
-                "callToAction", Mitems.getText("weekly-core.weekly-email.button"),
+                "text", Mitems.getText("weekly-core.weekly-email.button1"),
                 "firstName", employee.getFirstName(),
-                "armoryUrl",
-                String.format("%s/%s?trigger=start-weekly-core", Settings.ARMORY_SITE_URL, getConnection("armory"))));
+                "button1", Mitems.getText("weekly-core.weekly-email.button2"),
+                "button2", Mitems.getText("weekly-core.weekly-email.description"),
+                "armoryUrl", String.format("%s/%s?trigger=start-weekly-core", Settings.ARMORY_SITE_URL, getConnection("armory"))));
 
         SendEmailPayload e = new SendEmailPayload();
         e.setRecipients(List.of(getConnection("email")));
-        e.setSubject(subject);
+        e.setSubject(Mitems.getText("weekly-core.weekly-email.subject"));
         e.setHtmlText(htmlBody);
         EmailAdapterAPI.newEmail(e);
     }
