@@ -28,9 +28,7 @@ rule "Send available days email"
             || (agent.getManualTrigger() == true))
         employee: EmployeeProfile()
     then
-        modify(agent) {
-            setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY)
-        }
+        modify(agent) {setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY)}
         agent.sendWeeklyEmail(employee);
 end
 
@@ -61,7 +59,7 @@ rule "Handle employee not available"
     then
         agent.showNotAvailableScreen();
         modify(agent) {updateAvailableDays((ArrayList<String>)(signal.getParam("availableDays")))};
-        agent.send(CultureMaster.ID, new AvaAvailabilitySignal(new AvaAvailability(agent.getId(), agent.getAvailableDays()))); 
+        agent.send(CultureMaster.ID, new AvaAvailabilitySignal(new AvaAvailability(agent.getId(),agent.getAvailableDays()))); 
         modify(agent) {setLunchCycleStage(AvaLunchCycleStage.ACCEPT_MATCH_INFO)};
         delete(signal);
 end
