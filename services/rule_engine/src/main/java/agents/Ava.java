@@ -70,6 +70,7 @@ public class Ava extends Agent {
     private List<String> lunchDeclineReasons = new ArrayList<>();
     private boolean manualTrigger;
 
+
     public Ava(String connectionName, String connectionId) {
         super(connectionName, connectionId);
     }
@@ -509,7 +510,12 @@ public class Ava extends Agent {
                 .addComponent("title", new TitleComponent(lunchDeclineScreen))
                 .addComponent(answerTag, new TextAreaComponent(answerTag, true))
                 .addComponent("submit", new PrimarySubmitButtonComponent("Submit", "finished-lunch-decline-form"));
+
+        BaseTemplate finalScreen = new TemplateGenerator("FinalDeclineScreen")
+                .addComponent("title", new TitleComponent(lunchDeclineScreen));
+
         showScreen(screen);
+
     }
 
     public void sendCalendarInvite(Days days, EmployeeProfile currentEmployee, EmployeeProfile otherEmployee)

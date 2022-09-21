@@ -40,7 +40,7 @@ rule "Send first reminder email"
         
 end
 
-rule "Send second reminder e-mail"
+rule "Send second reminder email"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
         eval(evaluateCronExpression("* * 13 ? * FRI *", ts, "Europe/Zagreb"))
@@ -54,13 +54,15 @@ rule "Send second reminder e-mail"
             setLunchReminderStage(LunchReminderStage.SECOND_REMINDER)
         }
 
+end
+
 rule "Send available days email"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.LUNCH_MAIL_SENDING,
-                   onboardingStage == OnboardingStage.FINISHED)
+                   onboardingStage == OnboardingStage.FINISHED, trigger: manualTrigger)
         eval(evaluateCronExpression("* * 8-17 ? * WED *", ts, "Europe/Zagreb")
-            || (agent.getManualTrigger() == true))
+            || (trigger == true))
         employee: EmployeeProfile()
     then
         modify(agent) {setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY),
@@ -73,11 +75,11 @@ rule "Ask for available days"
         Heartbeat(ts: timestamp) from entry-point "signals"
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-weekly-core") from entry-point "signals"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY,
-                   onboardingStage == OnboardingStage.FINISHED)
+                   onboardingStage == OnboardingStage.FINISHED, trigger: manualTrigger)
         eval(evaluateCronExpression("* * 9-23 * * WED", ts, "Europe/Zagreb") 
             || (evaluateCronExpression("* * * * * THU", ts, "Europe/Zagreb"))
             || (evaluateCronExpression("* * 00-18 * * MON", ts, "Europe/Zagreb"))
-            || (agent.getManualTrigger() == true))
+            || (trigger== true))
     then 
         // what if person decides to exit this screen without answering, now we can't get back because we are in the next stage
         modify(agent) {
@@ -128,7 +130,7 @@ end
 rule "Finish lunch decline form"
    when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        signal: SubmitEvent(getParamAsString("Submit") == "finished-lunch-decline-form") from entry-point "signals"
+        signal: SubmitEvent(getParamAsString("submit") == "finished-lunch-decline-form") from entry-point "signals"
         agent: Ava(lunchReminderStage != LunchReminderStage.USER_RESPONDED)
    then
         for (String paramId : signal.getParams().keySet())
@@ -136,9 +138,6 @@ rule "Finish lunch decline form"
                 modify(agent) { getLunchDeclineReasons().add(signal.getParamAsString(paramId));
                         };
             }
-        for(String reason:agent.getLunchDeclineReasons()){
-             Log.info(reason);
-        }
        
         delete(signal);
 end
