@@ -5,13 +5,6 @@ import signals.EmployeeUpdateSignal;
 import com.mindsmiths.employeeManager.ManualTriggerEvent;
 import com.mindsmiths.ruleEngine.util.Log;
 import models.CmLunchCycleStage;
-import java.util.Date;
-import com.mindsmiths.sdk.core.db.DataUtils;
-import models.Match;
-import com.mindsmiths.pairingalgorithm.Days;
-import com.mindsmiths.sdk.core.db.EmitType;
-
-import com.mindsmiths.employeeManager.EmployeeManagerAPI
 
 rule "Add or update Ava data"
     when
