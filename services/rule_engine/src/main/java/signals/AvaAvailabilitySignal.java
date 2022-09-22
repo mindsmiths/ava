@@ -12,4 +12,5 @@ import com.mindsmiths.pairingalgorithm.AvaAvailability;
 @NoArgsConstructor
 public class AvaAvailabilitySignal extends Signal {
     AvaAvailability avaAvailability;
+
 }

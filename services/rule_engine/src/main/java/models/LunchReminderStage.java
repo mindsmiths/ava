@@ -1,8 +1,8 @@
 package models;
 
 public enum LunchReminderStage {
-    EMAIL_SENT,
-    USER_RESPONDED,
-    FIRST_REMINDER,
-    SECOND_REMINDER;
+    FIRST_EMAIL_SENT,
+    SECOND_EMAIL_SENT,
+    THIRD_EMAIL_SENT,
+    USER_RESPONDED;
 }

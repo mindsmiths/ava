@@ -3,12 +3,14 @@ body {
 }
 
 .GenericTemplate {
-    justify-content: center !important;
-
     h2 {
         text-align: center;
         color: rgb(0, 0, 0);
     }
+}
+
+.CenteredContentTemplate {
+    justify-content: center;
 }
 
 .DescriptionComponent {

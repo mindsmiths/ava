@@ -72,6 +72,7 @@ public class Ava extends Agent {
 
     public Ava(String connectionName, String connectionId) {
         super(connectionName, connectionId);
+
     }
 
     public void updateAvailableDays(List<String> availableDaysStr) {
@@ -264,6 +265,7 @@ public class Ava extends Agent {
                                 "submit", finishQuizButton[0].getText(), "finished-personal-quiz")));
                 String goodbyeScreen = Mitems.getText("onboarding.finish-personal-quiz.goodbye-screen");
                 screens.put("finished-personal-quiz", new TemplateGenerator("goodbye")
+                        .setTemplateName("CenteredContentTemplate")
                         .addComponent("title", new TitleComponent(goodbyeScreen)));
                 break;
             }
@@ -485,11 +487,11 @@ public class Ava extends Agent {
         String subject = Mitems.getText("weekly-core.weekly-email.subject");
         String description = Mitems.getText("weekly-core.weekly-email.description");
 
-        if (this.lunchReminderStage == LunchReminderStage.FIRST_REMINDER) { // first reminder text
+        if (this.lunchReminderStage == LunchReminderStage.SECOND_EMAIL_SENT) { // second mail text
             subject = Mitems.getText("weekly-core.first-reminder-email.subject");
             description = Mitems.getText("weekly-core.first-reminder-email.description");
 
-        } else if (this.lunchReminderStage == LunchReminderStage.SECOND_REMINDER) { // second reminder text
+        } else if (this.lunchReminderStage == LunchReminderStage.THIRD_EMAIL_SENT) { // third mail text
             subject = Mitems.getText("weekly-core.second-reminder-email.subject");
             description = Mitems.getText("weekly-core.second-reminder-email.description");
 

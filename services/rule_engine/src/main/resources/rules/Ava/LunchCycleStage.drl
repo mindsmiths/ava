@@ -22,38 +22,68 @@ import models.AvaLunchCycleStage;
 import models.OnboardingStage;
 import models.LunchReminderStage;
 
-rule "Send first reminder email"
+rule "Send second email"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        eval(evaluateCronExpression("* * 11 ? * THU *", ts, "Europe/Zagreb"))
-        agent: Ava(lunchCycleStage == AvaLunchCycleStage.LUNCH_MAIL_SENDING,
-                   onboardingStage == OnboardingStage.FINISHED,
-                   lunchReminderStage != LunchReminderStage.USER_RESPONDED)
+        eval(evaluateCronExpression("* * * ? * THU *", ts, "Europe/Zagreb"))
+        agent: Ava(
+            lunchReminderStage == LunchReminderStage.FIRST_EMAIL_SENT,
+            workingHours == true
+            )
         employee: EmployeeProfile() 
     then
         modify(agent) {
-            setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY),
-            setLunchReminderStage(LunchReminderStage.FIRST_REMINDER)
+            setLunchReminderStage(LunchReminderStage.SECOND_EMAIL_SENT)
         }
         agent.sendWeeklyEmail(employee);
 
         
 end
 
-rule "Send second reminder email"
+rule "Send third email"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        eval(evaluateCronExpression("* * 13 ? * FRI *", ts, "Europe/Zagreb"))
-        agent: Ava(lunchCycleStage == AvaLunchCycleStage.LUNCH_MAIL_SENDING,
-                   onboardingStage == OnboardingStage.FINISHED,
-                   lunchReminderStage != LunchReminderStage.USER_RESPONDED)
+        eval(evaluateCronExpression("* * 0-13 ? * FRI *", ts, "Europe/Zagreb")) 
+        agent: Ava(
+            lunchReminderStage == LunchReminderStage.SECOND_EMAIL_SENT,
+            workingHours == true
+            )
+        
         employee: EmployeeProfile()
     then
         modify(agent) {
-            setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY),
-            setLunchReminderStage(LunchReminderStage.SECOND_REMINDER)
+            setLunchReminderStage(LunchReminderStage.THIRD_EMAIL_SENT)
         }
         agent.sendWeeklyEmail(employee);
+end
+
+rule "Auto assign days"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        eval(evaluateCronExpression("* * 14-15 ? * FRI *", ts, "Europe/Zagreb")) 
+        agent: Ava(
+            lunchReminderStage == LunchReminderStage.THIRD_EMAIL_SENT,
+            lunchCycleStage == AvaLunchCycleStage.FORWARD_AVAILABILITY
+
+        )
+        employee: EmployeeProfile()
+    then
+        modify(agent) {
+            getAvailableDays().addAll(new ArrayList<Days>() {
+            {
+                add(Days.MON);
+                add(Days.TUE);
+                add(Days.WED);
+                add(Days.THU);
+                add(Days.FRI);
+            }
+            });
+        }
+        agent.send(CultureMaster.ID, new AvaAvailabilitySignal(new AvaAvailability(agent.getId(), agent.getAvailableDays())));
+        modify(agent) {
+            setLunchCycleStage(AvaLunchCycleStage.ACCEPT_MATCH_INFO),
+            setLunchReminderStage(LunchReminderStage.USER_RESPONDED)
+            };
 end
 
 rule "Send available days email"
@@ -67,7 +97,7 @@ rule "Send available days email"
     then
         modify(agent) {
             setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY),
-            setLunchReminderStage(LunchReminderStage.EMAIL_SENT)
+            setLunchReminderStage(LunchReminderStage.FIRST_EMAIL_SENT)
             }
         agent.sendWeeklyEmail(employee);
 end
@@ -147,7 +177,8 @@ rule "Finish lunch decline form"
             if (paramId.startsWith("answer")){
                 modify(agent) {
                     getLunchDeclineReasons().add(signal.getParamAsString(paramId)),
-                    setLunchReminderStage(LunchReminderStage.USER_RESPONDED)
+                    setLunchReminderStage(LunchReminderStage.USER_RESPONDED),
+                    setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY)
                 };
             }
        
@@ -179,7 +210,7 @@ rule "Reset Ava lunch cycle stage"
             };
 end
 
-rule "User confirmed available days"
+rule "User already confirmed available days"
     when 
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-weekly-core") from entry-point "signals"
         agent: Ava(lunchReminderStage == LunchReminderStage.USER_RESPONDED)
@@ -188,7 +219,7 @@ rule "User confirmed available days"
         delete(signal);
 end
 
-rule "User declined available days"
+rule "User already declined available days"
     when 
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-lunch-decline-reason-screen") from entry-point "signals"
         agent: Ava(lunchReminderStage == LunchReminderStage.USER_RESPONDED)
