@@ -25,3 +25,5 @@ package-lock.json
 secrets
 tags.temp
 target/
+
+services/commands/connections_graphs/
