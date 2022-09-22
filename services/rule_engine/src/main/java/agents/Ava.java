@@ -270,7 +270,9 @@ public class Ava extends Agent {
 
     public void showFinalScreen() {
         String goodbyeScreen = Mitems.getText("onboarding.finish-personal-quiz.goodbye-screen");
-        BaseTemplate screen = new TemplateGenerator("goodbye").addComponent("title", new TitleComponent(goodbyeScreen));
+        BaseTemplate screen = new TemplateGenerator("goodbye")
+                                        .setTemplateName("CenteredContentTemplate")
+                                        .addComponent("title", new TitleComponent(goodbyeScreen));
         showScreen(screen);
     }
 
