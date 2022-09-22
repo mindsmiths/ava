@@ -107,7 +107,7 @@ public class Ava extends Agent {
                         new DescriptionComponent(
                                 Mitems.getText("weekly-core.description-asking-for-available-days.text")))
                 .addComponent("cloudSelect", new CloudSelectComponent("availableDays", options))
-                .addComponent("submit", new PrimarySubmitButtonComponent("submit", "confirmDays"));
+                .addComponent("submit", new PrimarySubmitButtonComponent("Submit", "confirmDays"));
         showScreen(daysScreen);
     }
 
@@ -120,16 +120,32 @@ public class Ava extends Agent {
     }
 
     public void confirmingDaysScreen() {
+        Option buttonOption = Mitems.getOptions("weekly-core.confirmation-of-choosen-available-days.button")[0];
+
         Map<String, BaseTemplate> screens = Map.of(
-                "confirmDaysScreen", new TemplateGenerator("confirmScreen")
-                        .addComponent("title",
-                                new TitleComponent(
-                                        Mitems.getText("weekly-core.confirmation-of-choosen-available-days.title")))
-                        .addComponent("button",
-                                new PrimarySubmitButtonComponent("submit", "confirmDaysAndThanksScreen")),
-                "confirmDaysAndThanksScreen", new TemplateGenerator("confirmAndThanksScreen")
-                        .addComponent("title", new TitleComponent(
-                                Mitems.getText("weekly-core.stay-tuned-second-confirmation-of-available-days.title"))));
+            "confirmDaysScreen", 
+            new TemplateGenerator("confirmScreen")
+                .setTemplateName("CenteredContentTemplate")
+                .addComponent(
+                    "title", 
+                    new TitleComponent(
+                        Mitems.getHTML("weekly-core.confirmation-of-choosen-available-days.title")
+                    )
+                )
+                .addComponent(
+                    "button",
+                    new PrimarySubmitButtonComponent(buttonOption.getText(), buttonOption.getId())
+                ),
+            "confirmDaysAndThanksScreen",
+            new TemplateGenerator("confirmAndThanksScreen")
+                .setTemplateName("CenteredContentTemplate")
+                .addComponent(
+                    "title",
+                    new TitleComponent(
+                        Mitems.getText("weekly-core.stay-tuned-second-confirmation-of-available-days.title")
+                    )
+                )
+        );
         showScreens("confirmDaysScreen", screens);
     }
 
@@ -141,7 +157,7 @@ public class Ava extends Agent {
         // Adding intro screen
         String introButton = Mitems.getText("onboarding.familiarity-quiz-intro.action");
         String introScreenTitle = Mitems.getText("onboarding.familiarity-quiz-intro.title");
-        String introScreenDescription = Mitems.getText("onboarding.familiarity-quiz-intro.description");
+        String introScreenDescription = Mitems.getHTML("onboarding.familiarity-quiz-intro.description");
 
         screens.put("introScreen", new TemplateGenerator()
                 .addComponent("image", new ImageComponent(avaImagePath))
@@ -180,7 +196,7 @@ public class Ava extends Agent {
                 String familiarityQuizFinalButton = Mitems
                         .getText("onboarding.familiarity-quiz-goodbye.action");
                 String finishFamiliarityQuizText = Mitems
-                        .getText("onboarding.familiarity-quiz-goodbye.text");
+                        .getHTML("onboarding.familiarity-quiz-goodbye.text");
                 String finishFamiliarityQuizTitle = Mitems
                         .getText("onboarding.familiarity-quiz-goodbye.title");
                 screens.put("finishfamiliarityquiz", new TemplateGenerator("finishfamiliarityquiz")
@@ -238,7 +254,7 @@ public class Ava extends Agent {
                 buttonComponent.setValue("finishpersonalquiz");
 
                 Option[] finishQuizButton = Mitems.getOptions("onboarding.finish-personal-quiz.button");
-                String finishPersonalQuiz = Mitems.getText("onboarding.finish-personal-quiz.text");
+                String finishPersonalQuiz = Mitems.getHTML("onboarding.finish-personal-quiz.text");
 
                 screens.put("finishpersonalquiz", new TemplateGenerator("finishpersonalquiz")
                         .addComponent("image", new ImageComponent(avaImagePath))
@@ -247,6 +263,7 @@ public class Ava extends Agent {
                                 "submit", finishQuizButton[0].getText(), "finished-personal-quiz")));
                 String goodbyeScreen = Mitems.getText("onboarding.finish-personal-quiz.goodbye-screen");
                 screens.put("finished-personal-quiz", new TemplateGenerator("goodbye")
+                        .setTemplateName("CenteredContentTemplate")
                         .addComponent("title", new TitleComponent(goodbyeScreen)));
                 break;
             }
@@ -256,7 +273,9 @@ public class Ava extends Agent {
 
     public void showFinalScreen() {
         String goodbyeScreen = Mitems.getText("onboarding.finish-personal-quiz.goodbye-screen");
-        BaseTemplate screen = new TemplateGenerator("goodbye").addComponent("title", new TitleComponent(goodbyeScreen));
+        BaseTemplate screen = new TemplateGenerator("goodbye")
+                                        .setTemplateName("CenteredContentTemplate")
+                                        .addComponent("title", new TitleComponent(goodbyeScreen));
         showScreen(screen);
     }
 
@@ -436,8 +455,9 @@ public class Ava extends Agent {
                 .addComponent("description", new TitleComponent(riskScreenTitle))
                 .addComponent("submit", new PrimarySubmitButtonComponent(riskScreenButton, "finalScreen")));
 
-        String finalScreenTitle = Mitems.getText("statistics.final-screen.title");
+        String finalScreenTitle = Mitems.getHTML("statistics.final-screen.title");
         screens.put("finalScreen", new TemplateGenerator()
+                .setTemplateName("CenteredContentTemplate")
                 .addComponent("description", new TitleComponent(finalScreenTitle)));
 
         showScreens("employeeNumberScreen", screens);
@@ -475,10 +495,10 @@ public class Ava extends Agent {
         );
 
         String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
-                "text", Mitems.getText("weekly-core.weekly-email.button1"),
+                "text", Mitems.getHTML("weekly-core.weekly-email.description"),
                 "firstName", employee.getFirstName(),
-                "button1", Mitems.getText("weekly-core.weekly-email.button2"),
-                "button2", Mitems.getText("weekly-core.weekly-email.description"),
+                "button1", Mitems.getText("weekly-core.weekly-email.button1"),
+                "button2", Mitems.getText("weekly-core.weekly-email.button2"),
                 "armoryUrl", String.format("%s/%s?trigger=start-weekly-core", Settings.ARMORY_SITE_URL, getConnection("armory"))));
 
         SendEmailPayload e = new SendEmailPayload();
@@ -511,7 +531,7 @@ public class Ava extends Agent {
     );
         return Templating.recursiveRender(htmlTemplate, Map.of(
             "title", Mitems.getText("weekly-core.matching-mail.title"),
-            "description", Mitems.getText("weekly-core.matching-mail.description"),
+            "description", Mitems.getHTML("weekly-core.matching-mail.description"),
             "otherName", otherEmployee.getFirstName(),
             "fullName", otherEmployee.getFullName(),
             "myName", currentEmployee.getFirstName(),
