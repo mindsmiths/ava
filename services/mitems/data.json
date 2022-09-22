@@ -512,6 +512,21 @@
         ]
       },
       {
+        "name": "Lunch Decline Reason",
+        "elements": [
+          {
+            "description": "FinalScreenTitle",
+            "type": "TEXT",
+            "content": "Bye now. You are the best!"
+          },
+          {
+            "description": "Title",
+            "type": "TEXT",
+            "content": "Sorry to hear you can't join us next week. What is the reason for that?"
+          }
+        ]
+      },
+      {
         "name": "Matching mail",
         "elements": [
           {
@@ -588,6 +603,16 @@
             "description": "Title",
             "type": "TEXT",
             "content": "Sorry to hear that :(\nHope to see you next week"
+          }
+        ]
+      },
+      {
+        "name": "User Already Responded Screen",
+        "elements": [
+          {
+            "description": "Title",
+            "type": "TEXT",
+            "content": "You already submitted your answer"
           }
         ]
       },

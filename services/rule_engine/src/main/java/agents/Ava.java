@@ -70,7 +70,6 @@ public class Ava extends Agent {
     private List<String> lunchDeclineReasons = new ArrayList<>();
     private boolean manualTrigger;
 
-
     public Ava(String connectionName, String connectionId) {
         super(connectionName, connectionId);
     }
@@ -303,11 +302,9 @@ public class Ava extends Agent {
         EmailAdapterAPI.newEmail(e);
     }
 
-    public boolean allEmployeesFinishedOnboarding(){
-        return otherEmployees.values().stream().allMatch(e -> 
-            (e.getOnboardingStage() == OnboardingStage.STATS_EMAIL)
-            || (e.getOnboardingStage() == OnboardingStage.FINISHED)
-        );
+    public boolean allEmployeesFinishedOnboarding() {
+        return otherEmployees.values().stream().allMatch(e -> (e.getOnboardingStage() == OnboardingStage.STATS_EMAIL)
+                || (e.getOnboardingStage() == OnboardingStage.FINISHED));
     }
 
     public void sendMonthlyCoreEmail(EmployeeProfile employee) throws IOException {
@@ -493,8 +490,10 @@ public class Ava extends Agent {
                 "firstName", employee.getFirstName(),
                 "button1", Mitems.getText("weekly-core.weekly-email.button1"),
                 "button2", Mitems.getText("weekly-core.weekly-email.button2"),
-                "armoryUrl1", String.format("%s/%s?trigger=start-weekly-core", Settings.ARMORY_SITE_URL, getConnection("armory")),
-                "armoryUrl2", String.format("%s/%s?trigger=start-lunch-decline-reason-screen", Settings.ARMORY_SITE_URL, getConnection("armory"))));
+                "armoryUrl1",
+                String.format("%s/%s?trigger=start-weekly-core", Settings.ARMORY_SITE_URL, getConnection("armory")),
+                "armoryUrl2", String.format("%s/%s?trigger=start-lunch-decline-reason-screen", Settings.ARMORY_SITE_URL,
+                        getConnection("armory"))));
 
         SendEmailPayload e = new SendEmailPayload();
         e.setRecipients(List.of(getConnection("email")));
@@ -504,18 +503,27 @@ public class Ava extends Agent {
     }
 
     public void showLunchDeclineReasonScreen() {
-        String lunchDeclineScreen = Mitems.getText("onboarding.finish-personal-quiz.goodbye-screen");
+        Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
+        String lunchDeclineScreen = Mitems.getText("weekly-core.lunch-decline-reason.title");
         String answerTag = "answer";
-        BaseTemplate screen = new TemplateGenerator("LunchDecline")
+        screens.put("LunchDecline", new TemplateGenerator()
                 .addComponent("title", new TitleComponent(lunchDeclineScreen))
                 .addComponent(answerTag, new TextAreaComponent(answerTag, true))
-                .addComponent("submit", new PrimarySubmitButtonComponent("Submit", "finished-lunch-decline-form"));
+                .addComponent("submit", new PrimarySubmitButtonComponent("Submit", "finished-lunch-decline-form")));
 
-        BaseTemplate finalScreen = new TemplateGenerator("FinalDeclineScreen")
-                .addComponent("title", new TitleComponent(lunchDeclineScreen));
+        String finalScreenTitle = Mitems.getText("weekly-core.lunch-decline-reason.finalscreentitle");
 
+        screens.put("finished-lunch-decline-form", new TemplateGenerator()
+                .addComponent("description", new TitleComponent(finalScreenTitle)));
+
+        showScreens("LunchDecline", screens);
+
+    }
+
+    public void showUserAlreadyRespondedScreen() {
+        String goodbyeScreen = Mitems.getText("weekly-core.user-already-responded-screen.title");
+        BaseTemplate screen = new TemplateGenerator("goodbye").addComponent("title", new TitleComponent(goodbyeScreen));
         showScreen(screen);
-
     }
 
     public void sendCalendarInvite(Days days, EmployeeProfile currentEmployee, EmployeeProfile otherEmployee)

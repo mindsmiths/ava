@@ -75,6 +75,7 @@ rule "Ask for available days"
         Heartbeat(ts: timestamp) from entry-point "signals"
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-weekly-core") from entry-point "signals"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY,
+                   lunchReminderStage != LunchReminderStage.USER_RESPONDED,
                    onboardingStage == OnboardingStage.FINISHED, trigger: manualTrigger)
         eval(evaluateCronExpression("* * 9-23 * * WED", ts, "Europe/Zagreb") 
             || (evaluateCronExpression("* * * * * THU", ts, "Europe/Zagreb"))
@@ -121,7 +122,8 @@ rule "Lunch decline reason screen"
         Heartbeat(ts: timestamp) from entry-point "signals"
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-lunch-decline-reason-screen") from entry-point "signals"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY,
-                   onboardingStage == OnboardingStage.FINISHED)
+                   onboardingStage == OnboardingStage.FINISHED,
+                   lunchReminderStage != LunchReminderStage.USER_RESPONDED)
     then 
         agent.showLunchDeclineReasonScreen();
         delete(signal);
@@ -135,7 +137,8 @@ rule "Finish lunch decline form"
    then
         for (String paramId : signal.getParams().keySet())
             if (paramId.startsWith("answer")){
-                modify(agent) { getLunchDeclineReasons().add(signal.getParamAsString(paramId));
+                modify(agent) { getLunchDeclineReasons().add(signal.getParamAsString(paramId)),
+                                setLunchReminderStage(LunchReminderStage.USER_RESPONDED)
                         };
             }
        
@@ -163,6 +166,24 @@ rule "Reset Ava lunch cycle stage"
         eval(evaluateCronExpression("* * 8-17 ? * SUN *", ts, "Europe/Zagreb"))
     then
         modify(agent) {setLunchCycleStage(AvaLunchCycleStage.LUNCH_MAIL_SENDING)};
+end
+
+rule "User confirmed available days"
+    when 
+        signal: UserConnectedEvent(getParamAsString("trigger") == "start-weekly-core") from entry-point "signals"
+        agent: Ava(lunchReminderStage == LunchReminderStage.USER_RESPONDED)
+    then
+        agent.showUserAlreadyRespondedScreen();
+        delete(signal);
+end
+
+rule "User declined available days"
+    when 
+        signal: UserConnectedEvent(getParamAsString("trigger") == "start-lunch-decline-reason-screen") from entry-point "signals"
+        agent: Ava(lunchReminderStage == LunchReminderStage.USER_RESPONDED)
+    then
+        agent.showUserAlreadyRespondedScreen();
+        delete(signal);
 end
 
 rule "Lunch invite expired"
