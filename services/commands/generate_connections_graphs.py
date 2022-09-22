@@ -43,5 +43,5 @@ def generate_connections_graphs():
         color_map[i] = "red"
         plt.show()
         nx.draw(G2, with_labels = False , node_color=color_map, width=2, edge_color = "royalblue", pos = layout)
-        plt.savefig("/app/services/commands/connections_graphs/{}.png".format(i+1), format="PNG")
+        plt.savefig(graphs_path + "{}.png".format(i+1), format="PNG")
         plt.close()
