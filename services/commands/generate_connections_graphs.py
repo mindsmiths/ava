@@ -31,7 +31,7 @@ def generate_connections_graphs():
             if a>=50 and b>=50:
                 score = (a+b)/2
                 if score > 80:
-                    G2.add_edge(employeeIDs[i],employeeIDs[j],weight = score/numOfEmployees**2)
+                    G2.add_edge(employeeIDs[i],employeeIDs[j], weight = score)
     
     graphs_path = "/app/services/commands/connections_graphs/"
     if not os.path.exists(graphs_path):
