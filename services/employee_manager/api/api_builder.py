@@ -1,4 +1,3 @@
-from forge.conf import settings
 from forge.core.api import api_interface, BaseAPI
 from datetime import datetime
 
