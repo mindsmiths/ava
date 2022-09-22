@@ -53,7 +53,7 @@ rule "Send second reminder email"
             setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY),
             setLunchReminderStage(LunchReminderStage.SECOND_REMINDER)
         }
-
+        agent.sendWeeklyEmail(employee);
 end
 
 rule "Send available days email"
@@ -65,8 +65,10 @@ rule "Send available days email"
             || (agent.isManualTrigger() == true))
         employee: EmployeeProfile()
     then
-        modify(agent) {setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY),
-                       setLunchReminderStage(LunchReminderStage.EMAIL_SENT)}
+        modify(agent) {
+            setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY),
+            setLunchReminderStage(LunchReminderStage.EMAIL_SENT)
+            }
         agent.sendWeeklyEmail(employee);
 end
 
@@ -96,9 +98,13 @@ rule "Handle employee not available"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.FORWARD_AVAILABILITY)
     then
         agent.showNotAvailableScreen();
-        modify(agent) {updateAvailableDays((ArrayList<String>)(signal.getParam("availableDays")))};
+        modify(agent) {
+            updateAvailableDays((ArrayList<String>)(signal.getParam("availableDays")))
+            };
         agent.send(CultureMaster.ID, new AvaAvailabilitySignal(new AvaAvailability(agent.getId(),agent.getAvailableDays()))); 
-        modify(agent) {setLunchCycleStage(AvaLunchCycleStage.ACCEPT_MATCH_INFO)};
+        modify(agent) {
+            setLunchCycleStage(AvaLunchCycleStage.ACCEPT_MATCH_INFO)
+            };
         delete(signal);
 end
 
@@ -108,11 +114,14 @@ rule "Confirm days"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.FORWARD_AVAILABILITY)
     then
         agent.confirmingDaysScreen();
-        modify(agent) {updateAvailableDays((ArrayList<String>)(signal.getParam("availableDays")))};
+        modify(agent) {
+            updateAvailableDays((ArrayList<String>)(signal.getParam("availableDays")))
+            };
         agent.send(CultureMaster.ID, new AvaAvailabilitySignal(new AvaAvailability(agent.getId(), agent.getAvailableDays())));
-        modify(agent) { setLunchCycleStage(AvaLunchCycleStage.ACCEPT_MATCH_INFO),
-                        setLunchReminderStage(LunchReminderStage.USER_RESPONDED)
-                        };
+        modify(agent) {
+            setLunchCycleStage(AvaLunchCycleStage.ACCEPT_MATCH_INFO),
+            setLunchReminderStage(LunchReminderStage.USER_RESPONDED)
+            };
         delete(signal);
 end
 
@@ -136,9 +145,10 @@ rule "Finish lunch decline form"
    then
         for (String paramId : signal.getParams().keySet())
             if (paramId.startsWith("answer")){
-                modify(agent) { getLunchDeclineReasons().add(signal.getParamAsString(paramId)),
-                                setLunchReminderStage(LunchReminderStage.USER_RESPONDED)
-                        };
+                modify(agent) {
+                    getLunchDeclineReasons().add(signal.getParamAsString(paramId)),
+                    setLunchReminderStage(LunchReminderStage.USER_RESPONDED)
+                };
             }
        
         delete(signal);
@@ -164,7 +174,9 @@ rule "Reset Ava lunch cycle stage"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.ACCEPT_MATCH_INFO)
         eval(evaluateCronExpression("* * 8-17 ? * SUN *", ts, "Europe/Zagreb"))
     then
-        modify(agent) {setLunchCycleStage(AvaLunchCycleStage.LUNCH_MAIL_SENDING)};
+        modify(agent) {
+            setLunchCycleStage(AvaLunchCycleStage.LUNCH_MAIL_SENDING)
+            };
 end
 
 rule "User confirmed available days"
