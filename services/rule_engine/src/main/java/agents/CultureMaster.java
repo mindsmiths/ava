@@ -1,6 +1,8 @@
 package agents;
 
 import com.mindsmiths.ruleEngine.model.Agent;
+import com.mindsmiths.ruleEngine.util.Log;
+
 import java.util.*;
 
 import lombok.AllArgsConstructor;
@@ -8,7 +10,7 @@ import lombok.Data;
 import models.CmLunchCycleStage;
 
 import com.mindsmiths.pairingalgorithm.PairingAlgorithmAPI;
-import com.mindsmiths.pairingalgorithm.AvaAvailability;
+import com.mindsmiths.pairingalgorithm.EmployeeAvailability;
 import com.mindsmiths.pairingalgorithm.Match;
 
 import signals.EmployeeUpdateSignal;
@@ -20,12 +22,11 @@ import models.EmployeeProfile;
 @Data
 @AllArgsConstructor
 public class CultureMaster extends Agent {
-    private List<AvaAvailability> avaAvailabilities = new ArrayList<>();
+    private List<EmployeeAvailability> employeeAvailabilities = new ArrayList<>();
     private List<Match> allMatches = new ArrayList<>();
     private CmLunchCycleStage lunchCycleStage = CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES;
     private Map<String, EmployeeProfile> employees = new HashMap<>();
-    private Map<String, Map<String, Double>> avaConnectionStrengths = new HashMap<>();
-    private Double[][] compatibility;
+    private Map<String, Map<String, Double>> employeeConnectionStrengths = new HashMap<>();
 
     public static String ID = "CULTURE_MASTER";
 
@@ -33,16 +34,16 @@ public class CultureMaster extends Agent {
         id = ID;
     }
 
-    public void addAvaAvailability(AvaAvailability avaAvailability) {
-        avaAvailabilities.add(avaAvailability);
+    public void addEmployeeAvailability(EmployeeAvailability employeeAvailability) {
+        employeeAvailabilities.add(employeeAvailability);
     }
 
-    public void clearAvaAvailabilities() {
-        this.avaAvailabilities = new ArrayList<>();
+    public void clearEmployeeAvailabilities() {
+        this.employeeAvailabilities = new ArrayList<>();
     }
 
     public void generateMatches() {
-        PairingAlgorithmAPI.generatePairs(new ArrayList<>(avaAvailabilities));
+        PairingAlgorithmAPI.generatePairs(new ArrayList<>(employeeAvailabilities), new HashMap<>(employeeConnectionStrengths));
     }
 
     public void addMatches(List<Match> allMatches) {
@@ -52,11 +53,11 @@ public class CultureMaster extends Agent {
     public void sendMatches() {
         for (String employeeKey : employees.keySet()) {
             for (Match m : allMatches) {
-                if (employeeKey.equals(m.getFirst())) {
+                if (employees.get(employeeKey).getId().equals(m.getFirst())) {
                     send(employeeKey, new SendMatchesSignal(m.getSecond(), m.getDay()));
                     break;
                 }
-                if (employeeKey.equals(m.getSecond())) {
+                if (employees.get(employeeKey).getId().equals(m.getSecond())) {
                     send(employeeKey, new SendMatchesSignal(m.getFirst(), m.getDay()));
                     break;
                 }
@@ -157,20 +158,4 @@ public class CultureMaster extends Agent {
 
         return risk;
     }
-
-    public void createCompatibilityMatrix() {
-        this.compatibility = new Double[this.avaConnectionStrengths.size()][this.avaConnectionStrengths.size()];
-        for(int i=0; i<this.avaConnectionStrengths.size(); i++) {
-            for(int j=0; j<this.avaConnectionStrengths.size(); j++) {
-                this.compatibility[i][j] = 0.;
-            }
-        }
-
-        for(String employeeId : avaConnectionStrengths.keySet()) {
-            for(Map.Entry<String, Double> entry : avaConnectionStrengths.get(employeeId).entrySet()) {
-                this.compatibility[Integer.valueOf(employeeId)-1][Integer.valueOf(entry.getKey())-1] = entry.getValue();
-            }
-        }
-    }
-
 }

@@ -36,6 +36,7 @@ import lombok.ToString;
 import models.AvaLunchCycleStage;
 import models.EmployeeProfile;
 import models.OnboardingStage;
+import signals.SendMatchesSignal;
 import models.Neuron;
 import utils.Settings;
 
@@ -112,6 +113,15 @@ public class Ava extends Agent {
         this.availableDays = new ArrayList<>();
         for (String day : availableDaysStr) {
             this.availableDays.add(Days.valueOf(day));
+        }
+    }
+
+    public void printMatchInfo(EmployeeProfile employee, SendMatchesSignal signal) {
+        for(Map.Entry<String, EmployeeProfile> entry : otherEmployees.entrySet()) {
+            if(entry.getValue().getId().equals(signal.getMatch())) {
+                Log.info("I'm " + employee.getFullName() + " my match is " + entry.getValue().getFullName() + " on " + signal.getMatchDay());
+                break;
+            }
         }
     }
 

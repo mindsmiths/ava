@@ -6,13 +6,13 @@ import com.mindsmiths.armory.events.UserConnectedEvent
 import com.mindsmiths.armory.events.SubmitEvent
 import com.mindsmiths.ruleEngine.model.Heartbeat;
 import com.mindsmiths.pairingalgorithm.Days;
-import com.mindsmiths.pairingalgorithm.AvaAvailability;
+import com.mindsmiths.pairingalgorithm.EmployeeAvailability;
 import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
 
 import agents.Ava;
 import agents.CultureMaster;
 
-import signals.AvaAvailabilitySignal;
+import signals.EmployeeAvailabilitySignal;
 import signals.SendMatchesSignal;
 import signals.ConnectionsStrengthSignal;
 
@@ -57,10 +57,11 @@ rule "Handle employee not available"
     when 
         signal: SubmitEvent((getParamAsString("submit") == "confirmDays") && (signal.getParam("availableDays") == [])) from entry-point "signals"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.FORWARD_AVAILABILITY)
+        employee: EmployeeProfile()
     then
         agent.showNotAvailableScreen();
         modify(agent) {updateAvailableDays((ArrayList<String>)(signal.getParam("availableDays")))};
-        agent.send(CultureMaster.ID, new AvaAvailabilitySignal(new AvaAvailability(agent.getId(), agent.getAvailableDays()))); 
+        agent.send(CultureMaster.ID, new EmployeeAvailabilitySignal(new EmployeeAvailability(employee.getId(), agent.getAvailableDays()))); 
         modify(agent) {setLunchCycleStage(AvaLunchCycleStage.ACCEPT_MATCH_INFO)};
         delete(signal);
 end
@@ -69,12 +70,13 @@ rule "Confirm days"
     when
         signal: SubmitEvent(getParamAsString("submit") == "confirmDays") from entry-point "signals"  
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.FORWARD_AVAILABILITY)
-        profile: EmployeeProfile()
+        employee: EmployeeProfile()
     then
         agent.confirmingDaysScreen();
         modify(agent) {updateAvailableDays((ArrayList<String>)(signal.getParam("availableDays")))};
-        agent.send(CultureMaster.ID, new AvaAvailabilitySignal(new AvaAvailability(agent.getId(), agent.getAvailableDays())));
-        agent.send(CultureMaster.ID, new ConnectionsStrengthSignal(profile.getId(), agent.getConnectionStrengthAsValue()));
+        agent.send(CultureMaster.ID, new EmployeeAvailabilitySignal(new EmployeeAvailability(employee.getId(), agent.getAvailableDays())));
+        agent.send(CultureMaster.ID, new ConnectionsStrengthSignal(employee.getId(), agent.getConnectionStrengthAsValue()));
+        Log.info("Im " + employee.getFullName() + " and sending connection strengts: " + agent.getConnectionStrengthAsValue());
         modify(agent) {setLunchCycleStage(AvaLunchCycleStage.ACCEPT_MATCH_INFO)};
         delete(signal);
 end
@@ -83,13 +85,11 @@ rule "Store match info"
     when
         signal: SendMatchesSignal() from entry-point "signals"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.ACCEPT_MATCH_INFO)
-        profile: EmployeeProfile()
+        employee: EmployeeProfile()
     then
         modify(agent) {setMatch(signal.getMatch()), setMatchDay(signal.getMatchDay())};
-        modify(agent) {getMatchHistory().add(agent.getOtherEmployees().get(signal.getMatch()).getId())}
-        Log.info("I'm " + profile.getFirstName() + " and my match is " +
-                agent.getOtherEmployees().get(signal.getMatch()).getFullName() +
-                " on " + agent.getMatchDay());
+        modify(agent) {getMatchHistory().add(signal.getMatch())};
+        agent.printMatchInfo(employee, signal);
         Log.info("My match history: " + agent.getMatchHistory());
         delete(signal);
 end

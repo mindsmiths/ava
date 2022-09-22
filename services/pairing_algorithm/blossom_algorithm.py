@@ -22,7 +22,7 @@ CHECK_DELTA = False
 CHECK_OPTIMUM = False
 
 
-def maxWeightMatching(edges, maxcardinality=False):
+def max_weight_matching(edges, maxcardinality=False):
     """Compute a maximum-weighted matching in the general undirected
     weighted graph given by "edges".  If "maxcardinality" is true,
     only maximum-cardinality matchings are considered as solutions.

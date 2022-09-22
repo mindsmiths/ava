@@ -51,7 +51,7 @@ rule "Trigger lunch pairing for Ava"
         agent: Ava(onboardingStage == OnboardingStage.FINISHED)
     then
         Log.info("Ava: triggered lunch pairing from dashboard");
-        modify(agent) {setLunchCycleStage(AvaLunchCycleStage.FORWARD_AVAILABILITY)};
+        modify(agent) {setLunchCycleStage(AvaLunchCycleStage.ACCEPT_MATCH_INFO)};
         delete(signal);            
 end
 
