@@ -74,33 +74,6 @@ rule "Send third reminder"
         agent.sendWeeklyEmail(employee);
 end
 
-rule "Auto assign days"
-    when
-        Heartbeat(ts: timestamp) from entry-point "signals"
-        eval(evaluateCronExpression("* * 14-15 ? * FRI *", ts, "Europe/Zagreb")) 
-        agent: Ava(
-            lunchReminderStage == LunchReminderStage.THIRD_EMAIL_SENT,
-            lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY
-        )
-        employee: EmployeeProfile()
-    then
-        modify(agent) {
-            setLunchCycleStage(AvaLunchCycleStage.ACCEPT_MATCH_INFO),
-            setLunchReminderStage(LunchReminderStage.USER_RESPONDED),
-            setAvailableDays(new ArrayList<Days>() {{
-                add(Days.MON);
-                add(Days.TUE);
-                add(Days.WED);
-                add(Days.THU);
-                add(Days.FRI);
-            }});
-        }
-        agent.send(CultureMaster.ID, new AvaAvailabilitySignal(new AvaAvailability(agent.getId(), agent.getAvailableDays())));
-        modify(agent) {
-
-        };
-end
-
 rule "Ask for available days"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
@@ -197,6 +170,33 @@ rule "Store match info"
         };
         agent.sendCalendarInvite(signal.getMatchDay(), profile, agent.getOtherEmployees().get(signal.getMatch()));
         delete(signal);
+end
+
+rule "Auto assign days"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        eval(evaluateCronExpression("* * 14-15 ? * FRI *", ts, "Europe/Zagreb")) 
+        agent: Ava(
+            lunchReminderStage == LunchReminderStage.THIRD_EMAIL_SENT,
+            lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY
+        )
+        employee: EmployeeProfile()
+    then
+        modify(agent) {
+            setLunchCycleStage(AvaLunchCycleStage.ACCEPT_MATCH_INFO),
+            setLunchReminderStage(LunchReminderStage.USER_RESPONDED),
+            setAvailableDays(new ArrayList<Days>() {{
+                add(Days.MON);
+                add(Days.TUE);
+                add(Days.WED);
+                add(Days.THU);
+                add(Days.FRI);
+            }});
+        }
+        agent.send(CultureMaster.ID, new AvaAvailabilitySignal(new AvaAvailability(agent.getId(), agent.getAvailableDays())));
+        modify(agent) {
+
+        };
 end
 
 rule "Reset Ava lunch cycle stage"
