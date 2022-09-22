@@ -13,14 +13,7 @@ def generate_connections_graphs():
     forge.setup("rule_engine")
     keeper = MongoClientKeeper()
     culture_master = keeper.ruleEngineDB.summary.find_one({"agentId": "CULTURE_MASTER"})
-    culture_master["agents#CultureMaster"]["CULTURE_MASTER"]["avaConnectionStrengths"]={
-        "1": {
-          "2": 100
-        },
-        "2": {
-          "1": 0
-        }
-      }    
+    
     avaConnectionStrengths = pd.DataFrame.from_dict(
         culture_master["agents#CultureMaster"]["CULTURE_MASTER"]["avaConnectionStrengths"]
     )
