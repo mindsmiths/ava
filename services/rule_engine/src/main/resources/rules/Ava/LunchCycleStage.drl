@@ -198,7 +198,7 @@ rule "Store match info"
             setMatchDay(signal.getMatchDay())
         };
         agent.sendCalendarInvite(signal.getMatchDay(), profile, agent.getOtherEmployees().get(signal.getMatch()));
-        delete(signal);   
+        delete(signal);
 end
 
 rule "Reset Ava lunch cycle stage"

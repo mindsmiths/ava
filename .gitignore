@@ -27,3 +27,4 @@ tags.temp
 target/
 
 **/core.*
+*.vsix
