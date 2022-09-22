@@ -11,7 +11,10 @@ import lombok.Data;
 import models.CmLunchCycleStage;
 
 import com.mindsmiths.pairingalgorithm.PairingAlgorithmAPI;
+import com.mindsmiths.mitems.Option;
+import com.mindsmiths.mitems.Mitems;
 import com.mindsmiths.pairingalgorithm.AvaAvailability;
+import com.mindsmiths.pairingalgorithm.Days;
 import com.mindsmiths.pairingalgorithm.Match;
 
 import signals.EmployeeUpdateSignal;
@@ -67,8 +70,9 @@ public class CultureMaster extends Agent {
                 }
             }
         }
-        for (Match m : allMatches)
-            DataUtils.emit(m, EmitType.CREATE);
+        for (Match m : allMatches){
+            DataUtils.emit(new models.Match(m), EmitType.CREATE);
+        }
     }
 
     public void addOrUpdateEmployee(EmployeeUpdateSignal signal) {

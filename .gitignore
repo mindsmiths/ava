@@ -26,3 +26,4 @@ secrets
 tags.temp
 target/
 core.*
+*.vsix

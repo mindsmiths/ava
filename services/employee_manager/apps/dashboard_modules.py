@@ -18,7 +18,7 @@ class MatchesModule(DashboardModule):
             days_ahead = weekday - day.weekday()
             if days_ahead <= 0:
                 days_ahead += 7
-            return day + timedelta(days_ahead)
+            return day + timedelta(days_ahead + 7)
 
         by_week = []
 
@@ -28,7 +28,6 @@ class MatchesModule(DashboardModule):
         for week in range(0, self.weekCount):
             weekly = Match.objects.all().filter(date__gte=week_start) \
                                         .filter(date__lte=week_end)
-
             by_week.append(weekly)
 
             week_end = week_start
