@@ -27,12 +27,13 @@ rule "Send second email"
         Heartbeat(ts: timestamp) from entry-point "signals"
         eval(evaluateCronExpression("* * * ? * THU *", ts, "Europe/Zagreb"))
         agent: Ava(
-            lunchReminderStage == LunchReminderStage.FIRST_EMAIL_SENT,
+            lunchReminderStage == LunchReminderStage.FIRST_EMAIL_SENT || lunchCycleStage == AvaLunchCycleStage.LUNCH_MAIL_SENDING,
             workingHours == true
             )
         employee: EmployeeProfile() 
     then
         modify(agent) {
+            setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY),
             setLunchReminderStage(LunchReminderStage.SECOND_EMAIL_SENT)
         }
         agent.sendWeeklyEmail(employee);
@@ -45,13 +46,14 @@ rule "Send third email"
         Heartbeat(ts: timestamp) from entry-point "signals"
         eval(evaluateCronExpression("* * 0-13 ? * FRI *", ts, "Europe/Zagreb")) 
         agent: Ava(
-            lunchReminderStage == LunchReminderStage.SECOND_EMAIL_SENT,
+            lunchReminderStage == LunchReminderStage.SECOND_EMAIL_SENT || lunchCycleStage == AvaLunchCycleStage.LUNCH_MAIL_SENDING,
             workingHours == true
             )
         
         employee: EmployeeProfile()
     then
         modify(agent) {
+            setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY),
             setLunchReminderStage(LunchReminderStage.THIRD_EMAIL_SENT)
         }
         agent.sendWeeklyEmail(employee);
