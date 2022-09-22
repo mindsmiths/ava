@@ -107,7 +107,7 @@ public class Ava extends Agent {
                         new DescriptionComponent(
                                 Mitems.getText("weekly-core.description-asking-for-available-days.text")))
                 .addComponent("cloudSelect", new CloudSelectComponent("availableDays", options))
-                .addComponent("submit", new PrimarySubmitButtonComponent("submit", "confirmDays"));
+                .addComponent("submit", new PrimarySubmitButtonComponent("Submit", "confirmDays"));
         showScreen(daysScreen);
     }
 
