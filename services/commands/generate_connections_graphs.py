@@ -6,13 +6,21 @@ import pandas as pd
 import networkx as nx
 from pyvis.network import Network
 import matplotlib.pyplot as plt
+import os
 
 @cli.command()
 def generate_connections_graphs():
     forge.setup("rule_engine")
     keeper = MongoClientKeeper()
     culture_master = keeper.ruleEngineDB.summary.find_one({"agentId": "CULTURE_MASTER"})
-    
+    culture_master["agents#CultureMaster"]["CULTURE_MASTER"]["avaConnectionStrengths"]={
+        "1": {
+          "2": 100
+        },
+        "2": {
+          "1": 0
+        }
+      }    
     avaConnectionStrengths = pd.DataFrame.from_dict(
         culture_master["agents#CultureMaster"]["CULTURE_MASTER"]["avaConnectionStrengths"]
     )
@@ -30,6 +38,10 @@ def generate_connections_graphs():
                 if score > 80:
                     G2.add_edge(employeeIDs[i],employeeIDs[j],weight=score)
     
+    graphs_path = "/app/services/commands/connections_graphs/"
+    if not os.path.exists(graphs_path):
+        os.makedirs(graphs_path)
+
     for i in range(len(employeeIDs)):
         color_map = len(employeeIDs) * ["royalblue"]
         color_map[i] = "red"
