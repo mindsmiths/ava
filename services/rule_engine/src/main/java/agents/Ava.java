@@ -72,7 +72,6 @@ public class Ava extends Agent {
 
     public Ava(String connectionName, String connectionId) {
         super(connectionName, connectionId);
-
     }
 
     public void updateAvailableDays(List<String> availableDaysStr) {
@@ -113,14 +112,6 @@ public class Ava extends Agent {
                 .addComponent("cloudSelect", new CloudSelectComponent("availableDays", options))
                 .addComponent("submit", new PrimarySubmitButtonComponent("Submit", "confirmDays"));
         showScreen(daysScreen);
-    }
-
-    public void showNotAvailableScreen() {
-        BaseTemplate notAvailableScreen = new TemplateGenerator()
-                .addComponent("title", new TitleComponent(
-                        Mitems.getText("weekly-core.title-for-person-who-is-not-available-any-day.title")));
-        // implement free form where they have to explain why they are not available
-        showScreen(notAvailableScreen);
     }
 
     public void confirmingDaysScreen() {
@@ -518,13 +509,12 @@ public class Ava extends Agent {
         EmailAdapterAPI.newEmail(e);
     }
 
-    public void showLunchDeclineReasonScreen() {
+    public void showLunchDeclineReasonScreens() {
         Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
         String lunchDeclineScreen = Mitems.getText("weekly-core.lunch-decline-reason.title");
-        String answerTag = "answer";
         screens.put("LunchDecline", new TemplateGenerator()
                 .addComponent("title", new TitleComponent(lunchDeclineScreen))
-                .addComponent(answerTag, new TextAreaComponent(answerTag, true))
+                .addComponent("answer", new TextAreaComponent("answer", true))
                 .addComponent("submit", new PrimarySubmitButtonComponent("Submit", "finished-lunch-decline-form")));
 
         String finalScreenTitle = Mitems.getText("weekly-core.lunch-decline-reason.finalscreentitle");
