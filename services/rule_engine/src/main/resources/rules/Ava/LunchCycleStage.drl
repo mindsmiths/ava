@@ -98,7 +98,7 @@ rule "Store match info"
                         setMatchDay(signal.getMatchDay()),
                         setLunchCycleStage(AvaLunchCycleStage.LUNCH_MAIL_SENDING) };
         agent.sendCalendarInvite(signal.getMatchDay(), profile, agent.getOtherEmployees().get(signal.getMatch()));
-        delete(signal);   
+        delete(signal);
 end
 
 

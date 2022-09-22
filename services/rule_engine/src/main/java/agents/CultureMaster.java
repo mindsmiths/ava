@@ -1,6 +1,9 @@
 package agents;
 
 import com.mindsmiths.ruleEngine.model.Agent;
+import com.mindsmiths.sdk.core.db.DataUtils;
+import com.mindsmiths.sdk.core.db.EmitType;
+
 import java.util.*;
 
 import lombok.AllArgsConstructor;
@@ -66,6 +69,8 @@ public class CultureMaster extends Agent {
                 }
             }
         }
+        for (Match m : allMatches)
+            DataUtils.emit(m, EmitType.CREATE);
     }
 
     public void addOrUpdateEmployee(EmployeeUpdateSignal signal) {
