@@ -22,14 +22,14 @@ import models.AvaLunchCycleStage;
 import models.OnboardingStage;
 import models.LunchReminderStage;
 
-rule "Send second email"
+rule "Send second reminder"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
         eval(evaluateCronExpression("* * * ? * THU *", ts, "Europe/Zagreb"))
         agent: Ava(
-            lunchReminderStage == LunchReminderStage.FIRST_EMAIL_SENT || lunchCycleStage == AvaLunchCycleStage.LUNCH_MAIL_SENDING,
+            (lunchReminderStage == LunchReminderStage.FIRST_EMAIL_SENT || lunchCycleStage == AvaLunchCycleStage.LUNCH_MAIL_SENDING),
             workingHours == true
-            )
+        )
         employee: EmployeeProfile() 
     then
         modify(agent) {
@@ -41,14 +41,14 @@ rule "Send second email"
         
 end
 
-rule "Send third email"
+rule "Send third reminder"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
         eval(evaluateCronExpression("* * 0-13 ? * FRI *", ts, "Europe/Zagreb")) 
         agent: Ava(
-            lunchReminderStage == LunchReminderStage.SECOND_EMAIL_SENT || lunchCycleStage == AvaLunchCycleStage.LUNCH_MAIL_SENDING,
+            (lunchReminderStage == LunchReminderStage.SECOND_EMAIL_SENT || lunchCycleStage == AvaLunchCycleStage.LUNCH_MAIL_SENDING),
             workingHours == true
-            )
+        )
         
         employee: EmployeeProfile()
     then
