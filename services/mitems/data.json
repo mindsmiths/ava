@@ -355,8 +355,8 @@
         "elements": [
           {
             "description": "Title",
-            "type": "TEXT",
-            "content": "Bye now. You are the best!"
+            "type": "HTML",
+            "content": "<p>Bye now.</p>\n<p>You are the best!</p>"
           }
         ]
       },
