@@ -48,6 +48,7 @@ THIRD_PARTY_APPS = (
 LOCAL_APPS = (
     'base',
     'employees',
+    'matches',
 )
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
