@@ -57,7 +57,7 @@ public class Ava extends Agent {
     private List<Days> availableDays = new ArrayList<>();
     private String match;
     private Days matchDay;
-    private AvaLunchCycleStage lunchCycleStage = AvaLunchCycleStage.FIND_AVAILABILITY;
+    private AvaLunchCycleStage lunchCycleStage;
     private OnboardingStage onboardingStage;
     private MonthlyCoreStage monthlyCoreStage;
     private Map<String, EmployeeProfile> otherEmployees;
