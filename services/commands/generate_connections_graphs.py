@@ -13,15 +13,25 @@ def generate_connections_graphs():
     forge.setup("rule_engine")
     keeper = MongoClientKeeper()
     culture_master = keeper.ruleEngineDB.summary.find_one({"agentId": "CULTURE_MASTER"})
-    
+    culture_master["agents#CultureMaster"]["CULTURE_MASTER"]["avaConnectionStrengths"]={
+        "1": {"2": 100, "3": 80, "4": 50, "5": 80, "6": 90, "7": 20},
+        "2": {"1": 100, "3": 80, "4": 50, "5": 80, "6": 90, "7": 20},
+        "3": {"2": 100, "1": 80, "4": 50, "5": 80, "6": 90, "7": 20},
+        "4": {"2": 100, "3": 80, "1": 50, "5": 80, "6": 90, "7": 20},
+        "5": {"2": 100, "3": 80, "4": 50, "1": 80, "6": 90, "7": 20},
+        "6": {"2": 100, "3": 80, "4": 50, "5": 80, "1": 90, "7": 20},
+        "7": {"2": 100, "3": 80, "4": 50, "5": 80, "6": 90, "1": 20}
+    }    
     avaConnectionStrengths = pd.DataFrame.from_dict(
         culture_master["agents#CultureMaster"]["CULTURE_MASTER"]["avaConnectionStrengths"]
     )
     employeeIDs = avaConnectionStrengths.columns
     G2 = nx.Graph()
-    for i in range(len(employeeIDs)):
+    numOfEmployees = len(employeeIDs)
+
+    for i in range(numOfEmployees):
         G2.add_node(employeeIDs[i])
-        for j in range(i+1, len(employeeIDs)):
+        for j in range(i+1, numOfEmployees):
             score = 0
             a = avaConnectionStrengths[employeeIDs[i]][employeeIDs[j]]
             b = avaConnectionStrengths[employeeIDs[j]][employeeIDs[i]]
@@ -29,16 +39,17 @@ def generate_connections_graphs():
             if a>=50 and b>=50:
                 score = (a+b)/2
                 if score > 80:
-                    G2.add_edge(employeeIDs[i],employeeIDs[j],weight=score)
+                    G2.add_edge(employeeIDs[i],employeeIDs[j],weight = score/numOfEmployees**2)
     
     graphs_path = "/app/services/commands/connections_graphs/"
     if not os.path.exists(graphs_path):
         os.makedirs(graphs_path)
 
-    for i in range(len(employeeIDs)):
-        color_map = len(employeeIDs) * ["royalblue"]
+    layout = nx.planar_layout(G2)
+    for i in range(numOfEmployees):
+        color_map = numOfEmployees * ["royalblue"]
         color_map[i] = "red"
         plt.show()
-        nx.draw(G2, with_labels = False , node_color=color_map, width=2, edge_color = "royalblue")
+        nx.draw(G2, with_labels = False , node_color=color_map, width=2, edge_color = "royalblue", pos = layout)
         plt.savefig("/app/services/commands/connections_graphs/{}.png".format(i+1), format="PNG")
         plt.close()
