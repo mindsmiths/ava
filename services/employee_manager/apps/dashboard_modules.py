@@ -9,8 +9,7 @@ class MatchesModule(DashboardModule):
     title = 'Matches'
     template = 'dashboard_modules/matches.html'
     column = 0
-    limit = 20
-    weekCount = 5
+    weekCount = 4
 
     def init_with_context(self, context):
         def next_saturday(day):
