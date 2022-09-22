@@ -15,6 +15,7 @@ import java.util.Map;
 public class EmployeeProfile extends Employee {
     Map<String, String> personalAnswers = new HashMap<>();
     Map<String, Double> familiarity = new HashMap<>();
+    OnboardingStage onboardingStage;
  
     public EmployeeProfile(Employee employee) {
         setId(employee.getId());
@@ -24,12 +25,14 @@ public class EmployeeProfile extends Employee {
         setActive(employee.getActive());
     }
 
-    public EmployeeProfile(Map<String, String> personalAnswers, Map<String, Double> familiarity, String id, String firstName, String lastName) {
+    public EmployeeProfile(Map<String, String> personalAnswers, Map<String, Double> familiarity, String id, String firstName, String lastName, String email, OnboardingStage onboardingStage) {
         this.setId(id);
         this.setFirstName(firstName);
         this.setLastName(lastName);
+        this.setEmail(email);
         this.personalAnswers = personalAnswers;
         this.familiarity = familiarity;
+        this.onboardingStage = onboardingStage;
     }
 
     public String getFullName() {

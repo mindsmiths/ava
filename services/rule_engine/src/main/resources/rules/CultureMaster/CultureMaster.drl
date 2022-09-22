@@ -1,8 +1,6 @@
 package rules.CultureMaster;
 
 import agents.CultureMaster;
-import signals.NumOfSilosSignal;
-import signals.SilosInfoSignal;
 import signals.EmployeeUpdateSignal;
 import com.mindsmiths.employeeManager.ManualTriggerEvent;
 import com.mindsmiths.ruleEngine.util.Log;
@@ -52,11 +50,11 @@ rule "Trigger familiarity quiz"
         // trigger quiz
 end
 
-rule "Send number of silos"
+rule "Trigger statistics email"
     when
-        signal: NumOfSilosSignal() from entry-point "signals"
+        signal: ManualTriggerEvent(triggerType == "statistics_email") from entry-point "signals"
         agent: CultureMaster()
     then
-        agent.send(signal.getId(), new SilosInfoSignal(agent.calculateSilosCount()));
-        delete(signal);
+        Log.info("CultureMaster: triggered statistics email from dashboard");
+        // trigger mail
 end

@@ -1,9 +1,7 @@
 package models;
 
-public enum OnboardingStage {
+public enum MonthlyCoreStage {
     EMAIL_SENT,
     FAMILIARITY_QUIZ,
-    PERSONAL_QUIZ,
-    STATS_EMAIL,
     FINISHED;
 }

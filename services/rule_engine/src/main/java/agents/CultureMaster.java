@@ -1,7 +1,8 @@
 package agents;
 
 import com.mindsmiths.ruleEngine.model.Agent;
-import com.mindsmiths.ruleEngine.util.Log;
+import com.mindsmiths.sdk.core.db.DataUtils;
+import com.mindsmiths.sdk.core.db.EmitType;
 
 import java.util.*;
 
@@ -63,6 +64,9 @@ public class CultureMaster extends Agent {
                 }
             }
         }
+        for (Match m : allMatches){
+            DataUtils.emit(new models.Match(m), EmitType.CREATE);
+        }
     }
 
     public void addOrUpdateEmployee(EmployeeUpdateSignal signal) {
@@ -70,8 +74,10 @@ public class CultureMaster extends Agent {
     }
 
     public void sendEmployeesToAva() {
+        int silosCount = calculateSilosCount();
+        String silosRisk = calculateSilosRisk(silosCount, employees.size());
         for (String address : employees.keySet()) {
-            AllEmployees allEmployees = new AllEmployees(employees);
+            AllEmployees allEmployees = new AllEmployees(employees, silosCount, silosRisk);
             send(address, allEmployees);
         }
     }
@@ -82,7 +88,7 @@ public class CultureMaster extends Agent {
         boolean[][] binaryMatrix = new boolean[employees.values().size()][employees.values().size()]; // binary matrix
 
         List<String> list = new LinkedList<>();
-        int limit = 3;
+        int limit = 2;
 
         for (int i = 0; i < employees.values().size(); i++) {
             for (int j = 0; j < employees.values().size(); j++) {
@@ -113,8 +119,8 @@ public class CultureMaster extends Agent {
 
         for (i = 0; i < employees.values().size(); i++) {
             for (j = 0; j < employees.values().size(); j++) {
-                Double avg = (matrix[i][j] + matrix[j][i]) / 2;
-                binaryMatrix[i][j] = (avg >= limit);
+                Double sum = (matrix[i][j] + matrix[j][i]);
+                binaryMatrix[i][j] = sum >= limit;
             }
         }
         return binaryMatrix;
@@ -130,19 +136,21 @@ public class CultureMaster extends Agent {
     }
 
     public int calculateSilosCount() {
+
         boolean[][] matrix = calculateEmployeeConnections(employees);
-        int count = 0;
+
+        int groupCount = 0;
         int size = matrix[0].length;
         boolean[] visited = new boolean[size];
 
         for (int i = 0; i < size; i++) {
             if (!visited[i]) {
-                count++;
+                groupCount++;
                 visited[i] = true;
                 gatherAllConnections(matrix, visited, i);
             }
         }
-        return count;
+        return groupCount;
     }
 
     public String calculateSilosRisk(int silosNum, int employeeNum) {

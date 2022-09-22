@@ -5,6 +5,7 @@ import java.util.*;
 import com.mindsmiths.armory.events.UserConnectedEvent
 import com.mindsmiths.armory.events.SubmitEvent
 import com.mindsmiths.ruleEngine.model.Heartbeat;
+import com.mindsmiths.ruleEngine.util.Agents;
 import com.mindsmiths.pairingalgorithm.Days;
 import com.mindsmiths.pairingalgorithm.EmployeeAvailability;
 import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
@@ -19,34 +20,36 @@ import signals.ConnectionsStrengthSignal;
 import models.AvaLunchCycleStage;
 import models.OnboardingStage;
 
-
-rule "Lunch invite expired"
+rule "Send available days email"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        eval(!evaluateCronExpression("* * 9-23 * * WED", ts, "Europe/Zagreb") && 
-            !evaluateCronExpression("* * * * * THU", ts, "Europe/Zagreb") &&
-            !evaluateCronExpression("* * 00-14 * * FRI", ts, "Europe/Zagreb"))
-        signal: UserConnectedEvent(getParamAsString("trigger") == "start-weekly-core") from entry-point "signals"
-        agent: Ava(lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY,
+        agent: Ava(lunchCycleStage == AvaLunchCycleStage.LUNCH_MAIL_SENDING,
                    onboardingStage == OnboardingStage.FINISHED)
-    then 
-        agent.showLunchInviteExpiredScreen();
-        delete(signal);
+        eval(evaluateCronExpression("* * 8-17 ? * WED *", ts, "Europe/Zagreb")
+            || (agent.isManualTrigger() == true))
+        employee: EmployeeProfile()
+    then
+        modify(agent) {setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY)}
+        agent.sendWeeklyEmail(employee);
 end
 
 rule "Ask for available days"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        eval(evaluateCronExpression("* * 9-23 * * WED", ts, "Europe/Zagreb") 
-        || (evaluateCronExpression("* * * * * THU", ts, "Europe/Zagreb"))
-        || (evaluateCronExpression("* * 00-14 * * FRI", ts, "Europe/Zagreb")))
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-weekly-core") from entry-point "signals"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY,
                    onboardingStage == OnboardingStage.FINISHED)
         employee: EmployeeProfile()
+        eval(evaluateCronExpression("* * 9-23 * * WED", ts, "Europe/Zagreb") 
+            || (evaluateCronExpression("* * * * * THU", ts, "Europe/Zagreb"))
+            || (evaluateCronExpression("* * 00-18 * * MON", ts, "Europe/Zagreb"))
+            || (agent.isManualTrigger() == true))
     then 
         // what if person decides to exit this screen without answering, now we can't get back because we are in the next stage
-        modify(agent) {setLunchCycleStage(AvaLunchCycleStage.FORWARD_AVAILABILITY)}
+        modify(agent) {
+            setLunchCycleStage(AvaLunchCycleStage.FORWARD_AVAILABILITY),
+            setManualTrigger(false)
+        };
         agent.chooseAvailableDaysScreen();
         Log.info("Decaying connection strength neurons for: " + employee.getFullName());
         modify(agent) {decayConnectionNeurons()}
@@ -91,7 +94,30 @@ rule "Store match info"
         modify(agent) {getMatchHistory().add(signal.getMatch())};
         agent.printMatchInfo(employee, signal);
         Log.info("My match history: " + agent.getMatchHistory());
+        agent.sendCalendarInvite(signal.getMatchDay(), employee, agent.getOtherEmployees().get(signal.getMatch()));
         delete(signal);
 end
 
+rule "Reset Ava lunch cycle stage"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        agent: Ava(lunchCycleStage == AvaLunchCycleStage.ACCEPT_MATCH_INFO)
+        eval(evaluateCronExpression("* * 8-17 ? * SUN *", ts, "Europe/Zagreb"))
+    then
+        modify(agent) {setLunchCycleStage(AvaLunchCycleStage.LUNCH_MAIL_SENDING)};
+end
 
+rule "Lunch invite expired"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        eval(!evaluateCronExpression("* * 9-23 * * WED", ts, "Europe/Zagreb") && 
+            !evaluateCronExpression("* * * * * THU", ts, "Europe/Zagreb") &&
+            !evaluateCronExpression("* * 00-14 * * FRI", ts, "Europe/Zagreb"))
+        signal: UserConnectedEvent(getParamAsString("trigger") == "start-weekly-core") from entry-point "signals"
+        agent: Ava(lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY,
+                   onboardingStage == OnboardingStage.FINISHED,
+                   manualTrigger == false)
+    then 
+        agent.showLunchInviteExpiredScreen();
+        delete(signal);
+end

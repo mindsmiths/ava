@@ -55,7 +55,6 @@ rule "Check that all ava availabilities came"
         modify(agent) {setLunchCycleStage(CmLunchCycleStage.GENERATE_MATCHES)};
 end
 
-
 rule "Generate this weeks matches"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
@@ -70,7 +69,7 @@ end
 rule "Store generated matches"
     when
         matches: Matches() from entry-point "signals"
-        agent: CultureMaster()
+        agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.COLLECT_GENERATED_MATCHES)
     then
         modify(agent) {addMatches(matches.getAllMatches())};
         Log.info("Matches from pairing algorithm: " + matches.getAllMatches());
@@ -84,7 +83,6 @@ rule "Send match info to Avas"
         agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.SEND_TO_AVAS)
     then
         agent.sendMatches();
-        // uncomment after TESTING........
-        // agent.clearEmployeeAvailabilities();
-        // modify(agent) {setLunchCycleStage(CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES)};
+        agent.clearEmployeeAvailabilities();
+        modify(agent) {setLunchCycleStage(CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES)};
 end

@@ -19,5 +19,6 @@ forge.setup('employee_manager')
 
 application = get_wsgi_application()
 
-from service import Service  # noqa: E402
-Service().start_in_thread()
+# if not Module.is_test():
+from service import EmployeeManagerListener  # noqa: E402
+EmployeeManagerListener().start_in_thread()

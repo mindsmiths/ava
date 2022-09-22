@@ -32,34 +32,3 @@ rule "Set non working hours"
             setWorkingHours(false)
         }
 end
-
-rule "Trigger lunch cycle for Ava"
-    when
-        signal: ManualTriggerEvent(triggerType == "lunch_cycle") from entry-point "signals"
-        agent: Ava(onboardingStage == OnboardingStage.FINISHED)
-        employee: EmployeeProfile()
-    then
-        Log.info("Ava: triggered lunch cycle from dashboard");
-        modify(agent) {setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY)};
-        agent.sendWeeklyEmail(employee);
-        delete(signal);            
-end
-
-rule "Trigger lunch pairing for Ava"
-    when
-        signal: ManualTriggerEvent(triggerType == "lunch_pairing") from entry-point "signals"
-        agent: Ava(onboardingStage == OnboardingStage.FINISHED)
-    then
-        Log.info("Ava: triggered lunch pairing from dashboard");
-        modify(agent) {setLunchCycleStage(AvaLunchCycleStage.ACCEPT_MATCH_INFO)};
-        delete(signal);            
-end
-
-rule "Trigger familiarity quiz"
-    when
-        signal: ManualTriggerEvent(triggerType == "familiarity_quiz") from entry-point "signals"
-        agent: Ava()
-    then
-        Log.info("Ava: triggered familiarity quiz from dashboard");
-        // trigger quiz
-end

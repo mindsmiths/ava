@@ -16,12 +16,14 @@ import agents.CultureMaster;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import models.OnboardingStage;
+import signals.AllEmployees;
+import models.AvaLunchCycleStage;
+
+import signals.EmployeeUpdateSignal;
 
 import models.EmployeeProfile;
 import models.OnboardingStage;
-
-import signals.NumOfSilosSignal;
-
 
 rule "Send welcome email"
     when
@@ -38,11 +40,40 @@ rule "Send welcome email"
         };
 end
 
-rule "Start and reconnect personal quiz"
+rule "Start and reconnect familiarity quiz"
    when
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-onboarding") from entry-point "signals"
-        agent: Ava(onboardingStage in (OnboardingStage.EMAIL_SENT, OnboardingStage.PERSONAL_QUIZ))
+        agent: Ava(onboardingStage in (OnboardingStage.EMAIL_SENT, OnboardingStage.FAMILIARITY_QUIZ))
    then
+        agent.showFamiliarityQuizScreens();
+        modify(agent) {
+            setOnboardingStage(OnboardingStage.FAMILIARITY_QUIZ)
+        };
+        delete(signal);
+end
+
+rule "Start personal quiz"
+   when
+        signal: SubmitEvent(getParamAsString("submit") == "finished-familiarity-quiz") from entry-point "signals"
+        agent: Ava(onboardingStage == OnboardingStage.FAMILIARITY_QUIZ)
+        employee: EmployeeProfile()
+   then 
+        Map<String, Double> familiarity = new HashMap<String, Double>(
+            employee.getFamiliarity()
+        );
+        for (String paramId : signal.getParams().keySet()){
+            if (paramId.startsWith("answers")) {
+                for (String em : (List<String>) signal.getParam(paramId)) {
+                    familiarity.put(
+                        em, familiarity.getOrDefault(em, 0.0) + 1.0
+                    );
+                } 
+            }
+        }    
+       
+        modify(employee) { 
+            setFamiliarity(familiarity)
+        };
         agent.showPersonalQuizScreens();
         modify(agent) {
             setOnboardingStage(OnboardingStage.PERSONAL_QUIZ)
@@ -50,9 +81,19 @@ rule "Start and reconnect personal quiz"
         delete(signal);
 end
 
-rule "Start familiarity quiz"
+rule "Reconnect personal quiz"
    when
-        signal: SubmitEvent(getParamAsString("submit") == "finished-personal-quiz") from entry-point "signals"
+        signal: UserConnectedEvent(getParamAsString("trigger") == "start-onboarding") from entry-point "signals"
+        agent: Ava(onboardingStage == OnboardingStage.PERSONAL_QUIZ)
+   then
+        agent.showPersonalQuizScreens();
+        delete(signal);
+end
+
+rule "Finish onboarding"
+   when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        signal: SubmitEvent(getParamAsString("submit") == "finishpersonalquiz") from entry-point "signals"
         agent: Ava(onboardingStage == OnboardingStage.PERSONAL_QUIZ)
         employee: EmployeeProfile()
    then
@@ -65,11 +106,9 @@ rule "Start familiarity quiz"
                     paramId.replace("answers", "question"),
                     signal.getParamAsString(paramId)
                 );
-        modify(employee) { setPersonalAnswers(personalAnswers) };
-
-        agent.showFamiliarityQuizScreens();
-        modify(agent) {
-            setOnboardingStage(OnboardingStage.FAMILIARITY_QUIZ)
+        modify(employee) {
+            setPersonalAnswers(personalAnswers),
+            setOnboardingStage(OnboardingStage.STATS_EMAIL) 
         };
         delete(signal);
 end
@@ -109,18 +148,31 @@ rule "Finish onboarding"
         // test to see if connections strengths works
         Log.info("I'm " + employee.getFirstName() + "and my connectionStrengths map is " + agent.getConnectionStrengths());
         modify(agent) {
-            setOnboardingStage(OnboardingStage.FINISHED),
+            setOnboardingStage(OnboardingStage.STATS_EMAIL),
+            setLunchCycleStage(AvaLunchCycleStage.LUNCH_MAIL_SENDING),
             setStatsEmailLastSentAt(ts)
         };
-        agent.send(CultureMaster.ID, new NumOfSilosSignal(agent.getId()));
+        agent.send(CultureMaster.ID, new EmployeeUpdateSignal(employee));
         delete(signal);
 end
 
 rule "Reconnect final screen"
    when
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-onboarding") from entry-point "signals"
-        agent: Ava(onboardingStage == OnboardingStage.FINISHED)
+        agent: Ava(onboardingStage in (OnboardingStage.STATS_EMAIL, OnboardingStage.FINISHED))
    then
         agent.showFinalScreen();
         delete(signal);
+end
+
+rule "Send statistics email"
+    when
+        agent: Ava(
+            onboardingStage == OnboardingStage.STATS_EMAIL,
+            allEmployeesFinishedOnboarding() == true
+        )
+        employee: EmployeeProfile()
+    then
+        agent.sendStatisticsEmail(employee);
+        modify(agent) {setOnboardingStage(OnboardingStage.FINISHED)};
 end

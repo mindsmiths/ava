@@ -2,7 +2,7 @@ global:
   dependencies:
     python:
       - forge-sdk==4.0.0a12
-      - forge-cli==4.0.0a26
+      - forge-cli==4.0.0a27
       - cecs==4.0.0a3
       - services/*.py
   env:
@@ -10,7 +10,7 @@ global:
 
     ENVIRONMENT_NAME: {{ env.ENVIRONMENT_NAME }}
     MODULE: '{{ env.MODULE | default("local", True) }}'
-    LOG_LEVEL: INFO
+    LOG_LEVEL: DEBUG
 
     # Messaging
     PULSAR_URL: pulsar://pulsar-proxy.pulsar.svc.cluster.local:6650
@@ -65,6 +65,9 @@ services:
     resources:
       cpu: 500m
       memory: 650Mi
+    dependencies:
+      - pairing-algorithm
+      - employee-manager
 
   heartbeat-scheduler:
     package: heartbeat

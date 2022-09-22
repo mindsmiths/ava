@@ -1,12 +1,14 @@
 package com.mindsmiths.employeeManager.employees;
 
 import com.mindsmiths.sdk.core.db.DataModel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.Setter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import java.io.Serializable;
+
 
 @Getter
 @Setter
