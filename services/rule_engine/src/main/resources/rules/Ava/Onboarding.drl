@@ -106,10 +106,8 @@ rule "Finish personal quiz"
                     paramId.replace("answers", "question"),
                     signal.getParamAsString(paramId)
                 );
-        modify(employee) {
-            setPersonalAnswers(personalAnswers),
-            setOnboardingStage(OnboardingStage.STATS_EMAIL) 
-        };
+        modify(employee) {setPersonalAnswers(personalAnswers)};
+        modify(agent) {setOnboardingStage(OnboardingStage.STATS_EMAIL)};
         delete(signal);
 end
 

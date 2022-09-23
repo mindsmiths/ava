@@ -132,7 +132,7 @@ public class Ava extends Agent {
 
     public String employeeToAvaId(String employeeId) {
         for(Map.Entry<String, EmployeeProfile> entry : otherEmployees.entrySet()) {
-            if(entry.getValue().getId() == employeeId) {
+            if(entry.getValue().getId().equals(employeeId)) {
                 return entry.getKey();
             }
         }

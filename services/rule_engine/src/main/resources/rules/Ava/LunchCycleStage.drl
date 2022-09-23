@@ -85,11 +85,11 @@ rule "Ask for available days"
             lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY,
             lunchReminderStage != LunchReminderStage.USER_RESPONDED
         )
-
         eval(evaluateCronExpression("* * 9-23 * * WED", ts, "Europe/Zagreb") 
             || (evaluateCronExpression("* * * * * THU", ts, "Europe/Zagreb"))
             || (evaluateCronExpression("* * 00-14 * * FRI", ts, "Europe/Zagreb"))
             || (agent.isManualTrigger() == true))
+        employee: EmployeeProfile()
     then 
         // what if person decides to exit this screen without answering, now we can't get back because we are in the next stage
         modify(agent) {
@@ -98,19 +98,6 @@ rule "Ask for available days"
         agent.chooseAvailableDaysScreen();
         Log.info("Decaying connection strength neurons for: " + employee.getFullName());
         modify(agent) {decayConnectionNeurons()}
-        delete(signal);
-end
-
-rule "Handle employee not available"
-    when 
-        signal: SubmitEvent((getParamAsString("submit") == "confirmDays") && (signal.getParam("availableDays") == [])) from entry-point "signals"
-        agent: Ava(lunchCycleStage == AvaLunchCycleStage.FORWARD_AVAILABILITY)
-        employee: EmployeeProfile()
-    then
-        agent.showNotAvailableScreen();
-        modify(agent) {updateAvailableDays((ArrayList<String>)(signal.getParam("availableDays")))};
-        agent.send(CultureMaster.ID, new EmployeeAvailabilitySignal(new EmployeeAvailability(employee.getId(), agent.getAvailableDays()))); 
-        modify(agent) {setLunchCycleStage(AvaLunchCycleStage.ACCEPT_MATCH_INFO)};
         delete(signal);
 end
 
@@ -171,7 +158,6 @@ rule "Store match info"
         modify(agent) {setMatch(signal.getMatch()), setMatchDay(signal.getMatchDay())};
         modify(agent) {getMatchHistory().add(signal.getMatch())};
         agent.printMatchInfo(employee, signal);
-        Log.info("My match history: " + agent.getMatchHistory());
         agent.sendCalendarInvite(signal.getMatchDay(), employee, agent.getOtherEmployees().get(agent.employeeToAvaId(signal.getMatch())));
         delete(signal);
 end
@@ -196,7 +182,7 @@ rule "Auto assign days"
                 add(Days.FRI);
             }});
         }
-        agent.send(CultureMaster.ID, new AvaAvailabilitySignal(new AvaAvailability(agent.getId(), agent.getAvailableDays())));
+        agent.send(CultureMaster.ID, new EmployeeAvailabilitySignal(new EmployeeAvailability(agent.getId(), agent.getAvailableDays())));
 end
 
 rule "Reset Ava lunch cycle stage"
