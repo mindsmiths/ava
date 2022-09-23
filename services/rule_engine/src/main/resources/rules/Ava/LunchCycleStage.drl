@@ -86,8 +86,8 @@ rule "Ask for available days"
         )
 
         eval(evaluateCronExpression("* * 9-23 * * WED", ts, "Europe/Zagreb") 
-            || (evaluateCronExpression("* * * * * THU", ts, "Europe/Zagreb")) ///// PREGLEDAT OBAVEZNO
-            || (evaluateCronExpression("* * 00-18 * * MON", ts, "Europe/Zagreb"))
+            || (evaluateCronExpression("* * * * * THU", ts, "Europe/Zagreb"))
+            || (evaluateCronExpression("* * 00-14 * * FRI", ts, "Europe/Zagreb"))
             || (agent.isManualTrigger() == true))
     then 
         // what if person decides to exit this screen without answering, now we can't get back because we are in the next stage
@@ -110,7 +110,7 @@ rule "Confirm days"
             agent.showLunchDeclineReasonScreens();
 
         modify(agent) {
-            updateAvailableDays((availableDays)), //(ArrayList<String>)
+            updateAvailableDays((availableDays)),
             setLunchCycleStage(AvaLunchCycleStage.ACCEPT_MATCH_INFO),
             setLunchReminderStage(LunchReminderStage.USER_RESPONDED)
         };
