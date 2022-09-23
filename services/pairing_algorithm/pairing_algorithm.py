@@ -59,8 +59,10 @@ class PairingAlgorithm(BaseService):
 
             # compatibility is the average of how a scored b
             # and how b scored a translated by a 100
-            first_score_second = employeeConnectionStrengths[str(employee_id_mapping[pair[0]])][str(employee_id_mapping[pair[1]])]
-            second_score_first = employeeConnectionStrengths[str(employee_id_mapping[pair[1]])][str(employee_id_mapping[pair[0]])]
+            first_score_second = employeeConnectionStrengths[str(
+                employee_id_mapping[pair[0]])][str(employee_id_mapping[pair[1]])]
+            second_score_first = employeeConnectionStrengths[str(
+                employee_id_mapping[pair[1]])][str(employee_id_mapping[pair[0]])]
             weight = 100 - ((first_score_second + second_score_first) / 2)
             # weight can't be 0, because of how blossom works
             if weight == 0:
