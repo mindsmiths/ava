@@ -8,14 +8,16 @@ from pyvis.network import Network
 import matplotlib.pyplot as plt
 import os
 
+
 @cli.command()
 def generate_connections_graphs():
     forge.setup("rule_engine")
     keeper = MongoClientKeeper()
-    culture_master = keeper.ruleEngineDB.summary.find_one({"agentId": "CULTURE_MASTER"})
+    culture_master = keeper.ruleEngineDB.summary.find_one(
+        {"agentId": "CULTURE_MASTER"})
 
     ava_connection_strengths = pd.DataFrame.from_dict(
-        culture_master["agents#CultureMaster"]["CULTURE_MASTER"]["avaConnectionStrengths"]
+        culture_master["agents#CultureMaster"]["CULTURE_MASTER"]["employeeConnectionStrengths"]
     )
     employee_ids = ava_connection_strengths.columns
     G2 = nx.Graph()
@@ -27,21 +29,22 @@ def generate_connections_graphs():
             score = 0
             a = ava_connection_strengths[employee_ids[i]][employee_ids[j]]
             b = ava_connection_strengths[employee_ids[j]][employee_ids[i]]
-        
-            if a>=50 and b>=50:
+
+            if a >= 50 and b >= 50:
                 score = (a+b)/2
                 if score > 80:
-                    G2.add_edge(employee_ids[i],employee_ids[j],weight = score)
-    
+                    G2.add_edge(employee_ids[i], employee_ids[j], weight=score)
+
     graphs_path = "./services/commands/connections_graphs/"
     if not os.path.exists(graphs_path):
         os.makedirs(graphs_path)
 
-    layout = nx.planar_layout(G2)
+    layout = nx.spring_layout(G2, seed=6)
     for i in range(num_of_employees):
         color_map = num_of_employees * ["royalblue"]
         color_map[i] = "red"
         plt.show()
-        nx.draw(G2, with_labels = False , node_color=color_map, width=2, edge_color = "royalblue", pos = layout)
-        plt.savefig(graphs_path + "{}.png".format(i+1), format="PNG")
+        nx.draw(G2, with_labels=False, node_color=color_map,
+                width=2, edge_color="royalblue", pos=layout)
+        plt.savefig(graphs_path + "{}.png".format(employee_ids[i]), format="PNG")
         plt.close()
