@@ -67,7 +67,7 @@ public class Ava extends Agent {
     private int silosCount;
     private String silosRisk;
     private LunchReminderStage lunchReminderStage;
-    private List<String> lunchDeclineReasons = new ArrayList<>();
+    private List<String> lunchDeclineReasons = new ArrayList<>(); // track days
     private boolean manualTrigger;
 
     public Ava(String connectionName, String connectionId) {
@@ -490,7 +490,6 @@ public class Ava extends Agent {
         } else if (this.lunchReminderStage == LunchReminderStage.THIRD_EMAIL_SENT) { // third mail text
             subject = Mitems.getText("weekly-core.second-reminder-email.subject");
             description = Mitems.getText("weekly-core.second-reminder-email.description");
-
         }
 
         String htmlTemplate = new String(Objects.requireNonNull(
@@ -521,14 +520,10 @@ public class Ava extends Agent {
                 .addComponent("title", new TitleComponent(lunchDeclineScreen))
                 .addComponent("answer", new TextAreaComponent("answer", true))
                 .addComponent("submit", new PrimarySubmitButtonComponent("Submit", "finished-lunch-decline-form")));
-
         String finalScreenTitle = Mitems.getText("weekly-core.lunch-decline-reason.finalscreentitle");
-
         screens.put("finished-lunch-decline-form", new TemplateGenerator()
                 .addComponent("description", new TitleComponent(finalScreenTitle)));
-
         showScreens("LunchDecline", screens);
-
     }
 
     public void showUserAlreadyRespondedScreen() {

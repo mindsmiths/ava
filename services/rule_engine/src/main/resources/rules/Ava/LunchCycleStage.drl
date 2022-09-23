@@ -190,15 +190,6 @@ rule "Reset Ava lunch cycle stage"
         };
 end
 
-rule "User already confirmed available days"
-    when 
-        signal: UserConnectedEvent(getParamAsString("trigger") == "start-weekly-core") from entry-point "signals"
-        agent: Ava(lunchReminderStage == LunchReminderStage.USER_RESPONDED)
-    then
-        agent.showUserAlreadyRespondedScreen();
-        delete(signal);
-end
-
 rule "User already declined or confirmed available days"
     when 
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-lunch-decline-reason-screen" || getParamAsString("trigger") == "start-weekly-core") from entry-point "signals" 
