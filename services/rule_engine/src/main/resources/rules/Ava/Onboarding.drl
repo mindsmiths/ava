@@ -76,6 +76,7 @@ rule "Start personal quiz"
         };
         agent.showPersonalQuizScreens();
         modify(agent) {
+            chargeConnectionNeurons(employee),
             setOnboardingStage(OnboardingStage.PERSONAL_QUIZ)
         };
         delete(signal);
@@ -108,47 +109,6 @@ rule "Finish personal quiz"
                 );
         modify(employee) {setPersonalAnswers(personalAnswers)};
         modify(agent) {setOnboardingStage(OnboardingStage.STATS_EMAIL)};
-        delete(signal);
-end
-
-rule "Reconnect familiarity quiz"
-   when
-        signal: UserConnectedEvent(getParamAsString("trigger") == "start-onboarding") from entry-point "signals"
-        agent: Ava(onboardingStage == OnboardingStage.FAMILIARITY_QUIZ)
-   then
-        agent.showFamiliarityQuizScreens();
-        delete(signal);
-end
-
-rule "Finish onboarding"
-   when
-        Heartbeat(ts: timestamp) from entry-point "signals"
-        signal: SubmitEvent(getParamAsString("submit") == "finished-familiarity-quiz") from entry-point "signals"
-        agent: Ava(onboardingStage == OnboardingStage.FAMILIARITY_QUIZ)
-        employee: EmployeeProfile()
-   then
-        Map<String, Double> familiarity = new HashMap<String, Double>(
-            employee.getFamiliarity()
-        );
-        for (String paramId : signal.getParams().keySet()) 
-            if (paramId.startsWith("answers")) {
-                for (String em : (List<String>) signal.getParam(paramId)) {
-                    familiarity.put(
-                        em, familiarity.getOrDefault(em, 0.0) + 1.0
-                    );
-                }
-                
-            }
-        modify(employee) { setFamiliarity(familiarity) };
-        agent.sendStatisticsEmail(employee);
-        modify(agent) {
-            chargeConnectionNeurons(employee),
-            setOnboardingStage(OnboardingStage.STATS_EMAIL),
-            setLunchCycleStage(AvaLunchCycleStage.LUNCH_MAIL_SENDING),
-            setStatsEmailLastSentAt(ts)
-        };
-        Log.info("I'm " + employee.getFirstName() + "and my connectionStrengths map is " + agent.getConnectionStrengths());
-        agent.send(CultureMaster.ID, new EmployeeUpdateSignal(employee));
         delete(signal);
 end
 

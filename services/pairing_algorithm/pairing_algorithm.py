@@ -85,4 +85,6 @@ class PairingAlgorithm(BaseService):
 
         # todo: handle people that didn't match
 
+        # handling people that are not matchable
+
         return Matches(allMatches=all_matches)

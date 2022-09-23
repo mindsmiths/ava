@@ -91,13 +91,12 @@ rule "Ask for available days"
             || (agent.isManualTrigger() == true))
         employee: EmployeeProfile()
     then 
-        // what if person decides to exit this screen without answering, now we can't get back because we are in the next stage
-        modify(agent) {
-            setManualTrigger(false)
-        };
         agent.chooseAvailableDaysScreen();
         Log.info("Decaying connection strength neurons for: " + employee.getFullName());
-        modify(agent) {decayConnectionNeurons()}
+        modify(agent) {
+            decayConnectionNeurons(),
+            setManualTrigger(false)
+            };
         delete(signal);
 end
 

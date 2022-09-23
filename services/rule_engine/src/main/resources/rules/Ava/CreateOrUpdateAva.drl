@@ -56,10 +56,10 @@ rule "Save or update all employees"
     then
         Map<String, EmployeeProfile> allEmployees = new HashMap<>(signal.getAllEmployees());
         allEmployees.remove(agent.getId());
-        modify(agent) {setOtherEmployees(allEmployees)};
-        // add neurons for new connections
-        modify(agent) {addConnectionStrengths()};
         modify (agent) {
+            setOtherEmployees(allEmployees)
+            // add neurons for new connections
+            addConnectionStrengths()
             setSilosCount(signal.getSilosCount()),
             setSilosRisk(signal.getSilosRisk())
         };
