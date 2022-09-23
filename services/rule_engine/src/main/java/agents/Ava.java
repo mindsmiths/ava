@@ -58,7 +58,7 @@ import utils.Settings;
 @NoArgsConstructor
 public class Ava extends Agent {
     private List<Days> availableDays = new ArrayList<>();
-    private String match; //avaId
+    private String match;
     private Days matchDay;
     private List<String> matchHistory = new ArrayList<>();
     private AvaLunchCycleStage lunchCycleStage;

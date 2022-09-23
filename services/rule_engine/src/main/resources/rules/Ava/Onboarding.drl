@@ -141,15 +141,13 @@ rule "Finish onboarding"
             }
         modify(employee) { setFamiliarity(familiarity) };
         agent.sendStatisticsEmail(employee);
-        // update neurons according to the results of the quiz
-        modify(agent) {chargeConnectionNeurons(employee)};
-        // test to see if connections strengths works
-        Log.info("I'm " + employee.getFirstName() + "and my connectionStrengths map is " + agent.getConnectionStrengths());
         modify(agent) {
+            chargeConnectionNeurons(employee),
             setOnboardingStage(OnboardingStage.STATS_EMAIL),
             setLunchCycleStage(AvaLunchCycleStage.LUNCH_MAIL_SENDING),
             setStatsEmailLastSentAt(ts)
         };
+        Log.info("I'm " + employee.getFirstName() + "and my connectionStrengths map is " + agent.getConnectionStrengths());
         agent.send(CultureMaster.ID, new EmployeeUpdateSignal(employee));
         delete(signal);
 end

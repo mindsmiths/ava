@@ -60,10 +60,9 @@ rule "Generate this weeks matches"
         Heartbeat(ts: timestamp) from entry-point "signals"
         agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.GENERATE_MATCHES)
     then
-        // uncomment after TESTING........
-        // Log.info("Generating matches....");
-        // modify(agent) {setLunchCycleStage(CmLunchCycleStage.COLLECT_GENERATED_MATCHES)};
-        // agent.generateMatches();
+        Log.info("Generating matches....");
+        modify(agent) {setLunchCycleStage(CmLunchCycleStage.COLLECT_GENERATED_MATCHES)};
+        agent.generateMatches();
 end
 
 rule "Store generated matches"
