@@ -26,7 +26,9 @@ rule "Set non working hours"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
         eval(!evaluateCronExpression("* * 8-17 ? * MON,TUE,WED,THU,FRI *", ts, "Europe/Zagreb"))
-        agent: Ava(workingHours != false)
+        agent: Ava(
+            workingHours != false
+        )
     then
         modify(agent) {
             setWorkingHours(false)
