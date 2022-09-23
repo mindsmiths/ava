@@ -10,7 +10,7 @@ body {
 }
 
 .CenteredContentTemplate {
-    justify-content: center;
+    justify-content: center !important;
 }
 
 .DescriptionComponent {
@@ -26,13 +26,13 @@ body {
         place-content: center;
     }
     
-    label.checkbox {
-        background-color: #ffffff;
-        color: #c0392b;
-        border-color: #c0392b;
+    label.checkbox { 
+        background-color: #fff;
+        color: #4a4a4a;
+        border-color: #4a4a4a;
     }
     
-    label.checkbox.is-primary {
+    label.checkbox.is-primary { 
         background-color: #7DD86F;
         color: #ffffff;
         border-color: #7DD86F;

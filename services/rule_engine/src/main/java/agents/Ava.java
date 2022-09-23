@@ -120,6 +120,7 @@ public class Ava extends Agent {
         Map<String, BaseTemplate> screens = Map.of(
             "confirmDaysScreen", 
             new TemplateGenerator("confirmScreen")
+                .setTemplateName("CenteredContentTemplate")
                 .addComponent(
                     "title", 
                     new TitleComponent(
@@ -132,6 +133,7 @@ public class Ava extends Agent {
                 ),
             "confirmDaysAndThanksScreen",
             new TemplateGenerator("confirmAndThanksScreen")
+                .setTemplateName("CenteredContentTemplate")
                 .addComponent(
                     "title",
                     new TitleComponent(
@@ -266,7 +268,9 @@ public class Ava extends Agent {
 
     public void showFinalScreen() {
         String goodbyeScreen = Mitems.getText("onboarding.finish-personal-quiz.goodbye-screen");
-        BaseTemplate screen = new TemplateGenerator("goodbye").addComponent("title", new TitleComponent(goodbyeScreen));
+        BaseTemplate screen = new TemplateGenerator("goodbye")
+                                        .setTemplateName("CenteredContentTemplate")
+                                        .addComponent("title", new TitleComponent(goodbyeScreen));
         showScreen(screen);
     }
 
@@ -441,8 +445,9 @@ public class Ava extends Agent {
                 .addComponent("description", new TitleComponent(riskScreenTitle))
                 .addComponent("submit", new PrimarySubmitButtonComponent(riskScreenButton, "finalScreen")));
 
-        String finalScreenTitle = Mitems.getText("statistics.final-screen.title");
+        String finalScreenTitle = Mitems.getHTML("statistics.final-screen.title");
         screens.put("finalScreen", new TemplateGenerator()
+                .setTemplateName("CenteredContentTemplate")
                 .addComponent("description", new TitleComponent(finalScreenTitle)));
 
         showScreens("employeeNumberScreen", screens);
