@@ -35,7 +35,7 @@ rule "Send available days email"
         modify(agent) {
             setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY),
             setLunchReminderStage(LunchReminderStage.FIRST_EMAIL_SENT)
-            }
+        }
         agent.sendWeeklyEmail(employee);
 end
 

@@ -209,6 +209,7 @@ services:
       - networkx==2.8.6
       - pyvis==0.2.1
       - matplotlib==3.6.0
+      - scipy==1.9.1
     resources:
       cpu: 50m
       memory: 75Mi
