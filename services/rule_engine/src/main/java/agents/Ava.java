@@ -1,17 +1,7 @@
 package agents;
 
-import java.util.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
-import utils.Settings;
-
-import lombok.Data;
-import lombok.ToString;
-import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 <<<<<<< HEAD
 import java.util.Collections;
@@ -25,9 +15,9 @@ import java.util.Date;
 import java.util.HashMap;
 >>>>>>> origin/main
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
-import java.util.Objects;
 
 import com.mindsmiths.armory.ArmoryAPI;
 import com.mindsmiths.armory.components.ActionGroupComponent;
@@ -41,19 +31,24 @@ import com.mindsmiths.armory.components.TextAreaComponent;
 import com.mindsmiths.armory.components.TitleComponent;
 import com.mindsmiths.armory.templates.BaseTemplate;
 import com.mindsmiths.armory.templates.TemplateGenerator;
+import com.mindsmiths.emailAdapter.AttachmentData;
 import com.mindsmiths.emailAdapter.EmailAdapterAPI;
 import com.mindsmiths.emailAdapter.SendEmailPayload;
+import com.mindsmiths.employeeManager.employees.Employee;
 import com.mindsmiths.mitems.Mitems;
 import com.mindsmiths.mitems.Option;
+import com.mindsmiths.pairingalgorithm.Days;
 import com.mindsmiths.ruleEngine.model.Agent;
 import com.mindsmiths.ruleEngine.util.Log;
-import com.mindsmiths.pairingalgorithm.Days;
-import com.mindsmiths.ruleEngine.model.Agent;
-import com.mindsmiths.pairingalgorithm.Days;
 import com.mindsmiths.sdk.utils.templating.Templating;
-import com.mindsmiths.employeeManager.employees.Employee;
-import com.mindsmiths.emailAdapter.AttachmentData;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import models.AvaLunchCycleStage;
+import models.EmployeeProfile;
+import models.MonthlyCoreStage;
+import models.OnboardingStage;
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.DateTime;
@@ -62,6 +57,7 @@ import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.Method;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.Version;
+<<<<<<< Updated upstream
 
 import models.AvaLunchCycleStage; 
 import lombok.Data;
@@ -70,6 +66,9 @@ import models.EmployeeProfile;
 import models.LunchReminderStage;
 import models.OnboardingStage;
 import models.MonthlyCoreStage;
+=======
+import utils.Settings;
+>>>>>>> Stashed changes
 
 @Data
 @ToString(callSuper = true)
@@ -88,6 +87,7 @@ public class Ava extends Agent {
     private Integer correct;
     private MonthlyCoreStage monthlyCoreStage;
     private Date matchedWithEmailSentAt;
+    private List<String> allQuestions = new ArrayList<>();
     private int silosCount;
     private String silosRisk;
     private LunchReminderStage lunchReminderStage;
@@ -298,55 +298,6 @@ public class Ava extends Agent {
                                         .addComponent("title", new TitleComponent(goodbyeScreen));
         showScreen(screen);
     }
-    /*
-    public void showGuessingQuizScreens() {
-        Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
-
-        String introTitle = Mitems.getText("weekly-core.guessing-quiz-intro-screen-title.title");
-        String introButton = Mitems.getText("weekly-core.guessing-quiz-intro-screen-title.button");
-
-        screens.put("introGuessingScreen", new TemplateGenerator()
-                .addComponent("title", new TitleComponent(introTitle))
-                .addComponent("submit", new PrimarySubmitButtonComponent(introButton, "guessingQuestion1")));
-
-        String question = Mitems.getText("weekly-core.guessing-quiz-question1.question");
-        Option[] answers = Mitems.getOptions("weekly-core.guessing-quiz-question1.options");
-        List<CloudSelectComponent.Option> options = new ArrayList<>();
-        for (Option option : answers)
-            options.add(new CloudSelectComponent.Option(option.getText(), option.getId(), false));
-        String button = Mitems.getText("weekly-core.guessing-quiz-question1.button");
-
-        screens.put("guessingQuestion1", new TemplateGenerator()
-                .addComponent("title", new TitleComponent(question))
-                .addComponent("options", new CloudSelectComponent("offeredAnswers", options))
-                .addComponent("submit", new PrimarySubmitButtonComponent(button, "guessingQuestion2")));
-
-        question = Mitems.getText("weekly-core.guessing-quiz-question2.question");
-        answers = Mitems.getOptions("weekly-core.guessing-quiz-question2.options");
-        options = new ArrayList<>();
-        for (Option option : answers)
-            options.add(new CloudSelectComponent.Option(option.getText(), option.getId(), false));
-        button = Mitems.getText("weekly-core.guessing-quiz-question2.button");
-
-        screens.put("guessingQuestion2", new TemplateGenerator()
-                .addComponent("title", new TitleComponent(question))
-                .addComponent("options", new CloudSelectComponent("offeredAnswers", options))
-                .addComponent("submit", new PrimarySubmitButtonComponent(button, "guessingQuestion3")));
-
-        question = Mitems.getText("weekly-core.guessing-quiz-question3.question");
-        answers = Mitems.getOptions("weekly-core.guessing-quiz-question3.options");
-        options = new ArrayList<>();
-        for (Option option : answers)
-            options.add(new CloudSelectComponent.Option(option.getText(), option.getId(), false));
-        button = Mitems.getText("weekly-core.guessing-quiz-question3.button");
-
-        screens.put("guessingQuestion3", new TemplateGenerator()
-                .addComponent("title", new TitleComponent(question))
-                .addComponent("options", new CloudSelectComponent("offeredAnswers", options))
-                .addComponent("submit", new PrimarySubmitButtonComponent(button, "guessingQuestion3")));
-        
-        showScreens("introGuessingScreen", screens);
-    }*/
     
     public void guessingQuizScreen() {
         Set<String> guessingQuestions = new LinkedHashSet<>();

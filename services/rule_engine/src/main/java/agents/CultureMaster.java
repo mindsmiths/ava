@@ -95,7 +95,7 @@ public class CultureMaster extends Agent {
         boolean[][] binaryMatrix = new boolean[employees.values().size()][employees.values().size()]; // binary matrix
 
         List<String> list = new LinkedList<>();
-        int limit = 2;
+        int limit = 3;
 
         for (int i = 0; i < employees.values().size(); i++) {
             for (int j = 0; j < employees.values().size(); j++) {

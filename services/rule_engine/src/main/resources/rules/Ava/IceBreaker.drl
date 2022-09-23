@@ -1,6 +1,7 @@
 package rules.Ava;
 
 import models.OnboardingStage;
+import com.mindsmiths.pairingalgorithm.Days;
 
 rule "Show guessing quiz"
     when

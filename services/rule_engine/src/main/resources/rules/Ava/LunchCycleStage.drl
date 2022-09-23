@@ -35,6 +35,7 @@ rule "Send available days email"
         modify(agent) {
             setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY),
             setLunchReminderStage(LunchReminderStage.FIRST_EMAIL_SENT)
+<<<<<<< Updated upstream
             }
         agent.sendWeeklyEmail(employee);
 end
@@ -72,6 +73,8 @@ rule "Send third reminder"
         modify(agent) {
             setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY),
             setLunchReminderStage(LunchReminderStage.THIRD_EMAIL_SENT)
+=======
+>>>>>>> Stashed changes
         }
         agent.sendWeeklyEmail(employee);
 end
@@ -87,11 +90,7 @@ rule "Ask for available days"
 
         eval(evaluateCronExpression("* * 9-23 * * WED", ts, "Europe/Zagreb") 
             || (evaluateCronExpression("* * * * * THU", ts, "Europe/Zagreb"))
-<<<<<<< HEAD
-            || (evaluateCronExpression("* * 00-18 * * MON", ts, "Europe/Zagreb"))
-=======
             || (evaluateCronExpression("* * 00-14 * * FRI", ts, "Europe/Zagreb"))
->>>>>>> origin/main
             || (agent.isManualTrigger() == true))
     then 
         // what if person decides to exit this screen without answering, now we can't get back because we are in the next stage
