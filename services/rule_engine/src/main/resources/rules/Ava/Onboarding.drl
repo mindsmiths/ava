@@ -20,7 +20,6 @@ import models.OnboardingStage;
 import signals.AllEmployees;
 import models.AvaLunchCycleStage;
 
-import signals.AvaAvailabilitySignal;
 import signals.EmployeeUpdateSignal;
 
 import models.EmployeeProfile;
@@ -77,6 +76,7 @@ rule "Start personal quiz"
         };
         agent.showPersonalQuizScreens();
         modify(agent) {
+            chargeConnectionNeurons(employee),
             setOnboardingStage(OnboardingStage.PERSONAL_QUIZ)
         };
         delete(signal);
@@ -107,15 +107,18 @@ rule "Finish onboarding"
                     paramId.replace("answers", "question"),
                     signal.getParamAsString(paramId)
                 );
+
         modify(employee) {
             setPersonalAnswers(personalAnswers),
             setOnboardingStage(OnboardingStage.STATS_EMAIL) 
         };
+        
         modify(agent) {
             setOnboardingStage(OnboardingStage.STATS_EMAIL),
             setLunchCycleStage(AvaLunchCycleStage.LUNCH_MAIL_SENDING),
             setStatsEmailLastSentAt(ts)
         };
+
         agent.send(CultureMaster.ID, new EmployeeUpdateSignal(employee));
         delete(signal);
 end

@@ -58,6 +58,7 @@ rule "Save or update all employees"
         allEmployees.remove(agent.getId());
         modify (agent) {
             setOtherEmployees(allEmployees),
+            addConnectionStrengths(),
             setSilosCount(signal.getSilosCount()),
             setSilosRisk(signal.getSilosRisk())
         };

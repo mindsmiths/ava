@@ -1,8 +1,8 @@
 package agents;
 
-import java.util.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Date;
@@ -25,6 +25,7 @@ import com.mindsmiths.emailAdapter.SendEmailPayload;
 import com.mindsmiths.mitems.Mitems;
 import com.mindsmiths.mitems.Option;
 import com.mindsmiths.ruleEngine.model.Agent;
+import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.pairingalgorithm.Days;
 import com.mindsmiths.sdk.utils.templating.Templating;
 import com.mindsmiths.employeeManager.employees.Employee;
@@ -47,6 +48,8 @@ import models.AvaLunchCycleStage;
 import models.EmployeeProfile;
 import models.LunchReminderStage;
 import models.OnboardingStage;
+import signals.SendMatchesSignal;
+import models.Neuron;
 import models.MonthlyCoreStage;
 import utils.Settings;
 
@@ -57,6 +60,7 @@ public class Ava extends Agent {
     private List<Days> availableDays = new ArrayList<>();
     private String match;
     private Days matchDay;
+    private List<String> matchHistory = new ArrayList<>();
     private AvaLunchCycleStage lunchCycleStage;
     private OnboardingStage onboardingStage;
     private MonthlyCoreStage monthlyCoreStage;
@@ -65,19 +69,89 @@ public class Ava extends Agent {
     private Date statsEmailLastSentAt;
     private Date matchedWithEmailSentAt;
     private int silosCount;
+    public static final double CONNECTION_NEURON_CAPACITY = 100;
+    public static final double CONNECTION_NEURON_RESISTANCE = 0.05;
     private String silosRisk;
     private LunchReminderStage lunchReminderStage;
     private List<String> lunchDeclineReasons = new ArrayList<>(); // track days
     private boolean manualTrigger;
+    // a map of how strong MY connections are to other employees
+    private Map<String, Neuron> connectionStrengths = new HashMap<>();
 
     public Ava(String connectionName, String connectionId) {
         super(connectionName, connectionId);
+    }
+
+    // trigger whenever new Ava is onboarded in CreateOrUpdateAva, "Save or update all employees"
+    public void addConnectionStrengths() {
+        for(String avaId : this.otherEmployees.keySet()) {
+            if(!connectionStrengths.containsKey(otherEmployees.get(avaId).getId())) {
+                connectionStrengths.put(otherEmployees.get(avaId).getId(), new Neuron(CONNECTION_NEURON_RESISTANCE, CONNECTION_NEURON_CAPACITY));
+            }
+        }
+    }
+
+    // if user picked employee in familiarity quiz, charge that connection to the max value
+    // trigger after familiarity quiz is over in Onboarding, "Finish onboarding"
+    public void chargeConnectionNeurons(EmployeeProfile employeeProfile) {
+        for(Map.Entry<String, Double> entry : employeeProfile.getFamiliarity().entrySet()) {
+            if(entry.getValue() != 0) {
+                this.connectionStrengths.get(entry.getKey()).setValue(CONNECTION_NEURON_CAPACITY);
+            }
+        }
+    }
+
+    public Neuron getConnectionNeuron(String employeeId) {
+        return this.connectionStrengths.get(employeeId);
+    }
+
+    // decrease the strength of connection with time (days)
+    // trigger every week in LunchCycleStage, "Ask for available days"
+    public void decayConnectionNeurons() {
+        for(String avaId : this.otherEmployees.keySet()) {
+            Log.info("Decaying SPECIFIC neuron with employee id: " + otherEmployees.get(avaId).getId());
+            long daysPassed = ChronoUnit.DAYS.between(getConnectionNeuron(otherEmployees.get(avaId).getId()).getLastUpdatedAt().toInstant(),
+                                                      new Date().toInstant());
+            getConnectionNeuron(otherEmployees.get(avaId).getId()).decay(daysPassed/1000.);
+        }
+    }
+
+    // convert map values from Neuron to Double
+    // used when sending data to CultureMaster
+    public Map<String, Double> getConnectionStrengthAsValue() {
+        Map<String, Double> m = new HashMap<>();
+        for(Map.Entry<String, Neuron> entry : connectionStrengths.entrySet()) {
+            m.put(entry.getKey(), entry.getValue().getValue());
+        }
+        return m;
+    }
+
+    public String avaToEmployeeId(String avaId) {
+        return otherEmployees.get(avaId).getId();
+    }
+
+    public String employeeToAvaId(String employeeId) {
+        for(Map.Entry<String, EmployeeProfile> entry : otherEmployees.entrySet()) {
+            if(entry.getValue().getId().equals(employeeId)) {
+                return entry.getKey();
+            }
+        }
+        return "";
     }
 
     public void updateAvailableDays(List<String> availableDaysStr) {
         this.availableDays = new ArrayList<>();
         for (String day : availableDaysStr) {
             this.availableDays.add(Days.valueOf(day));
+        }
+    }
+
+    public void printMatchInfo(EmployeeProfile employee, SendMatchesSignal signal) {
+        for(Map.Entry<String, EmployeeProfile> entry : otherEmployees.entrySet()) {
+            if(entry.getValue().getId().equals(signal.getMatch())) {
+                Log.info("I'm " + employee.getFullName() + " my match is " + entry.getValue().getFullName() + " on " + signal.getMatchDay());
+                break;
+            }
         }
     }
 
@@ -155,11 +229,18 @@ public class Ava extends Agent {
         String introScreenDescription = Mitems.getHTML("onboarding.familiarity-quiz-intro.description");
 
         screens.put("introScreen", new TemplateGenerator()
-                .addComponent("image", new ImageComponent(avaImagePath))
+                .addComponent("image", new ImageComponent(Mitems.getText("onboarding.silos-image-path.connected")))
                 .addComponent("title", new TitleComponent(introScreenTitle))
                 .addComponent("description", new DescriptionComponent(introScreenDescription))
-                .addComponent("submit", new PrimarySubmitButtonComponent(introButton, "question1")));
+                .addComponent("submit", new PrimarySubmitButtonComponent(introButton, "secondIntroScreen")));
         // Adding questions and final screen in familiarity quiz
+
+        screens.put("secondIntroScreen", new TemplateGenerator()
+        .addComponent("image", new ImageComponent(Mitems.getText("onboarding.silos-image-path.devided")))
+        .addComponent("header", new HeaderComponent(null, true))
+        .addComponent("title", new TitleComponent(Mitems.getText("onboarding.familiarity-quiz-second-intro.title")))
+        .addComponent("description", new DescriptionComponent(Mitems.getText("onboarding.familiarity-quiz-second-intro.description")))
+        .addComponent("submit", new PrimarySubmitButtonComponent(Mitems.getText("onboarding.familiarity-quiz-second-intro.action"), "question1")));
         int questionNum = 1;
         String submitButton = Mitems.getText("onboarding.familiarity-quiz-questions.action");
 
