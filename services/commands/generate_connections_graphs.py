@@ -8,11 +8,13 @@ from pyvis.network import Network
 import matplotlib.pyplot as plt
 import os
 
+
 @cli.command()
 def generate_connections_graphs():
     forge.setup("rule_engine")
     keeper = MongoClientKeeper()
-    culture_master = keeper.ruleEngineDB.summary.find_one({"agentId": "CULTURE_MASTER"})
+    culture_master = keeper.ruleEngineDB.summary.find_one(
+        {"agentId": "CULTURE_MASTER"})
 
     ava_connection_strengths = pd.DataFrame.from_dict(
         culture_master["agents#CultureMaster"]["CULTURE_MASTER"]["employeeConnectionStrengths"]
