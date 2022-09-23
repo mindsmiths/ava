@@ -115,27 +115,27 @@
           {
             "description": "Action",
             "type": "TEXT",
-            "content": "Submit"
+            "content": "Next"
           },
           {
             "description": "question1",
             "type": "TEXT",
-            "content": "Who do you know very well?"
+            "content": "Who are you in sync with?\n(choose none, one or more people, depending on your gut feeling)\n"
           },
           {
             "description": "question2",
             "type": "TEXT",
-            "content": "Who do you know very well?"
+            "content": "Who are you in sync with?\n(choose none, one or more people, depending on your gut feeling)\n"
           },
           {
             "description": "question3",
             "type": "TEXT",
-            "content": "Who do you know very well?"
+            "content": "Who are you in sync with?\n(choose none, one or more people, depending on your gut feeling)\n"
           },
           {
             "description": "question4",
             "type": "TEXT",
-            "content": "Who do you know very well?"
+            "content": "Who are you in sync with?\n(choose none, one or more people, depending on your gut feeling)\n"
           }
         ]
       },
@@ -150,7 +150,7 @@
           {
             "description": "Text",
             "type": "HTML",
-            "content": "<p>You did a great job and don&rsquo;t worry about the absolute accuracy of your answers because it is not important.</p>\n<p>Now let me get to know YOU a bit better.</p>"
+            "content": "<p><span style=\"font-weight: 400;\">You did a great job and don&rsquo;t worry about the absolute accuracy of your answers, it&rsquo;s difficult to pinpoint something based on a feeling.&nbsp;</span></p>\n<p><span style=\"font-weight: 400;\">Now let me get to know YOU a bit better.</span></p>"
           },
           {
             "description": "Title",
@@ -165,17 +165,37 @@
           {
             "description": "Action",
             "type": "TEXT",
-            "content": "Let's see"
+            "content": "Next"
           },
           {
             "description": "Description",
             "type": "HTML",
-            "content": "<p>I will show you a list of names, feel free to choose those you know better than others.</p>\n<p>You can choose more than one person.</p>\n<p>You can also decide not to choose anyone if you don&rsquo;t feel like you know anyone on the list that well.</p>"
+            "content": "<p><span style=\"font-weight: 400;\">The dots represent people and the lines represent information flow.</span></p>\n<p><span style=\"font-weight: 400;\">When we&rsquo;re&nbsp; not in sync with our colleagues, information silos occur and the organization looks something like this</span></p>"
           },
           {
             "description": "Title",
             "type": "TEXT",
-            "content": "Who do you know very well?"
+            "content": "This is how a healthy, silos-free organization looks like"
+          }
+        ]
+      },
+      {
+        "name": "Familiarity quiz second intro",
+        "elements": [
+          {
+            "description": "Action",
+            "type": "TEXT",
+            "content": "Let's do it"
+          },
+          {
+            "description": "Description",
+            "type": "HTML",
+            "content": "<p><span style=\"font-weight: 400;\">To tackle this, we just need to get to know each other better and be in sync.</span></p>\n<p><span style=\"font-weight: 400;\">I will show you a list of names, all you need to do is mark those people that you feel like you are in sync with, where you feel like the relationship is a two-way street.</span></p>"
+          },
+          {
+            "description": "Title",
+            "type": "TEXT",
+            "content": "This is how silos show up in our graph, a clear disconnect in information flow."
           }
         ]
       },
@@ -225,12 +245,12 @@
           {
             "description": "Action",
             "type": "TEXT",
-            "content": "Submit"
+            "content": "Next"
           },
           {
             "description": "question1",
             "type": "TEXT",
-            "content": "🌏If you could live anywhere, where would it be?"
+            "content": "1/6<br/>\n🌏If you could live anywhere, where would it be?"
           }
         ]
       },
@@ -240,12 +260,12 @@
           {
             "description": "Action",
             "type": "TEXT",
-            "content": "Submit"
+            "content": "Next"
           },
           {
             "description": "question2",
             "type": "TEXT",
-            "content": "📺 Have you ever binge watched something? What was it?"
+            "content": "2/6<br/>\n📺 Name a TV show that first comes to mind"
           }
         ]
       },
@@ -255,12 +275,12 @@
           {
             "description": "Action",
             "type": "TEXT",
-            "content": "Submit"
+            "content": "Next"
           },
           {
             "description": "question3",
             "type": "TEXT",
-            "content": "🎧Name one song that you could listen on repeat."
+            "content": "3/6<br/>\n🎧Name the first song that comes to mind"
           }
         ]
       },
@@ -270,12 +290,12 @@
           {
             "description": "Action",
             "type": "TEXT",
-            "content": "Submit"
+            "content": "Next"
           },
           {
             "description": "question4",
             "type": "TEXT",
-            "content": "🥘What’s your favorite type of food for lunch?"
+            "content": "4/6<br/>\n🥘What’s your favorite type of food for lunch at work?\n(First thing that comes to mind)\n"
           }
         ]
       },
@@ -285,12 +305,12 @@
           {
             "description": "Action",
             "type": "TEXT",
-            "content": "Submit"
+            "content": "Next"
           },
           {
             "description": "question5",
             "type": "TEXT",
-            "content": "🌴Describe your favorite type of holiday."
+            "content": "5/6<br/>\n🍵Coffee or Tea? What’s your drink and how do you take it?"
           }
         ]
       },
@@ -300,12 +320,27 @@
           {
             "description": "Action",
             "type": "TEXT",
-            "content": "Submit"
+            "content": "Next"
           },
           {
             "description": "question6",
             "type": "TEXT",
-            "content": "📕What was your favorite subject in school?"
+            "content": "6/6<br/>\n💊Red pill or Blue pill?\n(Is it better to free your mind? Or live in blissful ignorance?)"
+          }
+        ]
+      },
+      {
+        "name": "Silos image path",
+        "elements": [
+          {
+            "description": "Connected",
+            "type": "TEXT",
+            "content": "/public/silos.png"
+          },
+          {
+            "description": "Devided",
+            "type": "TEXT",
+            "content": "/public/silos2.png"
           }
         ]
       },
@@ -320,7 +355,7 @@
           {
             "description": "Description",
             "type": "HTML",
-            "content": "<p><span style=\"font-weight: 400;\">Dear {{ firstName }},</span></p>\n<p><span style=\"font-weight: 400;\">When team members are working in silos, they cannot collaborate effectively, which can lead to missed deadlines, subpar work, poor communication and general feelings of frustration.</span></p>\n<p><span style=\"font-weight: 400;\">To avoid this, we will encourage communication and collaboration, promote knowledge sharing and encourage networking.&nbsp;</span></p>\n<p><span style=\"font-weight: 400;\">How? Easy, I will do all the work and guide you all the way.</span></p>"
+            "content": "<p><span style=\"font-weight: 400;\">Dear {{ firstName }},</span></p>\n<p><span style=\"font-weight: 400;\">When team members are working in silos, they cannot collaborate effectively, which can lead to missed deadlines, subpar work, poor communication and general feelings of frustration.</span></p>\n<p>&nbsp;</p>\n<p><span style=\"font-weight: 400;\">To avoid this, we need to encourage communication and collaboration, promote knowledge sharing and encourage networking.&nbsp;</span></p>\n<p>&nbsp;</p>\n<p><span style=\"font-weight: 400;\">How? Easy, I will do all the work and guide you all the way. Just follow my lead!</span></p>"
           },
           {
             "description": "Subject",
@@ -477,7 +512,7 @@
           {
             "description": "Subject",
             "type": "TEXT",
-            "content": "Ava reminder"
+            "content": "Pick a day"
           }
         ]
       },
@@ -577,7 +612,7 @@
           {
             "description": "Subject",
             "type": "TEXT",
-            "content": "Ava reminder"
+            "content": "Pick a day"
           }
         ]
       },
@@ -642,7 +677,7 @@
           {
             "description": "Subject",
             "type": "TEXT",
-            "content": "It's lunch time!"
+            "content": "Pick a day"
           }
         ]
       }
