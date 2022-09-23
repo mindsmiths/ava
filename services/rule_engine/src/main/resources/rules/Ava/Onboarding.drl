@@ -91,7 +91,7 @@ rule "Reconnect personal quiz"
         delete(signal);
 end
 
-rule "Finish personal quiz"
+rule "Finish onboarding"
    when
         Heartbeat(ts: timestamp) from entry-point "signals"
         signal: SubmitEvent(getParamAsString("submit") == "finishpersonalquiz") from entry-point "signals"
@@ -107,8 +107,19 @@ rule "Finish personal quiz"
                     paramId.replace("answers", "question"),
                     signal.getParamAsString(paramId)
                 );
-        modify(employee) {setPersonalAnswers(personalAnswers)};
-        modify(agent) {setOnboardingStage(OnboardingStage.STATS_EMAIL)};
+
+        modify(employee) {
+            setPersonalAnswers(personalAnswers),
+            setOnboardingStage(OnboardingStage.STATS_EMAIL) 
+        };
+        
+        modify(agent) {
+            setOnboardingStage(OnboardingStage.STATS_EMAIL),
+            setLunchCycleStage(AvaLunchCycleStage.LUNCH_MAIL_SENDING),
+            setStatsEmailLastSentAt(ts)
+        };
+
+        agent.send(CultureMaster.ID, new EmployeeUpdateSignal(employee));
         delete(signal);
 end
 
