@@ -25,5 +25,6 @@ package-lock.json
 secrets
 tags.temp
 target/
-core.*
+
+**/core.*
 *.vsix
