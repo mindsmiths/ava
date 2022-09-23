@@ -10,6 +10,7 @@ import models.CmLunchCycleStage;
 import com.mindsmiths.pairingalgorithm.PairingAlgorithmAPI;
 import com.mindsmiths.pairingalgorithm.AvaAvailability;
 import com.mindsmiths.pairingalgorithm.Match;
+import com.mindsmiths.ruleEngine.util.Log;
 
 import signals.EmployeeUpdateSignal;
 import signals.AllEmployees;

@@ -437,7 +437,7 @@
           {
             "description": "Title",
             "type": "TEXT",
-            "content": "Okay great! I'll send Melissa's answers to my other AI assistant who'll try to guess what kind of person she is."
+            "content": "Okay great!\n\nYou have {{ correctCount }} answers.\n\n I'll send {{ firstName }}'s answers to my other AI assistant who'll try to guess what kind of person she is."
           }
         ]
       },
@@ -462,26 +462,6 @@
         ]
       },
       {
-        "name": "Guessing options",
-        "elements": [
-          {
-            "description": "Options",
-            "type": "OPTIONS",
-            "content": "[{\"text\":\"The Joker\",\"id\":\"0\"},{\"text\":\"The Godfather\",\"id\":\"1\"},{\"text\":\"Her\",\"id\":\"2\"},{\"text\":\"Maldivi\",\"id\":\"3\"},{\"text\":\"Petrinja\",\"id\":\"4\"},{\"text\":\"Vienna\",\"id\":\"5\"}]"
-          }
-        ]
-      },
-      {
-        "name": "Guessing questions",
-        "elements": [
-          {
-            "description": "Questions",
-            "type": "OPTIONS",
-            "content": "[{\"text\":\"Last movie Melissa watched is\",\"id\":\"0\"},{\"text\":\"Last place Melissa has visited is\",\"id\":\"1\"}]"
-          }
-        ]
-      },
-      {
         "name": "Guessing quiz intro screen title",
         "elements": [
           {
@@ -492,7 +472,97 @@
           {
             "description": "Title",
             "type": "TEXT",
-            "content": "Okay! I prepared 2 questions about Melissa. Ready to start?"
+            "content": "Okay! I prepared 3 questions about {{ firstName }}. Ready to start?"
+          }
+        ]
+      },
+      {
+        "name": "Guessing quiz question1",
+        "elements": [
+          {
+            "description": "Button",
+            "type": "TEXT",
+            "content": "Next"
+          },
+          {
+            "description": "Options",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"Easy On Me by Adele\",\"id\":\"opt1\"},{\"text\":\"Thunder by AC/DC\",\"id\":\"opt2\"},{\"text\":\"About Damn Time by Lizzo\",\"id\":\"opt3\"}]"
+          },
+          {
+            "description": "Question",
+            "type": "TEXT",
+            "content": "If {{ firstName }} could live anywhere in the world, where it would be?"
+          }
+        ]
+      },
+      {
+        "name": "Guessing quiz question2",
+        "elements": [
+          {
+            "description": "Button",
+            "type": "TEXT",
+            "content": "Next"
+          },
+          {
+            "description": "Options",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"Stranger Things\",\"id\":\"opt1\"},{\"text\":\"How To Design a Sex Room\",\"id\":\"opt2\"},{\"text\":\"Lucifer\",\"id\":\"opt3\"}]"
+          },
+          {
+            "description": "Question",
+            "type": "TEXT",
+            "content": "Something {{ firstName }} binge watched:"
+          }
+        ]
+      },
+      {
+        "name": "Guessing quiz question3",
+        "elements": [
+          {
+            "description": "Button",
+            "type": "TEXT",
+            "content": "Next"
+          },
+          {
+            "description": "Options",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"Sharing a home cooked meal\",\"id\":\"opt1\"},{\"text\":\"Juicy BBQ ribs\",\"id\":\"opt2\"},{\"text\":\"Salad at a restaurant nearby\",\"id\":\"opt3\"}]"
+          },
+          {
+            "description": "Question",
+            "type": "TEXT",
+            "content": "When asked to name a song that she could listen to on repeat, {{ firstName }} answered:"
+          }
+        ]
+      },
+      {
+        "name": "Guessing quiz question4",
+        "elements": [
+          {
+            "description": "Question",
+            "type": "TEXT",
+            "content": "What is {{ firstName }}'s favourite type of food for lunch?"
+          }
+        ]
+      },
+      {
+        "name": "Guessing quiz question5",
+        "elements": [
+          {
+            "description": "Question",
+            "type": "TEXT",
+            "content": "When asked to describe her perfect type of holiday, {{ firstName }} said:"
+          }
+        ]
+      },
+      {
+        "name": "Guessing quiz question6",
+        "elements": [
+          {
+            "description": "Question",
+            "type": "TEXT",
+            "content": "What was {{ firstName }}'s favourite subject in school?"
           }
         ]
       },

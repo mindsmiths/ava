@@ -24,7 +24,7 @@ import signals.AvaAvailabilitySignal;
 import signals.EmployeeUpdateSignal;
 
 import models.EmployeeProfile;
-import models.OnboardingStage;
+import models.OnboardingStage; 
 
 rule "Send welcome email"
     when
@@ -101,12 +101,15 @@ rule "Finish onboarding"
         Map<String, String> personalAnswers = new HashMap<String, String>(
             employee.getPersonalAnswers()
         );
+        Log.info(signal.getParams().keySet());
         for (String paramId : signal.getParams().keySet())
-            if (paramId.startsWith("answers"))
+            if (paramId.startsWith("answers")){
+                Log.info("OVAJ LOG JE UNUTAR IF-A");
                 personalAnswers.put(
                     paramId.replace("answers", "question"),
                     signal.getParamAsString(paramId)
                 );
+            }
         modify(employee) {
             setPersonalAnswers(personalAnswers),
             setOnboardingStage(OnboardingStage.STATS_EMAIL) 
