@@ -63,7 +63,7 @@ class PairingAlgorithm(BaseService):
                 employee_id_mapping[pair[0]])][str(employee_id_mapping[pair[1]])]
             second_score_first = employeeConnectionStrengths[str(
                 employee_id_mapping[pair[1]])][str(employee_id_mapping[pair[0]])]
-            weight = 100 - ((first_score_second + second_score_first) / 2)
+            weight = 200 - ((first_score_second + second_score_first) / 2)
             # weight can't be 0, because of how blossom works
             if weight == 0:
                 weight = 1
@@ -72,6 +72,8 @@ class PairingAlgorithm(BaseService):
 
         matching = max_weight_matching(edges, False)
         for index, element in enumerate(matching):
+            if element == -1:
+                continue
             # convert indexes to employee ids
             first = employee_id_mapping[index]
             second = employee_id_mapping[element]
