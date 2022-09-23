@@ -35,7 +35,6 @@ rule "Send available days email"
         modify(agent) {
             setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY),
             setLunchReminderStage(LunchReminderStage.FIRST_EMAIL_SENT)
-<<<<<<< Updated upstream
             }
         agent.sendWeeklyEmail(employee);
 end
@@ -73,8 +72,6 @@ rule "Send third reminder"
         modify(agent) {
             setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY),
             setLunchReminderStage(LunchReminderStage.THIRD_EMAIL_SENT)
-=======
->>>>>>> Stashed changes
         }
         agent.sendWeeklyEmail(employee);
 end

@@ -104,7 +104,6 @@ rule "Finish onboarding"
         Log.info(signal.getParams().keySet());
         for (String paramId : signal.getParams().keySet())
             if (paramId.startsWith("answers")){
-                Log.info("OVAJ LOG JE UNUTAR IF-A");
                 personalAnswers.put(
                     paramId.replace("answers", "question"),
                     signal.getParamAsString(paramId)

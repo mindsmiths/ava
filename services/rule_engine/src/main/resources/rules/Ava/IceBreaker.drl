@@ -8,6 +8,7 @@ rule "Show guessing quiz"
         signal: UserConnectedEvent(getParamAsString("trigger") == "ice-breaker") from entry-point "signals"
         agent: Ava()
     then
+        Log.error("****************************");
         agent.setOtherEmployees(Map.of(
             "1", new EmployeeProfile(
                 Map.of("question1", "Answer1.1", "question2", "Answer2.1", "question3", "Answer3.1"),

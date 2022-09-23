@@ -3,17 +3,12 @@ package agents;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-<<<<<<< HEAD
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-=======
-import java.util.List;
-import java.util.Date;
-import java.util.HashMap;
->>>>>>> origin/main
+
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
@@ -57,7 +52,6 @@ import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.Method;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.Version;
-<<<<<<< Updated upstream
 
 import models.AvaLunchCycleStage; 
 import lombok.Data;
@@ -66,9 +60,7 @@ import models.EmployeeProfile;
 import models.LunchReminderStage;
 import models.OnboardingStage;
 import models.MonthlyCoreStage;
-=======
 import utils.Settings;
->>>>>>> Stashed changes
 
 @Data
 @ToString(callSuper = true)
@@ -608,16 +600,12 @@ public class Ava extends Agent {
         EmailAdapterAPI.newEmail(e);
     }
 
-<<<<<<< HEAD
     public void showLunchInviteExpiredScreen() {
         BaseTemplate lunchInviteExpiredScreen = new TemplateGenerator()
             .addComponent("title", new TitleComponent(Mitems.getText("weekly-core.message-about-not-working-hours-for-links.title")));
         showScreen(lunchInviteExpiredScreen);
     }
     
-    public void sendCalendarInvite(Days days, EmployeeProfile currentEmployee, EmployeeProfile otherEmployee) throws IOException {
-        if(currentEmployee == null || otherEmployee == null)
-=======
     public void showLunchDeclineReasonScreens() {
         Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
         String lunchDeclineScreen = Mitems.getText("weekly-core.lunch-decline-reason.title");
@@ -640,7 +628,6 @@ public class Ava extends Agent {
     public void sendCalendarInvite(Days days, EmployeeProfile currentEmployee, EmployeeProfile otherEmployee)
             throws IOException {
         if (currentEmployee == null || otherEmployee == null)
->>>>>>> origin/main
             throw new RuntimeException("Ava.sendCalendarInvite called with null arguments!");
 
         String subject = Templating.recursiveRender(Mitems.getText("weekly-core.matching-mail.subject"), Map.of(
