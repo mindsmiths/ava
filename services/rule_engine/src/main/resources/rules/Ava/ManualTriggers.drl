@@ -12,14 +12,14 @@ import models.OnboardingStage;
 rule "Trigger lunch cycle for Ava"
     when
         signal: ManualTriggerEvent(triggerType == "lunch_cycle") from entry-point "signals"
-        agent: Ava(
-            lunchCycleStage == AvaLunchCycleStage.LUNCH_MAIL_SENDING,
-            onboardingStage == OnboardingStage.FINISHED
-            )
+        agent: Ava(onboardingStage in (OnboardingStage.STATS_EMAIL, OnboardingStage.FINISHED))
         employee: EmployeeProfile()
     then
         Log.info("Ava: triggered lunch cycle from dashboard");
-        modify(agent) {setManualTrigger(true)};
+        modify(agent) {
+            setManualTrigger(true),
+            setLunchCycleStage(AvaLunchCycleStage.LUNCH_MAIL_SENDING)
+        };
         delete(signal);            
 end
 
@@ -35,10 +35,11 @@ end
 rule "Trigger statistics email"
     when
         signal: ManualTriggerEvent(triggerType == "statistics_email") from entry-point "signals"
-        agent: Ava(onboardingStage == OnboardingStage.STATS_EMAIL)
+        agent: Ava(onboardingStage in (OnboardingStage.STATS_EMAIL, OnboardingStage.FINISHED))
         employee: EmployeeProfile()
     then
         Log.info("Ava: triggered statistics email from dashboard");
         agent.sendStatisticsEmail(employee);
         modify(agent) {setOnboardingStage(OnboardingStage.FINISHED)};
+        delete(signal)
 end

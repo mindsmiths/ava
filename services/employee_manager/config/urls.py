@@ -6,8 +6,8 @@ from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
-from . import views
 
+from . import views
 
 urlpatterns = [
     path('jet/', include('jet.urls', 'jet')),  # Django JET URLS

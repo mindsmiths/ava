@@ -13,11 +13,17 @@ import lombok.Data;
 import lombok.ToString;
 import lombok.NoArgsConstructor;
 import java.util.ArrayList;
+<<<<<<< HEAD
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+=======
+import java.util.List;
+import java.util.Date;
+import java.util.HashMap;
+>>>>>>> origin/main
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -61,6 +67,7 @@ import models.AvaLunchCycleStage;
 import lombok.Data;
 
 import models.EmployeeProfile;
+import models.LunchReminderStage;
 import models.OnboardingStage;
 import models.MonthlyCoreStage;
 
@@ -71,7 +78,7 @@ public class Ava extends Agent {
     private List<Days> availableDays = new ArrayList<>();
     private String match;
     private Days matchDay;
-    private AvaLunchCycleStage lunchCycleStage = AvaLunchCycleStage.FIND_AVAILABILITY;
+    private AvaLunchCycleStage lunchCycleStage;
     private OnboardingStage onboardingStage;
     private Map<String, EmployeeProfile> otherEmployees; 
     private Map<String, String> personalAnswers = new HashMap<String, String>();
@@ -83,6 +90,8 @@ public class Ava extends Agent {
     private Date matchedWithEmailSentAt;
     private int silosCount;
     private String silosRisk;
+    private LunchReminderStage lunchReminderStage;
+    private List<String> lunchDeclineReasons = new ArrayList<>(); // track days
     private boolean manualTrigger;
     public final Integer LUNCH_QUIZ_QUESTIONS_COUNT = 3;
     public final Integer LUNCH_QUIZ_OPTIONS_COUNT = 3;
@@ -120,29 +129,37 @@ public class Ava extends Agent {
                         new DescriptionComponent(
                                 Mitems.getText("weekly-core.description-asking-for-available-days.text")))
                 .addComponent("cloudSelect", new CloudSelectComponent("availableDays", options))
-                .addComponent("submit", new PrimarySubmitButtonComponent("submit", "confirmDays"));
+                .addComponent("submit", new PrimarySubmitButtonComponent("Submit", "confirmDays"));
         showScreen(daysScreen);
     }
 
-    public void showNotAvailableScreen() {
-        BaseTemplate notAvailableScreen = new TemplateGenerator()
-                .addComponent("title", new TitleComponent(
-                        Mitems.getText("weekly-core.title-for-person-who-is-not-available-any-day.title")));
-        // implement free form where they have to explain why they are not available
-        showScreen(notAvailableScreen);
-    }
-
     public void confirmingDaysScreen() {
+        Option buttonOption = Mitems.getOptions("weekly-core.confirmation-of-choosen-available-days.button")[0];
+
         Map<String, BaseTemplate> screens = Map.of(
-                "confirmDaysScreen", new TemplateGenerator("confirmScreen")
-                        .addComponent("title",
-                                new TitleComponent(
-                                        Mitems.getText("weekly-core.confirmation-of-choosen-available-days.title")))
-                        .addComponent("button",
-                                new PrimarySubmitButtonComponent("submit", "confirmDaysAndThanksScreen")),
-                "confirmDaysAndThanksScreen", new TemplateGenerator("confirmAndThanksScreen")
-                        .addComponent("title", new TitleComponent(
-                                Mitems.getText("weekly-core.stay-tuned-second-confirmation-of-available-days.title"))));
+            "confirmDaysScreen", 
+            new TemplateGenerator("confirmScreen")
+                .setTemplateName("CenteredContentTemplate")
+                .addComponent(
+                    "title", 
+                    new TitleComponent(
+                        Mitems.getHTML("weekly-core.confirmation-of-choosen-available-days.title")
+                    )
+                )
+                .addComponent(
+                    "button",
+                    new PrimarySubmitButtonComponent(buttonOption.getText(), buttonOption.getId())
+                ),
+            "confirmDaysAndThanksScreen",
+            new TemplateGenerator("confirmAndThanksScreen")
+                .setTemplateName("CenteredContentTemplate")
+                .addComponent(
+                    "title",
+                    new TitleComponent(
+                        Mitems.getText("weekly-core.stay-tuned-second-confirmation-of-available-days.title")
+                    )
+                )
+        );
         showScreens("confirmDaysScreen", screens);
         Log.info(match);
         Log.info(this.match);
@@ -160,7 +177,7 @@ public class Ava extends Agent {
         // Adding intro screen
         String introButton = Mitems.getText("onboarding.familiarity-quiz-intro.action");
         String introScreenTitle = Mitems.getText("onboarding.familiarity-quiz-intro.title");
-        String introScreenDescription = Mitems.getText("onboarding.familiarity-quiz-intro.description");
+        String introScreenDescription = Mitems.getHTML("onboarding.familiarity-quiz-intro.description");
 
         screens.put("introScreen", new TemplateGenerator()
                 .addComponent("image", new ImageComponent(avaImagePath))
@@ -199,7 +216,7 @@ public class Ava extends Agent {
                 String familiarityQuizFinalButton = Mitems
                         .getText("onboarding.familiarity-quiz-goodbye.action");
                 String finishFamiliarityQuizText = Mitems
-                        .getText("onboarding.familiarity-quiz-goodbye.text");
+                        .getHTML("onboarding.familiarity-quiz-goodbye.text");
                 String finishFamiliarityQuizTitle = Mitems
                         .getText("onboarding.familiarity-quiz-goodbye.title");
                 screens.put("finishfamiliarityquiz", new TemplateGenerator("finishfamiliarityquiz")
@@ -257,7 +274,7 @@ public class Ava extends Agent {
                 buttonComponent.setValue("finishpersonalquiz");
 
                 Option[] finishQuizButton = Mitems.getOptions("onboarding.finish-personal-quiz.button");
-                String finishPersonalQuiz = Mitems.getText("onboarding.finish-personal-quiz.text");
+                String finishPersonalQuiz = Mitems.getHTML("onboarding.finish-personal-quiz.text");
 
                 screens.put("finishpersonalquiz", new TemplateGenerator("finishpersonalquiz")
                         .addComponent("image", new ImageComponent(avaImagePath))
@@ -266,6 +283,7 @@ public class Ava extends Agent {
                                 "submit", finishQuizButton[0].getText(), "finished-personal-quiz")));
                 String goodbyeScreen = Mitems.getText("onboarding.finish-personal-quiz.goodbye-screen");
                 screens.put("finished-personal-quiz", new TemplateGenerator("goodbye")
+                        .setTemplateName("CenteredContentTemplate")
                         .addComponent("title", new TitleComponent(goodbyeScreen)));
                 break;
             }
@@ -275,7 +293,9 @@ public class Ava extends Agent {
 
     public void showFinalScreen() {
         String goodbyeScreen = Mitems.getText("onboarding.finish-personal-quiz.goodbye-screen");
-        BaseTemplate screen = new TemplateGenerator("goodbye").addComponent("title", new TitleComponent(goodbyeScreen));
+        BaseTemplate screen = new TemplateGenerator("goodbye")
+                                        .setTemplateName("CenteredContentTemplate")
+                                        .addComponent("title", new TitleComponent(goodbyeScreen));
         showScreen(screen);
     }
     /*
@@ -423,8 +443,7 @@ public class Ava extends Agent {
         String subject = Mitems.getText("onboarding.welcome-email.subject");
         String description = Mitems.getText("onboarding.welcome-email.description");
         String htmlTemplate = new String(Objects.requireNonNull(
-                getClass().getClassLoader().getResourceAsStream("emailTemplates/EmailTemplate.html")).readAllBytes()
-        );
+                getClass().getClassLoader().getResourceAsStream("emailTemplates/EmailTemplate.html")).readAllBytes());
         String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
                 "description", description,
                 "callToAction", Mitems.getText("onboarding.welcome-email.action"),
@@ -439,19 +458,16 @@ public class Ava extends Agent {
         EmailAdapterAPI.newEmail(e);
     }
 
-    public boolean allEmployeesFinishedOnboarding(){
-        return otherEmployees.values().stream().allMatch(e -> 
-            (e.getOnboardingStage() == OnboardingStage.STATS_EMAIL)
-            || (e.getOnboardingStage() == OnboardingStage.FINISHED)
-        );
+    public boolean allEmployeesFinishedOnboarding() {
+        return otherEmployees.values().stream().allMatch(e -> (e.getOnboardingStage() == OnboardingStage.STATS_EMAIL)
+                || (e.getOnboardingStage() == OnboardingStage.FINISHED));
     }
 
     public void sendMonthlyCoreEmail(EmployeeProfile employee) throws IOException {
         String subject = Mitems.getText("monthly-core.welcome-email.subject");
         String description = Mitems.getText("monthly-core.welcome-email.description");
         String htmlTemplate = new String(Objects.requireNonNull(
-                getClass().getClassLoader().getResourceAsStream("emailTemplates/EmailTemplate.html")).readAllBytes()
-        );
+                getClass().getClassLoader().getResourceAsStream("emailTemplates/EmailTemplate.html")).readAllBytes());
 
         String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
                 "description", description,
@@ -527,8 +543,7 @@ public class Ava extends Agent {
         String subject = Mitems.getText("statistics.statistics-email.subject");
         String description = Mitems.getText("statistics.statistics-email.description");
         String htmlTemplate = new String(Objects.requireNonNull(
-                getClass().getClassLoader().getResourceAsStream("emailTemplates/EmailTemplate.html")).readAllBytes()
-        );
+                getClass().getClassLoader().getResourceAsStream("emailTemplates/EmailTemplate.html")).readAllBytes());
 
         String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
                 "description", description,
@@ -575,8 +590,9 @@ public class Ava extends Agent {
                 .addComponent("description", new TitleComponent(riskScreenTitle))
                 .addComponent("submit", new PrimarySubmitButtonComponent(riskScreenButton, "finalScreen")));
 
-        String finalScreenTitle = Mitems.getText("statistics.final-screen.title");
+        String finalScreenTitle = Mitems.getHTML("statistics.final-screen.title");
         screens.put("finalScreen", new TemplateGenerator()
+                .setTemplateName("CenteredContentTemplate")
                 .addComponent("description", new TitleComponent(finalScreenTitle)));
 
         showScreens("employeeNumberScreen", screens);
@@ -608,24 +624,40 @@ public class Ava extends Agent {
     }
 
     public void sendWeeklyEmail(EmployeeProfile employee) throws IOException {
+        String subject = Mitems.getText("weekly-core.weekly-email.subject");
+        String description = Mitems.getText("weekly-core.weekly-email.description");
+
+        if (this.lunchReminderStage == LunchReminderStage.SECOND_EMAIL_SENT) { // second mail text
+            subject = Mitems.getText("weekly-core.first-reminder-email.subject");
+            description = Mitems.getText("weekly-core.first-reminder-email.description");
+
+        } else if (this.lunchReminderStage == LunchReminderStage.THIRD_EMAIL_SENT) { // third mail text
+            subject = Mitems.getText("weekly-core.second-reminder-email.subject");
+            description = Mitems.getText("weekly-core.second-reminder-email.description");
+        }
+
         String htmlTemplate = new String(Objects.requireNonNull(
-                getClass().getClassLoader().getResourceAsStream("emailTemplates/FirstWeeklyEmailTemplate.html")).readAllBytes()
-        );
+                getClass().getClassLoader().getResourceAsStream("emailTemplates/WeeklyEmailTemplate.html"))
+                .readAllBytes());
 
         String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
-                "text", Mitems.getText("weekly-core.weekly-email.button1"),
+                "text", description,
                 "firstName", employee.getFirstName(),
-                "button1", Mitems.getText("weekly-core.weekly-email.button2"),
-                "button2", Mitems.getText("weekly-core.weekly-email.description"),
-                "armoryUrl", String.format("%s/%s?trigger=start-weekly-core", Settings.ARMORY_SITE_URL, getConnection("armory"))));
+                "button1", Mitems.getText("weekly-core.weekly-email.button1"),
+                "button2", Mitems.getText("weekly-core.weekly-email.button2"),
+                "armoryUrl1",
+                String.format("%s/%s?trigger=start-weekly-core", Settings.ARMORY_SITE_URL, getConnection("armory")),
+                "armoryUrl2", String.format("%s/%s?trigger=start-lunch-decline-reason-screen", Settings.ARMORY_SITE_URL,
+                        getConnection("armory"))));
 
         SendEmailPayload e = new SendEmailPayload();
         e.setRecipients(List.of(getConnection("email")));
-        e.setSubject(Mitems.getText("weekly-core.weekly-email.subject"));
+        e.setSubject(subject);
         e.setHtmlText(htmlBody);
         EmailAdapterAPI.newEmail(e);
     }
 
+<<<<<<< HEAD
     public void showLunchInviteExpiredScreen() {
         BaseTemplate lunchInviteExpiredScreen = new TemplateGenerator()
             .addComponent("title", new TitleComponent(Mitems.getText("weekly-core.message-about-not-working-hours-for-links.title")));
@@ -634,28 +666,53 @@ public class Ava extends Agent {
     
     public void sendCalendarInvite(Days days, EmployeeProfile currentEmployee, EmployeeProfile otherEmployee) throws IOException {
         if(currentEmployee == null || otherEmployee == null)
+=======
+    public void showLunchDeclineReasonScreens() {
+        Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
+        String lunchDeclineScreen = Mitems.getText("weekly-core.lunch-decline-reason.title");
+        screens.put("LunchDecline", new TemplateGenerator()
+                .addComponent("title", new TitleComponent(lunchDeclineScreen))
+                .addComponent("answer", new TextAreaComponent("answer", true))
+                .addComponent("submit", new PrimarySubmitButtonComponent("Submit", "finished-lunch-decline-form")));
+        String finalScreenTitle = Mitems.getText("weekly-core.lunch-decline-reason.finalscreentitle");
+        screens.put("finished-lunch-decline-form", new TemplateGenerator()
+                .addComponent("description", new TitleComponent(finalScreenTitle)));
+        showScreens("LunchDecline", screens);
+    }
+
+    public void showUserAlreadyRespondedScreen() {
+        String goodbyeScreen = Mitems.getText("weekly-core.user-already-responded-screen.title");
+        BaseTemplate screen = new TemplateGenerator("goodbye").addComponent("title", new TitleComponent(goodbyeScreen));
+        showScreen(screen);
+    }
+
+    public void sendCalendarInvite(Days days, EmployeeProfile currentEmployee, EmployeeProfile otherEmployee)
+            throws IOException {
+        if (currentEmployee == null || otherEmployee == null)
+>>>>>>> origin/main
             throw new RuntimeException("Ava.sendCalendarInvite called with null arguments!");
-        
+
         String subject = Templating.recursiveRender(Mitems.getText("weekly-core.matching-mail.subject"), Map.of(
                 "employeeName", otherEmployee.getFirstName(),
-                "day", daysToPrettyString(days)
-        ));
-    
+                "day", daysToPrettyString(days)));
+
         SendEmailPayload payload = new SendEmailPayload();
         payload.setRecipients(List.of(currentEmployee.getEmail()));
         payload.setSubject(subject);
         payload.setHtmlText(renderMatchmakingEmail(days, currentEmployee, otherEmployee)); // here goes HTML
-        payload.setAttachments(List.of(new AttachmentData(getICSInvite(days, currentEmployee, otherEmployee), "invite.ics")));
+        payload.setAttachments(
+                List.of(new AttachmentData(getICSInvite(days, currentEmployee, otherEmployee), "invite.ics")));
         EmailAdapterAPI.newEmail(payload);
     }
 
-    public String renderMatchmakingEmail(Days days, EmployeeProfile currentEmployee, EmployeeProfile otherEmployee) throws IOException {
+    public String renderMatchmakingEmail(Days days, EmployeeProfile currentEmployee, EmployeeProfile otherEmployee)
+            throws IOException {
         String htmlTemplate = new String(Objects.requireNonNull(
-            getClass().getClassLoader().getResourceAsStream("emailTemplates/EmailTemplateCalendar.html")).readAllBytes()
-    );
+                getClass().getClassLoader().getResourceAsStream("emailTemplates/EmailTemplateCalendar.html"))
+                .readAllBytes());
         return Templating.recursiveRender(htmlTemplate, Map.of(
             "title", Mitems.getText("weekly-core.matching-mail.title"),
-            "description", Mitems.getText("weekly-core.matching-mail.description"),
+            "description", Mitems.getHTML("weekly-core.matching-mail.description"),
             "otherName", otherEmployee.getFirstName(),
             "fullName", otherEmployee.getFullName(),
             "myName", currentEmployee.getFirstName(),
@@ -670,14 +727,13 @@ public class Ava extends Agent {
             invite.getProperties().add(Version.VERSION_2_0);
             invite.getProperties().add(CalScale.GREGORIAN);
             invite.getProperties().add(Method.REQUEST);
-            
+
             int chosenDay = Map.of(
-                Days.MON, java.util.Calendar.MONDAY,
-                Days.TUE, java.util.Calendar.TUESDAY,
-                Days.WED, java.util.Calendar.WEDNESDAY,
-                Days.THU, java.util.Calendar.THURSDAY,
-                Days.FRI, java.util.Calendar.FRIDAY
-            ).get(day);
+                    Days.MON, java.util.Calendar.MONDAY,
+                    Days.TUE, java.util.Calendar.TUESDAY,
+                    Days.WED, java.util.Calendar.WEDNESDAY,
+                    Days.THU, java.util.Calendar.THURSDAY,
+                    Days.FRI, java.util.Calendar.FRIDAY).get(day);
 
             java.util.Calendar now = java.util.Calendar.getInstance();
             java.util.Calendar saturday = nextDayOfWeek(now, java.util.Calendar.SATURDAY);
@@ -691,18 +747,18 @@ public class Ava extends Agent {
             lunchCalendarDatePlusHour.set(java.util.Calendar.HOUR_OF_DAY, 13);
 
             String calendarEventName = Templating.recursiveRender(
-                Mitems.getText("weekly-core.matching-mail.calendar-event"),
-                Map.of(
-                    "firstName", currentEmployee.getFirstName(),
-                    "secondName", otherEmployee.getFirstName()
-                )
-            );
+                    Mitems.getText("weekly-core.matching-mail.calendar-event"),
+                    Map.of(
+                            "firstName", currentEmployee.getFirstName(),
+                            "secondName", otherEmployee.getFirstName()));
             VEvent ev = new VEvent(new DateTime(lunchCalendarDate.getTime()),
-                                   new DateTime(lunchCalendarDatePlusHour.getTime()),
-                                   calendarEventName);
-            ev.getProperties().add(new net.fortuna.ical4j.model.property.Attendee("mailto:" + currentEmployee.getEmail()));
-            ev.getProperties().add(new net.fortuna.ical4j.model.property.Attendee("mailto:" + otherEmployee.getEmail())); 
-            
+                    new DateTime(lunchCalendarDatePlusHour.getTime()),
+                    calendarEventName);
+            ev.getProperties()
+                    .add(new net.fortuna.ical4j.model.property.Attendee("mailto:" + currentEmployee.getEmail()));
+            ev.getProperties()
+                    .add(new net.fortuna.ical4j.model.property.Attendee("mailto:" + otherEmployee.getEmail()));
+
             invite.getComponents().add(ev);
 
             ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
@@ -715,11 +771,11 @@ public class Ava extends Agent {
     }
 
     public String daysToPrettyString(Days days) {
-        for(Option option: Mitems.getOptions("weekly-core.days.each-day")) {
-            if(days.toString().equals(option.getId())) {
+        for (Option option : Mitems.getOptions("weekly-core.days.each-day")) {
+            if (days.toString().equals(option.getId())) {
                 return option.getText();
-            } 
-        }       
+            }
+        }
         return "Unknown";
     }
 
