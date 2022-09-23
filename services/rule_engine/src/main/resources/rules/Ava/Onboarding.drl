@@ -90,7 +90,7 @@ rule "Reconnect personal quiz"
         delete(signal);
 end
 
-rule "Finish onboarding"
+rule "Finish personal quiz"
    when
         Heartbeat(ts: timestamp) from entry-point "signals"
         signal: SubmitEvent(getParamAsString("submit") == "finishpersonalquiz") from entry-point "signals"

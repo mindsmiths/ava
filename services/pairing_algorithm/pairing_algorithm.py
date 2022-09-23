@@ -41,6 +41,8 @@ class PairingAlgorithm(BaseService):
             pair = list(pair)
             pair.sort()
             # check if a and b have days when both are available
+            first_availability = []
+            second_availability = []
             for availability in employeeAvailabilities:
                 if int(availability.employeeId) == employee_id_mapping[pair[0]]:
                     first_availability = availability.availableDays
@@ -56,10 +58,10 @@ class PairingAlgorithm(BaseService):
             availability_intersections[tuple(pair)] = intersection
 
             # compatibility is the average of how a scored b
-            # and how b scored a
+            # and how b scored a translated by a 100
             first_score_second = employeeConnectionStrengths[str(employee_id_mapping[pair[0]])][str(employee_id_mapping[pair[1]])]
             second_score_first = employeeConnectionStrengths[str(employee_id_mapping[pair[1]])][str(employee_id_mapping[pair[0]])]
-            weight = (first_score_second + second_score_first) / 2
+            weight = 100 - ((first_score_second + second_score_first) / 2)
             # weight can't be 0, because of how blossom works
             if weight == 0:
                 weight = 1

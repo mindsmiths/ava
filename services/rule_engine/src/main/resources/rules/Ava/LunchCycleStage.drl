@@ -172,7 +172,7 @@ rule "Store match info"
         modify(agent) {getMatchHistory().add(signal.getMatch())};
         agent.printMatchInfo(employee, signal);
         Log.info("My match history: " + agent.getMatchHistory());
-        agent.sendCalendarInvite(signal.getMatchDay(), employee, agent.getOtherEmployees().get(signal.getMatch()));
+        agent.sendCalendarInvite(signal.getMatchDay(), employee, agent.getOtherEmployees().get(agent.employeeToAvaId(signal.getMatch())));
         delete(signal);
 end
 

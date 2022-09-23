@@ -126,6 +126,19 @@ public class Ava extends Agent {
         return m;
     }
 
+    public String avaToEmployeeId(String avaId) {
+        return otherEmployees.get(avaId).getId();
+    }
+
+    public String employeeToAvaId(String employeeId) {
+        for(Map.Entry<String, EmployeeProfile> entry : otherEmployees.entrySet()) {
+            if(entry.getValue().getId() == employeeId) {
+                return entry.getKey();
+            }
+        }
+        return "";
+    }
+
     public void updateAvailableDays(List<String> availableDaysStr) {
         this.availableDays = new ArrayList<>();
         for (String day : availableDaysStr) {
