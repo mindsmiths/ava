@@ -61,7 +61,7 @@ end
 rule "Send third reminder"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        eval(evaluateCronExpression("* * 0-13 ? * FRI *", ts, "Europe/Zagreb")) 
+        eval(evaluateCronExpression("* * 0-15 ? * FRI *", ts, "Europe/Zagreb")) 
         agent: Ava(
             (lunchReminderStage == LunchReminderStage.SECOND_EMAIL_SENT || lunchCycleStage == AvaLunchCycleStage.LUNCH_MAIL_SENDING),
             workingHours == true,
@@ -87,7 +87,7 @@ rule "Ask for available days"
         )
         eval(evaluateCronExpression("* * 9-23 * * WED", ts, "Europe/Zagreb") 
             || (evaluateCronExpression("* * * * * THU", ts, "Europe/Zagreb"))
-            || (evaluateCronExpression("* * 00-14 * * FRI", ts, "Europe/Zagreb"))
+            || (evaluateCronExpression("* * 00-16 * * FRI", ts, "Europe/Zagreb"))
             || (agent.isManualTrigger() == true))
         employee: EmployeeProfile()
     then 
@@ -166,7 +166,7 @@ end
 rule "Auto assign days"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        eval(evaluateCronExpression("* * 16-17 ? * FRI *", ts, "Europe/Zagreb")) // KOMENTAR
+        eval(evaluateCronExpression("* 30-59 16 ? * FRI *", ts, "Europe/Zagreb")) // KOMENTAR
         agent: Ava(
             lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY
         )
