@@ -27,5 +27,5 @@ tags.temp
 target/
 
 services/commands/connections_graphs/
-core.*
+**/core.*
 *.vsix
