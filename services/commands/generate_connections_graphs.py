@@ -41,14 +41,14 @@ def generate_connections_graphs():
 
     for i in range(num_of_employees):
         layout = nx.spring_layout(G, k = 10)
-        
+
         color_map = []
         for node in G:
             if node == employee_ids[i]:
                 color_map.append('red')
             else:
                 color_map.append('royalblue')
-        
+
         edge_color_map = []
         for edge in G.edges():
             if employee_ids[i] in edge:
