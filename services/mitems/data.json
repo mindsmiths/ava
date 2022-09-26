@@ -602,6 +602,21 @@
         ]
       },
       {
+        "name": "No match email",
+        "elements": [
+          {
+            "description": "Description",
+            "type": "TEXT",
+            "content": "Better luck next week"
+          },
+          {
+            "description": "Subject",
+            "type": "TEXT",
+            "content": "Sorry"
+          }
+        ]
+      },
+      {
         "name": "Second reminder email",
         "elements": [
           {

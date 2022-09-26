@@ -229,16 +229,16 @@ public class Ava extends Agent {
         String introScreenDescription = Mitems.getHTML("onboarding.familiarity-quiz-intro.description");
 
         screens.put("introScreen", new TemplateGenerator()
-                .addComponent("image", new ImageComponent(Mitems.getText("onboarding.silos-image-path.connected")))
                 .addComponent("title", new TitleComponent(introScreenTitle))
+                .addComponent("image", new ImageComponent(Mitems.getText("onboarding.silos-image-path.connected")))
                 .addComponent("description", new DescriptionComponent(introScreenDescription))
                 .addComponent("submit", new PrimarySubmitButtonComponent(introButton, "secondIntroScreen")));
         // Adding questions and final screen in familiarity quiz
 
         screens.put("secondIntroScreen", new TemplateGenerator()
-        .addComponent("image", new ImageComponent(Mitems.getText("onboarding.silos-image-path.devided")))
         .addComponent("header", new HeaderComponent(null, true))
         .addComponent("title", new TitleComponent(Mitems.getText("onboarding.familiarity-quiz-second-intro.title")))
+        .addComponent("image", new ImageComponent(Mitems.getText("onboarding.silos-image-path.devided")))
         .addComponent("description", new DescriptionComponent(Mitems.getText("onboarding.familiarity-quiz-second-intro.description")))
         .addComponent("submit", new PrimarySubmitButtonComponent(Mitems.getText("onboarding.familiarity-quiz-second-intro.action"), "question1")));
         int questionNum = 1;
@@ -385,12 +385,22 @@ public class Ava extends Agent {
                 "callToAction", Mitems.getText("onboarding.welcome-email.action"),
                 "firstName", employee.getFirstName(),
                 "armoryUrl",
-                String.format("%s/%s?trigger=start-onboarding", Settings.ARMORY_SITE_URL, getConnection("armory"))));
+               String.format("%s/%s?trigger=start-onboarding", Settings.ARMORY_SITE_URL, getConnection("armory"))));
 
         SendEmailPayload e = new SendEmailPayload();
         e.setRecipients(List.of(getConnection("email")));
         e.setSubject(subject);
         e.setHtmlText(htmlBody);
+        EmailAdapterAPI.newEmail(e);
+    }
+
+    public void sendNoMatchEmail() throws IOException {
+        String subject = Mitems.getText("weekly-core.no-match-email.subject");
+        String description = Mitems.getText("weekly-core.no-match-email.description");
+        SendEmailPayload e = new SendEmailPayload();
+        e.setRecipients(List.of(getConnection("email")));
+        e.setSubject(subject);
+        e.setPlainText(description);
         EmailAdapterAPI.newEmail(e);
     }
 

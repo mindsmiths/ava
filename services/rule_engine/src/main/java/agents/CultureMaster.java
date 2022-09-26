@@ -1,24 +1,25 @@
 package agents;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import com.mindsmiths.pairingalgorithm.EmployeeAvailability;
+import com.mindsmiths.pairingalgorithm.Match;
+import com.mindsmiths.pairingalgorithm.PairingAlgorithmAPI;
 import com.mindsmiths.ruleEngine.model.Agent;
 import com.mindsmiths.sdk.core.db.DataUtils;
 import com.mindsmiths.sdk.core.db.EmitType;
 
-import java.util.*;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import models.CmLunchCycleStage;
-
-import com.mindsmiths.pairingalgorithm.PairingAlgorithmAPI;
-import com.mindsmiths.pairingalgorithm.EmployeeAvailability;
-import com.mindsmiths.pairingalgorithm.Match;
-
-import signals.EmployeeUpdateSignal;
-import signals.AllEmployees;
-import signals.SendMatchesSignal;
-
 import models.EmployeeProfile;
+import signals.AllEmployees;
+import signals.EmployeeUpdateSignal;
+import signals.SendMatchesSignal;
 
 @Data
 @AllArgsConstructor
@@ -67,6 +68,7 @@ public class CultureMaster extends Agent {
         for (Match m : allMatches){
             DataUtils.emit(new models.Match(m), EmitType.CREATE);
         }
+
     }
 
     public void addOrUpdateEmployee(EmployeeUpdateSignal signal) {
