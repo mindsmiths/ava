@@ -130,6 +130,7 @@ rule "Reconnect final screen"
 end
 
 rule "Send statistics email"
+    enabled false
     when
         agent: Ava(
             onboardingStage == OnboardingStage.STATS_EMAIL,
