@@ -7,6 +7,8 @@ import networkx as nx
 from pyvis.network import Network
 import matplotlib.pyplot as plt
 import os
+from collections import defaultdict
+from pprint import pprint
 
 
 @cli.command()
@@ -16,48 +18,52 @@ def generate_connections_graphs():
     culture_master = keeper.ruleEngineDB.summary.find_one(
         {"agentId": "CULTURE_MASTER"})
 
-    ava_connection_strengths = pd.DataFrame.from_dict(
-        culture_master["agents#CultureMaster"]["CULTURE_MASTER"]["employeeConnectionStrengths"]
-    )
-    employee_ids = ava_connection_strengths.columns
+    ava_connection_strengths =  culture_master["agents#CultureMaster"]["CULTURE_MASTER"]["employeeConnectionStrengths"]
     G = nx.Graph()
-    num_of_employees = len(employee_ids)
+    edges = []
 
-    for i in range(num_of_employees):
-        G.add_node(employee_ids[i])
-        for j in range(i+1, num_of_employees):
-            score = 0
-            a = ava_connection_strengths[employee_ids[i]][employee_ids[j]]
-            b = ava_connection_strengths[employee_ids[j]][employee_ids[i]]
-
-            if a >= 50 and b >= 50:
-                score = (a+b)/2
-                if score > 80:
-                    G.add_edge(employee_ids[i], employee_ids[j], weight=score)
+    for i in ava_connection_strengths:
+        G.add_node(i)
+        for j in ava_connection_strengths[i]:
+            if i == j:
+                continue
+            weight = (ava_connection_strengths[i][j])
+            if weight > 80:
+                edges.append((i, j))
+                G.add_edge(i, j, weight=weight)
 
     graphs_path = "./services/commands/connections_graphs/"
     if not os.path.exists(graphs_path):
         os.makedirs(graphs_path)
 
-    for i in range(num_of_employees):
+    edges_map = defaultdict(list)
+    for edge in edges:
+        edges_map[edge[0]].append(edge[1])
+    
+    for i in ava_connection_strengths:
+        current_employee = i
         layout = nx.spring_layout(G, k = 10)
 
         color_map = []
         for node in G:
-            if node == employee_ids[i]:
-                color_map.append('red')
+            if node == current_employee:
+                color_map.append('black')
             else:
-                color_map.append('royalblue')
+                color_map.append('grey')
 
         edge_color_map = []
+
         for edge in G.edges():
-            if employee_ids[i] in edge:
-                edge_color_map.append('red')
+            if current_employee in edge:
+                if edge[0] in edges_map.get(edge[1], []) and edge[1] in edges_map.get(edge[0], []):
+                    edge_color_map.append('green')
+                else:
+                    edge_color_map.append('red')
             else:
-                edge_color_map.append('royalblue')
+                edge_color_map.append('grey')
 
         plt.show()
         nx.draw(G, with_labels=False, node_color=color_map, width=2,
                 edge_color=edge_color_map, pos=layout)
-        plt.savefig(graphs_path + "{}.png".format(employee_ids[i]), format="PNG")
+        plt.savefig(graphs_path + "{}.png".format(i), format="PNG")
         plt.close()
