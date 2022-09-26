@@ -8,7 +8,7 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AvaAvailability {
-    private String agentId;
+public class EmployeeAvailability {
+    private String employeeId;
     private List<Days> availableDays = new ArrayList<>();
 }
