@@ -62,13 +62,21 @@ class PairingAlgorithm(BaseService):
             if not intersection:
                 continue
             # calculate lunch recency
-            match_history = employeeMatchHistories[employee_id_mapping[pair[0]]]
-            lunch_recency = 1
-            for index, past_match in reversed(list(enumerate(match_history))):
+            match_history_first = employeeMatchHistories[employee_id_mapping[pair[0]]]
+            lunch_recency_first = 1
+            for index, past_match in reversed(list(enumerate(match_history_first))):
                 if past_match == employee_id_mapping[pair[1]]:
-                    lunch_recency = index / \
-                        (len(match_history)*len(employeeAvailabilities))
+                    lunch_recency_first = index / \
+                        (len(match_history_first)*len(employeeAvailabilities))
                     break
+            match_history_second = employeeMatchHistories[employee_id_mapping[pair[1]]]
+            lunch_recency_second = 1
+            for index, past_match in reversed(list(enumerate(match_history_second))):
+                if past_match == employee_id_mapping[pair[1]]:
+                    lunch_recency_second = index / \
+                        (len(match_history_second)*len(employeeAvailabilities))
+                    break
+            lunch_recency = (lunch_recency_first + lunch_recency_second) / 2
             # calculte connection strength
             first_score_second = employeeConnectionStrengths[
                 employee_id_mapping[pair[0]]][employee_id_mapping[pair[1]]]
