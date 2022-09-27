@@ -69,14 +69,15 @@ public class Ava extends Agent {
     private Date statsEmailLastSentAt;
     private Date matchedWithEmailSentAt;
     private int silosCount;
-    public static final double CONNECTION_NEURON_CAPACITY = 100;
-    public static final double CONNECTION_NEURON_RESISTANCE = 0.05;
     private String silosRisk;
     private LunchReminderStage lunchReminderStage;
     private List<String> lunchDeclineReasons = new ArrayList<>(); // track days
     private boolean manualTrigger;
     // a map of how strong MY connections are to other employees
     private Map<String, Neuron> connectionStrengths = new HashMap<>();
+
+    public static final double CONNECTION_NEURON_CAPACITY = 100;
+    public static final double CONNECTION_NEURON_RESISTANCE = 0.05;
 
     public Ava(String connectionName, String connectionId) {
         super(connectionName, connectionId);
@@ -112,7 +113,9 @@ public class Ava extends Agent {
             Log.info("Decaying SPECIFIC neuron with employee id: " + otherEmployees.get(avaId).getId());
             long daysPassed = ChronoUnit.DAYS.between(getConnectionNeuron(otherEmployees.get(avaId).getId()).getLastUpdatedAt().toInstant(),
                                                       new Date().toInstant());
-            getConnectionNeuron(otherEmployees.get(avaId).getId()).decay(daysPassed/1000.);
+            // UNCOMMENT AND SWITCH AFTER TESTING                                         
+            // getConnectionNeuron(otherEmployees.get(avaId).getId()).decay(daysPassed);
+            getConnectionNeuron(otherEmployees.get(avaId).getId()).decay(7.);
         }
     }
 

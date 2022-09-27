@@ -8,7 +8,7 @@ import com.mindsmiths.ruleEngine.util.Agents;
 import com.mindsmiths.ruleEngine.model.Initialize;
 import com.mindsmiths.pairingalgorithm.Matches;
 
-import signals.ConnectionsStrengthSignal;
+import signals.MatchingParametarsSignal;
 import signals.EmployeeAvailabilitySignal;
 
 import agents.CultureMaster;
@@ -25,7 +25,7 @@ rule "First contact"
         delete(initialize);
 end
 
-rule "Store Ava availability"
+rule "Store Employee availability"
     when
         signal: EmployeeAvailabilitySignal() from entry-point "signals"
         agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES)
@@ -35,13 +35,15 @@ rule "Store Ava availability"
         delete(signal);
 end
 
-rule "Store Ava connections strengths"
+rule "Store Employee matching parametars"
     when
-        signal: ConnectionsStrengthSignal() from entry-point "signals"
+        signal: MatchingParametarsSignal() from entry-point "signals"
         agent: CultureMaster()
     then
-        modify(agent) {getEmployeeConnectionStrengths().put(signal.getEmployeeId(), signal.getConnectionStrengths())};   
-        Log.info("Storing connection strength: " + agent.getEmployeeConnectionStrengths());
+        modify(agent) {
+            getEmployeeConnectionStrengths().put(signal.getEmployeeId(), signal.getConnectionStrengths()),
+            getEmployeeMatchHistories().put(signal.getEmployeeId(), signal.getMatchHistory())
+        };   
         delete(signal);
 end
 
@@ -52,7 +54,8 @@ rule "Check that all ava availabilities came"
                             employees.size() == employeeAvailabilities.size(),
                             !employees.isEmpty())
     then
-        modify(agent) {setLunchCycleStage(CmLunchCycleStage.GENERATE_MATCHES)};
+        // UNCOMMENT AFTER TESTING
+        // modify(agent) {setLunchCycleStage(CmLunchCycleStage.GENERATE_MATCHES)};
 end
 
 rule "Generate this weeks matches"
@@ -82,6 +85,7 @@ rule "Send match info to Avas"
         agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.SEND_TO_AVAS)
     then
         agent.sendMatches();
-        agent.clearEmployeeAvailabilities();
+        // UNCOMMENT AFTER TESTING
+        // agent.clearEmployeeAvailabilities();
         modify(agent) {setLunchCycleStage(CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES)};
 end

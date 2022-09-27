@@ -23,12 +23,16 @@ class PairingAlgorithm(BaseService):
     def generate_pairs(
             self,
             employeeAvailabilities: List[EmployeeAvailability],
-            employeeConnectionStrengths: Dict[str, Dict[str, float]]) -> Matches:
+            employeeConnectionStrengths: Dict[str, Dict[str, float]],
+            employeeMatchHistories: Dict[str, List[str]]) -> Matches:
         all_matches: List[Match] = []
         edges = list()
         already_matched = set()
         not_matched = set()
         availability_intersections = {}
+
+        print("successfully received employee match histories")
+        print(employeeMatchHistories)
 
         employeeAvailabilities_ = {}
         for availability in employeeAvailabilities:
@@ -43,6 +47,7 @@ class PairingAlgorithm(BaseService):
         # FIND COMPATIBILITY BETWEEN ALL EMPLOYEES
         pairs = combinations(employee_id_mapping.keys(), 2)
         for pair in pairs:
+            weight = 1000
             employee_pair = list(
                 (employee_id_mapping[pair[0]], employee_id_mapping[pair[1]]))
             employee_pair.sort()
@@ -51,20 +56,27 @@ class PairingAlgorithm(BaseService):
                 employee_id_mapping[pair[0]]]
             second_availability = employeeAvailabilities_[
                 employee_id_mapping[pair[1]]]
-
             intersection = set(first_availability) &\
                 set(second_availability)
             availability_intersections[tuple(employee_pair)] = intersection
             if not intersection:
                 continue
-            # compatibility is the average of how a scored b
-            # and how b scored a translated by a 100
+            # calculate lunch recency
+            match_history = employeeMatchHistories[employee_id_mapping[pair[0]]]
+            lunch_recency = 1
+            for index, past_match in reversed(list(enumerate(match_history))):
+                if past_match == employee_id_mapping[pair[1]]:
+                    lunch_recency = index / \
+                        (len(match_history)*len(employeeAvailabilities))
+                    break
+            # calculte connection strength
             first_score_second = employeeConnectionStrengths[
                 employee_id_mapping[pair[0]]][employee_id_mapping[pair[1]]]
             second_score_first = employeeConnectionStrengths[
                 employee_id_mapping[pair[1]]][employee_id_mapping[pair[0]]]
-            weight = 100 - ((first_score_second + second_score_first) / 2)
-            # weight can't be 0, because of blossom implementation
+
+            weight = weight - (first_score_second + second_score_first)
+            weight = weight * lunch_recency
             if weight == 0:
                 weight = 1
             # create tuple readable to blossom algorithm
