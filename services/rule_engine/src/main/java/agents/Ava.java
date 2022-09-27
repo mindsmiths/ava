@@ -218,12 +218,20 @@ public class Ava extends Agent {
         showScreens("confirmDaysScreen", screens);
     }
 
+    private Map<String, String> getOtherEmployeeNames() {
+        Map<String, String> otherEmployeeNames = new HashMap<>();
+
+        for (EmployeeProfile employee : otherEmployees.values()) {
+            otherEmployeeNames.put(employee.getFullName(), employee.getId());
+        }
+        return otherEmployeeNames;
+    }
+
     public void showFamiliarityQuizScreens() {
         Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
         String avaImagePath = Mitems.getText("onboarding.ava-image-path.path");
-        List<Map<String, String>> names = getAllEmployeeNames();
-
-        // Adding intro screen
+        Map<String, String> otherEmployeeNames = getOtherEmployeeNames();
+        // Adding intro screens
         String introButton = Mitems.getText("onboarding.familiarity-quiz-intro.action");
         String introScreenTitle = Mitems.getText("onboarding.familiarity-quiz-intro.title");
         String introScreenDescription = Mitems.getHTML("onboarding.familiarity-quiz-intro.description");
@@ -232,18 +240,24 @@ public class Ava extends Agent {
                 .addComponent("image", new ImageComponent(Mitems.getText("onboarding.silos-image-path.connected")))
                 .addComponent("title", new TitleComponent(introScreenTitle))
                 .addComponent("description", new DescriptionComponent(introScreenDescription))
-                .addComponent("submit", new PrimarySubmitButtonComponent(introButton, "secondIntroScreen")));
-        // Adding questions and final screen in familiarity quiz
+                .addComponent("submit", new PrimarySubmitButtonComponent(introButton, "secondIntroScreen"))
+                .addComponent("pageNum", new DescriptionComponent("1/2")));
 
         screens.put("secondIntroScreen", new TemplateGenerator()
-        .addComponent("image", new ImageComponent(Mitems.getText("onboarding.silos-image-path.devided")))
-        .addComponent("header", new HeaderComponent(null, true))
-        .addComponent("title", new TitleComponent(Mitems.getText("onboarding.familiarity-quiz-second-intro.title")))
-        .addComponent("description", new DescriptionComponent(Mitems.getText("onboarding.familiarity-quiz-second-intro.description")))
-        .addComponent("submit", new PrimarySubmitButtonComponent(Mitems.getText("onboarding.familiarity-quiz-second-intro.action"), "question1")));
+            .addComponent("image", new ImageComponent(Mitems.getText("onboarding.silos-image-path.devided")))
+            .addComponent("header", new HeaderComponent(null, true))
+            .addComponent("title", new TitleComponent(
+                Mitems.getText("onboarding.familiarity-quiz-second-intro.title")))
+            .addComponent("description", new DescriptionComponent(
+                Mitems.getText("onboarding.familiarity-quiz-second-intro.description")))
+            .addComponent("submit", new PrimarySubmitButtonComponent(
+                Mitems.getText("onboarding.familiarity-quiz-second-intro.action"), "question1"))
+            .addComponent("pageNum", new DescriptionComponent("2/2")));
+        
         int questionNum = 1;
         String submitButton = Mitems.getText("onboarding.familiarity-quiz-questions.action");
-
+        String questionDescription = Mitems.getText("onboarding.familiarity-quiz-questions.question-description");
+        
         while (true) {
             String questionTag = "question" + String.valueOf(questionNum);
             String nextQuestionTag = "question" + String.valueOf(questionNum + 1);
@@ -254,9 +268,11 @@ public class Ava extends Agent {
                 screens.put(questionTag, new TemplateGenerator(questionTag)
                         .addComponent("header", new HeaderComponent(null, true))
                         .addComponent("question", new TitleComponent(questionText))
-                        .addComponent(answersTag, new CloudSelectComponent(answersTag, names.get(questionNum - 1)))
+                        .addComponent("description", new DescriptionComponent(questionDescription))
+                        .addComponent(answersTag, new CloudSelectComponent(answersTag, otherEmployeeNames))
                         .addComponent("submit", new PrimarySubmitButtonComponent(
-                                "submit", submitButton, nextQuestionTag)));
+                                "submit", submitButton, nextQuestionTag))
+                        .addComponent("pageNum", new DescriptionComponent(questionNum + "/3")));
                 questionNum += 1;
 
             } catch (Exception e) {
@@ -318,7 +334,8 @@ public class Ava extends Agent {
                         .addComponent("submit", new PrimarySubmitButtonComponent(
                                 "submit",
                                 Mitems.getText(String.format("onboarding.personal-quiz-%s.action", questionTag)),
-                                nextQuestionTag)));
+                                nextQuestionTag))
+                        .addComponent("pageNum", new DescriptionComponent(questionNum + "/6")));
                 questionNum += 1;
             } catch (Exception e) {
                 // Changing button value
@@ -353,26 +370,6 @@ public class Ava extends Agent {
                                         .setTemplateName("CenteredContentTemplate")
                                         .addComponent("title", new TitleComponent(goodbyeScreen));
         showScreen(screen);
-    }
-
-    private List<Map<String, String>> getAllEmployeeNames() {
-        List<Map<String, String>> names = new ArrayList<>();
-        List<Integer> employeesPerQuestionDistribution = employeesPerQuestionDistribution();
-        List<EmployeeProfile> employees = new ArrayList<>(otherEmployees.values());
-
-        int startIndex = 0;
-        int endIndex = 0;
-        for (int len : employeesPerQuestionDistribution) {
-            endIndex += len;
-            Map<String, String> namesPerQuestion = new HashMap<>();
-
-            for (EmployeeProfile employee : employees.subList(startIndex, endIndex)) {
-                namesPerQuestion.put(employee.getFullName(), employee.getId());
-            }
-            names.add(namesPerQuestion);
-            startIndex = endIndex;
-        }
-        return names;
     }
 
     public void sendWelcomeEmail(EmployeeProfile employee) throws IOException {
@@ -422,7 +419,7 @@ public class Ava extends Agent {
     public void showMonthlyQuizScreens() {
         Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
         String avaImagePath = Mitems.getText("monthly-core.ava-image-path.path");
-        List<Map<String, String>> names = getAllEmployeeNames();
+        Map<String, String> otherEmployeeNames = getOtherEmployeeNames();
 
         // Adding intro screen
         String introButton = Mitems.getText("monthly-core.familiarity-quiz-intro.action");
@@ -448,7 +445,7 @@ public class Ava extends Agent {
                 screens.put(questionTag, new TemplateGenerator(questionTag)
                         .addComponent("header", new HeaderComponent(null, questionNum > 1))
                         .addComponent("question", new TitleComponent(questionText))
-                        .addComponent(answersTag, new CloudSelectComponent(answersTag, names.get(questionNum - 1)))
+                        .addComponent(answersTag, new CloudSelectComponent(answersTag, otherEmployeeNames))
                         .addComponent("submit", new PrimarySubmitButtonComponent(
                                 "submit", submitButton, nextQuestionTag)));
                 questionNum += 1;
@@ -533,31 +530,6 @@ public class Ava extends Agent {
 
         showScreens("employeeNumberScreen", screens);
 
-    }
-
-    private List<Integer> employeesPerQuestionDistribution() {
-        List<Integer> employeesPerQuestionDistribution = new ArrayList<Integer>();
-        int numOfOtherEmployees = otherEmployees.size();
-        int numOfQuestions = (int) Math.ceil((double) numOfOtherEmployees / 10.0);
-
-        // Calculating number of employees per question
-        double employeesPerQuestion;
-        int employeesPerQuestionRounded;
-
-        while (numOfOtherEmployees > 0) {
-            employeesPerQuestion = (double) numOfOtherEmployees / (double) numOfQuestions;
-
-            if (employeesPerQuestion % 1 != 0) {
-                employeesPerQuestionRounded = (int) Math.ceil(employeesPerQuestion);
-            } else {
-                employeesPerQuestionRounded = (int) Math.floor(employeesPerQuestion);
-            }
-
-            employeesPerQuestionDistribution.add(employeesPerQuestionRounded);
-            numOfOtherEmployees = numOfOtherEmployees - employeesPerQuestionRounded;
-            numOfQuestions -= 1;
-        }
-        return employeesPerQuestionDistribution;
     }
 
     public void sendWeeklyEmail(EmployeeProfile employee) throws IOException {

@@ -118,24 +118,24 @@
             "content": "Next"
           },
           {
+            "description": "question description",
+            "type": "TEXT",
+            "content": "(choose one, none or more people, depending on your situation)"
+          },
+          {
             "description": "question1",
             "type": "TEXT",
-            "content": "Who are you in sync with?\n(choose none, one or more people, depending on your gut feeling)\n"
+            "content": "Mark people you had a chance to work with closely in the past month"
           },
           {
             "description": "question2",
             "type": "TEXT",
-            "content": "Who are you in sync with?\n(choose none, one or more people, depending on your gut feeling)\n"
+            "content": "Mark people you had the chance to hangout with over drinks or meal in the past month. "
           },
           {
             "description": "question3",
             "type": "TEXT",
-            "content": "Who are you in sync with?\n(choose none, one or more people, depending on your gut feeling)\n"
-          },
-          {
-            "description": "question4",
-            "type": "TEXT",
-            "content": "Who are you in sync with?\n(choose none, one or more people, depending on your gut feeling)\n"
+            "content": "Mark people you spent time with in meetings or calls during the past month."
           }
         ]
       },
@@ -150,7 +150,7 @@
           {
             "description": "Text",
             "type": "HTML",
-            "content": "<p><span style=\"font-weight: 400;\">You did a great job and don&rsquo;t worry about the absolute accuracy of your answers, it&rsquo;s difficult to pinpoint something based on a feeling.&nbsp;</span></p>\n<p><span style=\"font-weight: 400;\">Now let me get to know YOU a bit better.</span></p>"
+            "content": "<p><span style=\"font-weight: 400;\">You did a great job and don&rsquo;t worry about the absolute accuracy of your answers, your best guess is good enough for me to do my math 😁</span></p>\n<p>&nbsp;</p>\n<p><span style=\"font-weight: 400;\">Now let me get to know YOU a bit better.</span></p>"
           },
           {
             "description": "Title",
@@ -170,7 +170,7 @@
           {
             "description": "Description",
             "type": "HTML",
-            "content": "<p><span style=\"font-weight: 400;\">The dots represent people and the lines represent information flow.</span></p>\n<p><span style=\"font-weight: 400;\">When we&rsquo;re&nbsp; not in sync with our colleagues, information silos occur and the organization looks something like this</span></p>"
+            "content": "<p><span style=\"font-weight: 400;\">The dots represent people and the lines represent information flow.</span></p>\n<p><span style=\"font-weight: 400;\">When we&rsquo;re&nbsp; not in sync with our colleagues, information silos occur.</span></p>\n<p>&nbsp;</p>"
           },
           {
             "description": "Title",
@@ -190,7 +190,7 @@
           {
             "description": "Description",
             "type": "HTML",
-            "content": "<p><span style=\"font-weight: 400;\">To tackle this, we just need to get to know each other better and be in sync.</span></p>\n<p><span style=\"font-weight: 400;\">I will show you a list of names, all you need to do is mark those people that you feel like you are in sync with, where you feel like the relationship is a two-way street.</span></p>"
+            "content": "<p><span style=\"font-weight: 400;\">Curious to see where you stand? Me too! 😄</span></p>\n<p><span style=\"font-weight: 400;\">I will show you a list of people, select those you had the opportunity to interact with in the past month.</span></p>"
           },
           {
             "description": "Title",
@@ -230,12 +230,12 @@
           {
             "description": "Description",
             "type": "TEXT",
-            "content": "Feel free to answer as much or as little as you want and write the first thing that comes to your mind."
+            "content": "The answers to these questions do not require much thought, feel free to answer the first thing that comes to mind.\n\nYou can skip a question if you don’t like it.\n"
           },
           {
             "description": "Title",
             "type": "TEXT",
-            "content": "Just a few questions"
+            "content": "Rapid Fire Questions"
           }
         ]
       },
