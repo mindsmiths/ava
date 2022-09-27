@@ -47,18 +47,18 @@ def generate_connections_graphs():
         color_map = []
         for node in G:
             if node == current_employee:
-                color_map.append('black')
+                color_map.append('red')
             else:
-                color_map.append('grey')
+                color_map.append('aquamarine') 
 
         edge_color_map = []
 
         for edge in G.edges():
             if current_employee in edge:
                 if edge[0] in edges_map.get(edge[1], []) and edge[1] in edges_map.get(edge[0], []):
-                    edge_color_map.append('green')
-                else:
                     edge_color_map.append('red')
+                else:
+                    edge_color_map.append('yellow')
             else:
                 edge_color_map.append('grey')
 
