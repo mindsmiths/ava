@@ -27,7 +27,7 @@ def generate_connections_graphs():
         for j in ava_connection_strengths[i]:
             if i == j:
                 continue
-            weight = (ava_connection_strengths[i][j]) * 2
+            weight = (ava_connection_strengths[i][j])
             if weight > 80:
                 edges.append((i, j))
                 G.add_edge(i, j, weight=weight)
@@ -64,6 +64,6 @@ def generate_connections_graphs():
 
         plt.show()
         nx.draw(G, with_labels=False, node_color=color_map, width=0.6,
-                edge_color=edge_color_map, pos=layout)
+                edge_color=edge_color_map, pos=layout, node_size=100)
         plt.savefig(graphs_path + "{}.png".format(i), format="PNG")
         plt.close()
