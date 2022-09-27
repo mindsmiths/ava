@@ -31,7 +31,7 @@ def generate_connections_graphs():
             if i == current_employee:
                 color_map.append('red')
             else:
-                color_map.append('black')
+                color_map.append('#778ca3')
 
         for other_employee in ava_connection_strengths[current_employee].keys():
             if other_employee == current_employee:
