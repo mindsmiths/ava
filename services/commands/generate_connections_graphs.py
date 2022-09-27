@@ -67,7 +67,7 @@ def generate_connections_graphs():
             new_graph.remove_edge(edge[0], edge[1])
 
         plt.show()
-        nx.draw(new_graph, with_labels=True, node_color=color_map, width=0.6,
+        nx.draw(new_graph, with_labels=False, node_color=color_map, width=0.6,
                 edge_color=edge_color_map, pos=layout, node_size=100)
         plt.savefig(graphs_path + "{}.png".format(i), format="PNG")
         plt.close()

@@ -51,7 +51,7 @@ def generate_full_graphs():
         G.remove_edge(edge[0], edge[1])
 
     plt.show()
-    nx.draw(G, with_labels=True, node_color=color_map, width=0.6,
+    nx.draw(G, with_labels=False, node_color=color_map, width=0.6,
             edge_color=edge_color_map, pos=layout, node_size=100)
     plt.savefig(graphs_path + "{}.png".format("allGraph"), format="PNG")
     plt.close()
