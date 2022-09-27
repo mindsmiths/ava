@@ -77,7 +77,7 @@ class PairingAlgorithm(BaseService):
                         (len(match_history_second)*len(employeeAvailabilities))
                     break
             lunch_recency = (lunch_recency_first + lunch_recency_second) / 2
-            # calculte connection strength
+            # calculate connection strength
             first_score_second = employeeConnectionStrengths[
                 employee_id_mapping[pair[0]]][employee_id_mapping[pair[1]]]
             second_score_first = employeeConnectionStrengths[
