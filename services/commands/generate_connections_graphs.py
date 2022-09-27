@@ -31,7 +31,7 @@ def generate_connections_graphs():
             if i == current_employee:
                 color_map.append('red')
             else:
-                color_map.append('aquamarine')
+                color_map.append('black')
 
         for other_employee in ava_connection_strengths[current_employee].keys():
             if other_employee == current_employee:
@@ -45,10 +45,10 @@ def generate_connections_graphs():
             other_connection_strength = ava_connection_strengths[other_employee][current_employee]
             if employee_connection_strength > 80 and other_connection_strength > 80:
                 G.add_edge(current_employee, other_employee, weight=100)
-                edge_color_map[(current_employee, other_employee)] = "red"
+                edge_color_map[(current_employee, other_employee)] = "green"
             elif employee_connection_strength > 80:
                 G.add_edge(current_employee, other_employee, weight=50)
-                edge_color_map[(current_employee, other_employee)] = "yellow"
+                edge_color_map[(current_employee, other_employee)] = "#FFC312"
 
         for i in range(len(ava_connection_strengths)):
             e1 = list(ava_connection_strengths.keys())[i]
@@ -62,15 +62,16 @@ def generate_connections_graphs():
 
                 if ava_connection_strengths[e1][e2] > 80 and ava_connection_strengths[e2][e1] > 80:
                     G.add_edge(e1, e2, weight=100)
-                    edge_color_map[(e1, e2)] = "#c4c4c4"
+                    edge_color_map[(e1, e2)] = "#d1d8e0"
+                    
 
         for edge in G.edges():
             edge_color_list.append(edge_color_map.get(edge, edge_color_map.get(edge[::-1])))
 
         layout = nx.spring_layout(G, k=15)
         plt.show()
-        nx.draw(G, with_labels=False, width=0.6, node_color=color_map,
-                edge_color=edge_color_list, pos=layout, node_size=100)
+        nx.draw(G, with_labels=False, width=0.8, node_color=color_map,
+                edge_color=edge_color_list, pos=layout, node_size=200)
         plt.savefig(f"{graphs_path}{current_employee}.png", format="PNG")
         plt.close()
 
