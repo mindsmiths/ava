@@ -11,19 +11,19 @@ import com.mindsmiths.sdk.utils.templating.*;
 
 import com.mindsmiths.employeeManager.employees.Employee;
 
-import agents.Ava;
-import agents.CultureMaster;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
-import models.OnboardingStage;
-import signals.AllEmployees;
-import models.AvaLunchCycleStage;
 
+import signals.AllEmployees;
 import signals.EmployeeUpdateSignal;
 
+import agents.Ava;
+import agents.CultureMaster;
 import models.EmployeeProfile;
 import models.OnboardingStage;
+import models.AvaLunchCycleStage;
+import models.AvaiablePersonalQuestions;
 
 rule "Send welcome email"
     when
@@ -52,7 +52,7 @@ rule "Start and reconnect familiarity quiz"
         delete(signal);
 end
 
-rule "Start personal quiz"
+rule "Start personal quiz intro"
    when
         signal: SubmitEvent(getParamAsString("submit") == "finished-familiarity-quiz") from entry-point "signals"
         agent: Ava(onboardingStage == OnboardingStage.FAMILIARITY_QUIZ)
@@ -67,37 +67,47 @@ rule "Start personal quiz"
                     familiarity.put(
                         em, familiarity.getOrDefault(em, 0.0) + 1.0
                     );
-                } 
+                }
             }
-        }    
-       
+        }
+
         modify(employee) { 
             setFamiliarity(familiarity)
         };
-        agent.showPersonalQuizScreens();
+        agent.showPersonalQuizIntroScreens();
         modify(agent) {
             chargeConnectionNeurons(employee),
-            setOnboardingStage(OnboardingStage.PERSONAL_QUIZ)
+            setOnboardingStage(OnboardingStage.PERSONAL_QUIZ_INTRO)
         };
         delete(signal);
 end
 
-rule "Reconnect personal quiz"
+rule "Reconnect personal quiz intro"
    when
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-onboarding") from entry-point "signals"
-        agent: Ava(onboardingStage == OnboardingStage.PERSONAL_QUIZ)
+        agent: Ava(onboardingStage == OnboardingStage.PERSONAL_QUIZ_INTRO)
    then
-        agent.showPersonalQuizScreens();
+        agent.showPersonalQuizIntroScreens();
         delete(signal);
 end
 
-rule "Finish onboarding"
-   when
-        Heartbeat(ts: timestamp) from entry-point "signals"
-        signal: SubmitEvent(getParamAsString("submit") == "finishpersonalquiz") from entry-point "signals"
+rule "Show personal quiz questions"
+    when
+        agent: Ava(onboardingStage in (OnboardingStage.PERSONAL_QUIZ_INTRO, OnboardingStage.PERSONAL_QUIZ))
+        EmployeeProfile(personalAnswers.size() < 3)
+        questions: AvaiablePersonalQuestions()
+    then
+        agent.showPersonalQuizScreens(questions.getCurrentQuestion());
+        modify(agent) { setOnboardingStage(OnboardingStage.PERSONAL_QUIZ)}
+end
+
+rule "Store personal quiz answers"
+    when
         agent: Ava(onboardingStage == OnboardingStage.PERSONAL_QUIZ)
-        employee: EmployeeProfile()
-   then
+        signal: SubmitEvent(getParamAsString("submit") == "submit") from entry-point "signals"
+        EmployeeProfile(personalAnswers.size() < 3)
+        questions: AvaiablePersonalQuestions()
+    then
         Map<String, String> personalAnswers = new HashMap<String, String>(
             employee.getPersonalAnswers()
         );
@@ -108,8 +118,33 @@ rule "Finish onboarding"
                     signal.getParamAsString(paramId)
                 );
 
+        modify(employee) {setPersonalAnswers(personalAnswers)};
+        modify(questions) {
+            questions.popAnsweredQuestion(),
+            questions.nextQuestion()
+        };
+        delete(signal);
+end
+
+rule "Skip personal quiz question"
+    when
+        agent: Ava(onboardingStage == OnboardingStage.PERSONAL_QUIZ)
+        signal: SubmitEvent(getParamAsString("skip") == "skip") from entry-point "signals"
+        EmployeeProfile(personalAnswers.size() < 3)
+        questions: AvaiablePersonalQuestions()
+    then
+        modify(questions) {questions.nextQuestion()};
+        delete(signal);
+end
+
+rule "Finish onboarding"
+   when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        signal: SubmitEvent(getParamAsString("submit") == "finishpersonalquiz") from entry-point "signals"
+        agent: Ava(onboardingStage == OnboardingStage.PERSONAL_QUIZ)
+        employee: EmployeeProfile()
+   then
         modify(employee) {
-            setPersonalAnswers(personalAnswers),
             setOnboardingStage(OnboardingStage.STATS_EMAIL) 
         };
         

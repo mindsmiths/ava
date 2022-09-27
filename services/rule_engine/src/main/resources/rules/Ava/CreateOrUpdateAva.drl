@@ -15,7 +15,7 @@ import agents.Ava;
 
 import models.EmployeeProfile;
 import models.OnboardingStage;
-
+import models.AvaiablePersonalQuestions;
 
 rule "Create new employee"
     when
@@ -28,7 +28,9 @@ rule "Create new employee"
             addConnection("armory", Utils.randomGenerator())
         };
         EmployeeProfile profile = new EmployeeProfile(newEmployee);
+        AvaiablePersonalQuestions days = new AvaiablePersonalQuestions();
         insert(profile);
+        insert(days);
         agent.send(CultureMaster.ID, new EmployeeUpdateSignal(profile));
 end
 
