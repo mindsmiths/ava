@@ -1,15 +1,12 @@
-import forge
-from forge.utils.mongo import MongoClientKeeper
-from forge_cli.admin import cli
-
-import pandas as pd
-import networkx as nx
-from pyvis.network import Network
-import matplotlib.pyplot as plt
-import os
 from collections import defaultdict
-from pprint import pprint
+import os
 
+import matplotlib.pyplot as plt
+import networkx as nx
+
+from forge_cli.admin import cli
+from forge.utils.mongo import MongoClientKeeper
+import forge
 
 @cli.command()
 def generate_connections_graphs():
@@ -18,7 +15,7 @@ def generate_connections_graphs():
     culture_master = keeper.ruleEngineDB.summary.find_one(
         {"agentId": "CULTURE_MASTER"})
 
-    ava_connection_strengths =  culture_master["agents#CultureMaster"]["CULTURE_MASTER"]["employeeConnectionStrengths"]
+    ava_connection_strengths = culture_master["agents#CultureMaster"]["CULTURE_MASTER"]["employeeConnectionStrengths"]
     G = nx.Graph()
     edges = []
 
@@ -27,7 +24,7 @@ def generate_connections_graphs():
         for j in ava_connection_strengths[i]:
             if i == j:
                 continue
-            weight = (ava_connection_strengths[i][j])
+            weight = ava_connection_strengths[i][j]
             if weight > 80:
                 edges.append((i, j))
                 G.add_edge(i, j, weight=weight)
@@ -41,29 +38,37 @@ def generate_connections_graphs():
         edges_map[edge[0]].append(edge[1])
     
     for i in ava_connection_strengths:
+        new_graph = G.copy()
         current_employee = i
-        layout = nx.spring_layout(G,k = 10)
+        layout = nx.spring_layout(G,k = 15)
 
         color_map = []
-        for node in G:
+        for node in new_graph:
             if node == current_employee:
                 color_map.append('red')
             else:
                 color_map.append('aquamarine') 
 
         edge_color_map = []
-
-        for edge in G.edges():
+        edges_to_remove = []
+        for edge in new_graph.edges():
             if current_employee in edge:
                 if edge[0] in edges_map.get(edge[1], []) and edge[1] in edges_map.get(edge[0], []):
                     edge_color_map.append('red')
                 else:
-                    edge_color_map.append('yellow')
+                    edge_color_map.append('#f1c40f')
             else:
-                edge_color_map.append('grey')
+                if edge[0] in edges_map.get(edge[1], []) and edge[1] in edges_map.get(edge[0], []):
+                    edge_color_map.append('#c4c4c4')
+                else: 
+                    edges_to_remove.append(edge)
+
+        for edge in edges_to_remove:
+            new_graph.remove_edge(edge[0], edge[1])
 
         plt.show()
-        nx.draw(G, with_labels=False, node_color=color_map, width=0.6,
+        nx.draw(new_graph, with_labels=True, node_color=color_map, width=0.6,
                 edge_color=edge_color_map, pos=layout, node_size=100)
         plt.savefig(graphs_path + "{}.png".format(i), format="PNG")
         plt.close()
+
