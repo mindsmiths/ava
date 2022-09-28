@@ -20,34 +20,34 @@ def generate_connections_graphs():
     
     for current_employee in ava_connection_strengths.keys():
         G = nx.Graph()
+        G.add_node(current_employee)
 
-        color_map = []
+        color_map = ["red"]
         edge_color_map = {}
         edge_color_list = []
         
-        for i in ava_connection_strengths.keys():
-            G.add_node(i)
-            if i == current_employee:
-                color_map.append('red')
-            else:
-                color_map.append('#778ca3')
-
         for other_employee in ava_connection_strengths[current_employee].keys():
             if other_employee == current_employee:
                 continue
 
+            G.add_node(other_employee)
+            color_map.append('#c8d6e5')
+
             if other_employee not in ava_connection_strengths.keys():
                 # Employee didn't answer
                 continue
+            color_map
 
             employee_connection_strength = ava_connection_strengths[current_employee][other_employee]
             other_connection_strength = ava_connection_strengths[other_employee][current_employee]
             if employee_connection_strength > 80 and other_connection_strength > 80:
                 G.add_edge(current_employee, other_employee, weight=100)
-                edge_color_map[(current_employee, other_employee)] = "green"
+                edge_color_map[(current_employee, other_employee)] = "#2980b9"
+                color_map[-1] = '#2980b9'
             elif employee_connection_strength > 80:
                 G.add_edge(current_employee, other_employee, weight=50)
                 edge_color_map[(current_employee, other_employee)] = "#FFC312"
+                color_map[-1] ='#FFC312'
 
         for i in range(len(ava_connection_strengths)):
             e1 = list(ava_connection_strengths.keys())[i]
@@ -62,7 +62,6 @@ def generate_connections_graphs():
                 if ava_connection_strengths[e1][e2] > 80 and ava_connection_strengths[e2][e1] > 80:
                     G.add_edge(e1, e2, weight=100)
                     edge_color_map[(e1, e2)] = "#d1d8e0"
-                    
 
         for edge in G.edges():
             edge_color_list.append(edge_color_map.get(edge, edge_color_map.get(edge[::-1])))
