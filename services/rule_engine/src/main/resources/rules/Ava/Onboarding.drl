@@ -116,21 +116,27 @@ rule "Store personal quiz answers"
     when
         agent: Ava(onboardingStage == OnboardingStage.WAIT_FOR_PERSONAL_ANSWER)
         signal: SubmitEvent(getParamAsString("submit") == "submit") from entry-point "signals"
-        employee: EmployeeProfile(getPersonalAnswers().size() < 3)
+        employee: EmployeeProfile(personalAnswers.size() < 3)
         questions: AvaiablePersonalQuestions()
     then
         Map<String, String> personalAnswers = new HashMap<String, String>(
             employee.getPersonalAnswers()
         );
-        for (String paramId : signal.getParams().keySet())
-            if (paramId.startsWith("answers"))
+        Boolean pop = false;
+        for (String paramId : signal.getParams().keySet()){
+            if (paramId.startsWith("answers") && signal.getParamAsString(paramId) != null) {
                 personalAnswers.put(
                     paramId.replace("answers", "question"),
                     signal.getParamAsString(paramId)
                 );
-
+                modify(questions) {popQuestion()};
+                pop = true;
+            }
+        }
+        if (pop != true) {
+            modify(questions) {nextQuestion()};
+        }
         modify(employee) {setPersonalAnswers(personalAnswers)};
-        modify(questions) {popAnsweredQuestion()};
         modify(agent) {setOnboardingStage(OnboardingStage.PERSONAL_QUIZ)};
         delete(signal);
 end
