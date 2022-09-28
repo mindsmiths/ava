@@ -28,9 +28,9 @@ rule "Create new employee"
             addConnection("armory", Utils.randomGenerator())
         };
         EmployeeProfile profile = new EmployeeProfile(newEmployee);
-        AvaiablePersonalQuestions days = new AvaiablePersonalQuestions();
+        AvaiablePersonalQuestions questions = new AvaiablePersonalQuestions(agent.getId());
         insert(profile);
-        insert(days);
+        insert(questions);
         agent.send(CultureMaster.ID, new EmployeeUpdateSignal(profile));
 end
 

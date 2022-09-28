@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.mindsmiths.armory.ArmoryAPI;
+import com.mindsmiths.armory.components.ActionGroupComponent;
 import com.mindsmiths.armory.components.CloudSelectComponent;
 import com.mindsmiths.armory.components.DescriptionComponent;
 import com.mindsmiths.armory.components.HeaderComponent;
@@ -305,10 +306,6 @@ public class Ava extends Agent {
         showScreens("introScreen", screens);
     }
 
-    public void getNextPersonalQuestion(){
-        
-    }
-
     public void showPersonalQuizIntroScreens() {
         BaseTemplate screen = new TemplateGenerator("introScreen")
                 .addComponent("image", new ImageComponent(Mitems.getText("onboarding.ava-image-path.path")))
@@ -316,7 +313,7 @@ public class Ava extends Agent {
                 .addComponent("description", new DescriptionComponent(
                     Mitems.getText("onboarding.personal-quiz-intro.description")))
                 .addComponent("submit", new PrimarySubmitButtonComponent(
-                    Mitems.getText("onboarding.personal-quiz-intro.action"), "startPersonalQuiz"));
+                    "submit", Mitems.getText("onboarding.personal-quiz-intro.action"), "startPersonalQuiz"));
         showScreen(screen);
     }
 
@@ -328,38 +325,36 @@ public class Ava extends Agent {
                 .addComponent("question", new TitleComponent(
                     Mitems.getText(String.format("onboarding.personal-quiz-%s.%s", questionTag, questionTag))))
                 .addComponent(answersTag, new TextAreaComponent(answersTag, "Type your answer here"))
-                .addComponent("submit", new PrimarySubmitButtonComponent(
+                .addComponent("actionGroup", new ActionGroupComponent(List.of(
+                    new PrimarySubmitButtonComponent(
                         "submit",
                         Mitems.getText(String.format("onboarding.personal-quiz-%s.action", questionTag)),
-                        "submit"))
-                .addComponent("submit", new PrimarySubmitButtonComponent(
+                        "submit"),
+                    new PrimarySubmitButtonComponent(
                     "skip",
                     "Skip this question",
-                    "skip"));
+                    "skip")
+                )));
         showScreen(screen);
-
-        // Changing button value
-        /*
-        String wrongQuestionTag = "question" + String.valueOf(questionNum - 1);
-        TemplateGenerator templateGenerator = (TemplateGenerator) screens.get(wrongQuestionTag);
-        PrimarySubmitButtonComponent buttonComponent = (PrimarySubmitButtonComponent) templateGenerator
-                .getComponents()
-                .get("submit");
-        buttonComponent.setValue("finishpersonalquiz");
-            Option[] finishQuizButton = Mitems.getOptions("onboarding.finish-personal-quiz.button");
-            String finishPersonalQuiz = Mitems.getHTML("onboarding.finish-personal-quiz.text");
-            screens.put("finishpersonalquiz", new TemplateGenerator("finishpersonalquiz")
-                    .addComponent("image", new ImageComponent(avaImagePath))
-                    .addComponent("title", new TitleComponent(finishPersonalQuiz))
-                    .addComponent("submit", new PrimarySubmitButtonComponent(
-                            "submit", finishQuizButton[0].getText(), "finished-personal-quiz")));
-            String goodbyeScreen = Mitems.getText("onboarding.finish-personal-quiz.goodbye-screen");
-            screens.put("finished-personal-quiz", new TemplateGenerator("goodbye")
-                    .setTemplateName("CenteredContentTemplate")
-                    .addComponent("title", new TitleComponent(goodbyeScreen)));
     }
-        showScreens("introScreen", screens);
-        */
+    
+    public void showPersonalQuizOutroScreens(){
+        Map<String, BaseTemplate> screens = new HashMap<>();
+        Option[] finishQuizButton = Mitems.getOptions("onboarding.finish-personal-quiz.button");
+        String finishPersonalQuiz = Mitems.getHTML("onboarding.finish-personal-quiz.text");
+        String avaImagePath = Mitems.getText("monthly-core.ava-image-path.path");
+
+        screens.put("finishpersonalquiz", new TemplateGenerator("finishpersonalquiz")
+                .addComponent("image", new ImageComponent(avaImagePath))
+                .addComponent("title", new TitleComponent(finishPersonalQuiz))
+                .addComponent("submit", new PrimarySubmitButtonComponent(
+                        "submit", finishQuizButton[0].getText(), "finished-personal-quiz")));
+        String goodbyeScreen = Mitems.getText("onboarding.finish-personal-quiz.goodbye-screen");
+        screens.put("finished-personal-quiz", new TemplateGenerator("goodbye")
+                .setTemplateName("CenteredContentTemplate")
+                .addComponent("title", new TitleComponent(goodbyeScreen)));
+
+        showScreens("finishpersonalquiz", screens);
     }
 
     public void showFinalScreen() {
