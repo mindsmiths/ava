@@ -333,8 +333,8 @@ public class Ava extends Agent {
                 new PrimarySubmitButtonComponent(
                 "skip",
                 "Skip this question",
-                "skip")
-            )));
+                "skip"))))
+            .addComponent("pageNum", new DescriptionComponent(questionNum + "/14"));
         showScreen(screen);
     }
 

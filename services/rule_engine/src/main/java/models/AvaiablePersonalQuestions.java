@@ -15,7 +15,7 @@ public class AvaiablePersonalQuestions {
     @PrimaryKey
     private String avaId;
     private ArrayList<String> personalQuestions = new ArrayList<String>();
-    private int numOfPersonalQuestions = 6;
+    private int numOfPersonalQuestions = 14;
     private String currentQuestion;
 
     public AvaiablePersonalQuestions(String avaId){
