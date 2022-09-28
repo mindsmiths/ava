@@ -437,12 +437,12 @@
           {
             "description": "Button",
             "type": "TEXT",
-            "content": "Okay"
+            "content": "Let's see!"
           },
           {
             "description": "Title",
             "type": "TEXT",
-            "content": "Okay great!\n\nYou have {{ correctCount }} answers.\n\n I'll send {{ firstName }}'s answers to my other AI assistant who'll try to guess what kind of person she is."
+            "content": "Okay great!\n\nNow I will show you results."
           }
         ]
       },
@@ -583,6 +583,16 @@
             "description": "Question",
             "type": "TEXT",
             "content": "What was {{ firstName }}'s favourite subject in school?"
+          }
+        ]
+      },
+      {
+        "name": "Guessing quiz results",
+        "elements": [
+          {
+            "description": "Results",
+            "type": "TEXT",
+            "content": "You have {{ correct }} correct answers about {{ firstName }}."
           }
         ]
       },

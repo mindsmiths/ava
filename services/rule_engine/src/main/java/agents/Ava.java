@@ -24,6 +24,7 @@ import com.mindsmiths.armory.components.ImageComponent;
 import com.mindsmiths.armory.components.PrimarySubmitButtonComponent;
 import com.mindsmiths.armory.components.TextAreaComponent;
 import com.mindsmiths.armory.components.TitleComponent;
+import com.mindsmiths.armory.events.SubmitEvent;
 import com.mindsmiths.armory.templates.BaseTemplate;
 import com.mindsmiths.armory.templates.TemplateGenerator;
 import com.mindsmiths.emailAdapter.AttachmentData;
@@ -76,7 +77,7 @@ public class Ava extends Agent {
     private boolean workingHours;
     private Date statsEmailLastSentAt;
     private Map<String, String> personalGuess = new HashMap<String, String>();
-    private Integer correct;
+    private int correct = 0;
     private MonthlyCoreStage monthlyCoreStage;
     private Date matchedWithEmailSentAt;
     private List<String> allQuestions = new ArrayList<>();
@@ -297,9 +298,10 @@ public class Ava extends Agent {
         Random random = new Random();
         List<String> allQuestions = new ArrayList<String>(this.otherEmployees.get(this.match).getPersonalAnswers().keySet());
 
-        while (guessingQuestions.size() <= Math.min(LUNCH_QUIZ_QUESTIONS_COUNT, allQuestions.size()))
-            guessingQuestions.add(allQuestions.get(random.nextInt(allQuestions.size())));
-
+        Collections.shuffle(allQuestions);
+        for (int i = 0; i < Math.min(LUNCH_QUIZ_QUESTIONS_COUNT, allQuestions.size()); i++)
+            guessingQuestions.add(allQuestions.get(i));
+        
         String title = Mitems.getText("weekly-core.guessing-quiz-intro-screen-title.title");
         title = Templating.recursiveRender(title, Map.of(
                 "firstName", this.otherEmployees.get(this.match).getFirstName()
@@ -316,14 +318,14 @@ public class Ava extends Agent {
             index++;
             Set<PrimarySubmitButtonComponent> options = new LinkedHashSet<>();
             options.add(new PrimarySubmitButtonComponent(
-                this.otherEmployees.get(this.match).getPersonalAnswers().get(questionId),
+                "guess--" + questionId,
                 this.otherEmployees.get(this.match).getPersonalAnswers().get(questionId),
                 String.format("guessingQuestion%d", index + 1)
             ));
             while (options.size() < Math.min(LUNCH_QUIZ_OPTIONS_COUNT, otherEmployees.size())) {
                 int randomNumber = random.nextInt(this.otherEmployees.size());
                 options.add(new PrimarySubmitButtonComponent(
-                    otherEmployees.get(randomNumber).getPersonalAnswers().get(questionId),
+                    "guess--" + questionId,
                     otherEmployees.get(randomNumber).getPersonalAnswers().get(questionId),
                     String.format("guessingQuestion%d", index + 1)
                 ));
@@ -344,11 +346,25 @@ public class Ava extends Agent {
             );
         }
 
+        title = Mitems.getText("weekly-core.confirming-quiz-guesses.title");
+
         screens.put(
             String.format("guessingQuestion%d", index + 1),
             new TemplateGenerator("confirmScreen")
-                .addComponent("title", new TitleComponent(Mitems.getText("weekly-core.confirming-quiz-guesses.title")))
-                .addComponent("submit", new PrimarySubmitButtonComponent(Mitems.getText("weekly-core.confirming-quiz-guesses.button"), "confirmGuess"))
+                .addComponent("title", new TitleComponent(title))
+                .addComponent("submit", new PrimarySubmitButtonComponent("finish-guessing-quiz", Mitems.getText("weekly-core.confirming-quiz-guesses.button"), "finish-guessing-quiz"))
+        );
+
+        title = Mitems.getText("weekly-core.guessing-quiz-results.results");
+        title = Templating.recursiveRender(title, Map.of(
+            "firstName", this.otherEmployees.get(this.match).getFirstName(),
+            "correct", this.correct
+        ));
+
+        screens.put(
+            String.format("finish-guessing-quiz"),
+            new TemplateGenerator("resultScreen")
+                .addComponent("title", new TitleComponent(title))
         );
 
         showScreens("introGuessingScreen", screens);
