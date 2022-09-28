@@ -322,22 +322,22 @@ public class Ava extends Agent {
         String answersTag = "answers" + String.valueOf(questionNum);
 
         BaseTemplate screen = new TemplateGenerator(questionTag)
-                .addComponent("question", new TitleComponent(
-                    Mitems.getText(String.format("onboarding.personal-quiz-%s.%s", questionTag, questionTag))))
-                .addComponent(answersTag, new TextAreaComponent(answersTag, "Type your answer here"))
-                .addComponent("actionGroup", new ActionGroupComponent(List.of(
-                    new PrimarySubmitButtonComponent(
-                        "submit",
-                        Mitems.getText(String.format("onboarding.personal-quiz-%s.action", questionTag)),
-                        "submit"),
-                    new PrimarySubmitButtonComponent(
-                    "skip",
-                    "Skip this question",
-                    "skip")
-                )));
+            .addComponent("question", new TitleComponent(
+                Mitems.getText(String.format("onboarding.personal-quiz-%s.%s", questionTag, questionTag))))
+            .addComponent(answersTag, new TextAreaComponent(answersTag, "Type your answer here"))
+            .addComponent("actionGroup", new ActionGroupComponent(List.of(
+                new PrimarySubmitButtonComponent(
+                    "submit",
+                    Mitems.getText(String.format("onboarding.personal-quiz-%s.action", questionTag)),
+                    "submit"),
+                new PrimarySubmitButtonComponent(
+                "skip",
+                "Skip this question",
+                "skip")
+            )));
         showScreen(screen);
     }
-    
+
     public void showPersonalQuizOutroScreens(){
         Map<String, BaseTemplate> screens = new HashMap<>();
         Option[] finishQuizButton = Mitems.getOptions("onboarding.finish-personal-quiz.button");
@@ -349,6 +349,7 @@ public class Ava extends Agent {
                 .addComponent("title", new TitleComponent(finishPersonalQuiz))
                 .addComponent("submit", new PrimarySubmitButtonComponent(
                         "submit", finishQuizButton[0].getText(), "finished-personal-quiz")));
+        
         String goodbyeScreen = Mitems.getText("onboarding.finish-personal-quiz.goodbye-screen");
         screens.put("finished-personal-quiz", new TemplateGenerator("goodbye")
                 .setTemplateName("CenteredContentTemplate")

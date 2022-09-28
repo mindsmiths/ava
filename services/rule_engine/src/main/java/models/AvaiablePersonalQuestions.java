@@ -17,7 +17,7 @@ public class AvaiablePersonalQuestions {
     private ArrayList<String> personalQuestions = new ArrayList<String>();
     private int numOfPersonalQuestions = 6;
     private String currentQuestion;
-    
+
     public AvaiablePersonalQuestions(String avaId){
         for(int questionNum = 1; questionNum <= numOfPersonalQuestions; questionNum++){
             this.personalQuestions.add("question" + questionNum);
