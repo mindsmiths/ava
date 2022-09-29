@@ -142,15 +142,16 @@ def generate_connections_graphs():
                 continue   
             G.add_node(other_employee)
             color_map.append('#c8d6e5')
-
+            
             employee_connection_strength = ava_connection_strengths[current_employee][other_employee]
             other_connection_strength = ava_connection_strengths[other_employee][current_employee]
+
             score = employee_connection_strength + other_connection_strength
             if employee_connection_strength > 80 and other_connection_strength > 80:
                 G.add_edge(current_employee, other_employee, weight=score)
                 edge_color_map[(current_employee, other_employee)] = "#2980b9"
                 color_map[-1] = '#2980b9'
-            elif employee_connection_strength > 80:
+            elif employee_connection_strength > 80 or other_connection_strength > 80:
                 G.add_edge(current_employee, other_employee, weight=score)
                 edge_color_map[(current_employee, other_employee)] = "#FFC312"
                 color_map[-1] ='#FFC312'
