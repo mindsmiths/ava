@@ -113,7 +113,7 @@ rule "Reconnect ask for available days"
             || (evaluateCronExpression("* * 00-16 * * FRI", ts, "Europe/Zagreb"))
             || (agent.isManualTrigger() == true))
    then
-        agent.showPersonalQuizScreens();
+        agent.chooseAvailableDaysScreen();
         delete(signal);
 end
 
