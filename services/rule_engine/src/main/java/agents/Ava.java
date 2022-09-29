@@ -238,22 +238,22 @@ public class Ava extends Agent {
         String introScreenDescription = Mitems.getHTML("onboarding.familiarity-quiz-intro.description");
 
         screens.put("introScreen", new TemplateGenerator()
-                .addComponent("image", new ImageComponent(Mitems.getText("onboarding.silos-image-path.connected")))
-                .addComponent("title", new TitleComponent(introScreenTitle))
-                .addComponent("description", new DescriptionComponent(introScreenDescription))
-                .addComponent("submit", new PrimarySubmitButtonComponent(introButton, "secondIntroScreen"))
-                .addComponent("pageNum", new DescriptionComponent("1/2")));
+            .addComponent("image", new ImageComponent(Mitems.getText("onboarding.silos-image-path.connected")))
+            .addComponent("title", new TitleComponent(introScreenTitle))
+            .addComponent("description", new DescriptionComponent(introScreenDescription))
+            .addComponent("submit", new PrimarySubmitButtonComponent(introButton, "secondIntroScreen"))
+            .addComponent("pageNum", new DescriptionComponent("1/2")));
 
         screens.put("secondIntroScreen", new TemplateGenerator()
-                .addComponent("image", new ImageComponent(Mitems.getText("onboarding.silos-image-path.devided")))
-                .addComponent("header", new HeaderComponent(null, true))
-                .addComponent("title", new TitleComponent(
-                        Mitems.getText("onboarding.familiarity-quiz-second-intro.title")))
-                .addComponent("description", new DescriptionComponent(
-                        Mitems.getText("onboarding.familiarity-quiz-second-intro.description")))
-                .addComponent("submit", new PrimarySubmitButtonComponent(
-                        Mitems.getText("onboarding.familiarity-quiz-second-intro.action"), "question1"))
-                .addComponent("pageNum", new DescriptionComponent("2/2")));
+            .addComponent("image", new ImageComponent(Mitems.getText("onboarding.silos-image-path.devided")))
+            .addComponent("header", new HeaderComponent(null, true))
+            .addComponent("title", new TitleComponent(
+            Mitems.getText("onboarding.familiarity-quiz-second-intro.title")))
+            .addComponent("description", new DescriptionComponent(
+            Mitems.getText("onboarding.familiarity-quiz-second-intro.description")))
+            .addComponent("submit", new PrimarySubmitButtonComponent(
+            Mitems.getText("onboarding.familiarity-quiz-second-intro.action"), "question1"))
+            .addComponent("pageNum", new DescriptionComponent("2/2")));
 
         int questionNum = 1;
         String submitButton = Mitems.getText("onboarding.familiarity-quiz-questions.action");

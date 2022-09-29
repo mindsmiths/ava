@@ -112,6 +112,17 @@ rule "Show personal quiz questions"
         modify(agent) {setOnboardingStage(OnboardingStage.WAIT_FOR_PERSONAL_ANSWER)};
 end
 
+rule "Reconnect personal quiz questions"
+    when
+        signal: UserConnectedEvent() from entry-point "signals"
+        agent: Ava(onboardingStage == OnboardingStage.WAIT_FOR_PERSONAL_ANSWER)
+        EmployeeProfile(personalAnswers.size() < 3)
+        questions: AvaiablePersonalQuestions()
+    then
+        agent.showPersonalQuizScreens(questions.getCurrentQuestion());
+        delete(signal);
+end
+
 rule "Store personal quiz answers"
     when
         agent: Ava(onboardingStage == OnboardingStage.WAIT_FOR_PERSONAL_ANSWER)

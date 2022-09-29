@@ -215,7 +215,7 @@
           {
             "description": "Text",
             "type": "HTML",
-            "content": "<p>That&rsquo;s it!</p>\n<p>Now it&rsquo;s up to me to analyze everything.</p>\n<p>You can expect an email from me soon.</p>"
+            "content": "<p>WooHoo! You did it! 🙌</p>\n<p>&nbsp;</p>\n<p>You can expect an email from me soon.</p>\n<p>&nbsp;</p>"
           }
         ]
       },
@@ -230,7 +230,7 @@
           {
             "description": "Description",
             "type": "TEXT",
-            "content": "The answers to these questions do not require much thought, feel free to answer the first thing that comes to mind.\n\nYou can skip a question if you don’t like it.\n"
+            "content": "The answers to these questions do not require much thought, feel free to answer the first thing that comes to mind.\n\n\n\nYou can skip a question if you don’t like it.\n"
           },
           {
             "description": "Title",
@@ -245,7 +245,7 @@
           {
             "description": "Action",
             "type": "TEXT",
-            "content": "Next"
+            "content": "Submit"
           },
           {
             "description": "question1",
@@ -335,7 +335,7 @@
           {
             "description": "Action",
             "type": "TEXT",
-            "content": "Next"
+            "content": "Submit"
           },
           {
             "description": "question2",
@@ -350,7 +350,7 @@
           {
             "description": "Action",
             "type": "TEXT",
-            "content": "Next"
+            "content": "Submit"
           },
           {
             "description": "question3",
@@ -365,7 +365,7 @@
           {
             "description": "Action",
             "type": "TEXT",
-            "content": "Next"
+            "content": "Submit"
           },
           {
             "description": "question4",
@@ -380,7 +380,7 @@
           {
             "description": "Action",
             "type": "TEXT",
-            "content": "Next"
+            "content": "Submit"
           },
           {
             "description": "question5",
@@ -395,7 +395,7 @@
           {
             "description": "Action",
             "type": "TEXT",
-            "content": "Next"
+            "content": "Submit"
           },
           {
             "description": "question6",
@@ -475,7 +475,7 @@
           {
             "description": "Description",
             "type": "HTML",
-            "content": "<p><span style=\"font-weight: 400;\">Dear {{ firstName }},</span></p>\n<p><span style=\"font-weight: 400;\">When team members are working in silos, they cannot collaborate effectively, which can lead to missed deadlines, subpar work, poor communication and general feelings of frustration.</span></p>\n<p>&nbsp;</p>\n<p><span style=\"font-weight: 400;\">To avoid this, we need to encourage communication and collaboration, promote knowledge sharing and encourage networking.&nbsp;</span></p>\n<p>&nbsp;</p>\n<p><span style=\"font-weight: 400;\">How? Easy, I will do all the work and guide you all the way. Just follow my lead!</span></p>"
+            "content": "<p><span style=\"font-weight: 400;\">Dear {{ firstName }},</span></p>\n<p><span style=\"font-weight: 400;\">When team members are working in silos, they cannot collaborate effectively, which can lead to missed deadlines, subpar work, poor communication and general feelings of frustration.</span></p>\n<p>&nbsp;</p>\n<p><span style=\"font-weight: 400;\">I think we can all agree that&rsquo;s something we don&rsquo;t want to see around here 😁</span></p>\n<p>&nbsp;</p>\n<p><span style=\"font-weight: 400;\">That&rsquo;s why we will encourage collaboration and networking across the organization.&nbsp;</span></p>\n<p><span style=\"font-weight: 400;\">&nbsp;</span></p>\n<p><span style=\"font-weight: 400;\">You can start by clicking the button below.</span></p>"
           },
           {
             "description": "Subject",
