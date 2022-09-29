@@ -317,7 +317,7 @@ public class Ava extends Agent {
         showScreen(screen);
     }
 
-    public void showPersonalQuizScreens(String questionTag) {
+    public void showPersonalQuizScreens(String questionTag, int numOfPersonalAnswers) {
         int questionNum = Integer.valueOf(questionTag.replace("question", ""));
         String answersTag = "answers" + String.valueOf(questionNum);
 
@@ -334,7 +334,7 @@ public class Ava extends Agent {
                                 "skip",
                                 "Skip this question",
                                 "skip"))))
-                .addComponent("pageNum", new DescriptionComponent(questionNum + "/14"));
+                .addComponent("pageNum", new DescriptionComponent(String.valueOf(numOfPersonalAnswers + 1) + "/3"));
         showScreen(screen);
     }
 
@@ -348,10 +348,10 @@ public class Ava extends Agent {
                 .addComponent("image", new ImageComponent(avaImagePath))
                 .addComponent("title", new TitleComponent(finishPersonalQuiz))
                 .addComponent("submit", new PrimarySubmitButtonComponent(
-                        "submit", finishQuizButton[0].getText(), "finished-personal-quiz")));
+                        "submit", finishQuizButton[0].getText(), "qoodbyescreen")));
 
         String goodbyeScreen = Mitems.getText("onboarding.finish-personal-quiz.goodbye-screen");
-        screens.put("finished-personal-quiz", new TemplateGenerator("goodbye")
+        screens.put("qoodbyescreen", new TemplateGenerator("goodbye")
                 .setTemplateName("CenteredContentTemplate")
                 .addComponent("title", new TitleComponent(goodbyeScreen)));
 

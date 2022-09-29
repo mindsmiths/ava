@@ -23,7 +23,7 @@ import agents.CultureMaster;
 import models.EmployeeProfile;
 import models.OnboardingStage;
 import models.AvaLunchCycleStage;
-import models.AvaiablePersonalQuestions;
+import models.AvailablePersonalQuestions;
 
 rule "Send welcome email"
     when
@@ -95,20 +95,21 @@ rule "Setup Ava for personal quiz"
     when
         signal: SubmitEvent(getParamAsString("submit") == "startPersonalQuiz") from entry-point "signals"
         agent: Ava(onboardingStage == OnboardingStage.PERSONAL_QUIZ_INTRO)
-        questions: AvaiablePersonalQuestions()
+        employee: EmployeeProfile(personalAnswers.size() < 3)
+        questions: AvailablePersonalQuestions()
     then
         modify(agent) {setOnboardingStage(OnboardingStage.PERSONAL_QUIZ)};
-        agent.showPersonalQuizScreens(questions.getCurrentQuestion());
+        agent.showPersonalQuizScreens(questions.getCurrentQuestion(), employee.getPersonalAnswers().size());
         delete(signal);
 end
 
 rule "Show personal quiz questions"
     when
         agent: Ava(onboardingStage == OnboardingStage.PERSONAL_QUIZ)
-        EmployeeProfile(personalAnswers.size() < 3)
-        questions: AvaiablePersonalQuestions()
+        employee: EmployeeProfile(personalAnswers.size() < 3)
+        questions: AvailablePersonalQuestions()
     then
-        agent.showPersonalQuizScreens(questions.getCurrentQuestion());
+        agent.showPersonalQuizScreens(questions.getCurrentQuestion(), employee.getPersonalAnswers().size());
         modify(agent) {setOnboardingStage(OnboardingStage.WAIT_FOR_PERSONAL_ANSWER)};
 end
 
@@ -116,10 +117,10 @@ rule "Reconnect personal quiz questions"
     when
         signal: UserConnectedEvent() from entry-point "signals"
         agent: Ava(onboardingStage == OnboardingStage.WAIT_FOR_PERSONAL_ANSWER)
-        EmployeeProfile(personalAnswers.size() < 3)
-        questions: AvaiablePersonalQuestions()
+        employee: EmployeeProfile(personalAnswers.size() < 3)
+        questions: AvailablePersonalQuestions()
     then
-        agent.showPersonalQuizScreens(questions.getCurrentQuestion());
+        agent.showPersonalQuizScreens(questions.getCurrentQuestion(), employee.getPersonalAnswers().size());
         delete(signal);
 end
 
@@ -128,7 +129,7 @@ rule "Store personal quiz answers"
         agent: Ava(onboardingStage == OnboardingStage.WAIT_FOR_PERSONAL_ANSWER)
         signal: SubmitEvent(getParamAsString("submit") == "submit") from entry-point "signals"
         employee: EmployeeProfile(personalAnswers.size() < 3)
-        questions: AvaiablePersonalQuestions()
+        questions: AvailablePersonalQuestions()
     then
         Map<String, String> personalAnswers = new HashMap<String, String>(
             employee.getPersonalAnswers()
@@ -156,8 +157,7 @@ rule "Skip personal quiz question"
     when
         agent: Ava(onboardingStage == OnboardingStage.WAIT_FOR_PERSONAL_ANSWER)
         signal: SubmitEvent(getParamAsString("skip") == "skip") from entry-point "signals"
-        EmployeeProfile(getPersonalAnswers().size() < 3)
-        questions: AvaiablePersonalQuestions()
+        questions: AvailablePersonalQuestions()
     then
         modify(questions) {nextQuestion()};
         modify(agent) {setOnboardingStage(OnboardingStage.PERSONAL_QUIZ)};

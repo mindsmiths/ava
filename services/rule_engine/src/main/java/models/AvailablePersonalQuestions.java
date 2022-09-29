@@ -11,14 +11,14 @@ import com.mindsmiths.sdk.core.db.PrimaryKey;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class AvaiablePersonalQuestions {
+public class AvailablePersonalQuestions {
     @PrimaryKey
     private String avaId;
     private ArrayList<String> personalQuestions = new ArrayList<String>();
     private int numOfPersonalQuestions = 14;
     private String currentQuestion;
 
-    public AvaiablePersonalQuestions(String avaId) {
+    public AvailablePersonalQuestions(String avaId) {
         for (int questionNum = 1; questionNum <= numOfPersonalQuestions; questionNum++) {
             this.personalQuestions.add("question" + questionNum);
         }
