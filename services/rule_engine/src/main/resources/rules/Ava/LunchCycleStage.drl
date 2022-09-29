@@ -152,7 +152,7 @@ end
 rule "Store match info"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        //eval(evaluateCronExpression("* * 17-18 ? * FRI *", ts, "Europe/Zagreb")) 
+        eval(evaluateCronExpression("* * 17-18 ? * FRI *", ts, "Europe/Zagreb")) 
         signal: SendMatchesSignal() from entry-point "signals"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.ACCEPT_MATCH_INFO)
         employee: EmployeeProfile()
@@ -167,7 +167,7 @@ end
 rule "Send no match email"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        //eval(evaluateCronExpression("* * 17-18 ? * FRI *", ts, "Europe/Zagreb")) 
+        eval(evaluateCronExpression("* * 18-19 ? * FRI *", ts, "Europe/Zagreb")) 
         signal: SendNoMatchesSignal() from entry-point "signals"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.ACCEPT_MATCH_INFO)
     then
@@ -178,7 +178,7 @@ end
 rule "Auto assign days"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        eval(evaluateCronExpression("* 30-59 16 ? * FRI *", ts, "Europe/Zagreb")) // KOMENTAR
+        eval(evaluateCronExpression("* * 16-17 ? * FRI *", ts, "Europe/Zagreb")) // KOMENTAR
         agent: Ava(
             lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY
         )

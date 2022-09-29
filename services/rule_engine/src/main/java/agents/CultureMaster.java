@@ -46,7 +46,8 @@ public class CultureMaster extends Agent {
     }
 
     public void generateMatches() {
-        PairingAlgorithmAPI.generatePairs(new ArrayList<>(employeeAvailabilities), new HashMap<>(employeeConnectionStrengths));
+        PairingAlgorithmAPI.generatePairs(new ArrayList<>(employeeAvailabilities),
+                new HashMap<>(employeeConnectionStrengths));
     }
 
     public void addMatches(List<Match> allMatches) {
@@ -54,7 +55,7 @@ public class CultureMaster extends Agent {
     }
 
     public void sendMatches() {
-        List<String> matchedPeople= new ArrayList<>();
+        List<String> matchedPeople = new ArrayList<>();
         for (String employeeKey : employees.keySet()) {
             for (Match m : allMatches) {
                 if (employees.get(employeeKey).getId().equals(m.getFirst())) {
@@ -69,7 +70,7 @@ public class CultureMaster extends Agent {
         }
         for (String employeeKey : employees.keySet()) {
             for (Match m : allMatches) {
-                if(!matchedPeople.contains(employees.get(employeeKey).getId())){
+                if (!matchedPeople.contains(employees.get(employeeKey).getId())) {
                     send(employeeKey, new SendNoMatchesSignal());
                     break;
                 }
@@ -83,7 +84,7 @@ public class CultureMaster extends Agent {
                 }
             }
         }
-        for (Match m : allMatches){
+        for (Match m : allMatches) {
             DataUtils.emit(new models.Match(m), EmitType.CREATE);
         }
 
@@ -139,9 +140,7 @@ public class CultureMaster extends Agent {
 
         for (i = 0; i < employees.values().size(); i++) {
             for (j = 0; j < employees.values().size(); j++) {
-                Double sum = (matrix[i][j] + matrix[j][i]);
-                //binaryMatrix[i][j] = sum >= limit;
-                binaryMatrix[i][j] = (matrix[i][j]>limit) && (matrix[j][i]>limit);
+                binaryMatrix[i][j] = (matrix[i][j] > limit) && (matrix[j][i] > limit);
             }
         }
         return binaryMatrix;

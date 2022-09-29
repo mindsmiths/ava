@@ -4,9 +4,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -20,17 +20,26 @@ import com.mindsmiths.armory.components.TextAreaComponent;
 import com.mindsmiths.armory.components.TitleComponent;
 import com.mindsmiths.armory.templates.BaseTemplate;
 import com.mindsmiths.armory.templates.TemplateGenerator;
+import com.mindsmiths.emailAdapter.AttachmentData;
 import com.mindsmiths.emailAdapter.EmailAdapterAPI;
 import com.mindsmiths.emailAdapter.SendEmailPayload;
+import com.mindsmiths.employeeManager.employees.Employee;
 import com.mindsmiths.mitems.Mitems;
 import com.mindsmiths.mitems.Option;
+import com.mindsmiths.pairingalgorithm.Days;
 import com.mindsmiths.ruleEngine.model.Agent;
 import com.mindsmiths.ruleEngine.util.Log;
-import com.mindsmiths.pairingalgorithm.Days;
 import com.mindsmiths.sdk.utils.templating.Templating;
-import com.mindsmiths.employeeManager.employees.Employee;
-import com.mindsmiths.emailAdapter.AttachmentData;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import models.AvaLunchCycleStage;
+import models.EmployeeProfile;
+import models.LunchReminderStage;
+import models.MonthlyCoreStage;
+import models.Neuron;
+import models.OnboardingStage;
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.DateTime;
@@ -39,18 +48,7 @@ import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.Method;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.Version;
-
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-
-import models.AvaLunchCycleStage;
-import models.EmployeeProfile;
-import models.LunchReminderStage;
-import models.OnboardingStage;
 import signals.SendMatchesSignal;
-import models.Neuron;
-import models.MonthlyCoreStage;
 import utils.Settings;
 
 @Data
@@ -82,6 +80,7 @@ public class Ava extends Agent {
     public Ava(String connectionName, String connectionId) {
         super(connectionName, connectionId);
     }
+
     // trigger whenever new Ava is onboarded in CreateOrUpdateAva, "Save or update
     // all employees"
     public void addConnectionStrengths() {
@@ -359,10 +358,10 @@ public class Ava extends Agent {
     public void showPersonalQuizFinalScreen() {
         String finishPersonalQuiz = Mitems.getHTML("onboarding.finish-personal-quiz.text");
         BaseTemplate screen = new TemplateGenerator("finish-personal-quiz")
-        .addComponent("image", new ImageComponent(Mitems.getText("onboarding.ava-image-path.path")))
-        .addComponent("title", new TitleComponent(finishPersonalQuiz))
-        .addComponent("submit", new PrimarySubmitButtonComponent(
-                "submit", "finishpersonalquiz"));
+                .addComponent("image", new ImageComponent(Mitems.getText("onboarding.ava-image-path.path")))
+                .addComponent("title", new TitleComponent(finishPersonalQuiz))
+                .addComponent("submit", new PrimarySubmitButtonComponent(
+                        "submit", "finishpersonalquiz"));
         showScreen(screen);
     }
 
@@ -514,11 +513,13 @@ public class Ava extends Agent {
         String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
                 "description", description,
                 "description2", description2,
-                "imagePath", "http://8000.workspace-ms-emil.msdev.mindsmiths.io" + Mitems.getText("statistics.statistics-email.image"),
+                "imagePath", String.format("%s%s", Settings.ARMORY_SITE_URL, Mitems.getText("statistics.statistics-email.image")),
                 "firstName", employee.getFirstName()));
 
         SendEmailPayload e = new SendEmailPayload();
         e.setRecipients(List.of(getConnection("email")));
+        Log.error(Settings.ARMORY_SITE_URL);
+        Log.error(this.getConnection("armory"));
         e.setSubject(subject);
         e.setHtmlText(htmlBody);
         EmailAdapterAPI.newEmail(e);
