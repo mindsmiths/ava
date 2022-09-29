@@ -70,5 +70,7 @@ rule "Finish guessing quiz"
         modify(agent) {
             setPersonalGuess(personalGuess)
         };
-        Log.error(agent.getPersonalGuess());
+        agent.correctness();
+        agent.showResultsScreen();
+        delete(signal);
 end

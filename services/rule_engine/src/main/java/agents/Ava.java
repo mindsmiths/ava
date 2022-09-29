@@ -24,7 +24,6 @@ import com.mindsmiths.armory.components.ImageComponent;
 import com.mindsmiths.armory.components.PrimarySubmitButtonComponent;
 import com.mindsmiths.armory.components.TextAreaComponent;
 import com.mindsmiths.armory.components.TitleComponent;
-import com.mindsmiths.armory.events.SubmitEvent;
 import com.mindsmiths.armory.templates.BaseTemplate;
 import com.mindsmiths.armory.templates.TemplateGenerator;
 import com.mindsmiths.emailAdapter.AttachmentData;
@@ -316,19 +315,24 @@ public class Ava extends Agent {
         int index = 0;
         for (String questionId : guessingQuestions) { 
             index++;
-            Set<PrimarySubmitButtonComponent> options = new LinkedHashSet<>();
+            List<PrimarySubmitButtonComponent> options = new ArrayList<>();
+            Set<String> texts = new LinkedHashSet<>();
+            texts.add(this.otherEmployees.get(this.match).getPersonalAnswers().get(questionId));
             options.add(new PrimarySubmitButtonComponent(
                 "guess--" + questionId,
                 this.otherEmployees.get(this.match).getPersonalAnswers().get(questionId),
-                String.format("guessingQuestion%d", index + 1)
+                String.format("correctScreen%d", index)
             ));
             while (options.size() < Math.min(LUNCH_QUIZ_OPTIONS_COUNT, otherEmployees.size())) {
-                int randomNumber = random.nextInt(this.otherEmployees.size());
-                options.add(new PrimarySubmitButtonComponent(
-                    "guess--" + questionId,
-                    otherEmployees.get(randomNumber).getPersonalAnswers().get(questionId),
-                    String.format("guessingQuestion%d", index + 1)
-                ));
+                String buttonText = otherEmployees.get(random.nextInt(this.otherEmployees.size())).getPersonalAnswers().get(questionId);
+                if (!texts.contains(buttonText)) {
+                    texts.add(buttonText);
+                    options.add(new PrimarySubmitButtonComponent(
+                            "guess--" + questionId,
+                            buttonText,
+                            String.format("wrongScreen%d", index)
+                    ));
+                }
             }
             List<BaseSubmitButtonComponent> answers = new ArrayList<BaseSubmitButtonComponent>(options);
             Collections.shuffle(answers);
@@ -344,38 +348,70 @@ public class Ava extends Agent {
                     .addComponent("title", new TitleComponent(question))
                     .addComponent(String.format("actionGroup%d", index), new ActionGroupComponent(answers))
             );
-        }
 
-        title = Mitems.getText("weekly-core.confirming-quiz-guesses.title");
+            screens.put(
+                String.format("correctScreen%d", index),
+                new TemplateGenerator("correctScreen")
+                    .addComponent("title", new TitleComponent(Mitems.getText("weekly-core.correct-screen.title")))
+                    .addComponent("image", new ImageComponent(Mitems.getText("weekly-core.correct-screen.image")))
+                    .addComponent("submit", new PrimarySubmitButtonComponent(Mitems.getText("weekly-core.correct-screen.button"), String.format("guessingQuestion%d", index + 1)))
+            );
+
+            screens.put(
+                String.format("wrongScreen%d", index),
+                new TemplateGenerator("wrongScreen")
+                    .addComponent("title", new TitleComponent(Mitems.getText("weekly-core.wrong-screen.title")))
+                    .addComponent("image", new ImageComponent(Mitems.getText("weekly-core.wrong-screen.image")))
+                    .addComponent("submit", new PrimarySubmitButtonComponent(Mitems.getText("weekly-core.wrong-screen.button"), String.format("guessingQuestion%d", index + 1)))
+            );
+        }
 
         screens.put(
             String.format("guessingQuestion%d", index + 1),
             new TemplateGenerator("confirmScreen")
-                .addComponent("title", new TitleComponent(title))
+                .addComponent("title", new TitleComponent(Mitems.getText("weekly-core.confirming-quiz-guesses.title")))
                 .addComponent("submit", new PrimarySubmitButtonComponent("finish-guessing-quiz", Mitems.getText("weekly-core.confirming-quiz-guesses.button"), "finish-guessing-quiz"))
-        );
-
-        title = Mitems.getText("weekly-core.guessing-quiz-results.results");
-        title = Templating.recursiveRender(title, Map.of(
-            "firstName", this.otherEmployees.get(this.match).getFirstName(),
-            "correct", this.correct
-        ));
-
-        screens.put(
-            String.format("finish-guessing-quiz"),
-            new TemplateGenerator("resultScreen")
-                .addComponent("title", new TitleComponent(title))
         );
 
         showScreens("introGuessingScreen", screens);
     }
 
+    public void showResultsScreen() {
+        String title = Mitems.getText("weekly-core.guessing-quiz-results.results");
+        String answers = new String();
+
+        Integer index = 1;
+        for (String questionId : personalGuess.keySet()) {
+            String answer = otherEmployees.get(this.match).getPersonalAnswers().get(questionId);
+            answers += index.toString() + ". " + answer + "<br/>";
+            index++;
+        }
+
+        title = Templating.recursiveRender(title, Map.of(
+            "firstName", this.otherEmployees.get(this.match).getFirstName(),
+            "correct", this.correct,
+            "questionsCount", LUNCH_QUIZ_QUESTIONS_COUNT,
+            "answers", answers
+        ));
+
+        Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
+        screens.put(
+            "finish-guessing-quiz",
+            new TemplateGenerator("resultsScreen")
+                .addComponent("title", new TitleComponent(title))
+        );
+
+        showScreens("finish-guessing-quiz", screens);
+    }
+
     public void correctness() {
+        this.correct = 0;
         for (Map.Entry<String, String> entry : personalGuess.entrySet()) {
             if (entry.getValue().equals(((otherEmployees.get(this.match)).getPersonalAnswers()).get(entry.getKey()))) {
-                correct++;
+                this.correct++;
             }
         }
+
     }   
 
     private List<Map<String, String>> getAllEmployeeNames() {

@@ -447,6 +447,26 @@
         ]
       },
       {
+        "name": "Correct screen",
+        "elements": [
+          {
+            "description": "Button",
+            "type": "TEXT",
+            "content": "Next"
+          },
+          {
+            "description": "Image",
+            "type": "TEXT",
+            "content": "/public/correct.png"
+          },
+          {
+            "description": "Title",
+            "type": "TEXT",
+            "content": "You are correct!"
+          }
+        ]
+      },
+      {
         "name": "Days",
         "elements": [
           {
@@ -591,8 +611,8 @@
         "elements": [
           {
             "description": "Results",
-            "type": "TEXT",
-            "content": "You have {{ correct }} correct answers about {{ firstName }}."
+            "type": "HTML",
+            "content": "<p style=\"text-align: center;\">Your results of the quiz:</p>\n<p style=\"text-align: center;\"><span style=\"font-size: 36pt;\"><strong>{{ correct }}/{{ questionsCount }}</strong></span></p>\n<p style=\"text-align: center;\"><span style=\"font-size: 18pt;\">{{ firstName }}'s answers:</span></p>\n<p style=\"text-align: center;\"><span style=\"font-size: 18pt;\">{{ answers }}</span></p>\n<p style=\"text-align: center;\">Find out more about your colleague during lunch today.</p>\n<p style=\"text-align: center;\">Have a great day!!</p>"
           }
         ]
       },
@@ -723,6 +743,26 @@
             "description": "Subject",
             "type": "TEXT",
             "content": "It's lunch time!"
+          }
+        ]
+      },
+      {
+        "name": "Wrong screen",
+        "elements": [
+          {
+            "description": "Button",
+            "type": "TEXT",
+            "content": "Next"
+          },
+          {
+            "description": "Image",
+            "type": "TEXT",
+            "content": "/public/wrong.png"
+          },
+          {
+            "description": "Title",
+            "type": "TEXT",
+            "content": "You guessed wrong!"
           }
         ]
       }
