@@ -70,14 +70,15 @@ public class Ava extends Agent {
     private Date statsEmailLastSentAt;
     private Date matchedWithEmailSentAt;
     private int silosCount;
-    public static final double CONNECTION_NEURON_CAPACITY = 100;
-    public static final double CONNECTION_NEURON_RESISTANCE = 0.05;
     private String silosRisk;
     private LunchReminderStage lunchReminderStage;
     private List<String> lunchDeclineReasons = new ArrayList<>(); // track days
     private boolean manualTrigger;
     // a map of how strong MY connections are to other employees
     private Map<String, Neuron> connectionStrengths = new HashMap<>();
+
+    public static final double CONNECTION_NEURON_CAPACITY = 100;
+    public static final double CONNECTION_NEURON_RESISTANCE = 0.05;
 
     public Ava(String connectionName, String connectionId) {
         super(connectionName, connectionId);
@@ -94,12 +95,11 @@ public class Ava extends Agent {
         }
     }
 
-    // if user picked employee in familiarity quiz, charge that connection to the
-    // max value
+    // if user picked employee at any question in familiarity quiz, charge that connection to the max value
     // trigger after familiarity quiz is over in Onboarding, "Finish onboarding"
     public void chargeConnectionNeurons(EmployeeProfile employeeProfile) {
-        for (Map.Entry<String, Double> entry : employeeProfile.getFamiliarity().entrySet()) {
-            if (entry.getValue() != 0) {
+        for(Map.Entry<String, Double> entry : employeeProfile.getFamiliarity().entrySet()) {
+            if(entry.getValue() > 0) {
                 this.connectionStrengths.get(entry.getKey()).setValue(CONNECTION_NEURON_CAPACITY);
             }
         }
@@ -114,10 +114,11 @@ public class Ava extends Agent {
     public void decayConnectionNeurons() {
         for (String avaId : this.otherEmployees.keySet()) {
             Log.info("Decaying SPECIFIC neuron with employee id: " + otherEmployees.get(avaId).getId());
-            long daysPassed = ChronoUnit.DAYS.between(
-                    getConnectionNeuron(otherEmployees.get(avaId).getId()).getLastUpdatedAt().toInstant(),
-                    new Date().toInstant());
-            getConnectionNeuron(otherEmployees.get(avaId).getId()).decay(daysPassed / 1000.);
+            long daysPassed = ChronoUnit.DAYS.between(getConnectionNeuron(otherEmployees.get(avaId).getId()).getLastUpdatedAt().toInstant(),
+                                                      new Date().toInstant());
+            // UNCOMMENT AND SWITCH AFTER TESTING                                         
+            // getConnectionNeuron(otherEmployees.get(avaId).getId()).decay(daysPassed);
+            getConnectionNeuron(otherEmployees.get(avaId).getId()).decay(7.);
         }
     }
 

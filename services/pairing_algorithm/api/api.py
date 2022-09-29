@@ -2,6 +2,7 @@ from typing import List
 from enum import Enum
 
 from forge.core.models import ExtendableModel
+from forge.core.db import DBView
 
 
 class Days(str, Enum):
@@ -25,3 +26,17 @@ class Match(ExtendableModel):
 
 class Matches(ExtendableModel):
     allMatches: List[Match]
+
+
+class LunchCompatibilityEdge(ExtendableModel):
+    first: str
+    second: str
+    edgeWeight: float
+
+
+class LunchCompatibilities(DBView):
+    edges: List[LunchCompatibilityEdge]
+
+    @classmethod
+    def get_service_name(cls) -> str:
+        return "pairing_algorithm"

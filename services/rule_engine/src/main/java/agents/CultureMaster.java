@@ -1,6 +1,7 @@
 package agents;
 
 import com.mindsmiths.ruleEngine.model.Agent;
+import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.sdk.core.db.DataUtils;
 import com.mindsmiths.sdk.core.db.EmitType;
 
@@ -13,6 +14,8 @@ import models.CmLunchCycleStage;
 import com.mindsmiths.pairingalgorithm.PairingAlgorithmAPI;
 import com.mindsmiths.pairingalgorithm.EmployeeAvailability;
 import com.mindsmiths.pairingalgorithm.Match;
+import com.mindsmiths.pairingalgorithm.LunchCompatibilities;
+import com.mindsmiths.pairingalgorithm.LunchCompatibilityEdge;
 
 import signals.EmployeeUpdateSignal;
 import signals.AllEmployees;
@@ -28,6 +31,7 @@ public class CultureMaster extends Agent {
     private CmLunchCycleStage lunchCycleStage = CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES;
     private Map<String, EmployeeProfile> employees = new HashMap<>();
     private Map<String, Map<String, Double>> employeeConnectionStrengths = new HashMap<>();
+    private Map<String, List<String>> employeeMatchHistories = new HashMap<>();
 
     public static String ID = "CULTURE_MASTER";
 
@@ -44,7 +48,13 @@ public class CultureMaster extends Agent {
     }
 
     public void generateMatches() {
-        PairingAlgorithmAPI.generatePairs(new ArrayList<>(employeeAvailabilities), new HashMap<>(employeeConnectionStrengths));
+        Log.info("PAIRING PARAMETARS");
+        Log.info(employeeAvailabilities);
+        Log.info(employeeConnectionStrengths);
+        Log.info(employeeMatchHistories);
+        PairingAlgorithmAPI.generatePairs(new ArrayList<>(employeeAvailabilities),
+                                          new HashMap<>(employeeConnectionStrengths),
+                                          new HashMap<>(employeeMatchHistories));
     }
 
     public void addMatches(List<Match> allMatches) {
@@ -52,14 +62,14 @@ public class CultureMaster extends Agent {
     }
 
     public void sendMatches() {
-        for (String employeeKey : employees.keySet()) {
+        for (String avaId : employees.keySet()) {
             for (Match m : allMatches) {
-                if (employees.get(employeeKey).getId().equals(m.getFirst())) {
-                    send(employeeKey, new SendMatchesSignal(m.getSecond(), m.getDay()));
+                if (employees.get(avaId).getId().equals(m.getFirst())) {
+                    send(avaId, new SendMatchesSignal(m.getSecond(), m.getDay()));
                     break;
                 }
-                if (employees.get(employeeKey).getId().equals(m.getSecond())) {
-                    send(employeeKey, new SendMatchesSignal(m.getFirst(), m.getDay()));
+                if (employees.get(avaId).getId().equals(m.getSecond())) {
+                    send(avaId, new SendMatchesSignal(m.getFirst(), m.getDay()));
                     break;
                 }
             }

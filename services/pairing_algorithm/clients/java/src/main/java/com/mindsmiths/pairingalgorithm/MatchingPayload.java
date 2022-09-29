@@ -13,4 +13,5 @@ import lombok.AllArgsConstructor;
 public class MatchingPayload implements Serializable {
     private List<EmployeeAvailability> employeeAvailabilities;
     private Map<String, Map<String, Double>> employeeConnectionStrengths;
+    private Map<String, List<String>> employeeMatchHistories;
 }

@@ -17,7 +17,7 @@ import agents.CultureMaster;
 
 import signals.EmployeeAvailabilitySignal;
 import signals.SendMatchesSignal;
-import signals.ConnectionsStrengthSignal;
+import signals.MatchingParametarsSignal;
 
 import models.AvaLunchCycleStage;
 import models.OnboardingStage;
@@ -100,6 +100,23 @@ rule "Ask for available days"
         delete(signal);
 end
 
+rule "Reconnect ask for available days"
+   when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        signal: UserConnectedEvent(getParamAsString("trigger") == "start-weekly-core") from entry-point "signals"
+        agent: Ava(
+            lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY,
+            lunchReminderStage != LunchReminderStage.USER_RESPONDED
+        )
+        eval(evaluateCronExpression("* * 9-23 * * WED", ts, "Europe/Zagreb") 
+            || (evaluateCronExpression("* * * * * THU", ts, "Europe/Zagreb"))
+            || (evaluateCronExpression("* * 00-16 * * FRI", ts, "Europe/Zagreb"))
+            || (agent.isManualTrigger() == true))
+   then
+        agent.chooseAvailableDaysScreen();
+        delete(signal);
+end
+
 rule "Confirm days"
     when
         signal: SubmitEvent(getParamAsString("submit") == "confirmDays") from entry-point "signals"  
@@ -119,8 +136,9 @@ rule "Confirm days"
         };
 
         agent.send(CultureMaster.ID, new EmployeeAvailabilitySignal(new EmployeeAvailability(employee.getId(), agent.getAvailableDays())));
-        agent.send(CultureMaster.ID, new ConnectionsStrengthSignal(employee.getId(), agent.getConnectionStrengthAsValue()));
-        Log.info("Im " + employee.getFullName() + " and sending connection strengts: " + agent.getConnectionStrengthAsValue());
+        agent.send(CultureMaster.ID, new MatchingParametarsSignal(employee.getId(),
+                                                                  agent.getConnectionStrengthAsValue(),
+                                                                  agent.getMatchHistory()));
         delete(signal);
 end
 
@@ -151,13 +169,17 @@ end
 rule "Store match info"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        eval(evaluateCronExpression("* * 17-18 ? * FRI *", ts, "Europe/Zagreb")) 
+        // UNCOMMENT AFTER TESTING
+        // eval(evaluateCronExpression("* * 17-18 ? * FRI *", ts, "Europe/Zagreb")) 
         signal: SendMatchesSignal() from entry-point "signals"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.ACCEPT_MATCH_INFO)
         employee: EmployeeProfile()
     then
-        modify(agent) {setMatch(signal.getMatch()), setMatchDay(signal.getMatchDay())};
-        modify(agent) {getMatchHistory().add(signal.getMatch())};
+        modify(agent) {
+            setMatch(signal.getMatch()), setMatchDay(signal.getMatchDay()),
+            getMatchHistory().add(signal.getMatch())
+        };
+        Log.info("updated match history " + agent.getMatchHistory());
         agent.printMatchInfo(employee, signal);
         agent.sendCalendarInvite(signal.getMatchDay(), employee, agent.getOtherEmployees().get(agent.employeeToAvaId(signal.getMatch())));
         delete(signal);
