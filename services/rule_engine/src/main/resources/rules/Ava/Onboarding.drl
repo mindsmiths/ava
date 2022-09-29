@@ -11,19 +11,19 @@ import com.mindsmiths.sdk.utils.templating.*;
 
 import com.mindsmiths.employeeManager.employees.Employee;
 
-import agents.Ava;
-import agents.CultureMaster;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
-import models.OnboardingStage;
-import signals.AllEmployees;
-import models.AvaLunchCycleStage;
 
+import signals.AllEmployees;
 import signals.EmployeeUpdateSignal;
 
+import agents.Ava;
+import agents.CultureMaster;
 import models.EmployeeProfile;
 import models.OnboardingStage;
+import models.AvaLunchCycleStage;
+import models.AvailablePersonalQuestions;
 
 rule "Send welcome email"
     when
@@ -52,7 +52,7 @@ rule "Start and reconnect familiarity quiz"
         delete(signal);
 end
 
-rule "Start personal quiz"
+rule "Start personal quiz intro"
    when
         signal: SubmitEvent(getParamAsString("submit") == "finished-familiarity-quiz") from entry-point "signals"
         agent: Ava(onboardingStage == OnboardingStage.FAMILIARITY_QUIZ)
@@ -67,49 +67,110 @@ rule "Start personal quiz"
                     familiarity.put(
                         em, familiarity.getOrDefault(em, 0.0) + 1.0
                     );
-                } 
+                }
             }
-        }    
-       
+        }
+
         modify(employee) { 
             setFamiliarity(familiarity)
         };
-        agent.showPersonalQuizScreens();
+        agent.showPersonalQuizIntroScreens();
         modify(agent) {
             chargeConnectionNeurons(employee),
-            setOnboardingStage(OnboardingStage.PERSONAL_QUIZ)
+            setOnboardingStage(OnboardingStage.PERSONAL_QUIZ_INTRO)
         };
         delete(signal);
 end
 
-rule "Reconnect personal quiz"
-   when
+rule "Reconnect personal quiz intro"
+    when
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-onboarding") from entry-point "signals"
+        agent: Ava(onboardingStage == OnboardingStage.PERSONAL_QUIZ_INTRO)
+    then
+        agent.showPersonalQuizIntroScreens();
+        delete(signal);
+end
+
+rule "Setup Ava for personal quiz"
+    when
+        signal: SubmitEvent(getParamAsString("submit") == "startPersonalQuiz") from entry-point "signals"
+        agent: Ava(onboardingStage == OnboardingStage.PERSONAL_QUIZ_INTRO)
+        employee: EmployeeProfile(personalAnswers.size() < 3)
+        questions: AvailablePersonalQuestions()
+    then
+        modify(agent) {setOnboardingStage(OnboardingStage.PERSONAL_QUIZ)};
+        agent.showPersonalQuizScreens(questions.getCurrentQuestion(), employee.getPersonalAnswers().size());
+        delete(signal);
+end
+
+rule "Show personal quiz questions"
+    when
         agent: Ava(onboardingStage == OnboardingStage.PERSONAL_QUIZ)
-   then
-        agent.showPersonalQuizScreens();
+        employee: EmployeeProfile(personalAnswers.size() < 3)
+        questions: AvailablePersonalQuestions()
+    then
+        agent.showPersonalQuizScreens(questions.getCurrentQuestion(), employee.getPersonalAnswers().size());
+        modify(agent) {setOnboardingStage(OnboardingStage.WAIT_FOR_PERSONAL_ANSWER)};
+end
+
+rule "Reconnect personal quiz questions"
+    when
+        signal: UserConnectedEvent() from entry-point "signals"
+        agent: Ava(onboardingStage == OnboardingStage.WAIT_FOR_PERSONAL_ANSWER)
+        employee: EmployeeProfile(personalAnswers.size() < 3)
+        questions: AvailablePersonalQuestions()
+    then
+        agent.showPersonalQuizScreens(questions.getCurrentQuestion(), employee.getPersonalAnswers().size());
+        delete(signal);
+end
+
+rule "Store personal quiz answers"
+    when
+        agent: Ava(onboardingStage == OnboardingStage.WAIT_FOR_PERSONAL_ANSWER)
+        signal: SubmitEvent(getParamAsString("submit") == "submit") from entry-point "signals"
+        employee: EmployeeProfile(personalAnswers.size() < 3)
+        questions: AvailablePersonalQuestions()
+    then
+        Map<String, String> personalAnswers = new HashMap<String, String>(
+            employee.getPersonalAnswers()
+        );
+        Boolean pop = false;
+        for (String paramId : signal.getParams().keySet()){
+            if (paramId.startsWith("answers") && signal.getParamAsString(paramId) != null) {
+                personalAnswers.put(
+                    paramId.replace("answers", "question"),
+                    signal.getParamAsString(paramId)
+                );
+                modify(questions) {popQuestion()};
+                pop = true;
+            }
+        }
+        if (pop != true) {
+            modify(questions) {nextQuestion()};
+        }
+        modify(employee) {setPersonalAnswers(personalAnswers)};
+        modify(agent) {setOnboardingStage(OnboardingStage.PERSONAL_QUIZ)};
+        delete(signal);
+end
+
+rule "Skip personal quiz question"
+    when
+        agent: Ava(onboardingStage == OnboardingStage.WAIT_FOR_PERSONAL_ANSWER)
+        signal: SubmitEvent(getParamAsString("skip") == "skip") from entry-point "signals"
+        questions: AvailablePersonalQuestions()
+    then
+        modify(questions) {nextQuestion()};
+        modify(agent) {setOnboardingStage(OnboardingStage.PERSONAL_QUIZ)};
         delete(signal);
 end
 
 rule "Finish onboarding"
    when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        signal: SubmitEvent(getParamAsString("submit") == "finishpersonalquiz") from entry-point "signals"
         agent: Ava(onboardingStage == OnboardingStage.PERSONAL_QUIZ)
-        employee: EmployeeProfile()
+        employee: EmployeeProfile(getPersonalAnswers().size() == 3)
    then
-        Map<String, String> personalAnswers = new HashMap<String, String>(
-            employee.getPersonalAnswers()
-        );
-        for (String paramId : signal.getParams().keySet())
-            if (paramId.startsWith("answers"))
-                personalAnswers.put(
-                    paramId.replace("answers", "question"),
-                    signal.getParamAsString(paramId)
-                );
-
         modify(employee) {
-            setPersonalAnswers(personalAnswers),
             setOnboardingStage(OnboardingStage.STATS_EMAIL) 
         };
         
@@ -118,9 +179,8 @@ rule "Finish onboarding"
             setLunchCycleStage(AvaLunchCycleStage.LUNCH_MAIL_SENDING),
             setStatsEmailLastSentAt(ts)
         };
-
+        agent.showPersonalQuizOutroScreens();
         agent.send(CultureMaster.ID, new EmployeeUpdateSignal(employee));
-        delete(signal);
 end
 
 rule "Reconnect final screen"
