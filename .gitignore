@@ -1,5 +1,5 @@
 .env
-
+.credentials
 *.err
 *.log
 *.swp
