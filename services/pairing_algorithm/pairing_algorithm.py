@@ -11,6 +11,8 @@ from forge.core.base import BaseService
 from .api import Matches
 from .api import EmployeeAvailability
 from .api import Match
+from .api import LunchCompatibilities
+from .api import LunchCompatibilityEdge
 
 from .blossom_algorithm import max_weight_matching
 
@@ -27,6 +29,7 @@ class PairingAlgorithm(BaseService):
             employeeMatchHistories: Dict[str, List[str]]) -> Matches:
         all_matches: List[Match] = []
         edges = list()
+        lunch_compatibilities = []
         already_matched = set()
         not_matched = set()
         availability_intersections = {}
@@ -91,6 +94,11 @@ class PairingAlgorithm(BaseService):
                 compatibility = 1
             # create tuple readable to blossom algorithm
             edges.append((pair[0], pair[1], compatibility))
+            lunch_compatibilities.append(LunchCompatibilityEdge(
+                first=employee_id_mapping[pair[0]],
+                second=employee_id_mapping[pair[1]],
+                edgeWeight=compatibility))
+        LunchCompatibilities(edges=lunch_compatibilities).emit()
 
         # RUN BLOSSOM
         matching = max_weight_matching(edges, False)

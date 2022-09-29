@@ -14,6 +14,8 @@ import models.CmLunchCycleStage;
 import com.mindsmiths.pairingalgorithm.PairingAlgorithmAPI;
 import com.mindsmiths.pairingalgorithm.EmployeeAvailability;
 import com.mindsmiths.pairingalgorithm.Match;
+import com.mindsmiths.pairingalgorithm.LunchCompatibilities;
+import com.mindsmiths.pairingalgorithm.LunchCompatibilityEdge;
 
 import signals.EmployeeUpdateSignal;
 import signals.AllEmployees;
