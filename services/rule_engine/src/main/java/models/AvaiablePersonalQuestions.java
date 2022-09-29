@@ -18,20 +18,20 @@ public class AvaiablePersonalQuestions {
     private int numOfPersonalQuestions = 14;
     private String currentQuestion;
 
-    public AvaiablePersonalQuestions(String avaId){
-        for(int questionNum = 1; questionNum <= numOfPersonalQuestions; questionNum++){
+    public AvaiablePersonalQuestions(String avaId) {
+        for (int questionNum = 1; questionNum <= numOfPersonalQuestions; questionNum++) {
             this.personalQuestions.add("question" + questionNum);
         }
         this.currentQuestion = personalQuestions.get(0);
         this.avaId = avaId;
     }
 
-    public void popQuestion(){
+    public void popQuestion() {
         this.personalQuestions.remove(0);
         this.currentQuestion = personalQuestions.get(0);
     }
 
-    public void nextQuestion(){
+    public void nextQuestion() {
         String temp = personalQuestions.get(0);
         this.personalQuestions.remove(0);
         this.personalQuestions.add(temp);
