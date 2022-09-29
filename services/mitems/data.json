@@ -737,12 +737,12 @@
           {
             "description": "Description",
             "type": "TEXT",
-            "content": "Better luck next week"
+            "content": "Couldn’t match you this week!\n\nUnfortunately I couldn’t match your availability this week with any of your colleagues. \nPlease try to make yourself available around noon every day next time if possible, that will increase your chances of meeting one of your colleagues for lunch.\nYou can do that right now if you want.\n\nBest,\n\nAva"
           },
           {
             "description": "Subject",
             "type": "TEXT",
-            "content": "Sorry"
+            "content": "Lunch info"
           }
         ]
       },
