@@ -28,12 +28,3 @@ rule "Send stats email monthly"
         };
         agent.sendStatisticsEmail(employee);
 end
-
-rule "Show stats screens"
-   when
-        signal: UserConnectedEvent(getParamAsString("trigger") == "show-stats") from entry-point "signals"
-        agent: Ava()
-   then
-        agent.showStatisticsScreens();
-        delete(signal);
-end
