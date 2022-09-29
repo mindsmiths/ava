@@ -47,7 +47,7 @@ class PairingAlgorithm(BaseService):
         # FIND COMPATIBILITY BETWEEN ALL EMPLOYEES
         pairs = combinations(employee_id_mapping.keys(), 2)
         for pair in pairs:
-            weight = 1000
+            compatibility = 1000
             employee_pair = list(
                 (employee_id_mapping[pair[0]], employee_id_mapping[pair[1]]))
             employee_pair.sort()
@@ -82,13 +82,15 @@ class PairingAlgorithm(BaseService):
                 employee_id_mapping[pair[0]]][employee_id_mapping[pair[1]]]
             second_score_first = employeeConnectionStrengths[
                 employee_id_mapping[pair[1]]][employee_id_mapping[pair[0]]]
-
-            weight = weight - (first_score_second + second_score_first)
-            weight = weight * lunch_recency
-            if weight == 0:
-                weight = 1
+            connection_strength = (
+                first_score_second + second_score_first) / 200
+            # calculate compatibility
+            compatibility = compatibility * (1 - connection_strength)
+            compatibility = compatibility * lunch_recency
+            if compatibility == 0:
+                compatibility = 1
             # create tuple readable to blossom algorithm
-            edges.append((pair[0], pair[1], weight))
+            edges.append((pair[0], pair[1], compatibility))
 
         # RUN BLOSSOM
         matching = max_weight_matching(edges, False)

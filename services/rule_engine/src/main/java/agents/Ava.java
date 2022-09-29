@@ -92,11 +92,11 @@ public class Ava extends Agent {
         }
     }
 
-    // if user picked employee in familiarity quiz, charge that connection to the max value
+    // if user picked employee at any question in familiarity quiz, charge that connection to the max value
     // trigger after familiarity quiz is over in Onboarding, "Finish onboarding"
     public void chargeConnectionNeurons(EmployeeProfile employeeProfile) {
         for(Map.Entry<String, Double> entry : employeeProfile.getFamiliarity().entrySet()) {
-            if(entry.getValue() != 0) {
+            if(entry.getValue() > 0) {
                 this.connectionStrengths.get(entry.getKey()).setValue(CONNECTION_NEURON_CAPACITY);
             }
         }
