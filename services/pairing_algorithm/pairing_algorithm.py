@@ -72,8 +72,10 @@ class PairingAlgorithm(BaseService):
 
         matching = max_weight_matching(edges, False)
         for index, element in enumerate(matching):
+            # people without match will be matched with null, on day null
             if element == -1:
                 continue
+            # convert indexes to employee ids
             # convert indexes to employee ids
             first = employee_id_mapping[index]
             second = employee_id_mapping[element]
