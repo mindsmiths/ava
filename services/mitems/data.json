@@ -556,7 +556,17 @@
           {
             "description": "Description",
             "type": "HTML",
-            "content": "<p>Dear {{ firstName }},</p>\n<p><span style=\"font-weight: 400;\">Thank you for taking the time to help me analyze our individual relations and learn more about you.</span></p>\n<p><span style=\"font-weight: 400;\">Based on your feedback I was able to identify our current level of exposure to risk of knowledge silos.</span></p>\n<p><span style=\"font-weight: 400;\">Take a look at where we stand right now, we will work together to break the silos and observe our impact on the trend in the future.</span></p>"
+            "content": "<p>Dear {{ firstName }},</p>\n<p><span style=\"font-weight: 400;\">I&rsquo;ve been a very busy girl, analyzing the connections within your organization!</span></p>\n<p><span style=\"font-weight: 400;\">Attached you will find a graph that&nbsp;</span></p>\n<p><span style=\"font-weight: 400;\">I&rsquo;ve collected and analyzed your feedback and the answers from the team. Based on that, you are doing a great job at staying connected with your teammates.</span></p>"
+          },
+          {
+            "description": "Description2",
+            "type": "HTML",
+            "content": "<p><span style=\"font-weight: 400;\">However, there are people who are not that well connected because they either joined the team recently or didn&rsquo;t get the chance to meet that many people so far.</span></p>"
+          },
+          {
+            "description": "Image",
+            "type": "TEXT",
+            "content": "/public/graph.png"
           },
           {
             "description": "Subject",
@@ -718,6 +728,21 @@
             "description": "Title",
             "type": "TEXT",
             "content": "Sorry, time has passed. Better luck next time ;)"
+          }
+        ]
+      },
+      {
+        "name": "No match email",
+        "elements": [
+          {
+            "description": "Description",
+            "type": "TEXT",
+            "content": "Better luck next week"
+          },
+          {
+            "description": "Subject",
+            "type": "TEXT",
+            "content": "Sorry"
           }
         ]
       },

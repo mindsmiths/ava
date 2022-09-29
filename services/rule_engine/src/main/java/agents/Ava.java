@@ -4,9 +4,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -21,17 +21,26 @@ import com.mindsmiths.armory.components.TextAreaComponent;
 import com.mindsmiths.armory.components.TitleComponent;
 import com.mindsmiths.armory.templates.BaseTemplate;
 import com.mindsmiths.armory.templates.TemplateGenerator;
+import com.mindsmiths.emailAdapter.AttachmentData;
 import com.mindsmiths.emailAdapter.EmailAdapterAPI;
 import com.mindsmiths.emailAdapter.SendEmailPayload;
+import com.mindsmiths.employeeManager.employees.Employee;
 import com.mindsmiths.mitems.Mitems;
 import com.mindsmiths.mitems.Option;
+import com.mindsmiths.pairingalgorithm.Days;
 import com.mindsmiths.ruleEngine.model.Agent;
 import com.mindsmiths.ruleEngine.util.Log;
-import com.mindsmiths.pairingalgorithm.Days;
 import com.mindsmiths.sdk.utils.templating.Templating;
-import com.mindsmiths.employeeManager.employees.Employee;
-import com.mindsmiths.emailAdapter.AttachmentData;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import models.AvaLunchCycleStage;
+import models.EmployeeProfile;
+import models.LunchReminderStage;
+import models.MonthlyCoreStage;
+import models.Neuron;
+import models.OnboardingStage;
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.DateTime;
@@ -40,18 +49,7 @@ import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.Method;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.Version;
-
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-
-import models.AvaLunchCycleStage;
-import models.EmployeeProfile;
-import models.LunchReminderStage;
-import models.OnboardingStage;
 import signals.SendMatchesSignal;
-import models.Neuron;
-import models.MonthlyCoreStage;
 import utils.Settings;
 
 @Data
@@ -68,6 +66,7 @@ public class Ava extends Agent {
     private Map<String, EmployeeProfile> otherEmployees;
     private boolean workingHours;
     private Date statsEmailLastSentAt;
+    private Date availableDaysEmailLastSentAt;
     private Date matchedWithEmailSentAt;
     private int silosCount;
     public static final double CONNECTION_NEURON_CAPACITY = 100;
@@ -238,22 +237,22 @@ public class Ava extends Agent {
         String introScreenDescription = Mitems.getHTML("onboarding.familiarity-quiz-intro.description");
 
         screens.put("introScreen", new TemplateGenerator()
-            .addComponent("image", new ImageComponent(Mitems.getText("onboarding.silos-image-path.connected")))
-            .addComponent("title", new TitleComponent(introScreenTitle))
-            .addComponent("description", new DescriptionComponent(introScreenDescription))
-            .addComponent("submit", new PrimarySubmitButtonComponent(introButton, "secondIntroScreen"))
-            .addComponent("pageNum", new DescriptionComponent("1/2")));
+                .addComponent("title", new TitleComponent(introScreenTitle))
+                .addComponent("image", new ImageComponent(Mitems.getText("onboarding.silos-image-path.connected")))
+                .addComponent("description", new DescriptionComponent(introScreenDescription))
+                .addComponent("submit", new PrimarySubmitButtonComponent(introButton, "secondIntroScreen"))
+                .addComponent("pageNum", new DescriptionComponent("1/2")));
 
         screens.put("secondIntroScreen", new TemplateGenerator()
-            .addComponent("image", new ImageComponent(Mitems.getText("onboarding.silos-image-path.devided")))
-            .addComponent("header", new HeaderComponent(null, true))
-            .addComponent("title", new TitleComponent(
-            Mitems.getText("onboarding.familiarity-quiz-second-intro.title")))
-            .addComponent("description", new DescriptionComponent(
-            Mitems.getText("onboarding.familiarity-quiz-second-intro.description")))
-            .addComponent("submit", new PrimarySubmitButtonComponent(
-            Mitems.getText("onboarding.familiarity-quiz-second-intro.action"), "question1"))
-            .addComponent("pageNum", new DescriptionComponent("2/2")));
+                .addComponent("header", new HeaderComponent(null, true))
+                .addComponent("title", new TitleComponent(
+                        Mitems.getText("onboarding.familiarity-quiz-second-intro.title")))
+                .addComponent("image", new ImageComponent(Mitems.getText("onboarding.silos-image-path.devided")))
+                .addComponent("description", new DescriptionComponent(
+                        Mitems.getText("onboarding.familiarity-quiz-second-intro.description")))
+                .addComponent("submit", new PrimarySubmitButtonComponent(
+                        Mitems.getText("onboarding.familiarity-quiz-second-intro.action"), "question1"))
+                .addComponent("pageNum", new DescriptionComponent("2/2")));
 
         int questionNum = 1;
         String submitButton = Mitems.getText("onboarding.familiarity-quiz-questions.action");
@@ -385,6 +384,16 @@ public class Ava extends Agent {
         EmailAdapterAPI.newEmail(e);
     }
 
+    public void sendNoMatchEmail() throws IOException {
+        String subject = Mitems.getText("weekly-core.no-match-email.subject");
+        String description = Mitems.getText("weekly-core.no-match-email.description");
+        SendEmailPayload e = new SendEmailPayload();
+        e.setRecipients(List.of(getConnection("email")));
+        e.setSubject(subject);
+        e.setPlainText(description);
+        EmailAdapterAPI.newEmail(e);
+    }
+
     public boolean allEmployeesFinishedOnboarding() {
         return otherEmployees.values().stream().allMatch(e -> (e.getOnboardingStage() == OnboardingStage.STATS_EMAIL)
                 || (e.getOnboardingStage() == OnboardingStage.FINISHED));
@@ -469,61 +478,25 @@ public class Ava extends Agent {
     public void sendStatisticsEmail(EmployeeProfile employee) throws IOException {
         String subject = Mitems.getText("statistics.statistics-email.subject");
         String description = Mitems.getText("statistics.statistics-email.description");
-        String htmlTemplate = new String(Objects.requireNonNull(
-                getClass().getClassLoader().getResourceAsStream("emailTemplates/EmailTemplate.html")).readAllBytes());
+        String description2 = Mitems.getText("statistics.statistics-email.description2");
 
+        String htmlTemplate = new String(Objects.requireNonNull(
+                getClass().getClassLoader().getResourceAsStream("emailTemplates/StatEmailTemplate.html"))
+                .readAllBytes());
         String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
                 "description", description,
-                "callToAction", Mitems.getText("statistics.statistics-email.action"),
-                "firstName", employee.getFirstName(),
-                "armoryUrl",
-                String.format("%s/%s?trigger=show-stats", Settings.ARMORY_SITE_URL, getConnection("armory"))));
+                "description2", description2,
+                "imagePath",
+                String.format("%s%s", Settings.ARMORY_SITE_URL, Mitems.getText("statistics.statistics-email.image")),
+                "firstName", employee.getFirstName()));
 
         SendEmailPayload e = new SendEmailPayload();
         e.setRecipients(List.of(getConnection("email")));
+        Log.error(Settings.ARMORY_SITE_URL);
+        Log.error(this.getConnection("armory"));
         e.setSubject(subject);
         e.setHtmlText(htmlBody);
         EmailAdapterAPI.newEmail(e);
-    }
-
-    public void showStatisticsScreens() {
-        Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
-        String employeeScreenButton = Mitems.getText("statistics.employee-number-screen.button");
-        String employeeNumberScreenDescription = Mitems
-                .getText("statistics.employee-number-screen.description");
-        String employeeNumberScreenNumber = String.format("%d", otherEmployees.values().size() + 1);
-
-        screens.put("employeeNumberScreen", new TemplateGenerator()
-                .addComponent("title", new DescriptionComponent(employeeNumberScreenDescription))
-                .addComponent("description", new TitleComponent(employeeNumberScreenNumber))
-                .addComponent("submit", new PrimarySubmitButtonComponent(employeeScreenButton, "silosNumberScreen")));
-        String silosScreenButton = Mitems.getText("statistics.silos-number-screen.button");
-        String silosNumberScreenDescription = Mitems
-                .getText("statistics.silos-number-screen.description");
-        String silosNumberScreenNumber = String.format("%d", silosCount);
-
-        screens.put("silosNumberScreen", new TemplateGenerator()
-                .addComponent("header", new HeaderComponent(null, true))
-                .addComponent("title", new DescriptionComponent(silosNumberScreenDescription))
-                .addComponent("description", new TitleComponent(silosNumberScreenNumber))
-                .addComponent("submit", new PrimarySubmitButtonComponent(silosScreenButton, "riskScreen")));
-        String riskScreenButton = Mitems.getText("statistics.risk-screen.button");
-        String riskScreenDescription = Mitems.getText("statistics.risk-screen.description");
-        String riskScreenTitle = "moderate";
-
-        screens.put("riskScreen", new TemplateGenerator()
-                .addComponent("header", new HeaderComponent(null, true))
-                .addComponent("title", new DescriptionComponent(riskScreenDescription))
-                .addComponent("description", new TitleComponent(riskScreenTitle))
-                .addComponent("submit", new PrimarySubmitButtonComponent(riskScreenButton, "finalScreen")));
-
-        String finalScreenTitle = Mitems.getHTML("statistics.final-screen.title");
-        screens.put("finalScreen", new TemplateGenerator()
-                .setTemplateName("CenteredContentTemplate")
-                .addComponent("description", new TitleComponent(finalScreenTitle)));
-
-        showScreens("employeeNumberScreen", screens);
-
     }
 
     public void sendWeeklyEmail(EmployeeProfile employee) throws IOException {
