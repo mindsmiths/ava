@@ -116,8 +116,7 @@ public class Ava extends Agent {
             Log.info("Decaying SPECIFIC neuron with employee id: " + otherEmployees.get(avaId).getId());
             long daysPassed = ChronoUnit.DAYS.between(getConnectionNeuron(otherEmployees.get(avaId).getId()).getLastUpdatedAt().toInstant(),
                                                       new Date().toInstant());
-            // UNCOMMENT AND SWITCH AFTER TESTING                                         
-            // getConnectionNeuron(otherEmployees.get(avaId).getId()).decay(daysPassed);
+            //getConnectionNeuron(otherEmployees.get(avaId).getId()).decay(daysPassed);
             getConnectionNeuron(otherEmployees.get(avaId).getId()).decay(7.);
         }
     }

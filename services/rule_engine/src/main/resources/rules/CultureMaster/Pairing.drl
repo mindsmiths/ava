@@ -55,8 +55,7 @@ rule "Check that all ava availabilities came"
                             employees.size() == employeeAvailabilities.size(),
                             !employees.isEmpty())
     then
-        // UNCOMMENT AFTER TESTING
-        // modify(agent) {setLunchCycleStage(CmLunchCycleStage.GENERATE_MATCHES)};
+        modify(agent) {setLunchCycleStage(CmLunchCycleStage.GENERATE_MATCHES)};
 end
 
 rule "Generate this weeks matches"
@@ -86,14 +85,16 @@ rule "Send match info to Avas"
         agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.SEND_TO_AVAS)
     then
         agent.sendMatches();
-        // UNCOMMENT AFTER TESTING
-        // agent.clearEmployeeAvailabilities();
+        agent.clearEmployeeAvailabilities();
         modify(agent) {setLunchCycleStage(CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES)};
 end
 
 rule "Store lunch compatibilities"
     when
         signal: LunchCompatibilities() from entry-point "signals"
+        agent: CultureMaster()
     then
-        Log.warn(signal);
+        modify(agent) {
+            setLunchCompatibilities(signal)
+        };
 end

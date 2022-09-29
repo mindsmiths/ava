@@ -32,6 +32,7 @@ public class CultureMaster extends Agent {
     private Map<String, EmployeeProfile> employees = new HashMap<>();
     private Map<String, Map<String, Double>> employeeConnectionStrengths = new HashMap<>();
     private Map<String, List<String>> employeeMatchHistories = new HashMap<>();
+    private LunchCompatibilities lunchCompatibilities;
 
     public static String ID = "CULTURE_MASTER";
 

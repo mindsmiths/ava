@@ -169,8 +169,7 @@ end
 rule "Store match info"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        // UNCOMMENT AFTER TESTING
-        // eval(evaluateCronExpression("* * 17-18 ? * FRI *", ts, "Europe/Zagreb")) 
+        eval(evaluateCronExpression("* * 17-18 ? * FRI *", ts, "Europe/Zagreb")) 
         signal: SendMatchesSignal() from entry-point "signals"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.ACCEPT_MATCH_INFO)
         employee: EmployeeProfile()
