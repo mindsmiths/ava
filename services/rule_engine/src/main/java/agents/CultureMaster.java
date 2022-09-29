@@ -20,6 +20,7 @@ import models.EmployeeProfile;
 import signals.AllEmployees;
 import signals.EmployeeUpdateSignal;
 import signals.SendMatchesSignal;
+import signals.SendNoMatchesSignal;
 
 @Data
 @AllArgsConstructor
@@ -53,8 +54,25 @@ public class CultureMaster extends Agent {
     }
 
     public void sendMatches() {
+        List<String> matchedPeople= new ArrayList<>();
         for (String employeeKey : employees.keySet()) {
             for (Match m : allMatches) {
+                if (employees.get(employeeKey).getId().equals(m.getFirst())) {
+                    matchedPeople.add(m.getFirst());
+                    break;
+                }
+                if (employees.get(employeeKey).getId().equals(m.getSecond())) {
+                    matchedPeople.add(m.getSecond());
+                    break;
+                }
+            }
+        }
+        for (String employeeKey : employees.keySet()) {
+            for (Match m : allMatches) {
+                if(!matchedPeople.contains(employees.get(employeeKey).getId())){
+                    send(employeeKey, new SendNoMatchesSignal());
+                    break;
+                }
                 if (employees.get(employeeKey).getId().equals(m.getFirst())) {
                     send(employeeKey, new SendMatchesSignal(m.getSecond(), m.getDay()));
                     break;
@@ -90,7 +108,7 @@ public class CultureMaster extends Agent {
         boolean[][] binaryMatrix = new boolean[employees.values().size()][employees.values().size()]; // binary matrix
 
         List<String> list = new LinkedList<>();
-        int limit = 2;
+        int limit = 1;
 
         for (int i = 0; i < employees.values().size(); i++) {
             for (int j = 0; j < employees.values().size(); j++) {
@@ -122,7 +140,8 @@ public class CultureMaster extends Agent {
         for (i = 0; i < employees.values().size(); i++) {
             for (j = 0; j < employees.values().size(); j++) {
                 Double sum = (matrix[i][j] + matrix[j][i]);
-                binaryMatrix[i][j] = sum >= limit;
+                //binaryMatrix[i][j] = sum >= limit;
+                binaryMatrix[i][j] = (matrix[i][j]>limit) && (matrix[j][i]>limit);
             }
         }
         return binaryMatrix;

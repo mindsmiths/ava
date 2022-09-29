@@ -17,6 +17,7 @@ import agents.CultureMaster;
 
 import signals.EmployeeAvailabilitySignal;
 import signals.SendMatchesSignal;
+import signals.SendNoMatchesSignal;
 import signals.ConnectionsStrengthSignal;
 
 import models.AvaLunchCycleStage;
@@ -158,12 +159,19 @@ rule "Store match info"
     then
         modify(agent) {setMatch(signal.getMatch()), setMatchDay(signal.getMatchDay())};
         modify(agent) {getMatchHistory().add(signal.getMatch())};
-        if(signal.getMatch().equals("16092002")){
-            agent.sendNoMatchEmail();
-        }else{
-            agent.printMatchInfo(employee, signal);
-            agent.sendCalendarInvite(signal.getMatchDay(), employee, agent.getOtherEmployees().get(agent.employeeToAvaId(signal.getMatch())));
-        }
+        agent.printMatchInfo(employee, signal);
+        agent.sendCalendarInvite(signal.getMatchDay(), employee, agent.getOtherEmployees().get(agent.employeeToAvaId(signal.getMatch())));
+        delete(signal);
+end
+
+rule "Send no match email"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        //eval(evaluateCronExpression("* * 17-18 ? * FRI *", ts, "Europe/Zagreb")) 
+        signal: SendNoMatchesSignal() from entry-point "signals"
+        agent: Ava(lunchCycleStage == AvaLunchCycleStage.ACCEPT_MATCH_INFO)
+    then
+        agent.sendNoMatchEmail();
         delete(signal);
 end
 

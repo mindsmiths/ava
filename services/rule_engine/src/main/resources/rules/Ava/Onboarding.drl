@@ -82,6 +82,22 @@ rule "Start personal quiz"
         delete(signal);
 end
 
+rule "Personal question counter"
+   when
+        
+        signal: SubmitEvent(getParamAsString("submit").startsWith("question")) from entry-point "signals"
+        agent: Ava(onboardingStage == OnboardingStage.PERSONAL_QUIZ, submitCount : submitCount)
+   then
+   Log.info(submitCount);
+        modify(agent) {
+            setSubmitCount(submitCount+1);
+        };
+    if(submitCount >= 3)
+        agent.showPersonalQuizFinalScreen();
+
+    delete(signal);
+end
+
 rule "Reconnect personal quiz"
    when
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-onboarding") from entry-point "signals"
@@ -120,6 +136,7 @@ rule "Finish onboarding"
         };
 
         agent.send(CultureMaster.ID, new EmployeeUpdateSignal(employee));
+        agent.showFinalScreen();
         delete(signal);
 end
 
@@ -133,11 +150,12 @@ rule "Reconnect final screen"
 end
 
 rule "Send statistics email"
-    enabled false
     when
+        Heartbeat(ts: timestamp) from entry-point "signals"
         agent: Ava(
-            onboardingStage == OnboardingStage.STATS_EMAIL,
-            allEmployeesFinishedOnboarding() == true
+            //(statsEmailLastSentAt == null || statsEmailLastSentAt before[12h] ts),
+            onboardingStage == OnboardingStage.STATS_EMAIL
+            //workingHours==true
         )
         employee: EmployeeProfile()
     then

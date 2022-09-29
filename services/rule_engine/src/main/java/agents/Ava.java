@@ -77,25 +77,28 @@ public class Ava extends Agent {
     private boolean manualTrigger;
     // a map of how strong MY connections are to other employees
     private Map<String, Neuron> connectionStrengths = new HashMap<>();
+    private int submitCount = 0;
 
     public Ava(String connectionName, String connectionId) {
         super(connectionName, connectionId);
     }
-
-    // trigger whenever new Ava is onboarded in CreateOrUpdateAva, "Save or update all employees"
+    // trigger whenever new Ava is onboarded in CreateOrUpdateAva, "Save or update
+    // all employees"
     public void addConnectionStrengths() {
-        for(String avaId : this.otherEmployees.keySet()) {
-            if(!connectionStrengths.containsKey(otherEmployees.get(avaId).getId())) {
-                connectionStrengths.put(otherEmployees.get(avaId).getId(), new Neuron(CONNECTION_NEURON_RESISTANCE, CONNECTION_NEURON_CAPACITY));
+        for (String avaId : this.otherEmployees.keySet()) {
+            if (!connectionStrengths.containsKey(otherEmployees.get(avaId).getId())) {
+                connectionStrengths.put(otherEmployees.get(avaId).getId(),
+                        new Neuron(CONNECTION_NEURON_RESISTANCE, CONNECTION_NEURON_CAPACITY));
             }
         }
     }
 
-    // if user picked employee in familiarity quiz, charge that connection to the max value
+    // if user picked employee in familiarity quiz, charge that connection to the
+    // max value
     // trigger after familiarity quiz is over in Onboarding, "Finish onboarding"
     public void chargeConnectionNeurons(EmployeeProfile employeeProfile) {
-        for(Map.Entry<String, Double> entry : employeeProfile.getFamiliarity().entrySet()) {
-            if(entry.getValue() != 0) {
+        for (Map.Entry<String, Double> entry : employeeProfile.getFamiliarity().entrySet()) {
+            if (entry.getValue() != 0) {
                 this.connectionStrengths.get(entry.getKey()).setValue(CONNECTION_NEURON_CAPACITY);
             }
         }
@@ -108,11 +111,12 @@ public class Ava extends Agent {
     // decrease the strength of connection with time (days)
     // trigger every week in LunchCycleStage, "Ask for available days"
     public void decayConnectionNeurons() {
-        for(String avaId : this.otherEmployees.keySet()) {
+        for (String avaId : this.otherEmployees.keySet()) {
             Log.info("Decaying SPECIFIC neuron with employee id: " + otherEmployees.get(avaId).getId());
-            long daysPassed = ChronoUnit.DAYS.between(getConnectionNeuron(otherEmployees.get(avaId).getId()).getLastUpdatedAt().toInstant(),
-                                                      new Date().toInstant());
-            getConnectionNeuron(otherEmployees.get(avaId).getId()).decay(daysPassed/1000.);
+            long daysPassed = ChronoUnit.DAYS.between(
+                    getConnectionNeuron(otherEmployees.get(avaId).getId()).getLastUpdatedAt().toInstant(),
+                    new Date().toInstant());
+            getConnectionNeuron(otherEmployees.get(avaId).getId()).decay(daysPassed / 1000.);
         }
     }
 
@@ -120,7 +124,7 @@ public class Ava extends Agent {
     // used when sending data to CultureMaster
     public Map<String, Double> getConnectionStrengthAsValue() {
         Map<String, Double> m = new HashMap<>();
-        for(Map.Entry<String, Neuron> entry : connectionStrengths.entrySet()) {
+        for (Map.Entry<String, Neuron> entry : connectionStrengths.entrySet()) {
             m.put(entry.getKey(), entry.getValue().getValue());
         }
         return m;
@@ -131,8 +135,8 @@ public class Ava extends Agent {
     }
 
     public String employeeToAvaId(String employeeId) {
-        for(Map.Entry<String, EmployeeProfile> entry : otherEmployees.entrySet()) {
-            if(entry.getValue().getId().equals(employeeId)) {
+        for (Map.Entry<String, EmployeeProfile> entry : otherEmployees.entrySet()) {
+            if (entry.getValue().getId().equals(employeeId)) {
                 return entry.getKey();
             }
         }
@@ -147,9 +151,10 @@ public class Ava extends Agent {
     }
 
     public void printMatchInfo(EmployeeProfile employee, SendMatchesSignal signal) {
-        for(Map.Entry<String, EmployeeProfile> entry : otherEmployees.entrySet()) {
-            if(entry.getValue().getId().equals(signal.getMatch())) {
-                Log.info("I'm " + employee.getFullName() + " my match is " + entry.getValue().getFullName() + " on " + signal.getMatchDay());
+        for (Map.Entry<String, EmployeeProfile> entry : otherEmployees.entrySet()) {
+            if (entry.getValue().getId().equals(signal.getMatch())) {
+                Log.info("I'm " + employee.getFullName() + " my match is " + entry.getValue().getFullName() + " on "
+                        + signal.getMatchDay());
                 break;
             }
         }
@@ -192,29 +197,24 @@ public class Ava extends Agent {
         Option buttonOption = Mitems.getOptions("weekly-core.confirmation-of-choosen-available-days.button")[0];
 
         Map<String, BaseTemplate> screens = Map.of(
-            "confirmDaysScreen", 
-            new TemplateGenerator("confirmScreen")
-                .setTemplateName("CenteredContentTemplate")
-                .addComponent(
-                    "title", 
-                    new TitleComponent(
-                        Mitems.getHTML("weekly-core.confirmation-of-choosen-available-days.title")
-                    )
-                )
-                .addComponent(
-                    "button",
-                    new PrimarySubmitButtonComponent(buttonOption.getText(), buttonOption.getId())
-                ),
-            "confirmDaysAndThanksScreen",
-            new TemplateGenerator("confirmAndThanksScreen")
-                .setTemplateName("CenteredContentTemplate")
-                .addComponent(
-                    "title",
-                    new TitleComponent(
-                        Mitems.getText("weekly-core.stay-tuned-second-confirmation-of-available-days.title")
-                    )
-                )
-        );
+                "confirmDaysScreen",
+                new TemplateGenerator("confirmScreen")
+                        .setTemplateName("CenteredContentTemplate")
+                        .addComponent(
+                                "title",
+                                new TitleComponent(
+                                        Mitems.getHTML("weekly-core.confirmation-of-choosen-available-days.title")))
+                        .addComponent(
+                                "button",
+                                new PrimarySubmitButtonComponent(buttonOption.getText(), buttonOption.getId())),
+                "confirmDaysAndThanksScreen",
+                new TemplateGenerator("confirmAndThanksScreen")
+                        .setTemplateName("CenteredContentTemplate")
+                        .addComponent(
+                                "title",
+                                new TitleComponent(
+                                        Mitems.getText(
+                                                "weekly-core.stay-tuned-second-confirmation-of-available-days.title"))));
         showScreens("confirmDaysScreen", screens);
     }
 
@@ -236,11 +236,15 @@ public class Ava extends Agent {
         // Adding questions and final screen in familiarity quiz
 
         screens.put("secondIntroScreen", new TemplateGenerator()
-        .addComponent("header", new HeaderComponent(null, true))
-        .addComponent("title", new TitleComponent(Mitems.getText("onboarding.familiarity-quiz-second-intro.title")))
-        .addComponent("image", new ImageComponent(Mitems.getText("onboarding.silos-image-path.devided")))
-        .addComponent("description", new DescriptionComponent(Mitems.getText("onboarding.familiarity-quiz-second-intro.description")))
-        .addComponent("submit", new PrimarySubmitButtonComponent(Mitems.getText("onboarding.familiarity-quiz-second-intro.action"), "question1")));
+                .addComponent("header", new HeaderComponent(null, true))
+                .addComponent("title",
+                        new TitleComponent(Mitems.getText("onboarding.familiarity-quiz-second-intro.title")))
+                .addComponent("image", new ImageComponent(Mitems.getText("onboarding.silos-image-path.devided")))
+                .addComponent("description",
+                        new DescriptionComponent(
+                                Mitems.getText("onboarding.familiarity-quiz-second-intro.description")))
+                .addComponent("submit", new PrimarySubmitButtonComponent(
+                        Mitems.getText("onboarding.familiarity-quiz-second-intro.action"), "question1")));
         int questionNum = 1;
         String submitButton = Mitems.getText("onboarding.familiarity-quiz-questions.action");
 
@@ -318,7 +322,12 @@ public class Ava extends Agent {
                         .addComponent("submit", new PrimarySubmitButtonComponent(
                                 "submit",
                                 Mitems.getText(String.format("onboarding.personal-quiz-%s.action", questionTag)),
+                                nextQuestionTag))
+                        .addComponent("skip", new PrimarySubmitButtonComponent(
+                                "skip",
+                                "Skip",
                                 nextQuestionTag)));
+
                 questionNum += 1;
             } catch (Exception e) {
                 // Changing button value
@@ -347,11 +356,21 @@ public class Ava extends Agent {
         showScreens("introScreen", screens);
     }
 
+    public void showPersonalQuizFinalScreen() {
+        String finishPersonalQuiz = Mitems.getHTML("onboarding.finish-personal-quiz.text");
+        BaseTemplate screen = new TemplateGenerator("finish-personal-quiz")
+        .addComponent("image", new ImageComponent(Mitems.getText("onboarding.ava-image-path.path")))
+        .addComponent("title", new TitleComponent(finishPersonalQuiz))
+        .addComponent("submit", new PrimarySubmitButtonComponent(
+                "submit", "finishpersonalquiz"));
+        showScreen(screen);
+    }
+
     public void showFinalScreen() {
         String goodbyeScreen = Mitems.getText("onboarding.finish-personal-quiz.goodbye-screen");
         BaseTemplate screen = new TemplateGenerator("goodbye")
-                                        .setTemplateName("CenteredContentTemplate")
-                                        .addComponent("title", new TitleComponent(goodbyeScreen));
+                .setTemplateName("CenteredContentTemplate")
+                .addComponent("title", new TitleComponent(goodbyeScreen));
         showScreen(screen);
     }
 
@@ -385,7 +404,7 @@ public class Ava extends Agent {
                 "callToAction", Mitems.getText("onboarding.welcome-email.action"),
                 "firstName", employee.getFirstName(),
                 "armoryUrl",
-               String.format("%s/%s?trigger=start-onboarding", Settings.ARMORY_SITE_URL, getConnection("armory"))));
+                String.format("%s/%s?trigger=start-onboarding", Settings.ARMORY_SITE_URL, getConnection("armory"))));
 
         SendEmailPayload e = new SendEmailPayload();
         e.setRecipients(List.of(getConnection("email")));
@@ -488,15 +507,15 @@ public class Ava extends Agent {
     public void sendStatisticsEmail(EmployeeProfile employee) throws IOException {
         String subject = Mitems.getText("statistics.statistics-email.subject");
         String description = Mitems.getText("statistics.statistics-email.description");
-        String htmlTemplate = new String(Objects.requireNonNull(
-                getClass().getClassLoader().getResourceAsStream("emailTemplates/EmailTemplate.html")).readAllBytes());
+        String description2 = Mitems.getText("statistics.statistics-email.description2");
 
+        String htmlTemplate = new String(Objects.requireNonNull(
+                getClass().getClassLoader().getResourceAsStream("emailTemplates/StatEmailTemplate.html")).readAllBytes());
         String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
                 "description", description,
-                "callToAction", Mitems.getText("statistics.statistics-email.action"),
-                "firstName", employee.getFirstName(),
-                "armoryUrl",
-                String.format("%s/%s?trigger=show-stats", Settings.ARMORY_SITE_URL, getConnection("armory"))));
+                "description2", description2,
+                "imagePath", "http://8000.workspace-ms-emil.msdev.mindsmiths.io" + Mitems.getText("statistics.statistics-email.image"),
+                "firstName", employee.getFirstName()));
 
         SendEmailPayload e = new SendEmailPayload();
         e.setRecipients(List.of(getConnection("email")));
@@ -647,13 +666,12 @@ public class Ava extends Agent {
                 getClass().getClassLoader().getResourceAsStream("emailTemplates/EmailTemplateCalendar.html"))
                 .readAllBytes());
         return Templating.recursiveRender(htmlTemplate, Map.of(
-            "title", Mitems.getText("weekly-core.matching-mail.title"),
-            "description", Mitems.getHTML("weekly-core.matching-mail.description"),
-            "otherName", otherEmployee.getFirstName(),
-            "fullName", otherEmployee.getFullName(),
-            "myName", currentEmployee.getFirstName(),
-            "lunchDay", daysToPrettyString(days)
-        ));
+                "title", Mitems.getText("weekly-core.matching-mail.title"),
+                "description", Mitems.getHTML("weekly-core.matching-mail.description"),
+                "otherName", otherEmployee.getFirstName(),
+                "fullName", otherEmployee.getFullName(),
+                "myName", currentEmployee.getFirstName(),
+                "lunchDay", daysToPrettyString(days)));
     }
 
     private byte[] getICSInvite(Days day, Employee currentEmployee, Employee otherEmployee) {

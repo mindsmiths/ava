@@ -74,11 +74,6 @@ class PairingAlgorithm(BaseService):
         for index, element in enumerate(matching):
             # people without match will be matched with null, on day null
             if element == -1:
-                match = Match(
-                    first=str(employee_id_mapping[index]),
-                    second="16092002",
-                    day="FRI")
-                all_matches.append(match)
                 continue
             # convert indexes to employee ids
             # convert indexes to employee ids
