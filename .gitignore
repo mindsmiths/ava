@@ -26,5 +26,6 @@ secrets
 tags.temp
 target/
 
+services/commands/connections_graphs/
 **/core.*
 *.vsix
