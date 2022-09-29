@@ -115,7 +115,7 @@ services:
       DJANGO_SUPERUSER_USERNAME: admin
       DJANGO_SUPERUSER_PASSWORD: '{{ env.MITEMS_ADMIN_PASSWORD | default("admin") }}'
       COMMIT_TOKEN: '{{ env.COMMIT_TOKEN }}'
-      REPO: '{{ env.CI_REPOSITORY_URL }}'
+      REPO: '@github.com/mindsmiths/ava.git'
       BRANCH: '{{ env.CI_COMMIT_BRANCH }}'
       SECRET_KEY: KE00K%SJ8vjYX46!%6$W3Js1OewOAmk@
 
@@ -168,7 +168,7 @@ services:
     env:
       DJANGO_SUPERUSER_USERNAME: admin
       DJANGO_SUPERUSER_PASSWORD: '{{ env.EMPLOYEE_MANAGER_ADMIN_PASSWORD | default("admin") }}'
-      SITE_URL: '{{ env.EMPLOYEE_MANAGER_URL }}'
+      SITE_URL: '{{ "employee-manager." + env.get("HOST_DOMAIN", "") }}'
       INTERNAL_SITE_URL: http://employee-manager
       SECRET_KEY: BKZvpQTokpkC7ArkUBdXGIyYe9s1py2XvQMTcyt7nFIQolTaS5
     resources:
@@ -192,7 +192,7 @@ services:
       - gunicorn==20.1.0
       - websockets==10.1
     env:
-      SITE_URL: '{{ env.ARMORY_URL }}'
+      SITE_URL: '{{ "armory." + env.get("HOST_DOMAIN", "") }}'
       INTERNAL_SITE_URL: "armory"
     resources:
       cpu: 50m
