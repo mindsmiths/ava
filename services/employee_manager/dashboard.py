@@ -32,6 +32,10 @@ class CustomIndexDashboard(Dashboard):
                         'title': _('Trigger statistics email'),
                         'url': '/trigger/statistics_email',
                     },
+                    {
+                        'title': _('Trigger ice breaker'),
+                        'url': '/trigger/ice_breaker',
+                    },
                 ],
                 column=0,
                 order=0
