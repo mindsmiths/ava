@@ -34,12 +34,9 @@ class PairingAlgorithm(BaseService):
         not_matched = set()
         availability_intersections = {}
 
-        print("successfully received employee match histories")
-        print(employeeMatchHistories)
-
-        employeeAvailabilities_ = {}
+        employee_availabilities = {}
         for availability in employeeAvailabilities:
-            employeeAvailabilities_[
+            employee_availabilities[
                 availability.employeeId] = availability.availableDays
 
         # blossom requires vertices to be labaled starting from 0
@@ -55,9 +52,9 @@ class PairingAlgorithm(BaseService):
                 (employee_id_mapping[pair[0]], employee_id_mapping[pair[1]]))
             employee_pair.sort()
             # check if a and b have days when both are available
-            first_availability = employeeAvailabilities_[
+            first_availability = employee_availabilities[
                 employee_id_mapping[pair[0]]]
-            second_availability = employeeAvailabilities_[
+            second_availability = employee_availabilities[
                 employee_id_mapping[pair[1]]]
             intersection = set(first_availability) &\
                 set(second_availability)
