@@ -189,7 +189,7 @@ public class Ava extends Agent {
                         new DescriptionComponent(
                                 Mitems.getText("weekly-core.description-asking-for-available-days.text")))
                 .addComponent("cloudSelect", new CloudSelectComponent("availableDays", options))
-                .addComponent("submit", new PrimarySubmitButtonComponent("Submit", "confirmDays"));
+                .addComponent("confirmDays", new PrimarySubmitButtonComponent("confirmDays", "Submit", "confirmDays"));
         showScreen(daysScreen);
     }
 
@@ -296,8 +296,8 @@ public class Ava extends Agent {
                         .addComponent("image", new ImageComponent(avaImagePath))
                         .addComponent("title", new TitleComponent(finishFamiliarityQuizTitle))
                         .addComponent("description", new DescriptionComponent(finishFamiliarityQuizText))
-                        .addComponent("submit", new PrimarySubmitButtonComponent(
-                                "submit", familiarityQuizFinalButton,
+                        .addComponent("finished-familiarity-quiz", new PrimarySubmitButtonComponent(
+                                "finished-familiarity-quiz", familiarityQuizFinalButton,
                                 "finished-familiarity-quiz")));
                 break;
             }
@@ -312,7 +312,7 @@ public class Ava extends Agent {
                 .addComponent("description", new DescriptionComponent(
                         Mitems.getText("onboarding.personal-quiz-intro.description")))
                 .addComponent("submit", new PrimarySubmitButtonComponent(
-                        "submit", Mitems.getText("onboarding.personal-quiz-intro.action"), "startPersonalQuiz"));
+                        "startPersonalQuiz", Mitems.getText("onboarding.personal-quiz-intro.action"), "startPersonalQuiz"));
         showScreen(screen);
     }
 
@@ -347,7 +347,7 @@ public class Ava extends Agent {
                 .addComponent("image", new ImageComponent(avaImagePath))
                 .addComponent("title", new TitleComponent(finishPersonalQuiz))
                 .addComponent("submit", new PrimarySubmitButtonComponent(
-                        "submit", finishQuizButton[0].getText(), "qoodbyescreen")));
+                        "qoodbyescreen", finishQuizButton[0].getText(), "qoodbyescreen")));
 
         String goodbyeScreen = Mitems.getText("onboarding.finish-personal-quiz.goodbye-screen");
         screens.put("qoodbyescreen", new TemplateGenerator("goodbye")
