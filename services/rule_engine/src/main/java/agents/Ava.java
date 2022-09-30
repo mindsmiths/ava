@@ -533,6 +533,28 @@ public class Ava extends Agent {
         EmailAdapterAPI.newEmail(e);
     }
 
+    public void sendIceBreakEmail(EmployeeProfile employee) throws IOException {
+        String subject = Mitems.getText("weekly-core.ice-breaker-email.subject");
+        String description = Mitems.getText("weekly-core.ice-breaker-email.description");
+
+        String htmlTemplate = new String(Objects.requireNonNull(
+                getClass().getClassLoader().getResourceAsStream("emailTemplates/IceBreakTemplate.html"))
+                .readAllBytes());
+
+        String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
+                "text", description,
+                "firstName", employee.getFirstName(),
+                "button", Mitems.getText("weekly-core.ice-breaker-email.button"),
+                "armoryUrl",
+                String.format("%s/%s?trigger=ice-breaker", Settings.ARMORY_SITE_URL, getConnection("armory"))));
+
+        SendEmailPayload e = new SendEmailPayload();
+        e.setRecipients(List.of(getConnection("email")));
+        e.setSubject(subject);
+        e.setHtmlText(htmlBody);
+        EmailAdapterAPI.newEmail(e);
+    }
+
     public void showLunchDeclineReasonScreens() {
         Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
         String lunchDeclineScreen = Mitems.getText("weekly-core.lunch-decline-reason.title");

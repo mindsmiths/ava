@@ -45,3 +45,14 @@ rule "Trigger statistics email"
         modify(agent) {setOnboardingStage(OnboardingStage.FINISHED)};
         delete(signal)
 end
+
+rule "Trigger ice_breaker email"
+    when
+        signal: ManualTriggerEvent(triggerType == "ice_breaker") from entry-point "signals"
+        agent: Ava()
+        employee: EmployeeProfile()
+    then
+        Log.info("Ava: triggered ice_breaker email from dashboard");
+        agent.sendIceBreakEmail(employee);
+        delete(signal)
+end

@@ -682,6 +682,26 @@
         ]
       },
       {
+        "name": "Ice breaker email",
+        "elements": [
+          {
+            "description": "Button",
+            "type": "TEXT",
+            "content": "Solve the ice breaker quiz."
+          },
+          {
+            "description": "Description",
+            "type": "HTML",
+            "content": "Dear {{ firstName }},\n\nIt's time to start getting to know your colleagues better."
+          },
+          {
+            "description": "Subject",
+            "type": "TEXT",
+            "content": "Ice breaker"
+          }
+        ]
+      },
+      {
         "name": "Lunch Decline Reason",
         "elements": [
           {
