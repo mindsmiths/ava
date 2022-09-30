@@ -9,16 +9,6 @@ from forge_cli.admin import cli
 from forge.utils.mongo import MongoClientKeeper
 import forge
 
-class LunchCompatibilityEdge:
-    first: str
-    second: str
-    edgeWeight: float
-
-    def __init__(self, first, second, edgeWeight):
-        self.first = first
-        self.second = second
-        self.edgeWeight = edgeWeight
-
 @cli.command()
 def generate_connections_graphs():
     graphs_path = "./services/commands/connections_graphs/"
@@ -28,34 +18,34 @@ def generate_connections_graphs():
     forge.setup("rule_engine")
     keeper = MongoClientKeeper()
     culture_master = keeper.ruleEngineDB.summary.find_one({"agentId": "CULTURE_MASTER"})
-    # ava_connection_strengths = culture_master["agents#CultureMaster"]["CULTURE_MASTER"]["employeeConnectionStrengths"] # TODO:
-    matches = [LunchCompatibilityEdge(first='1', second='2', edgeWeight='300.0'), LunchCompatibilityEdge(first='1', second='3', edgeWeight='800.0'), LunchCompatibilityEdge(first='1', second='4', edgeWeight='400.0'), LunchCompatibilityEdge(first='1', second='5', edgeWeight='500.0'), LunchCompatibilityEdge(first='1', second='6', edgeWeight='600.0'), LunchCompatibilityEdge(first='1', second='7', edgeWeight='700.0'), LunchCompatibilityEdge(first='1', second='8', edgeWeight='850.0'), LunchCompatibilityEdge(first='1', second='9', edgeWeight='900.0'), LunchCompatibilityEdge(first='1', second='10', edgeWeight='1000.0'), LunchCompatibilityEdge(first='1', second='11', edgeWeight='100.0')]
-    # ava_employees = culture_master["agents#CultureMaster"]["CULTURE_MASTER"]["employees"]
-    ava_employees = {'1': 'miho', '2': 'Filip', '3': 'Borna', '4': 'emil', '5': 'tomislav', '6': 'juraj', '7': 'mislav', '8': 'mislav', '9': 'nikola', '10': 'žul', '11': 'mario'}
+    employee_dictionary = culture_master["agents#CultureMaster"]["CULTURE_MASTER"]["lunchCompatibilities"]
+    ava_employees = culture_master["agents#CultureMaster"]["CULTURE_MASTER"]["employees"]
+
+    matches = employee_dictionary["edges"]
 
     all_ids = set()
     for emp in matches:
-        all_ids.add(emp.first)
-        all_ids.add(emp.second)
+        all_ids.add(emp["first"])
+        all_ids.add(emp["second"])
 
     ava_name_keeper = {}
-    for id, name in ava_employees.items():
-        if id not in all_ids:
+    for _, val in ava_employees.items():
+        if val["id"] not in all_ids:
             # Employee didn't answer
             continue
         else:
-            ava_name_keeper[id] = name
+            ava_name_keeper[val["id"]] = val["firstName"]
 
     G = nx.Graph()
 
     for match in matches:
-        G.add_node(ava_name_keeper[match.first])
-        G.add_node(ava_name_keeper[match.second])
+        G.add_node(ava_name_keeper[match["first"]])
+        G.add_node(ava_name_keeper[match["second"]])
 
     for match in matches:
-        print(float(match.edgeWeight))
-        G.add_edge(ava_name_keeper[match.first], ava_name_keeper[match.second], width=float(match.edgeWeight))
+        G.add_edge(ava_name_keeper[match["first"]], ava_name_keeper[match["second"]], width=float(match["edgeWeight"]))
 
+    print('Saving...')
     nx.draw(G, node_size=450, with_labels=True)
 
     plt.axis('equal')
