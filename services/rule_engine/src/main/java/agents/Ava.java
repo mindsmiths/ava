@@ -486,14 +486,14 @@ public class Ava extends Agent {
         String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
                 "description", description,
                 "description2", description2,
-                "imagePath",
-                String.format("%s%s", Settings.ARMORY_SITE_URL, Mitems.getText("statistics.statistics-email.image")),
+                "imagePath", Mitems.getText("statistics.statistics-email.image"),
                 "firstName", employee.getFirstName()));
+
+            // "imagePath",
+            // String.format("%s%s", Settings.ARMORY_SITE_URL, Mitems.getText("statistics.statistics-email.image")),
 
         SendEmailPayload e = new SendEmailPayload();
         e.setRecipients(List.of(getConnection("email")));
-        Log.error(Settings.ARMORY_SITE_URL);
-        Log.error(this.getConnection("armory"));
         e.setSubject(subject);
         e.setHtmlText(htmlBody);
         EmailAdapterAPI.newEmail(e);
