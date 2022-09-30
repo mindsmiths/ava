@@ -16,10 +16,14 @@ import com.mindsmiths.sdk.core.db.EmitType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import models.CmLunchCycleStage;
-import models.EmployeeProfile;
-import signals.AllEmployees;
+
+import com.mindsmiths.pairingalgorithm.LunchCompatibilities;
+
 import signals.EmployeeUpdateSignal;
+import signals.AllEmployees;
 import signals.SendMatchesSignal;
+
+import models.EmployeeProfile;
 import signals.SendNoMatchesSignal;
 
 @Data
@@ -30,6 +34,8 @@ public class CultureMaster extends Agent {
     private CmLunchCycleStage lunchCycleStage = CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES;
     private Map<String, EmployeeProfile> employees = new HashMap<>();
     private Map<String, Map<String, Double>> employeeConnectionStrengths = new HashMap<>();
+    private Map<String, List<String>> employeeMatchHistories = new HashMap<>();
+    private LunchCompatibilities lunchCompatibilities;
 
     public static String ID = "CULTURE_MASTER";
 
@@ -47,7 +53,8 @@ public class CultureMaster extends Agent {
 
     public void generateMatches() {
         PairingAlgorithmAPI.generatePairs(new ArrayList<>(employeeAvailabilities),
-                new HashMap<>(employeeConnectionStrengths));
+                                          new HashMap<>(employeeConnectionStrengths),
+                                          new HashMap<>(employeeMatchHistories));
     }
 
     public void addMatches(List<Match> allMatches) {
