@@ -1,9 +1,7 @@
 import os
 
-import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 import networkx as nx
-import networkx.algorithms.community as nx_comm
 
 from forge_cli.admin import cli
 from forge.utils.mongo import MongoClientKeeper
