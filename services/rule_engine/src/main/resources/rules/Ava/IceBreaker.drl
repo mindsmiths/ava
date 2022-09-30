@@ -12,7 +12,7 @@ import models.OnboardingStage;
 import signals.AllEmployees;
 import models.AvaLunchCycleStage;
 
-import signals.AvaAvailabilitySignal;
+import signals.EmployeeAvailabilitySignal;
 import signals.EmployeeUpdateSignal;
 
 import models.EmployeeProfile;
@@ -24,6 +24,7 @@ rule "Show guessing quiz"
         signal: UserConnectedEvent(getParamAsString("trigger") == "ice-breaker") from entry-point "signals"
         agent: Ava()
     then
+        /*
         agent.setOtherEmployees(Map.of(
             "1", new EmployeeProfile(
                 Map.of("question1", "Answer1.1", "question2", "Answer2.1", "question3", "Answer3.1"),
@@ -44,6 +45,7 @@ rule "Show guessing quiz"
         ));
         agent.setMatch("2");
         agent.setMatchDay(Days.THU);
+        */
         agent.guessingQuizScreen();
         delete(signal);
 end

@@ -5,7 +5,7 @@ from forge.core.api import api_interface
 
 from services import pairing_algorithm
 from .api import Matches
-from .api import AvaAvailability
+from .api import EmployeeAvailability
 
 
 @api_interface
@@ -14,7 +14,7 @@ class PairingAlgorithmAPI(BaseAPI):
 
     @staticmethod
     def generate_pairs(self,
-                       avaAvailabilities: List[AvaAvailability]
+                       employeeAvailabilities: List[EmployeeAvailability]
                        ) -> Future[Matches]:
         """Generates pairs of people that should go on a lunch together""" 
 

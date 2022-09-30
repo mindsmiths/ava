@@ -9,14 +9,16 @@ import com.mindsmiths.armory.events.SubmitEvent
 import com.mindsmiths.ruleEngine.model.Heartbeat;
 import com.mindsmiths.ruleEngine.util.Agents;
 import com.mindsmiths.pairingalgorithm.Days;
-import com.mindsmiths.pairingalgorithm.AvaAvailability;
+import com.mindsmiths.pairingalgorithm.EmployeeAvailability;
 import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
  
 import agents.Ava;
 import agents.CultureMaster;
 
-import signals.AvaAvailabilitySignal;
+import signals.EmployeeAvailabilitySignal;
 import signals.SendMatchesSignal;
+import signals.SendNoMatchesSignal;
+import signals.ConnectionsStrengthSignal;
 
 import models.AvaLunchCycleStage;
 import models.OnboardingStage;
@@ -34,7 +36,8 @@ rule "Send available days email"
     then
         modify(agent) {
             setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY),
-            setLunchReminderStage(LunchReminderStage.FIRST_EMAIL_SENT)
+            setLunchReminderStage(LunchReminderStage.FIRST_EMAIL_SENT),
+            setAvailableDaysEmailLastSentAt(ts)
             }
         agent.sendWeeklyEmail(employee);
 end
@@ -46,6 +49,7 @@ rule "Send second reminder"
         agent: Ava(
             (lunchReminderStage == LunchReminderStage.FIRST_EMAIL_SENT || lunchCycleStage == AvaLunchCycleStage.LUNCH_MAIL_SENDING),
             workingHours == true,
+            availableDaysEmailLastSentAt == null || availableDaysEmailLastSentAt before[12h] ts,
             isManualTrigger() == false
         )
         employee: EmployeeProfile() 
@@ -60,10 +64,11 @@ end
 rule "Send third reminder"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        eval(evaluateCronExpression("* * 0-13 ? * FRI *", ts, "Europe/Zagreb")) 
+        eval(evaluateCronExpression("* * 0-15 ? * FRI *", ts, "Europe/Zagreb")) 
         agent: Ava(
             (lunchReminderStage == LunchReminderStage.SECOND_EMAIL_SENT || lunchCycleStage == AvaLunchCycleStage.LUNCH_MAIL_SENDING),
             workingHours == true,
+            availableDaysEmailLastSentAt == null || availableDaysEmailLastSentAt before[12h] ts,
             isManualTrigger() == false
         )
         
@@ -84,17 +89,18 @@ rule "Ask for available days"
             lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY,
             lunchReminderStage != LunchReminderStage.USER_RESPONDED
         )
-
         eval(evaluateCronExpression("* * 9-23 * * WED", ts, "Europe/Zagreb") 
             || (evaluateCronExpression("* * * * * THU", ts, "Europe/Zagreb"))
-            || (evaluateCronExpression("* * 00-14 * * FRI", ts, "Europe/Zagreb"))
+            || (evaluateCronExpression("* * 00-16 * * FRI", ts, "Europe/Zagreb"))
             || (agent.isManualTrigger() == true))
+        employee: EmployeeProfile()
     then 
-        // what if person decides to exit this screen without answering, now we can't get back because we are in the next stage
-        modify(agent) {
-            setManualTrigger(false)
-        };
         agent.chooseAvailableDaysScreen();
+        Log.info("Decaying connection strength neurons for: " + employee.getFullName());
+        modify(agent) {
+            decayConnectionNeurons(),
+            setManualTrigger(false)
+            };
         delete(signal);
 end
 
@@ -102,6 +108,7 @@ rule "Confirm days"
     when
         signal: SubmitEvent(getParamAsString("submit") == "confirmDays") from entry-point "signals"  
         agent: Ava()
+        employee: EmployeeProfile()
     then
         List<String> availableDays = (ArrayList<String>)signal.getParam("availableDays");
         if(availableDays.size() > 0)
@@ -114,7 +121,10 @@ rule "Confirm days"
             setLunchCycleStage(AvaLunchCycleStage.ACCEPT_MATCH_INFO),
             setLunchReminderStage(LunchReminderStage.USER_RESPONDED)
         };
-        agent.send(CultureMaster.ID, new AvaAvailabilitySignal(new AvaAvailability(agent.getId(), agent.getAvailableDays())));
+
+        agent.send(CultureMaster.ID, new EmployeeAvailabilitySignal(new EmployeeAvailability(employee.getId(), agent.getAvailableDays())));
+        agent.send(CultureMaster.ID, new ConnectionsStrengthSignal(employee.getId(), agent.getConnectionStrengthAsValue()));
+        Log.info("Im " + employee.getFullName() + " and sending connection strengts: " + agent.getConnectionStrengthAsValue());
         delete(signal);
 end
 
@@ -144,22 +154,34 @@ end
 
 rule "Store match info"
     when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        //eval(evaluateCronExpression("* * 17-18 ? * FRI *", ts, "Europe/Zagreb"))
         signal: SendMatchesSignal() from entry-point "signals"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.ACCEPT_MATCH_INFO)
-        profile: EmployeeProfile()
+        employee: EmployeeProfile()
     then
-        modify(agent) {
-            setMatch(signal.getMatch()), 
-            setMatchDay(signal.getMatchDay())
-        };
-        agent.sendCalendarInvite(signal.getMatchDay(), profile, agent.getOtherEmployees().get(signal.getMatch()));
+        modify(agent) {setMatch(signal.getMatch()), setMatchDay(signal.getMatchDay())};
+        modify(agent) {getMatchHistory().add(signal.getMatch())};
+        agent.printMatchInfo(employee, signal);
+        agent.sendCalendarInvite(signal.getMatchDay(), employee, agent.getOtherEmployees().get(agent.employeeToAvaId(signal.getMatch())));
+        delete(signal);
+end
+
+rule "Send no match email"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        //eval(evaluateCronExpression("* * 17-18 ? * FRI *", ts, "Europe/Zagreb")) 
+        signal: SendNoMatchesSignal() from entry-point "signals"
+        agent: Ava(lunchCycleStage == AvaLunchCycleStage.ACCEPT_MATCH_INFO)
+    then
+        agent.sendNoMatchEmail();
         delete(signal);
 end
 
 rule "Auto assign days"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        eval(evaluateCronExpression("* * 14-15 ? * FRI *", ts, "Europe/Zagreb")) 
+        eval(evaluateCronExpression("* * 16-17 ? * FRI *", ts, "Europe/Zagreb"))
         agent: Ava(
             lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY
         )
@@ -176,7 +198,7 @@ rule "Auto assign days"
                 add(Days.FRI);
             }});
         }
-        agent.send(CultureMaster.ID, new AvaAvailabilitySignal(new AvaAvailability(agent.getId(), agent.getAvailableDays())));
+        agent.send(CultureMaster.ID, new EmployeeAvailabilitySignal(new EmployeeAvailability(agent.getId(), agent.getAvailableDays())));
 end
 
 rule "Reset Ava lunch cycle stage"

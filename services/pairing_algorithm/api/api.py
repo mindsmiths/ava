@@ -12,8 +12,8 @@ class Days(str, Enum):
     FRI = "FRI"
 
 
-class AvaAvailability(ExtendableModel):
-    agentId: str
+class EmployeeAvailability(ExtendableModel):
+    employeeId: str
     availableDays: List[Days]
 
 

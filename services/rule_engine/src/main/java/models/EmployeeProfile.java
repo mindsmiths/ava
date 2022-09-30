@@ -16,7 +16,7 @@ public class EmployeeProfile extends Employee {
     Map<String, String> personalAnswers = new HashMap<>();
     Map<String, Double> familiarity = new HashMap<>();
     OnboardingStage onboardingStage;
- 
+    
     public EmployeeProfile(Employee employee) {
         setId(employee.getId());
         setFirstName(employee.getFirstName());

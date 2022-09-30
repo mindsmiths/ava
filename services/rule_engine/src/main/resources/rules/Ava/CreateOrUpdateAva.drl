@@ -15,7 +15,7 @@ import agents.Ava;
 
 import models.EmployeeProfile;
 import models.OnboardingStage;
-
+import models.AvailablePersonalQuestions;
 
 rule "Create new employee"
     when
@@ -28,7 +28,9 @@ rule "Create new employee"
             addConnection("armory", Utils.randomGenerator())
         };
         EmployeeProfile profile = new EmployeeProfile(newEmployee);
+        AvailablePersonalQuestions questions = new AvailablePersonalQuestions(agent.getId());
         insert(profile);
+        insert(questions);
         agent.send(CultureMaster.ID, new EmployeeUpdateSignal(profile));
 end
 
@@ -58,6 +60,7 @@ rule "Save or update all employees"
         allEmployees.remove(agent.getId());
         modify (agent) {
             setOtherEmployees(allEmployees),
+            addConnectionStrengths(),
             setSilosCount(signal.getSilosCount()),
             setSilosRisk(signal.getSilosRisk())
         };

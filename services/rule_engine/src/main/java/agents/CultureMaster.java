@@ -1,10 +1,17 @@
 package agents;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import com.mindsmiths.pairingalgorithm.EmployeeAvailability;
+import com.mindsmiths.pairingalgorithm.Match;
+import com.mindsmiths.pairingalgorithm.PairingAlgorithmAPI;
 import com.mindsmiths.ruleEngine.model.Agent;
 import com.mindsmiths.sdk.core.db.DataUtils;
 import com.mindsmiths.sdk.core.db.EmitType;
-
-import java.util.*;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,7 +20,6 @@ import models.CmLunchCycleStage;
 import com.mindsmiths.pairingalgorithm.PairingAlgorithmAPI;
 import com.mindsmiths.mitems.Option;
 import com.mindsmiths.mitems.Mitems;
-import com.mindsmiths.pairingalgorithm.AvaAvailability;
 import com.mindsmiths.pairingalgorithm.Days;
 import com.mindsmiths.pairingalgorithm.Match;
 import com.mindsmiths.ruleEngine.util.Log;
@@ -23,14 +29,19 @@ import signals.AllEmployees;
 import signals.SendMatchesSignal;
 
 import models.EmployeeProfile;
+import signals.AllEmployees;
+import signals.EmployeeUpdateSignal;
+import signals.SendMatchesSignal;
+import signals.SendNoMatchesSignal;
 
 @Data
 @AllArgsConstructor
 public class CultureMaster extends Agent {
-    private List<AvaAvailability> avaAvailabilities = new ArrayList<>();
+    private List<EmployeeAvailability> employeeAvailabilities = new ArrayList<>();
     private List<Match> allMatches = new ArrayList<>();
     private CmLunchCycleStage lunchCycleStage = CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES;
     private Map<String, EmployeeProfile> employees = new HashMap<>();
+    private Map<String, Map<String, Double>> employeeConnectionStrengths = new HashMap<>();
 
     public static String ID = "CULTURE_MASTER";
 
@@ -38,42 +49,57 @@ public class CultureMaster extends Agent {
         id = ID;
     }
 
-    public void addAvaAvailability(AvaAvailability avaAvailability) {
-        avaAvailabilities.add(avaAvailability);
+    public void addEmployeeAvailability(EmployeeAvailability employeeAvailability) {
+        employeeAvailabilities.add(employeeAvailability);
     }
 
-    public void clearAvaAvailabilities() {
-        this.avaAvailabilities = new ArrayList<>();
+    public void clearEmployeeAvailabilities() {
+        this.employeeAvailabilities = new ArrayList<>();
     }
 
     public void generateMatches() {
-        PairingAlgorithmAPI.generatePairs(new ArrayList<>(avaAvailabilities));
+        PairingAlgorithmAPI.generatePairs(new ArrayList<>(employeeAvailabilities),
+                new HashMap<>(employeeConnectionStrengths));
     }
 
     public void addMatches(List<Match> allMatches) {
         this.allMatches = allMatches;
     }
 
-    private String getFullName(EmployeeProfile employee) {
-        return employee.getFirstName() + " " + employee.getLastName();
-    }
-
     public void sendMatches() {
+        List<String> matchedPeople = new ArrayList<>();
         for (String employeeKey : employees.keySet()) {
             for (Match m : allMatches) {
-                if (employeeKey.equals(m.getFirst())) {
+                if (employees.get(employeeKey).getId().equals(m.getFirst())) {
+                    matchedPeople.add(m.getFirst());
+                    break;
+                }
+                if (employees.get(employeeKey).getId().equals(m.getSecond())) {
+                    matchedPeople.add(m.getSecond());
+                    break;
+                }
+            }
+        }
+        for (String employeeKey : employees.keySet()) {
+            for (Match m : allMatches) {
+                if (!matchedPeople.contains(employees.get(employeeKey).getId())) {
+                    send(employeeKey, new SendNoMatchesSignal());
+                    break;
+                }
+                if (employees.get(employeeKey).getId().equals(m.getFirst())) {
                     send(employeeKey, new SendMatchesSignal(m.getSecond(), m.getDay()));
                     break;
                 }
-                if (employeeKey.equals(m.getSecond())) {
+                if (employees.get(employeeKey).getId().equals(m.getSecond())) {
                     send(employeeKey, new SendMatchesSignal(m.getFirst(), m.getDay()));
                     break;
                 }
             }
         }
-        for (Match m : allMatches){
+        for (Match m : allMatches) {
             DataUtils.emit(new models.Match(m), EmitType.CREATE);
         }
+
     }
 
     public void addOrUpdateEmployee(EmployeeUpdateSignal signal) {
@@ -95,7 +121,7 @@ public class CultureMaster extends Agent {
         boolean[][] binaryMatrix = new boolean[employees.values().size()][employees.values().size()]; // binary matrix
 
         List<String> list = new LinkedList<>();
-        int limit = 3;
+        int limit = 1;
 
         for (int i = 0; i < employees.values().size(); i++) {
             for (int j = 0; j < employees.values().size(); j++) {
@@ -126,8 +152,7 @@ public class CultureMaster extends Agent {
 
         for (i = 0; i < employees.values().size(); i++) {
             for (j = 0; j < employees.values().size(); j++) {
-                Double sum = (matrix[i][j] + matrix[j][i]);
-                binaryMatrix[i][j] = sum >= limit;
+                binaryMatrix[i][j] = (matrix[i][j] > limit) && (matrix[j][i] > limit);
             }
         }
         return binaryMatrix;

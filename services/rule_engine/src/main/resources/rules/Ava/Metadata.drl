@@ -14,7 +14,8 @@ import models.OnboardingStage;
 rule "Set working hours"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        eval(evaluateCronExpression("* * 8-18 ? * MON,TUE,WED,THU,FRI *", ts, "Europe/Zagreb"))
+        eval(evaluateCronExpression("* * 8-17 ? * MON-FRI *", ts, "Europe/Zagreb"))
+
         agent: Ava(workingHours != true)
     then
         modify(agent) {
@@ -25,7 +26,7 @@ end
 rule "Set non working hours"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        eval(!evaluateCronExpression("* * 8-18 ? * MON,TUE,WED,THU,FRI *", ts, "Europe/Zagreb"))
+        eval(!evaluateCronExpression("* * 8-17 ? * MON-FRI *", ts, "Europe/Zagreb"))
         agent: Ava(
             workingHours != false
         )

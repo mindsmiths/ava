@@ -115,27 +115,27 @@
           {
             "description": "Action",
             "type": "TEXT",
-            "content": "Submit"
+            "content": "Next"
+          },
+          {
+            "description": "question description",
+            "type": "TEXT",
+            "content": "(choose one, none or more people, depending on your situation)"
           },
           {
             "description": "question1",
             "type": "TEXT",
-            "content": "Who do you know very well?"
+            "content": "Mark people you had a chance to work with closely in the past month"
           },
           {
             "description": "question2",
             "type": "TEXT",
-            "content": "Who do you know very well?"
+            "content": "Mark people you had the chance to hangout with over drinks or meal in the past month. "
           },
           {
             "description": "question3",
             "type": "TEXT",
-            "content": "Who do you know very well?"
-          },
-          {
-            "description": "question4",
-            "type": "TEXT",
-            "content": "Who do you know very well?"
+            "content": "Mark people you spent time with in meetings or calls during the past month."
           }
         ]
       },
@@ -150,7 +150,7 @@
           {
             "description": "Text",
             "type": "HTML",
-            "content": "<p>You did a great job and don&rsquo;t worry about the absolute accuracy of your answers because it is not important.</p>\n<p>Now let me get to know YOU a bit better.</p>"
+            "content": "<p><span style=\"font-weight: 400;\">You did a great job and don&rsquo;t worry about the absolute accuracy of your answers, your best guess is good enough for me to do my math 😁</span></p>\n<p>&nbsp;</p>\n<p><span style=\"font-weight: 400;\">Now let me get to know YOU a bit better.</span></p>"
           },
           {
             "description": "Title",
@@ -165,17 +165,37 @@
           {
             "description": "Action",
             "type": "TEXT",
-            "content": "Let's see"
+            "content": "Next"
           },
           {
             "description": "Description",
             "type": "HTML",
-            "content": "<p>I will show you a list of names, feel free to choose those you know better than others.</p>\n<p>You can choose more than one person.</p>\n<p>You can also decide not to choose anyone if you don&rsquo;t feel like you know anyone on the list that well.</p>"
+            "content": "<p><span style=\"font-weight: 400;\">The dots represent people and the lines represent information flow.</span></p>\n<p><span style=\"font-weight: 400;\">When we&rsquo;re&nbsp; not in sync with our colleagues, information silos occur.</span></p>\n<p>&nbsp;</p>"
           },
           {
             "description": "Title",
             "type": "TEXT",
-            "content": "Who do you know very well?"
+            "content": "This is how a healthy, silos-free organization looks like"
+          }
+        ]
+      },
+      {
+        "name": "Familiarity quiz second intro",
+        "elements": [
+          {
+            "description": "Action",
+            "type": "TEXT",
+            "content": "Let's do it"
+          },
+          {
+            "description": "Description",
+            "type": "HTML",
+            "content": "<p><span style=\"font-weight: 400;\">Curious to see where you stand? Me too! 😄</span></p>\n<p><span style=\"font-weight: 400;\">I will show you a list of people, select those you had the opportunity to interact with in the past month.</span></p>"
+          },
+          {
+            "description": "Title",
+            "type": "TEXT",
+            "content": "This is how silos show up in our graph, a clear disconnect in information flow."
           }
         ]
       },
@@ -195,7 +215,7 @@
           {
             "description": "Text",
             "type": "HTML",
-            "content": "<p>That&rsquo;s it!</p>\n<p>Now it&rsquo;s up to me to analyze everything.</p>\n<p>You can expect an email from me soon.</p>"
+            "content": "<p>WooHoo! You did it! 🙌</p>\n<p>&nbsp;</p>\n<p>You can expect an email from me soon.</p>\n<p>&nbsp;</p>"
           }
         ]
       },
@@ -210,12 +230,12 @@
           {
             "description": "Description",
             "type": "TEXT",
-            "content": "Feel free to answer as much or as little as you want and write the first thing that comes to your mind."
+            "content": "The answers to these questions do not require much thought, feel free to answer the first thing that comes to mind.\n\n\n\nYou can skip a question if you don’t like it.\n"
           },
           {
             "description": "Title",
             "type": "TEXT",
-            "content": "Just a few questions"
+            "content": "Rapid Fire Questions"
           }
         ]
       },
@@ -230,7 +250,82 @@
           {
             "description": "question1",
             "type": "TEXT",
-            "content": "🌏If you could live anywhere, where would it be?"
+            "content": "If you could live anywhere, where would it be?"
+          }
+        ]
+      },
+      {
+        "name": "Personal quiz question10",
+        "elements": [
+          {
+            "description": "Action",
+            "type": "TEXT",
+            "content": "Submit"
+          },
+          {
+            "description": "question10",
+            "type": "TEXT",
+            "content": "What was your last impulse buy?"
+          }
+        ]
+      },
+      {
+        "name": "Personal quiz question11",
+        "elements": [
+          {
+            "description": "Action",
+            "type": "TEXT",
+            "content": "Submit"
+          },
+          {
+            "description": "question11",
+            "type": "TEXT",
+            "content": "What are the least-likely three words someone would use to describe you?\n"
+          }
+        ]
+      },
+      {
+        "name": "Personal quiz question12",
+        "elements": [
+          {
+            "description": "Action",
+            "type": "TEXT",
+            "content": "Submit"
+          },
+          {
+            "description": "question12",
+            "type": "TEXT",
+            "content": "What’s your favorite type of food for lunch at work?\n"
+          }
+        ]
+      },
+      {
+        "name": "Personal quiz question13",
+        "elements": [
+          {
+            "description": "Action",
+            "type": "TEXT",
+            "content": "Submit"
+          },
+          {
+            "description": "Question13",
+            "type": "TEXT",
+            "content": "Coffee, tea or something else? What’s your fav drink and how do you take it?"
+          }
+        ]
+      },
+      {
+        "name": "Personal quiz question14",
+        "elements": [
+          {
+            "description": "Action",
+            "type": "TEXT",
+            "content": "Submit"
+          },
+          {
+            "description": "question14",
+            "type": "TEXT",
+            "content": "Do you wake up long before work, or right before you start working?\n"
           }
         ]
       },
@@ -245,7 +340,7 @@
           {
             "description": "question2",
             "type": "TEXT",
-            "content": "📺 Have you ever binge watched something? What was it?"
+            "content": "What object do you misplace or lose the most?"
           }
         ]
       },
@@ -260,7 +355,7 @@
           {
             "description": "question3",
             "type": "TEXT",
-            "content": "🎧Name one song that you could listen on repeat."
+            "content": "Which celebrity annoys you the most?"
           }
         ]
       },
@@ -275,7 +370,7 @@
           {
             "description": "question4",
             "type": "TEXT",
-            "content": "🥘What’s your favorite type of food for lunch?"
+            "content": "What is your hidden talent?"
           }
         ]
       },
@@ -290,7 +385,7 @@
           {
             "description": "question5",
             "type": "TEXT",
-            "content": "🌴Describe your favorite type of holiday."
+            "content": "What dish do you cook best?"
           }
         ]
       },
@@ -305,7 +400,67 @@
           {
             "description": "question6",
             "type": "TEXT",
-            "content": "📕What was your favorite subject in school?"
+            "content": "What is your favorite board game?"
+          }
+        ]
+      },
+      {
+        "name": "Personal quiz question7",
+        "elements": [
+          {
+            "description": "Action",
+            "type": "TEXT",
+            "content": "Submit"
+          },
+          {
+            "description": "question7",
+            "type": "TEXT",
+            "content": "What item is worth spending more money on?"
+          }
+        ]
+      },
+      {
+        "name": "Personal quiz question8",
+        "elements": [
+          {
+            "description": "Action",
+            "type": "TEXT",
+            "content": "Submit"
+          },
+          {
+            "description": "question8",
+            "type": "TEXT",
+            "content": "What is your go-to snack?\n"
+          }
+        ]
+      },
+      {
+        "name": "Personal quiz question9",
+        "elements": [
+          {
+            "description": "Action",
+            "type": "TEXT",
+            "content": "Submit"
+          },
+          {
+            "description": "question9",
+            "type": "TEXT",
+            "content": "What is not a big deal to most people but is torture to you?"
+          }
+        ]
+      },
+      {
+        "name": "Silos image path",
+        "elements": [
+          {
+            "description": "Connected",
+            "type": "TEXT",
+            "content": "/public/silos.png"
+          },
+          {
+            "description": "Devided",
+            "type": "TEXT",
+            "content": "/public/silos2.png"
           }
         ]
       },
@@ -320,7 +475,7 @@
           {
             "description": "Description",
             "type": "HTML",
-            "content": "<p><span style=\"font-weight: 400;\">Dear {{ firstName }},</span></p>\n<p><span style=\"font-weight: 400;\">When team members are working in silos, they cannot collaborate effectively, which can lead to missed deadlines, subpar work, poor communication and general feelings of frustration.</span></p>\n<p><span style=\"font-weight: 400;\">To avoid this, we will encourage communication and collaboration, promote knowledge sharing and encourage networking.&nbsp;</span></p>\n<p><span style=\"font-weight: 400;\">How? Easy, I will do all the work and guide you all the way.</span></p>"
+            "content": "<p><span style=\"font-weight: 400;\">Dear {{ firstName }},</span></p>\n<p><span style=\"font-weight: 400;\">When team members are working in silos, they cannot collaborate effectively, which can lead to missed deadlines, subpar work, poor communication and general feelings of frustration.</span></p>\n<p>&nbsp;</p>\n<p><span style=\"font-weight: 400;\">I think we can all agree that&rsquo;s something we don&rsquo;t want to see around here 😁</span></p>\n<p>&nbsp;</p>\n<p><span style=\"font-weight: 400;\">That&rsquo;s why we will encourage collaboration and networking across the organization.&nbsp;</span></p>\n<p><span style=\"font-weight: 400;\">&nbsp;</span></p>\n<p><span style=\"font-weight: 400;\">You can start by clicking the button below.</span></p>"
           },
           {
             "description": "Subject",
@@ -401,7 +556,17 @@
           {
             "description": "Description",
             "type": "HTML",
-            "content": "<p>Dear {{ firstName }},</p>\n<p><span style=\"font-weight: 400;\">Thank you for taking the time to help me analyze our individual relations and learn more about you.</span></p>\n<p><span style=\"font-weight: 400;\">Based on your feedback I was able to identify our current level of exposure to risk of knowledge silos.</span></p>\n<p><span style=\"font-weight: 400;\">Take a look at where we stand right now, we will work together to break the silos and observe our impact on the trend in the future.</span></p>"
+            "content": "<p>Dear {{ firstName }},</p>\n<p><span style=\"font-weight: 400;\">I&rsquo;ve been a very busy girl, analyzing the connections within your organization!</span></p>\n<p><span style=\"font-weight: 400;\">Attached you will find a graph that&nbsp;</span></p>\n<p><span style=\"font-weight: 400;\">I&rsquo;ve collected and analyzed your feedback and the answers from the team. Based on that, you are doing a great job at staying connected with your teammates.</span></p>"
+          },
+          {
+            "description": "Description2",
+            "type": "HTML",
+            "content": "<p><span style=\"font-weight: 400;\">However, there are people who are not that well connected because they either joined the team recently or didn&rsquo;t get the chance to meet that many people so far.</span></p>"
+          },
+          {
+            "description": "Image",
+            "type": "TEXT",
+            "content": "/public/graph.png"
           },
           {
             "description": "Subject",
@@ -497,7 +662,7 @@
           {
             "description": "Subject",
             "type": "TEXT",
-            "content": "Ava reminder"
+            "content": "Pick a day"
           }
         ]
       },
@@ -667,6 +832,21 @@
         ]
       },
       {
+        "name": "No match email",
+        "elements": [
+          {
+            "description": "Description",
+            "type": "TEXT",
+            "content": "Couldn’t match you this week!\n\nUnfortunately I couldn’t match your availability this week with any of your colleagues. \nPlease try to make yourself available around noon every day next time if possible, that will increase your chances of meeting one of your colleagues for lunch.\nYou can do that right now if you want.\n\nBest,\n\nAva"
+          },
+          {
+            "description": "Subject",
+            "type": "TEXT",
+            "content": "Lunch info"
+          }
+        ]
+      },
+      {
         "name": "Second reminder email",
         "elements": [
           {
@@ -677,7 +857,7 @@
           {
             "description": "Subject",
             "type": "TEXT",
-            "content": "Ava reminder"
+            "content": "Pick a day"
           }
         ]
       },
@@ -742,7 +922,7 @@
           {
             "description": "Subject",
             "type": "TEXT",
-            "content": "It's lunch time!"
+            "content": "Pick a day"
           }
         ]
       },
