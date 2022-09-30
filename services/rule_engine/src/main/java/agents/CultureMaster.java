@@ -1,27 +1,30 @@
 package agents;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import com.mindsmiths.pairingalgorithm.EmployeeAvailability;
+import com.mindsmiths.pairingalgorithm.Match;
+import com.mindsmiths.pairingalgorithm.PairingAlgorithmAPI;
 import com.mindsmiths.ruleEngine.model.Agent;
-import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.sdk.core.db.DataUtils;
 import com.mindsmiths.sdk.core.db.EmitType;
-
-import java.util.*;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import models.CmLunchCycleStage;
 
-import com.mindsmiths.pairingalgorithm.PairingAlgorithmAPI;
-import com.mindsmiths.pairingalgorithm.EmployeeAvailability;
-import com.mindsmiths.pairingalgorithm.Match;
 import com.mindsmiths.pairingalgorithm.LunchCompatibilities;
-import com.mindsmiths.pairingalgorithm.LunchCompatibilityEdge;
 
 import signals.EmployeeUpdateSignal;
 import signals.AllEmployees;
 import signals.SendMatchesSignal;
 
 import models.EmployeeProfile;
+import signals.SendNoMatchesSignal;
 
 @Data
 @AllArgsConstructor
@@ -49,10 +52,6 @@ public class CultureMaster extends Agent {
     }
 
     public void generateMatches() {
-        Log.info("PAIRING PARAMETARS");
-        Log.info(employeeAvailabilities);
-        Log.info(employeeConnectionStrengths);
-        Log.info(employeeMatchHistories);
         PairingAlgorithmAPI.generatePairs(new ArrayList<>(employeeAvailabilities),
                                           new HashMap<>(employeeConnectionStrengths),
                                           new HashMap<>(employeeMatchHistories));
@@ -63,21 +62,39 @@ public class CultureMaster extends Agent {
     }
 
     public void sendMatches() {
-        for (String avaId : employees.keySet()) {
+        List<String> matchedPeople = new ArrayList<>();
+        for (String employeeKey : employees.keySet()) {
             for (Match m : allMatches) {
-                if (employees.get(avaId).getId().equals(m.getFirst())) {
-                    send(avaId, new SendMatchesSignal(m.getSecond(), m.getDay()));
+                if (employees.get(employeeKey).getId().equals(m.getFirst())) {
+                    matchedPeople.add(m.getFirst());
                     break;
                 }
-                if (employees.get(avaId).getId().equals(m.getSecond())) {
-                    send(avaId, new SendMatchesSignal(m.getFirst(), m.getDay()));
+                if (employees.get(employeeKey).getId().equals(m.getSecond())) {
+                    matchedPeople.add(m.getSecond());
                     break;
                 }
             }
         }
-        for (Match m : allMatches){
+        for (String employeeKey : employees.keySet()) {
+            for (Match m : allMatches) {
+                if (!matchedPeople.contains(employees.get(employeeKey).getId())) {
+                    send(employeeKey, new SendNoMatchesSignal());
+                    break;
+                }
+                if (employees.get(employeeKey).getId().equals(m.getFirst())) {
+                    send(employeeKey, new SendMatchesSignal(m.getSecond(), m.getDay()));
+                    break;
+                }
+                if (employees.get(employeeKey).getId().equals(m.getSecond())) {
+                    send(employeeKey, new SendMatchesSignal(m.getFirst(), m.getDay()));
+                    break;
+                }
+            }
+        }
+        for (Match m : allMatches) {
             DataUtils.emit(new models.Match(m), EmitType.CREATE);
         }
+
     }
 
     public void addOrUpdateEmployee(EmployeeUpdateSignal signal) {
@@ -99,7 +116,7 @@ public class CultureMaster extends Agent {
         boolean[][] binaryMatrix = new boolean[employees.values().size()][employees.values().size()]; // binary matrix
 
         List<String> list = new LinkedList<>();
-        int limit = 2;
+        int limit = 1;
 
         for (int i = 0; i < employees.values().size(); i++) {
             for (int j = 0; j < employees.values().size(); j++) {
@@ -130,8 +147,7 @@ public class CultureMaster extends Agent {
 
         for (i = 0; i < employees.values().size(); i++) {
             for (j = 0; j < employees.values().size(); j++) {
-                Double sum = (matrix[i][j] + matrix[j][i]);
-                binaryMatrix[i][j] = sum >= limit;
+                binaryMatrix[i][j] = (matrix[i][j] > limit) && (matrix[j][i] > limit);
             }
         }
         return binaryMatrix;
