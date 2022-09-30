@@ -4,14 +4,23 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
+import java.util.Set;
 
 import com.mindsmiths.armory.ArmoryAPI;
 import com.mindsmiths.armory.components.ActionGroupComponent;
+import com.mindsmiths.armory.components.BaseSubmitButtonComponent;
 import com.mindsmiths.armory.components.CloudSelectComponent;
 import com.mindsmiths.armory.components.DescriptionComponent;
 import com.mindsmiths.armory.components.HeaderComponent;
@@ -37,6 +46,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import models.AvaLunchCycleStage;
 import models.EmployeeProfile;
+import models.MonthlyCoreStage;
 import models.LunchReminderStage;
 import models.MonthlyCoreStage;
 import models.Neuron;
@@ -49,6 +59,14 @@ import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.Method;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.Version;
+
+import models.AvaLunchCycleStage; 
+import lombok.Data;
+
+import models.EmployeeProfile;
+import models.LunchReminderStage;
+import models.OnboardingStage;
+import models.MonthlyCoreStage;
 import signals.SendMatchesSignal;
 import utils.Settings;
 
@@ -62,17 +80,23 @@ public class Ava extends Agent {
     private List<String> matchHistory = new ArrayList<>();
     private AvaLunchCycleStage lunchCycleStage;
     private OnboardingStage onboardingStage;
-    private MonthlyCoreStage monthlyCoreStage;
-    private Map<String, EmployeeProfile> otherEmployees;
+    private Map<String, EmployeeProfile> otherEmployees; 
+    //private Map<String, String> personalAnswers = new HashMap<String, String>();
     private boolean workingHours;
     private Date statsEmailLastSentAt;
+    private Map<String, String> personalGuess = new HashMap<String, String>();
+    private int correct = 0;
+    private MonthlyCoreStage monthlyCoreStage;
     private Date availableDaysEmailLastSentAt;
     private Date matchedWithEmailSentAt;
+    private List<String> allQuestions = new ArrayList<>();
     private int silosCount;
     private String silosRisk;
     private LunchReminderStage lunchReminderStage;
     private List<String> lunchDeclineReasons = new ArrayList<>(); // track days
     private boolean manualTrigger;
+    public final Integer LUNCH_QUIZ_QUESTIONS_COUNT = 3;
+    public final Integer LUNCH_QUIZ_OPTIONS_COUNT = 3;
     // a map of how strong MY connections are to other employees
     private Map<String, Neuron> connectionStrengths = new HashMap<>();
 
@@ -168,13 +192,6 @@ public class Ava extends Agent {
         ArmoryAPI.showScreens(getConnection("armory"), firstScreenId, screens);
     }
 
-    public void showLunchInviteExpiredScreen() {
-        BaseTemplate lunchInviteExpiredScreen = new TemplateGenerator()
-                .addComponent("title", new TitleComponent(
-                        Mitems.getText("weekly-core.message-about-not-working-hours-for-links.title")));
-        showScreen(lunchInviteExpiredScreen);
-    }
-
     public void chooseAvailableDaysScreen() {
         Option[] days = Mitems.getOptions("weekly-core.days.each-day");
         List<CloudSelectComponent.Option> options = new ArrayList<>();
@@ -216,6 +233,8 @@ public class Ava extends Agent {
                                         Mitems.getText(
                                                 "weekly-core.stay-tuned-second-confirmation-of-available-days.title"))));
         showScreens("confirmDaysScreen", screens);
+        Log.info(match);
+        Log.info(this.match);
     }
 
     private Map<String, String> getOtherEmployeeNames() {
@@ -228,6 +247,9 @@ public class Ava extends Agent {
     }
 
     public void showFamiliarityQuizScreens() {
+        Log.info(match);
+        Log.info(this.match);
+        //Log.info(this.personalAnswers);
         Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
         String avaImagePath = Mitems.getText("onboarding.ava-image-path.path");
         Map<String, String> otherEmployeeNames = getOtherEmployeeNames();
@@ -364,6 +386,131 @@ public class Ava extends Agent {
                 .addComponent("title", new TitleComponent(goodbyeScreen));
         showScreen(screen);
     }
+    
+    public void guessingQuizScreen() {
+        Set<String> guessingQuestions = new LinkedHashSet<>();
+        Log.warn(this.otherEmployees);
+        List<EmployeeProfile> others = new ArrayList<>(this.otherEmployees.values());
+        Log.warn(this.otherEmployees);
+        Random random = new Random();
+        List<String> allQuestions = new ArrayList<String>(this.otherEmployees.get(employeeToAvaId(this.match)).getPersonalAnswers().keySet());
+
+        Collections.shuffle(allQuestions);
+        for (int i = 0; i < Math.min(LUNCH_QUIZ_QUESTIONS_COUNT, allQuestions.size()); i++)
+            guessingQuestions.add(allQuestions.get(i));
+        
+        String title = Mitems.getText("weekly-core.guessing-quiz-intro-screen-title.title");
+        title = Templating.recursiveRender(title, Map.of(
+                "firstName", this.otherEmployees.get(employeeToAvaId(this.match)).getFirstName()
+        ));
+
+        Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
+        screens.put("introGuessingScreen", new TemplateGenerator("introScreen")
+            .addComponent("title", new TitleComponent(title))
+            .addComponent("button", new PrimarySubmitButtonComponent(Mitems.getText("weekly-core.guessing-quiz-intro-screen-title.button"), "guessingQuestion1"))
+        );
+
+        int index = 0;
+        for (String questionId : guessingQuestions) { 
+            index++;
+            List<PrimarySubmitButtonComponent> options = new ArrayList<>();
+            Set<String> texts = new LinkedHashSet<>();
+            texts.add(this.otherEmployees.get(employeeToAvaId(this.match)).getPersonalAnswers().get(questionId));
+            options.add(new PrimarySubmitButtonComponent(
+                "guess--" + questionId,
+                this.otherEmployees.get(employeeToAvaId(this.match)).getPersonalAnswers().get(questionId),
+                String.format("correctScreen%d", index)
+            ));
+            while (options.size() < Math.min(LUNCH_QUIZ_OPTIONS_COUNT, others.size())) {
+                String buttonText = others.get(random.nextInt(this.otherEmployees.size())).getPersonalAnswers().get(questionId);
+                if (!texts.contains(buttonText)) {
+                    texts.add(buttonText);
+                    options.add(new PrimarySubmitButtonComponent(
+                            "guess--" + questionId,
+                            buttonText,
+                            String.format("wrongScreen%d", index)
+                    ));
+                }
+            }
+            List<BaseSubmitButtonComponent> answers = new ArrayList<BaseSubmitButtonComponent>(options);
+            Collections.shuffle(answers);
+
+            String question = Mitems.getText("weekly-core.guessing-quiz-" + questionId + ".question");
+            question = Templating.recursiveRender(question, Map.of(
+                "firstName", this.otherEmployees.get(employeeToAvaId(this.match)).getFirstName()
+            ));
+
+            screens.put(
+                String.format("guessingQuestion%d", index),
+                new TemplateGenerator(String.format("GuessingQuestion%d", index))
+                    .addComponent("title", new TitleComponent(question))
+                    .addComponent(String.format("actionGroup%d", index), new ActionGroupComponent(answers))
+            );
+
+            screens.put(
+                String.format("correctScreen%d", index),
+                new TemplateGenerator("correctScreen")
+                    .addComponent("title", new TitleComponent(Mitems.getText("weekly-core.correct-screen.title")))
+                    .addComponent("image", new ImageComponent(Mitems.getText("weekly-core.correct-screen.image")))
+                    .addComponent("submit", new PrimarySubmitButtonComponent(Mitems.getText("weekly-core.correct-screen.button"), String.format("guessingQuestion%d", index + 1)))
+            );
+
+            screens.put(
+                String.format("wrongScreen%d", index),
+                new TemplateGenerator("wrongScreen")
+                    .addComponent("title", new TitleComponent(Mitems.getText("weekly-core.wrong-screen.title")))
+                    .addComponent("image", new ImageComponent(Mitems.getText("weekly-core.wrong-screen.image")))
+                    .addComponent("submit", new PrimarySubmitButtonComponent(Mitems.getText("weekly-core.wrong-screen.button"), String.format("guessingQuestion%d", index + 1)))
+            );
+        }
+
+        screens.put(
+            String.format("guessingQuestion%d", index + 1),
+            new TemplateGenerator("confirmScreen")
+                .addComponent("title", new TitleComponent(Mitems.getText("weekly-core.confirming-quiz-guesses.title")))
+                .addComponent("submit", new PrimarySubmitButtonComponent("finish-guessing-quiz", Mitems.getText("weekly-core.confirming-quiz-guesses.button"), "finish-guessing-quiz"))
+        );
+
+        showScreens("introGuessingScreen", screens);
+    }
+
+    public void showResultsScreen() {
+        String title = Mitems.getText("weekly-core.guessing-quiz-results.results");
+        String answers = new String();
+
+        Integer index = 1;
+        for (String questionId : personalGuess.keySet()) {
+            String answer = this.otherEmployees.get(employeeToAvaId(this.match)).getPersonalAnswers().get(questionId);
+            answers += index.toString() + ". " + answer + "<br/>";
+            index++;
+        }
+
+        title = Templating.recursiveRender(title, Map.of(
+            "firstName", this.otherEmployees.get(employeeToAvaId(this.match)).getFirstName(),
+            "correct", this.correct,
+            "questionsCount", LUNCH_QUIZ_QUESTIONS_COUNT,
+            "answers", answers
+        ));
+
+        Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
+        screens.put(
+            "finish-guessing-quiz",
+            new TemplateGenerator("resultsScreen")
+                .addComponent("title", new TitleComponent(title))
+        );
+
+        showScreens("finish-guessing-quiz", screens);
+    }
+
+    public void correctness() {
+        this.correct = 0;
+        for (Map.Entry<String, String> entry : personalGuess.entrySet()) {
+            if (entry.getValue().equals(((this.otherEmployees.get(employeeToAvaId(this.match))).getPersonalAnswers()).get(entry.getKey()))) {
+                this.correct++;
+            }
+        }
+
+    }   
 
     public void sendWelcomeEmail(EmployeeProfile employee) throws IOException {
         String subject = Mitems.getText("onboarding.welcome-email.subject");
@@ -533,6 +680,12 @@ public class Ava extends Agent {
         EmailAdapterAPI.newEmail(e);
     }
 
+    public void showLunchInviteExpiredScreen() {
+        BaseTemplate lunchInviteExpiredScreen = new TemplateGenerator()
+            .addComponent("title", new TitleComponent(Mitems.getText("weekly-core.message-about-not-working-hours-for-links.title")));
+        showScreen(lunchInviteExpiredScreen);
+    }
+    
     public void showLunchDeclineReasonScreens() {
         Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
         String lunchDeclineScreen = Mitems.getText("weekly-core.lunch-decline-reason.title");

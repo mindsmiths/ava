@@ -1,5 +1,5 @@
 package models;
-
+ 
 public enum AvaLunchCycleStage {
     LUNCH_MAIL_SENDING,
     FIND_AVAILABILITY,

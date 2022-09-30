@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-@NoArgsConstructor
+@NoArgsConstructor 
 @AllArgsConstructor
 @Data
 public class EmployeeProfile extends Employee {

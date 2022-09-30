@@ -173,7 +173,7 @@ rule "Finish onboarding"
         modify(employee) {
             setOnboardingStage(OnboardingStage.STATS_EMAIL) 
         };
-        
+
         modify(agent) {
             setOnboardingStage(OnboardingStage.STATS_EMAIL),
             setLunchCycleStage(AvaLunchCycleStage.LUNCH_MAIL_SENDING),
