@@ -11,6 +11,8 @@ from forge.core.base import BaseService
 from .api import Matches
 from .api import EmployeeAvailability
 from .api import Match
+from .api import LunchCompatibilities
+from .api import LunchCompatibilityEdge
 
 from .blossom_algorithm import max_weight_matching
 
@@ -21,74 +23,117 @@ class PairingAlgorithm(BaseService):
 
     @api
     def generate_pairs(
-            self, employeeAvailabilities: List[EmployeeAvailability],
-            employeeConnectionStrengths: Dict[str, Dict[str, float]]) -> Matches:
+            self,
+            employeeAvailabilities: List[EmployeeAvailability],
+            employeeConnectionStrengths: Dict[str, Dict[str, float]],
+            employeeMatchHistories: Dict[str, List[str]]) -> Matches:
         all_matches: List[Match] = []
         edges = list()
+        lunch_compatibilities = []
         already_matched = set()
+        not_matched = set()
         availability_intersections = {}
 
+        employee_availabilities = {}
+        for availability in employeeAvailabilities:
+            employee_availabilities[
+                availability.employeeId] = availability.availableDays
+
+        # blossom requires vertices to be labaled starting from 0
         employee_id_mapping = {}
         for index, employee_id in enumerate(employeeConnectionStrengths):
-            employee_id_mapping[index] = int(employee_id)
+            employee_id_mapping[index] = employee_id
 
-        # create all possible pairs
-        # combinations function treats ab and ba as one pair
+        # FIND COMPATIBILITY BETWEEN ALL EMPLOYEES
         pairs = combinations(employee_id_mapping.keys(), 2)
-
-        # find compatibility for all pairs
         for pair in pairs:
-            pair = list(pair)
-            pair.sort()
+            compatibility = 1000
+            employee_pair = list(
+                (employee_id_mapping[pair[0]], employee_id_mapping[pair[1]]))
+            employee_pair.sort()
             # check if a and b have days when both are available
-            first_availability = []
-            second_availability = []
-            for availability in employeeAvailabilities:
-                if int(availability.employeeId) == employee_id_mapping[pair[0]]:
-                    first_availability = availability.availableDays
-                    break
-            for availability in employeeAvailabilities:
-                if int(availability.employeeId) == employee_id_mapping[pair[1]]:
-                    second_availability = availability.availableDays
-                    break
+            first_availability = employee_availabilities[
+                employee_id_mapping[pair[0]]]
+            second_availability = employee_availabilities[
+                employee_id_mapping[pair[1]]]
             intersection = set(first_availability) &\
                 set(second_availability)
+            availability_intersections[tuple(employee_pair)] = intersection
             if not intersection:
                 continue
-            availability_intersections[tuple(pair)] = intersection
-
-            # compatibility is the average of how a scored b
-            # and how b scored a translated by a 100
-            first_score_second = employeeConnectionStrengths[str(
-                employee_id_mapping[pair[0]])][str(employee_id_mapping[pair[1]])]
-            second_score_first = employeeConnectionStrengths[str(
-                employee_id_mapping[pair[1]])][str(employee_id_mapping[pair[0]])]
-            weight = 200 - ((first_score_second + second_score_first) / 2)
-            # weight can't be 0, because of how blossom works
-            if weight == 0:
-                weight = 1
+            # calculate lunch recency
+            match_history_first = employeeMatchHistories[employee_id_mapping[pair[0]]]
+            lunch_recency_first = 1
+            for index, past_match in reversed(list(enumerate(match_history_first))):
+                if past_match == employee_id_mapping[pair[1]]:
+                    lunch_recency_first = index / \
+                        (len(match_history_first)*len(employeeAvailabilities))
+                    break
+            match_history_second = employeeMatchHistories[employee_id_mapping[pair[1]]]
+            lunch_recency_second = 1
+            for index, past_match in reversed(list(enumerate(match_history_second))):
+                if past_match == employee_id_mapping[pair[1]]:
+                    lunch_recency_second = index / \
+                        (len(match_history_second)*len(employeeAvailabilities))
+                    break
+            lunch_recency = (lunch_recency_first + lunch_recency_second) / 2
+            # calculate connection strength
+            first_score_second = employeeConnectionStrengths[
+                employee_id_mapping[pair[0]]][employee_id_mapping[pair[1]]]
+            second_score_first = employeeConnectionStrengths[
+                employee_id_mapping[pair[1]]][employee_id_mapping[pair[0]]]
+            connection_strength = (
+                first_score_second + second_score_first) / 200
+            # calculate compatibility
+            compatibility = compatibility * (1 - connection_strength)
+            compatibility = compatibility * lunch_recency
+            if compatibility == 0:
+                compatibility = 1
             # create tuple readable to blossom algorithm
-            edges.append((pair[0], pair[1], weight))
+            edges.append((pair[0], pair[1], compatibility))
+            lunch_compatibilities.append(LunchCompatibilityEdge(
+                first=employee_id_mapping[pair[0]],
+                second=employee_id_mapping[pair[1]],
+                edgeWeight=compatibility))
+        LunchCompatibilities(edges=lunch_compatibilities).emit()
 
+        # RUN BLOSSOM
         matching = max_weight_matching(edges, False)
-        for index, element in enumerate(matching):
-            # people without match will be matched with null, on day null
-            if element == -1:
+        for employee, match in enumerate(matching):
+            if match == -1:   # match was not found
+                not_matched.add(employee_id_mapping[employee])
                 continue
-            # convert indexes to employee ids
-            # convert indexes to employee ids
-            first = employee_id_mapping[index]
-            second = employee_id_mapping[element]
-            if first in already_matched or second in already_matched:
+            first = employee_id_mapping[employee]
+            second = employee_id_mapping[match]
+            if first in already_matched and second in already_matched:
                 continue
+            employee_pair = [first, second]
+            employee_pair.sort()
             already_matched.add(first)
             already_matched.add(second)
-            day = availability_intersections[tuple((index, element))].pop()
-            match = Match(first=str(first), second=str(second), day=day)
+            day = availability_intersections[tuple(employee_pair)].pop()
+            match = Match(first=first, second=second, day=day)
             all_matches.append(match)
 
-        # todo: handle people that didn't match
-
-        # handling people that are not matchable
+        # DOUBLE LUNCHES
+        already_matched_twice = set()
+        not_matched_ = list(not_matched)
+        already_matched_ = list(already_matched)
+        for first in not_matched_:
+            for second in already_matched_:
+                if second in already_matched_twice:
+                    continue
+                employee_pair = [first, second]
+                employee_pair.sort()
+                if availability_intersections[tuple(employee_pair)]:
+                    day = availability_intersections[tuple(
+                        employee_pair)].pop()
+                    match = Match(first=first, second=second, day=day)
+                    all_matches.append(match)
+                    already_matched.add(first)
+                    already_matched.add(second)
+                    not_matched.remove(first)
+                    already_matched_twice.add(second)
+                    break
 
         return Matches(allMatches=all_matches)
