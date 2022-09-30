@@ -633,14 +633,14 @@ public class Ava extends Agent {
         String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
                 "description", description,
                 "description2", description2,
-                "imagePath",
-                String.format("%s%s", Settings.ARMORY_SITE_URL, Mitems.getText("statistics.statistics-email.image")),
+                "imagePath", Mitems.getText("statistics.statistics-email.image"),
                 "firstName", employee.getFirstName()));
+
+            // "imagePath",
+            // String.format("%s%s", Settings.ARMORY_SITE_URL, Mitems.getText("statistics.statistics-email.image")),
 
         SendEmailPayload e = new SendEmailPayload();
         e.setRecipients(List.of(getConnection("email")));
-        Log.error(Settings.ARMORY_SITE_URL);
-        Log.error(this.getConnection("armory"));
         e.setSubject(subject);
         e.setHtmlText(htmlBody);
         EmailAdapterAPI.newEmail(e);
@@ -686,6 +686,28 @@ public class Ava extends Agent {
         showScreen(lunchInviteExpiredScreen);
     }
     
+    public void sendIceBreakEmail(EmployeeProfile employee) throws IOException {
+        String subject = Mitems.getText("weekly-core.ice-breaker-email.subject");
+        String description = Mitems.getText("weekly-core.ice-breaker-email.description");
+
+        String htmlTemplate = new String(Objects.requireNonNull(
+                getClass().getClassLoader().getResourceAsStream("emailTemplates/IceBreakTemplate.html"))
+                .readAllBytes());
+
+        String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
+                "text", description,
+                "firstName", employee.getFirstName(),
+                "button", Mitems.getText("weekly-core.ice-breaker-email.button"),
+                "armoryUrl",
+                String.format("%s/%s?trigger=ice-breaker", Settings.ARMORY_SITE_URL, getConnection("armory"))));
+
+        SendEmailPayload e = new SendEmailPayload();
+        e.setRecipients(List.of(getConnection("email")));
+        e.setSubject(subject);
+        e.setHtmlText(htmlBody);
+        EmailAdapterAPI.newEmail(e);
+    }
+
     public void showLunchDeclineReasonScreens() {
         Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
         String lunchDeclineScreen = Mitems.getText("weekly-core.lunch-decline-reason.title");

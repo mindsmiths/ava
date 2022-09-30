@@ -566,7 +566,7 @@
           {
             "description": "Image",
             "type": "TEXT",
-            "content": "/public/graph.png"
+            "content": "https://lh3.googleusercontent.com/drive-viewer/AJc5JmRx_itlP7KTMEkhTEEKUsMA3wEz9ceHED49bQiYs27Uty3Jo9PmNma4RL4H7Nec02p_O1KwO_4=w1920-h966"
           },
           {
             "description": "Subject",
@@ -778,6 +778,26 @@
             "description": "Results",
             "type": "HTML",
             "content": "<p style=\"text-align: center;\">Your results of the quiz:</p>\n<p style=\"text-align: center;\"><span style=\"font-size: 36pt;\"><strong>{{ correct }}/{{ questionsCount }}</strong></span></p>\n<p style=\"text-align: center;\"><span style=\"font-size: 18pt;\">{{ firstName }}'s answers:</span></p>\n<p style=\"text-align: center;\"><span style=\"font-size: 18pt;\">{{ answers }}</span></p>\n<p style=\"text-align: center;\">Find out more about your colleague during lunch today.</p>\n<p style=\"text-align: center;\">Have a great day!!</p>"
+          }
+        ]
+      },
+      {
+        "name": "Ice breaker email",
+        "elements": [
+          {
+            "description": "Button",
+            "type": "TEXT",
+            "content": "Solve the ice breaker quiz."
+          },
+          {
+            "description": "Description",
+            "type": "HTML",
+            "content": "Dear {{ firstName }},\n\nIt's time to start getting to know your colleagues better."
+          },
+          {
+            "description": "Subject",
+            "type": "TEXT",
+            "content": "Ice breaker"
           }
         ]
       },
