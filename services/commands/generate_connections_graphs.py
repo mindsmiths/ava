@@ -9,7 +9,7 @@ import forge
 
 @cli.command()
 def generate_connections_graphs():
-    graphs_path = "./services/commands/connections_graphs/"
+    graphs_path = "./services/armory/public/"
     if not os.path.exists(graphs_path):
         os.makedirs(graphs_path)
 
@@ -48,5 +48,5 @@ def generate_connections_graphs():
 
     plt.axis('equal')
     plt.show()
-    plt.savefig(f"{graphs_path}test666.png", format="PNG")
+    plt.savefig(f"{graphs_path}connection_graph.png", format="PNG")
     plt.close()
