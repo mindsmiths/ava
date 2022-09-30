@@ -29,9 +29,9 @@ def generate_connections_graphs():
     keeper = MongoClientKeeper()
     culture_master = keeper.ruleEngineDB.summary.find_one({"agentId": "CULTURE_MASTER"})
     # ava_connection_strengths = culture_master["agents#CultureMaster"]["CULTURE_MASTER"]["employeeConnectionStrengths"] # TODO:
-    matches = [LunchCompatibilityEdge(first='1', second='2', edgeWeight='300.0'), LunchCompatibilityEdge(first='1', second='3', edgeWeight='800.0')]
+    matches = [LunchCompatibilityEdge(first='1', second='2', edgeWeight='300.0'), LunchCompatibilityEdge(first='1', second='3', edgeWeight='800.0'), LunchCompatibilityEdge(first='1', second='4', edgeWeight='400.0'), LunchCompatibilityEdge(first='1', second='5', edgeWeight='500.0'), LunchCompatibilityEdge(first='1', second='6', edgeWeight='600.0'), LunchCompatibilityEdge(first='1', second='7', edgeWeight='700.0'), LunchCompatibilityEdge(first='1', second='8', edgeWeight='850.0'), LunchCompatibilityEdge(first='1', second='9', edgeWeight='900.0'), LunchCompatibilityEdge(first='1', second='10', edgeWeight='1000.0'), LunchCompatibilityEdge(first='1', second='11', edgeWeight='100.0')]
     # ava_employees = culture_master["agents#CultureMaster"]["CULTURE_MASTER"]["employees"]
-    ava_employees = {'1': 'miho', '2': 'Filip', '3': 'Borna'}
+    ava_employees = {'1': 'miho', '2': 'Filip', '3': 'Borna', '4': 'emil', '5': 'tomislav', '6': 'juraj', '7': 'mislav', '8': 'mislav', '9': 'nikola', '10': 'žul', '11': 'mario'}
 
     all_ids = set()
     for emp in matches:
@@ -60,5 +60,5 @@ def generate_connections_graphs():
 
     plt.axis('equal')
     plt.show()
-    plt.savefig(f"{graphs_path}test2.png", format="PNG")
+    plt.savefig(f"{graphs_path}test666.png", format="PNG")
     plt.close()
