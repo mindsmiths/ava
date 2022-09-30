@@ -34,12 +34,9 @@ class PairingAlgorithm(BaseService):
         not_matched = set()
         availability_intersections = {}
 
-        print("successfully received employee match histories")
-        print(employeeMatchHistories)
-
-        employeeAvailabilities_ = {}
+        employee_availabilities = {}
         for availability in employeeAvailabilities:
-            employeeAvailabilities_[
+            employee_availabilities[
                 availability.employeeId] = availability.availableDays
 
         # blossom requires vertices to be labaled starting from 0
@@ -55,9 +52,9 @@ class PairingAlgorithm(BaseService):
                 (employee_id_mapping[pair[0]], employee_id_mapping[pair[1]]))
             employee_pair.sort()
             # check if a and b have days when both are available
-            first_availability = employeeAvailabilities_[
+            first_availability = employee_availabilities[
                 employee_id_mapping[pair[0]]]
-            second_availability = employeeAvailabilities_[
+            second_availability = employee_availabilities[
                 employee_id_mapping[pair[1]]]
             intersection = set(first_availability) &\
                 set(second_availability)
@@ -66,14 +63,14 @@ class PairingAlgorithm(BaseService):
                 continue
             # calculate lunch recency
             match_history_first = employeeMatchHistories[employee_id_mapping[pair[0]]]
-            lunch_recency_first = 0
+            lunch_recency_first = 1
             for index, past_match in reversed(list(enumerate(match_history_first))):
                 if past_match == employee_id_mapping[pair[1]]:
                     lunch_recency_first = index / \
                         (len(match_history_first)*len(employeeAvailabilities))
                     break
             match_history_second = employeeMatchHistories[employee_id_mapping[pair[1]]]
-            lunch_recency_second = 0
+            lunch_recency_second = 1
             for index, past_match in reversed(list(enumerate(match_history_second))):
                 if past_match == employee_id_mapping[pair[1]]:
                     lunch_recency_second = index / \
@@ -89,7 +86,7 @@ class PairingAlgorithm(BaseService):
                 first_score_second + second_score_first) / 200
             # calculate compatibility
             compatibility = compatibility * (1 - connection_strength)
-            compatibility = compatibility * (1 - lunch_recency)
+            compatibility = compatibility * lunch_recency
             if compatibility == 0:
                 compatibility = 1
             # create tuple readable to blossom algorithm

@@ -194,9 +194,11 @@ end
 
 rule "Send statistics email"
     when
+        Heartbeat(ts: timestamp) from entry-point "signals"
         agent: Ava(
+            (statsEmailLastSentAt == null || statsEmailLastSentAt before[12h] ts),
             onboardingStage == OnboardingStage.STATS_EMAIL,
-            allEmployeesFinishedOnboarding() == true
+            workingHours==true
         )
         employee: EmployeeProfile()
     then

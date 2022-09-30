@@ -5,6 +5,8 @@ import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.employeeManager.ManualTriggerEvent;
 
 import agents.Ava;
+import signals.SendMatchesSignal;
+import signals.SendNoMatchesSignal;
 
 import models.AvaLunchCycleStage;
 import models.OnboardingStage;
