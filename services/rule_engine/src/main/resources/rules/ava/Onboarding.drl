@@ -1,4 +1,4 @@
-package rules.Ava;
+package rules.ava;
 
 import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.ruleEngine.util.Agents;
@@ -23,15 +23,12 @@ import agents.CultureMaster;
 import models.EmployeeProfile;
 import models.OnboardingStage;
 import models.AvaLunchCycleStage;
-import models.AvailablePersonalQuestions;
+import models.AvailablePersonalQuestions
+import com.mindsmiths.ruleEngine.model.Heartbeat;
 
 rule "Send welcome email"
     when
-        Heartbeat(ts: timestamp) from entry-point "signals"
-        agent: Ava(
-            workingHours == true,
-            onboardingStage == null
-        )
+        agent: Ava(workingHours == true, onboardingStage == null)
         employee: EmployeeProfile()
     then
         agent.sendWelcomeEmail(employee);
@@ -40,7 +37,7 @@ rule "Send welcome email"
         };
 end
 
-rule "Start and reconnect familiarity quiz"
+rule "Start or reconnect familiarity quiz"
    when
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-onboarding") from entry-point "signals"
         agent: Ava(onboardingStage in (OnboardingStage.EMAIL_SENT, OnboardingStage.FAMILIARITY_QUIZ))
@@ -56,24 +53,13 @@ rule "Start personal quiz intro"
    when
         signal: SubmitEvent(getParamAsString("submit") == "finished-familiarity-quiz") from entry-point "signals"
         agent: Ava(onboardingStage == OnboardingStage.FAMILIARITY_QUIZ)
-        employee: EmployeeProfile()
-   then 
-        Map<String, Double> familiarity = new HashMap<String, Double>(
-            employee.getFamiliarity()
-        );
-        for (String paramId : signal.getParams().keySet()){
-            if (paramId.startsWith("answers")) {
-                for (String em : (List<String>) signal.getParam(paramId)) {
-                    familiarity.put(
-                        em, familiarity.getOrDefault(em, 0.0) + 1.0
-                    );
-                }
-            }
-        }
-
-        modify(employee) { 
-            setFamiliarity(familiarity)
-        };
+        employee: EmployeeProfile(familiarity: familiarity)
+   then
+        for (String paramId : signal.getParams().keySet())
+            if (paramId.startsWith("answers"))
+                for (String em : (List<String>) signal.getParam(paramId))
+                    employee.getFamiliarity().put(em, (Double) familiarity.getOrDefault(em, 0.0) + 1.0);
+        update(employee)
         agent.showPersonalQuizIntroScreens();
         modify(agent) {
             chargeConnectionNeurons(employee),
@@ -96,7 +82,7 @@ rule "Setup Ava for personal quiz"
         signal: SubmitEvent(getParamAsString("submit") == "startPersonalQuiz") from entry-point "signals"
         agent: Ava(onboardingStage == OnboardingStage.PERSONAL_QUIZ_INTRO)
         employee: EmployeeProfile(personalAnswers.size() < 3)
-        questions: AvailablePersonalQuestions()
+        questions: AvailablePersonalQuestions(currentQuestion: currentQuestion)
     then
         modify(agent) {setOnboardingStage(OnboardingStage.PERSONAL_QUIZ)};
         agent.showPersonalQuizScreens(questions.getCurrentQuestion(), employee.getPersonalAnswers().size());
@@ -127,29 +113,20 @@ end
 rule "Store personal quiz answers"
     when
         agent: Ava(onboardingStage == OnboardingStage.WAIT_FOR_PERSONAL_ANSWER)
-        signal: SubmitEvent(getParamAsString("submit") == "submit") from entry-point "signals"
-        employee: EmployeeProfile(personalAnswers.size() < 3)
-        questions: AvailablePersonalQuestions()
+        signal: SubmitEvent(getParamAsString("submit") == "submit", params: params) from entry-point "signals"
+        employee: EmployeeProfile(personalAnswers: personalAnswers, personalAnswers.size() < 3)
+        questions: AvailablePersonalQuestions(currentQuestion : currentQuestion)
     then
-        Map<String, String> personalAnswers = new HashMap<String, String>(
-            employee.getPersonalAnswers()
-        );
-        Boolean pop = false;
-        for (String paramId : signal.getParams().keySet()){
-            if (paramId.startsWith("answers") && signal.getParamAsString(paramId) != null) {
-                personalAnswers.put(
-                    paramId.replace("answers", "question"),
-                    signal.getParamAsString(paramId)
-                );
-                modify(questions) {popQuestion()};
-                pop = true;
-            }
+        String answer = signal.getParamAsString(currentQuestion);
+        if (answer == null || answer.strip().equals("")) questions.nextQuestion();
+        else {
+            personalAnswers.put(currentQuestion, answer);
+            questions.popQuestion();
         }
-        if (pop != true) {
-            modify(questions) {nextQuestion()};
-        }
-        modify(employee) {setPersonalAnswers(personalAnswers)};
-        modify(agent) {setOnboardingStage(OnboardingStage.PERSONAL_QUIZ)};
+        agent.setOnboardingStage(OnboardingStage.PERSONAL_QUIZ);
+        update(questions)
+        update(employee)
+        update(agent)
         delete(signal);
 end
 
@@ -170,10 +147,6 @@ rule "Finish onboarding"
         agent: Ava(onboardingStage == OnboardingStage.PERSONAL_QUIZ)
         employee: EmployeeProfile(getPersonalAnswers().size() == 3)
    then
-        modify(employee) {
-            setOnboardingStage(OnboardingStage.STATS_EMAIL) 
-        };
-
         modify(agent) {
             setOnboardingStage(OnboardingStage.STATS_EMAIL),
             setLunchCycleStage(AvaLunchCycleStage.LUNCH_MAIL_SENDING),
@@ -198,7 +171,7 @@ rule "Send statistics email"
         agent: Ava(
             (statsEmailLastSentAt == null || statsEmailLastSentAt before[12h] ts),
             onboardingStage == OnboardingStage.STATS_EMAIL,
-            workingHours==true
+            workingHours == true
         )
         employee: EmployeeProfile()
     then

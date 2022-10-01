@@ -1,4 +1,4 @@
-package rules.Ava;
+package rules.ava;
 
 import com.mindsmiths.sdk.utils.templating.*;
 import com.mindsmiths.ruleEngine.util.Agents;
@@ -11,20 +11,21 @@ import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
 import agents.Ava;
 import agents.CultureMaster;
 
-import models.EmployeeProfile;
+import models.EmployeeProfile
+import com.mindsmiths.ruleEngine.model.Heartbeat;
 
 rule "Send stats email monthly"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
         eval(evaluateCronExpression("* * * ? * 2#1 *", ts, "Europe/Zagreb"))
         agent: Ava(
-            statsEmailLastSentAt == null || statsEmailLastSentAt before[1d] ts,
-            workingHours == true
-        )
+            workingHours == true,
+            (statsEmailLastSentAt == null || statsEmailLastSentAt before[1d] ts)
+            )
         employee: EmployeeProfile()
     then
+        agent.sendStatisticsEmail(employee);
         modify(agent) {
             setStatsEmailLastSentAt(ts)
         };
-        agent.sendStatisticsEmail(employee);
 end

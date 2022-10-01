@@ -29,3 +29,4 @@ target/
 services/commands/connections_graphs/
 **/core.*
 *.vsix
+/services/RuleEngine.iml

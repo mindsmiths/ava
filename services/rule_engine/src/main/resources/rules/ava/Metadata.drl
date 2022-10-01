@@ -1,4 +1,4 @@
-package rules.Ava;
+package rules.ava;
 
 import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
 import com.mindsmiths.ruleEngine.model.Heartbeat;
@@ -35,3 +35,15 @@ rule "Set non working hours"
             setWorkingHours(false)
         }
 end
+
+rule "Set availability interval"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        agent: Ava(availabilityInterval != anyCronSatisfied(ts, "Europe/Zagreb", "* * 9-23 * * WED", "* * * * * THU",
+                                                            "* * 00-16 * * FRI"), interval: availabilityInterval)
+    then
+        modify(agent) {
+            setAvailabilityInterval(!interval)
+        }
+end
+

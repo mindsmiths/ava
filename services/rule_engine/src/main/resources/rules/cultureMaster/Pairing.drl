@@ -1,4 +1,4 @@
-package rules.CultureMaster;
+package rules.cultureMaster;
 
 import java.util.Date;
 
@@ -28,23 +28,24 @@ end
 
 rule "Store Employee availability"
     when
-        signal: EmployeeAvailabilitySignal() from entry-point "signals"
+        signal: EmployeeAvailabilitySignal(employeeAvailability: employeeAvailability) from entry-point "signals"
         agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES)
     then
-        modify(agent) {addEmployeeAvailability(signal.getEmployeeAvailability())};
+        modify(agent) {addEmployeeAvailability(employeeAvailability)};
         Log.info("Storing availability: " + agent.getEmployeeAvailabilities());
         delete(signal);
 end
 
 rule "Store Employee matching parametars"
     when
-        signal: MatchingParametarsSignal() from entry-point "signals"
-        agent: CultureMaster()
+        signal: MatchingParametarsSignal(employeeId: employeeId, connectionStrengths: connectionStrengths,
+                                         matchHistory: matchHistory) from entry-point "signals"
+        agent: CultureMaster(employeeConnectionStrengths: employeeConnectionStrengths,
+                             employeeMatchHistories: employeeMatchHistories)
     then
-        modify(agent) {
-            getEmployeeConnectionStrengths().put(signal.getEmployeeId(), signal.getConnectionStrengths()),
-            getEmployeeMatchHistories().put(signal.getEmployeeId(), signal.getMatchHistory())
-        };   
+        employeeConnectionStrengths.put(employeeId, connectionStrengths);
+        employeeMatchHistories.put(employeeId, matchHistory);
+        update(agent)
         delete(signal);
 end
 
@@ -60,23 +61,26 @@ end
 
 rule "Store generated matches"
     when
-        matches: Matches() from entry-point "signals"
+        generatedMatches: Matches(allMatches: allMatches) from entry-point "signals"
         agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.COLLECT_GENERATED_MATCHES)
     then
-        modify(agent) {addMatches(matches.getAllMatches())};
-        Log.info("Matches from pairing algorithm: " + matches.getAllMatches());
-        modify(agent) {setLunchCycleStage(CmLunchCycleStage.SEND_TO_AVAS)};
-        delete(matches);
+        Log.info("Matches from pairing algorithm: " + allMatches);
+        modify(agent) {
+            addMatches(allMatches),
+            setLunchCycleStage(CmLunchCycleStage.SEND_TO_AVAS)
+        };
+        delete(generatedMatches);
 end
 
-rule "Send match info to Avas"
+rule "Send match info to Ava agents"
     when 
-        Heartbeat(ts: timestamp) from entry-point "signals"
         agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.SEND_TO_AVAS)
     then
         agent.sendMatches();
-        agent.clearEmployeeAvailabilities();
-        modify(agent) {setLunchCycleStage(CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES)};
+        modify(agent) {
+            setLunchCycleStage(CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES),
+            clearEmployeeAvailabilities()
+        };
 end
 
 rule "Store lunch compatibilities"
@@ -84,7 +88,5 @@ rule "Store lunch compatibilities"
         signal: LunchCompatibilities() from entry-point "signals"
         agent: CultureMaster()
     then
-        modify(agent) {
-            setLunchCompatibilities(signal)
-        };
+        modify(agent) {setLunchCompatibilities(signal)};
 end

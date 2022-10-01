@@ -1,4 +1,4 @@
-package rules.Ava;
+package rules.ava;
 
 import models.OnboardingStage;
 import com.mindsmiths.pairingalgorithm.Days;
@@ -24,43 +24,20 @@ rule "Show guessing quiz"
         signal: UserConnectedEvent(getParamAsString("trigger") == "ice-breaker") from entry-point "signals"
         agent: Ava()
     then
-        /*
-        agent.setOtherEmployees(Map.of(
-            "1", new EmployeeProfile(
-                Map.of("question1", "Answer1.1", "question2", "Answer2.1", "question3", "Answer3.1"),
-                null, "1", "First 1", "Last 1", "mail1", null
-            ),
-            "2", new EmployeeProfile(
-                Map.of("question1", "Answer1.2", "question2", "Answer2.2", "question3", "Answer3.2"),
-                null, "2", "First 2", "Last 2", "mail2", null
-            ),
-            "3", new EmployeeProfile(
-                Map.of("question1", "Answer1.3", "question2", "Answer2.3", "question3", "Answer3.3"),
-                null, "3", "First 3", "Last 3", "mail3", null
-            ),
-            "4", new EmployeeProfile(
-                Map.of("question1", "Answer1.4", "question2", "Answer2.4", "question3", "Answer3.4"),
-                null, "4", "First 4", "Last 4", "mail4", null
-            )
-        ));
-        agent.setMatch("2");
-        agent.setMatchDay(Days.THU);
-        */
         agent.guessingQuizScreen();
         delete(signal);
 end
 
 rule "Finish guessing quiz"
     when
-        Heartbeat(ts: timestamp) from entry-point "signals"
         signal: SubmitEvent(getParamAsString("submit") == "finish-guessing-quiz") from entry-point "signals"
         agent: Ava()
     then
-        Map<String, String> personalGuess = new HashMap<String, String>();
-        String questionId = new String();
-        String answer = new String();
+        Map<String, String> personalGuess = new HashMap<>();
+        String questionId = "";
+        String answer = "";
         String prefix = "guess--";
-        for (String paramId : signal.getParams().keySet()) {
+        for (String paramId : signal.getParams().keySet())
             if (paramId.startsWith(prefix)) {
                 questionId = paramId.substring(prefix.length());
                 answer = ((HashMap<String,String>) signal.getParams().get(paramId)).get("text");
@@ -68,7 +45,7 @@ rule "Finish guessing quiz"
                     questionId, answer
                 );
             }
-        }
+
         modify(agent) {
             setPersonalGuess(personalGuess)
         };

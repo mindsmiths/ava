@@ -1,4 +1,4 @@
-package rules.Ava;
+package rules.ava;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,16 +22,16 @@ rule "Create new employee"
         newEmployee: Employee() from entry-point "signals"
         agent: Ava(onboardingStage == null)
     then
-        delete(newEmployee);
         modify(agent) {
             addConnection("email", newEmployee.getEmail()),
             addConnection("armory", Utils.randomGenerator())
         };
         EmployeeProfile profile = new EmployeeProfile(newEmployee);
-        AvailablePersonalQuestions questions = new AvailablePersonalQuestions(agent.getId());
+        AvailablePersonalQuestions questions = new AvailablePersonalQuestions();
         insert(profile);
         insert(questions);
         agent.send(CultureMaster.ID, new EmployeeUpdateSignal(profile));
+        delete(newEmployee);
 end
 
 rule "Update existing employee"
@@ -53,10 +53,9 @@ end
 
 rule "Save or update all employees"
     when
-        signal: AllEmployees() from entry-point "signals"
+        signal: AllEmployees(allEmployees: allEmployees) from entry-point "signals"
         agent: Ava()
     then
-        Map<String, EmployeeProfile> allEmployees = new HashMap<>(signal.getAllEmployees());
         allEmployees.remove(agent.getId());
         modify (agent) {
             setOtherEmployees(allEmployees),

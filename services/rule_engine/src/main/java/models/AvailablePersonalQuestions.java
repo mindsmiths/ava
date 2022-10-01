@@ -1,29 +1,25 @@
 package models;
 
+import com.mindsmiths.mitems.Mitems;
+import com.mindsmiths.mitems.Option;
+import com.mindsmiths.sdk.utils.Utils;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.Data;
 
 import java.util.ArrayList;
 
-import com.mindsmiths.sdk.core.db.PrimaryKey;
-
 @AllArgsConstructor
-@NoArgsConstructor
 @Data
 public class AvailablePersonalQuestions {
-    @PrimaryKey
-    private String avaId;
-    private ArrayList<String> personalQuestions = new ArrayList<String>();
+    private String id = Utils.randomGenerator();
+    private ArrayList<String> personalQuestions = new ArrayList<>();
     private int numOfPersonalQuestions = 14;
     private String currentQuestion;
 
-    public AvailablePersonalQuestions(String avaId) {
-        for (int questionNum = 1; questionNum <= numOfPersonalQuestions; questionNum++) {
-            this.personalQuestions.add("question" + questionNum);
-        }
+    public AvailablePersonalQuestions() {
+        for (Option option : Mitems.getOptions("onboarding.personal-questions.questions"))
+            personalQuestions.add(option.getId());
         this.currentQuestion = personalQuestions.get(0);
-        this.avaId = avaId;
     }
 
     public void popQuestion() {
@@ -32,9 +28,9 @@ public class AvailablePersonalQuestions {
     }
 
     public void nextQuestion() {
-        String temp = personalQuestions.get(0);
+        String tmp = personalQuestions.get(0);
         this.personalQuestions.remove(0);
-        this.personalQuestions.add(temp);
+        this.personalQuestions.add(tmp);
         this.currentQuestion = personalQuestions.get(0);
     }
 }

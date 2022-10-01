@@ -220,6 +220,86 @@
         ]
       },
       {
+        "name": "Personal questions",
+        "elements": [
+          {
+            "description": "Annoying celebrity",
+            "type": "TEXT",
+            "content": "Which celebrity annoys you the most?"
+          },
+          {
+            "description": "Best dish",
+            "type": "TEXT",
+            "content": "What dish do you cook best?"
+          },
+          {
+            "description": "Big deal",
+            "type": "TEXT",
+            "content": "What is not a big deal to most people but is torture to you?"
+          },
+          {
+            "description": "Board game",
+            "type": "TEXT",
+            "content": "What is your favorite board game?"
+          },
+          {
+            "description": "Coffee or tea",
+            "type": "TEXT",
+            "content": "Coffee, tea or something else? What’s your fav drink and how do you take it?"
+          },
+          {
+            "description": "Hidden talent",
+            "type": "TEXT",
+            "content": "What is your hidden talent?"
+          },
+          {
+            "description": "Ideal place",
+            "type": "TEXT",
+            "content": "If you could live anywhere, where would it be?"
+          },
+          {
+            "description": "Impulse buy",
+            "type": "TEXT",
+            "content": "What was your last impulse buy?"
+          },
+          {
+            "description": "Least likely",
+            "type": "TEXT",
+            "content": "What are the least-likely three words someone would use to describe you?"
+          },
+          {
+            "description": "Lunch food",
+            "type": "TEXT",
+            "content": "What’s your favorite type of food for lunch at work?"
+          },
+          {
+            "description": "Missing object",
+            "type": "TEXT",
+            "content": "What object do you misplace or lose the most?"
+          },
+          {
+            "description": "Snack",
+            "type": "TEXT",
+            "content": "What is your go-to snack?"
+          },
+          {
+            "description": "Spending money",
+            "type": "TEXT",
+            "content": "What item is worth spending more money on?"
+          },
+          {
+            "description": "Waking up",
+            "type": "TEXT",
+            "content": "Do you wake up long before work, or right before you start working?"
+          },
+          {
+            "description": "questions",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"Submit\",\"id\":\"ideal-place\"},{\"text\":\"Submit\",\"id\":\"missing-object\"},{\"text\":\"Submit\",\"id\":\"annoying-celebrity\"},{\"text\":\"Submit\",\"id\":\"hidden-talent\"},{\"text\":\"Submit\",\"id\":\"best-dish\"},{\"text\":\"Submit\",\"id\":\"board-game\"},{\"text\":\"Submit\",\"id\":\"spending-money\"},{\"text\":\"Submit\",\"id\":\"snack\"},{\"text\":\"Submit\",\"id\":\"big-deal\"},{\"text\":\"Submit\",\"id\":\"impulse-buy\"},{\"text\":\"Submit\",\"id\":\"least-likely\"},{\"text\":\"Submit\",\"id\":\"lunch-food\"},{\"text\":\"Submit\",\"id\":\"coffee-or-tea\"},{\"text\":\"Submit\",\"id\":\"waking-up\"}]"
+          }
+        ]
+      },
+      {
         "name": "Personal quiz intro",
         "elements": [
           {

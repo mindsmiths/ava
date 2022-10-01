@@ -1,4 +1,4 @@
-package rules.Ava;
+package rules.ava;
 
 import com.mindsmiths.ruleEngine.model.Heartbeat;
 import com.mindsmiths.ruleEngine.util.Log;
@@ -9,7 +9,8 @@ import signals.SendMatchesSignal;
 import signals.SendNoMatchesSignal;
 
 import models.AvaLunchCycleStage;
-import models.OnboardingStage;
+import models.OnboardingStage
+import models.EmployeeProfile;
 
 rule "Trigger lunch cycle for Ava"
     when
@@ -43,7 +44,7 @@ rule "Trigger statistics email"
         Log.info("Ava: triggered statistics email from dashboard");
         agent.sendStatisticsEmail(employee);
         modify(agent) {setOnboardingStage(OnboardingStage.FINISHED)};
-        delete(signal)
+        delete(signal);
 end
 
 rule "Trigger ice_breaker email"

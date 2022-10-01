@@ -1,4 +1,4 @@
-package rules.Ava;
+package rules.ava;
 
 import com.mindsmiths.sdk.utils.templating.*;
 import com.mindsmiths.ruleEngine.util.Agents;
@@ -11,17 +11,20 @@ import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
 import agents.Ava;
 
 import models.EmployeeProfile;
-import models.MonthlyCoreStage;
+import models.MonthlyCoreStage
+import com.mindsmiths.ruleEngine.model.Heartbeat
+import com.mindsmiths.armory.events.UserConnectedEvent
+import com.mindsmiths.armory.events.SubmitEvent
+import java.util.Map
+import java.util.HashMap
+import java.util.List;
 
 
 rule "Send monthly core email"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
         eval(evaluateCronExpression("* * * ? * 2#1 *", ts, "Europe/Zagreb"))
-        agent: Ava(
-            workingHours == true,
-            monthlyCoreStage == null
-        )
+        agent: Ava(workingHours == true, monthlyCoreStage == null)
         employee: EmployeeProfile()
     then
         Log.info("Weekly core mail");
@@ -47,24 +50,16 @@ end
 rule "Finish monthly core"
    when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        signal: SubmitEvent(getParamAsString("submit") == "finishmonthlyquiz") from entry-point "signals"
+        signal: SubmitEvent(getParamAsString("submit") == "finish-monthly-quiz") from entry-point "signals"
         agent: Ava(monthlyCoreStage == MonthlyCoreStage.FAMILIARITY_QUIZ)
-        employee: EmployeeProfile()
+        employee: EmployeeProfile(familiarity : familiarity)
    then
-        Map<String, Double> familiarity = new HashMap<String, Double>(
-            employee.getFamiliarity()
-        );
         for (String paramId : signal.getParams().keySet()) 
-            if (paramId.startsWith("answers")) {
-                for (String em : (List<String>) signal.getParam(paramId)) {
-                    familiarity.put(
-                        em, familiarity.getOrDefault(em, 0.0) + 1.0
-                    );
-                }
-                
-            }
-        modify(employee) { setFamiliarity(familiarity) };
+            if (paramId.startsWith("answers"))
+                for (String em : (List<String>) signal.getParam(paramId))
+                    familiarity.put(em, (Double) familiarity.getOrDefault(em, 0.0) + 1.0);
 
+        update(employee)
         modify(agent) {
             setMonthlyCoreStage(MonthlyCoreStage.FINISHED)
         };
@@ -73,7 +68,7 @@ end
 
 rule "Reconnect monthly final screen"
    when
-        signal: UserConnectedEvent(getParamAsString("trigger") == "start-monthlyCore") from entry-point "signals"
+        signal: UserConnectedEvent(getParamAsString("trigger") == "start-monthly-core") from entry-point "signals"
         agent: Ava(monthlyCoreStage == MonthlyCoreStage.FINISHED)
    then
         agent.showFinalScreen();
