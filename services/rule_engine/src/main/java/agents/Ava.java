@@ -51,7 +51,7 @@ public class Ava extends Agent {
     private boolean workingHours;
     private boolean availabilityInterval;
     private Date statsEmailLastSentAt;
-    private Map<String, String> personalGuess = new HashMap<String, String>();
+    private Map<String, String> personalGuess = new HashMap<>();
     private int correct = 0;
     private MonthlyCoreStage monthlyCoreStage;
     private Date availableDaysEmailLastSentAt;
@@ -355,10 +355,10 @@ public class Ava extends Agent {
         Set<String> guessingQuestions = new LinkedHashSet<>();
         List<EmployeeProfile> others = new ArrayList<>(this.otherEmployees.values());
         Random random = new Random();
-        List<String> allQuestions = new ArrayList<>(this.otherEmployees.get(employeeToAvaId(this.match)).getPersonalAnswers().keySet());
+        List<String> matchAnsweredQuestions = new ArrayList<>(this.otherEmployees.get(employeeToAvaId(this.match)).getPersonalAnswers().keySet());
 
-        Collections.shuffle(allQuestions);
-        for (int i = 0; i < Math.min(LUNCH_QUIZ_QUESTIONS_COUNT, allQuestions.size()); i++)
+        Collections.shuffle(matchAnsweredQuestions);
+        for (int i = 0; i < Math.min(LUNCH_QUIZ_QUESTIONS_COUNT, matchAnsweredQuestions.size()); i++)
             guessingQuestions.add(allQuestions.get(i));
 
         String title = Mitems.getText("weekly-core.guessing-quiz-intro-screen-title.title");

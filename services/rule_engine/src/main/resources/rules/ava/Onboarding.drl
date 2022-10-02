@@ -120,7 +120,7 @@ rule "Store personal quiz answers"
         String answer = signal.getParamAsString(currentQuestion);
         if (answer == null || answer.strip().equals("")) questions.nextQuestion();
         else {
-            personalAnswers.put(currentQuestion, answer);
+            personalAnswers.put(currentQuestion, answer.strip());
             questions.popQuestion();
         }
         agent.setOnboardingStage(OnboardingStage.PERSONAL_QUIZ);

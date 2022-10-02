@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 @AllArgsConstructor
 @Data
@@ -17,8 +18,9 @@ public class AvailablePersonalQuestions {
     private String currentQuestion;
 
     public AvailablePersonalQuestions() {
-        for (Option option : Mitems.getOptions("onboarding.personal-questions.questions"))
+        for (Option option : Mitems.getOptions("questions.personal-questions.questions"))
             personalQuestions.add(option.getId());
+        Collections.shuffle(personalQuestions);
         this.currentQuestion = personalQuestions.get(0);
     }
 
