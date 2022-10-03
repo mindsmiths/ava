@@ -74,9 +74,10 @@ public class Ava extends Agent {
         super(connectionName, connectionId);
     }
 
-    public boolean getAvailabilityInterval(){
+    public boolean getAvailabilityInterval() {
         return availabilityInterval;
     }
+
     // trigger whenever new Ava is onboarded in CreateOrUpdateAva, "Save or update
     // all employees"
     public void addConnectionStrengths() {
@@ -217,7 +218,7 @@ public class Ava extends Agent {
     }
 
     public void showFamiliarityQuizScreens() {
-        Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
+        Map<String, BaseTemplate> screens = new HashMap<>();
         String avaImagePath = Mitems.getText("onboarding.ava-image-path.path");
         // Adding intro screens
         String introButton = Mitems.getText("onboarding.familiarity-quiz-intro.action");
@@ -352,6 +353,9 @@ public class Ava extends Agent {
 
 
     public void guessingQuizScreen() {
+        GuessingQuizQuestions questions = new GuessingQuizQuestions(
+                this.otherEmployees.get(employeeToAvaId(this.match)).getPersonalAnswers(),
+                this.otherEmployees.values().stream().toList());
         Set<String> guessingQuestions = new LinkedHashSet<>();
         List<EmployeeProfile> others = new ArrayList<>(this.otherEmployees.values());
         Random random = new Random();

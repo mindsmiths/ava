@@ -44,7 +44,7 @@ rule "Trigger statistics email"
         Log.info("Ava: triggered statistics email from dashboard");
         agent.sendStatisticsEmail(employee);
         modify(agent) {setOnboardingStage(OnboardingStage.FINISHED)};
-        delete(signal);
+        delete(signal)
 end
 
 rule "Trigger ice_breaker email"
