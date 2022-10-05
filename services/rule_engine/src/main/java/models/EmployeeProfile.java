@@ -13,7 +13,6 @@ import java.util.Map;
 @AllArgsConstructor
 @Data
 public class EmployeeProfile extends Employee {
-    Map<String, String> personalAnswers = new HashMap<>();
     Map<String, Double> familiarity = new HashMap<>();
     OnboardingStage onboardingStage;
     
@@ -25,12 +24,11 @@ public class EmployeeProfile extends Employee {
         setActive(employee.getActive());
     }
 
-    public EmployeeProfile(Map<String, String> personalAnswers, Map<String, Double> familiarity, String id, String firstName, String lastName, String email, OnboardingStage onboardingStage) {
+    public EmployeeProfile(Map<String, Double> familiarity, String id, String firstName, String lastName, String email, OnboardingStage onboardingStage) {
         this.setId(id);
         this.setFirstName(firstName);
         this.setLastName(lastName);
         this.setEmail(email);
-        this.personalAnswers = personalAnswers;
         this.familiarity = familiarity;
         this.onboardingStage = onboardingStage;
     }

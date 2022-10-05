@@ -66,8 +66,8 @@ public class CultureMaster extends Agent {
 
     public void generateMatches() {
         PairingAlgorithmAPI.generatePairs(new ArrayList<>(employeeAvailabilities),
-                                          new HashMap<>(employeeConnectionStrengths),
-                                          new HashMap<>(employeeMatchHistories));
+                new HashMap<>(employeeConnectionStrengths),
+                new HashMap<>(employeeMatchHistories));
     }
 
     public void addMatches(List<Match> allMatches) {
@@ -88,26 +88,24 @@ public class CultureMaster extends Agent {
                 }
             }
         }
-        for (String employeeKey : employees.keySet()) {
-            for (Match m : allMatches) {
-                if (!matchedPeople.contains(employees.get(employeeKey).getId())) {
-                    send(employeeKey, new SendNoMatchesSignal());
-                    break;
-                }
-                if (employees.get(employeeKey).getId().equals(m.getFirst())) {
-                    send(employeeKey, new SendMatchesSignal(m.getSecond(), m.getDay()));
-                    break;
-                }
-                if (employees.get(employeeKey).getId().equals(m.getSecond())) {
-                    send(employeeKey, new SendMatchesSignal(m.getFirst(), m.getDay()));
-                    break;
-                }
-            }
-        }
-        for (Match m : allMatches) {
-            DataUtils.emit(new models.Match(m), EmitType.CREATE);
-        }
+        for (String employeeKey : employees.keySet())
+            if (!matchedPeople.contains(employees.get(employeeKey).getId()))
+                send(employeeKey, new SendNoMatchesSignal());
 
+        for (Match m : allMatches) {
+            send(employeeToAvaId(m.getFirst()), new SendMatchesSignal(m.getSecond(), m.getDay()));
+            send(employeeToAvaId(m.getSecond()), new SendMatchesSignal(m.getFirst(), m.getDay()));
+        }
+        for (Match m : allMatches)
+            DataUtils.emit(new models.Match(m), EmitType.CREATE);
+
+    }
+
+    public String employeeToAvaId(String employeeId) {
+        for (Map.Entry<String, EmployeeProfile> entry : employees.entrySet())
+            if (entry.getValue().getId().equals(employeeId))
+                return entry.getKey();
+        return "";
     }
 
     public void addOrUpdateEmployee(EmployeeUpdateSignal signal) {
@@ -116,9 +114,8 @@ public class CultureMaster extends Agent {
 
     public void sendEmployeesToAva() {
         int silosCount = calculateSilosCount();
-        String silosRisk = calculateSilosRisk(silosCount, employees.size());
         for (String address : employees.keySet()) {
-            AllEmployees allEmployees = new AllEmployees(employees, silosCount, silosRisk);
+            AllEmployees allEmployees = new AllEmployees(employees, silosCount);
             send(address, allEmployees);
         }
     }
@@ -191,19 +188,5 @@ public class CultureMaster extends Agent {
             }
         }
         return groupCount;
-    }
-
-    public String calculateSilosRisk(int silosNum, int employeeNum) {
-        double score = (double) silosNum / (double) employeeNum;
-
-        String risk = "";
-        if (score <= 0.1)
-            risk = "low";
-        else if (score < 0.15)
-            risk = "moderate";
-        else
-            risk = "high";
-
-        return risk;
     }
 }

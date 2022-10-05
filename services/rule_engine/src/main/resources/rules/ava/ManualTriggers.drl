@@ -34,26 +34,3 @@ rule "Trigger familiarity quiz"
         Log.info("Ava: triggered familiarity quiz from dashboard");
         // trigger quiz
 end
-
-rule "Trigger statistics email"
-    when
-        signal: ManualTriggerEvent(triggerType == "statistics_email") from entry-point "signals"
-        agent: Ava(onboardingStage in (OnboardingStage.STATS_EMAIL, OnboardingStage.FINISHED))
-        employee: EmployeeProfile()
-    then
-        Log.info("Ava: triggered statistics email from dashboard");
-        agent.sendStatisticsEmail(employee);
-        modify(agent) {setOnboardingStage(OnboardingStage.FINISHED)};
-        delete(signal)
-end
-
-rule "Trigger ice_breaker email"
-    when
-        signal: ManualTriggerEvent(triggerType == "ice_breaker") from entry-point "signals"
-        agent: Ava()
-        employee: EmployeeProfile()
-    then
-        Log.info("Ava: triggered ice_breaker email from dashboard");
-        agent.sendIceBreakEmail(employee);
-        delete(signal)
-end

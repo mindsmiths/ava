@@ -47,23 +47,17 @@ public class Ava extends Agent {
     private AvaLunchCycleStage lunchCycleStage;
     private OnboardingStage onboardingStage;
     private Map<String, EmployeeProfile> otherEmployees;
-    //private Map<String, String> personalAnswers = new HashMap<String, String>();
     private boolean workingHours;
     private boolean availabilityInterval;
     private Date statsEmailLastSentAt;
-    private Map<String, String> personalGuess = new HashMap<>();
-    private int correct = 0;
     private MonthlyCoreStage monthlyCoreStage;
     private Date availableDaysEmailLastSentAt;
     private Date matchedWithEmailSentAt;
     private List<String> allQuestions = new ArrayList<>();
     private int silosCount;
-    private String silosRisk;
     private LunchReminderStage lunchReminderStage;
     private List<String> lunchDeclineReasons = new ArrayList<>(); // track days
     private boolean manualTrigger;
-    public final Integer LUNCH_QUIZ_QUESTIONS_COUNT = 3;
-    public final Integer LUNCH_QUIZ_OPTIONS_COUNT = 3;
     // a map of how strong MY connections are to other employees
     private Map<String, Neuron> connectionStrengths = new HashMap<>();
 
@@ -294,188 +288,12 @@ public class Ava extends Agent {
         showScreens("introScreen", screens);
     }
 
-    public void showPersonalQuizIntroScreens() {
-        BaseTemplate screen = new TemplateGenerator("introScreen")
-                .addComponent("image", new ImageComponent(Mitems.getText("onboarding.ava-image-path.path")))
-                .addComponent("title", new TitleComponent(Mitems.getText("onboarding.personal-quiz-intro.title")))
-                .addComponent("description", new DescriptionComponent(
-                        Mitems.getText("onboarding.personal-quiz-intro.description")))
-                .addComponent("submit", new PrimarySubmitButtonComponent(
-                        "startPersonalQuiz", Mitems.getText("onboarding.personal-quiz-intro.action"), "startPersonalQuiz"));
-        showScreen(screen);
-    }
-
-    public void showPersonalQuizScreens(String questionId, int numOfPersonalAnswers) {
-        String buttonText = "Submit";
-        for (Option option : Mitems.getOptions("onboarding.personal-questions.questions"))
-            if (option.getId().equals(questionId)) {
-                buttonText = option.getText();
-                break;
-            }
-        BaseTemplate screen = new TemplateGenerator(questionId)
-                .addComponent("question",
-                        new TitleComponent(Mitems.getText("onboarding.personal-questions." + questionId)))
-                .addComponent(questionId, new TextAreaComponent(questionId, "Type your answer here"))
-                .addComponent("actionGroup", new ActionGroupComponent(List.of(
-                        new PrimarySubmitButtonComponent("submit", buttonText, questionId),
-                        new PrimarySubmitButtonComponent("skip", "Skip this question", "skip"))))
-                .addComponent("pageNum", new DescriptionComponent("Answered: " + (numOfPersonalAnswers) + "/3"));
-        showScreen(screen);
-    }
-
-    public void showPersonalQuizOutroScreens() {
-        Map<String, BaseTemplate> screens = new HashMap<>();
-        Option[] finishQuizButton = Mitems.getOptions("onboarding.finish-personal-quiz.button");
-        String finishPersonalQuiz = Mitems.getHTML("onboarding.finish-personal-quiz.text");
-        String avaImagePath = Mitems.getText("monthly-core.ava-image-path.path");
-
-        screens.put("finish-personal-quiz", new TemplateGenerator("finish-personal-quiz")
-                .addComponent("image", new ImageComponent(avaImagePath))
-                .addComponent("title", new TitleComponent(finishPersonalQuiz))
-                .addComponent("submit", new PrimarySubmitButtonComponent(
-                        "qoodbye-screen", finishQuizButton[0].getText(), "qoodbye-screen")));
-
-        String goodbyeScreen = Mitems.getText("onboarding.finish-personal-quiz.goodbye-screen");
-        screens.put("qoodbye-screen", new TemplateGenerator("goodbye")
-                .setTemplateName("CenteredContentTemplate")
-                .addComponent("title", new TitleComponent(goodbyeScreen)));
-
-        showScreens("finish-personal-quiz", screens);
-    }
-
     public void showFinalScreen() {
-        String goodbyeScreen = Mitems.getText("onboarding.finish-personal-quiz.goodbye-screen");
+        String goodbyeScreen = Mitems.getText("onboarding.familiarity-quiz-goodbye.finish-screen");
         BaseTemplate screen = new TemplateGenerator("goodbye")
                 .setTemplateName("CenteredContentTemplate")
                 .addComponent("title", new TitleComponent(goodbyeScreen));
         showScreen(screen);
-    }
-
-
-    public void guessingQuizScreen() {
-        GuessingQuizQuestions questions = new GuessingQuizQuestions(
-                this.otherEmployees.get(employeeToAvaId(this.match)).getPersonalAnswers(),
-                this.otherEmployees.values().stream().toList());
-        Set<String> guessingQuestions = new LinkedHashSet<>();
-        List<EmployeeProfile> others = new ArrayList<>(this.otherEmployees.values());
-        Random random = new Random();
-        List<String> matchAnsweredQuestions = new ArrayList<>(this.otherEmployees.get(employeeToAvaId(this.match)).getPersonalAnswers().keySet());
-
-        Collections.shuffle(matchAnsweredQuestions);
-        for (int i = 0; i < Math.min(LUNCH_QUIZ_QUESTIONS_COUNT, matchAnsweredQuestions.size()); i++)
-            guessingQuestions.add(allQuestions.get(i));
-
-        String title = Mitems.getText("weekly-core.guessing-quiz-intro-screen-title.title");
-        title = Templating.recursiveRender(title, Map.of(
-                "firstName", this.otherEmployees.get(employeeToAvaId(this.match)).getFirstName()
-        ));
-
-        Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
-        screens.put("introGuessingScreen", new TemplateGenerator("introScreen")
-                .addComponent("title", new TitleComponent(title))
-                .addComponent("button", new PrimarySubmitButtonComponent(Mitems.getText("weekly-core.guessing-quiz-intro-screen-title.button"), "guessingQuestion1"))
-        );
-
-        int index = 0;
-        for (String questionId : guessingQuestions) {
-            index++;
-            List<PrimarySubmitButtonComponent> options = new ArrayList<>();
-            Set<String> texts = new LinkedHashSet<>();
-            texts.add(this.otherEmployees.get(employeeToAvaId(this.match)).getPersonalAnswers().get(questionId));
-            options.add(new PrimarySubmitButtonComponent(
-                    "guess--" + questionId,
-                    this.otherEmployees.get(employeeToAvaId(this.match)).getPersonalAnswers().get(questionId),
-                    String.format("correctScreen%d", index)
-            ));
-            while (options.size() < Math.min(LUNCH_QUIZ_OPTIONS_COUNT, others.size())) {
-                String buttonText = others.get(random.nextInt(this.otherEmployees.size())).getPersonalAnswers().get(questionId);
-                if (!texts.contains(buttonText)) {
-                    texts.add(buttonText);
-                    options.add(new PrimarySubmitButtonComponent(
-                            "guess--" + questionId,
-                            buttonText,
-                            String.format("wrongScreen%d", index)
-                    ));
-                }
-            }
-            List<BaseSubmitButtonComponent> answers = new ArrayList<>(options);
-            Collections.shuffle(answers);
-
-            String question = Mitems.getText("weekly-core.guessing-quiz-" + questionId + ".question");
-            question = Templating.recursiveRender(question, Map.of(
-                    "firstName", this.otherEmployees.get(employeeToAvaId(this.match)).getFirstName()
-            ));
-
-            screens.put(
-                    String.format("guessingQuestion%d", index),
-                    new TemplateGenerator(String.format("GuessingQuestion%d", index))
-                            .addComponent("title", new TitleComponent(question))
-                            .addComponent(String.format("actionGroup%d", index), new ActionGroupComponent(answers))
-            );
-
-            screens.put(
-                    String.format("correctScreen%d", index),
-                    new TemplateGenerator("correctScreen")
-                            .addComponent("title", new TitleComponent(Mitems.getText("weekly-core.correct-screen.title")))
-                            .addComponent("image", new ImageComponent(Mitems.getText("weekly-core.correct-screen.image")))
-                            .addComponent("submit", new PrimarySubmitButtonComponent(Mitems.getText("weekly-core.correct-screen.button"), String.format("guessingQuestion%d", index + 1)))
-            );
-
-            screens.put(
-                    String.format("wrongScreen%d", index),
-                    new TemplateGenerator("wrongScreen")
-                            .addComponent("title", new TitleComponent(Mitems.getText("weekly-core.wrong-screen.title")))
-                            .addComponent("image", new ImageComponent(Mitems.getText("weekly-core.wrong-screen.image")))
-                            .addComponent("submit", new PrimarySubmitButtonComponent(Mitems.getText("weekly-core.wrong-screen.button"), String.format("guessingQuestion%d", index + 1)))
-            );
-        }
-
-        screens.put(
-                String.format("guessingQuestion%d", index + 1),
-                new TemplateGenerator("confirmScreen")
-                        .addComponent("title", new TitleComponent(Mitems.getText("weekly-core.confirming-quiz-guesses.title")))
-                        .addComponent("submit", new PrimarySubmitButtonComponent("finish-guessing-quiz", Mitems.getText("weekly-core.confirming-quiz-guesses.button"), "finish-guessing-quiz"))
-        );
-
-        showScreens("introGuessingScreen", screens);
-    }
-
-    public void showResultsScreen() {
-        String title = Mitems.getText("weekly-core.guessing-quiz-results.results");
-        String answers = new String();
-
-        Integer index = 1;
-        for (String questionId : personalGuess.keySet()) {
-            String answer = this.otherEmployees.get(employeeToAvaId(this.match)).getPersonalAnswers().get(questionId);
-            answers += index.toString() + ". " + answer + "<br/>";
-            index++;
-        }
-
-        title = Templating.recursiveRender(title, Map.of(
-                "firstName", this.otherEmployees.get(employeeToAvaId(this.match)).getFirstName(),
-                "correct", this.correct,
-                "questionsCount", LUNCH_QUIZ_QUESTIONS_COUNT,
-                "answers", answers
-        ));
-
-        Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
-        screens.put(
-                "finish-guessing-quiz",
-                new TemplateGenerator("resultsScreen")
-                        .addComponent("title", new TitleComponent(title))
-        );
-
-        showScreens("finish-guessing-quiz", screens);
-    }
-
-    public void correctness() {
-        this.correct = 0;
-        for (Map.Entry<String, String> entry : personalGuess.entrySet()) {
-            if (entry.getValue().equals(((this.otherEmployees.get(employeeToAvaId(this.match))).getPersonalAnswers()).get(entry.getKey()))) {
-                this.correct++;
-            }
-        }
-
     }
 
     public void sendWelcomeEmail(EmployeeProfile employee) throws IOException {
@@ -587,30 +405,6 @@ public class Ava extends Agent {
         showScreens("introScreen", screens);
     }
 
-    public void sendStatisticsEmail(EmployeeProfile employee) throws IOException {
-        String subject = Mitems.getText("statistics.statistics-email.subject");
-        String description = Mitems.getText("statistics.statistics-email.description");
-        String description2 = Mitems.getText("statistics.statistics-email.description2");
-
-        String htmlTemplate = new String(Objects.requireNonNull(
-                        getClass().getClassLoader().getResourceAsStream("emailTemplates/StatEmailTemplate.html"))
-                .readAllBytes());
-        String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
-                "description", description,
-                "description2", description2,
-                "imagePath", Mitems.getText("statistics.statistics-email.image"),
-                "firstName", employee.getFirstName()));
-
-        // "imagePath",
-        // String.format("%s%s", Settings.ARMORY_SITE_URL, Mitems.getText("statistics.statistics-email.image")),
-
-        SendEmailPayload e = new SendEmailPayload();
-        e.setRecipients(List.of(getConnection("email")));
-        e.setSubject(subject);
-        e.setHtmlText(htmlBody);
-        EmailAdapterAPI.newEmail(e);
-    }
-
     public void sendWeeklyEmail(EmployeeProfile employee) throws IOException {
         String subject = Mitems.getText("weekly-core.weekly-email.subject");
         String description = Mitems.getText("weekly-core.weekly-email.description");
@@ -649,28 +443,6 @@ public class Ava extends Agent {
         BaseTemplate lunchInviteExpiredScreen = new TemplateGenerator()
                 .addComponent("title", new TitleComponent(Mitems.getText("weekly-core.message-about-not-working-hours-for-links.title")));
         showScreen(lunchInviteExpiredScreen);
-    }
-
-    public void sendIceBreakEmail(EmployeeProfile employee) throws IOException {
-        String subject = Mitems.getText("weekly-core.ice-breaker-email.subject");
-        String description = Mitems.getText("weekly-core.ice-breaker-email.description");
-
-        String htmlTemplate = new String(Objects.requireNonNull(
-                        getClass().getClassLoader().getResourceAsStream("emailTemplates/IceBreakTemplate.html"))
-                .readAllBytes());
-
-        String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
-                "text", description,
-                "firstName", employee.getFirstName(),
-                "button", Mitems.getText("weekly-core.ice-breaker-email.button"),
-                "armoryUrl",
-                String.format("%s/%s?trigger=ice-breaker", Settings.ARMORY_SITE_URL, getConnection("armory"))));
-
-        SendEmailPayload e = new SendEmailPayload();
-        e.setRecipients(List.of(getConnection("email")));
-        e.setSubject(subject);
-        e.setHtmlText(htmlBody);
-        EmailAdapterAPI.newEmail(e);
     }
 
     public void showLunchDeclineReasonScreens() {
