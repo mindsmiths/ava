@@ -29,6 +29,7 @@ import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.Version;
 import signals.SendMatchesSignal;
 import utils.Settings;
+import utils.EventTracking;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -542,4 +543,23 @@ public class Ava extends Agent {
         now.add(java.util.Calendar.DAY_OF_MONTH, diff);
         return now;
     }
+
+    // Events
+
+    public void identify() {
+        EventTracking.identify(id, new HashMap<>() {
+            {
+                put("agentType", getClass().getSimpleName());
+            }
+        });
+    }
+
+    public void logEvent(String event) {
+        EventTracking.capture(id, event);
+    }
+
+    public void logEvent(String event, Map<String, Object> properties) {
+        EventTracking.capture(id, event, properties);
+    }
+
 }

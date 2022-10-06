@@ -19,27 +19,22 @@
           {
             "description": "Action",
             "type": "TEXT",
-            "content": "Submit"
+            "content": "Next"
           },
           {
             "description": "question1",
             "type": "TEXT",
-            "content": "Who of the following do you know very well?"
+            "content": "Mark people you had a chance to work with closely in the past month"
           },
           {
             "description": "question2",
             "type": "TEXT",
-            "content": "Who of the following do you know very well?"
+            "content": "Mark people you had the chance to hangout with over drinks or meal in the past month. "
           },
           {
             "description": "question3",
             "type": "TEXT",
-            "content": "Who of the following do you know very well?"
-          },
-          {
-            "description": "question4",
-            "type": "TEXT",
-            "content": "Who of the following do you know very well?"
+            "content": "Mark people you spent time with in meetings or calls during the past month."
           }
         ]
       },

@@ -1,7 +1,6 @@
 package utils;
 
 import java.util.Map;
-
 import io.github.cdimascio.dotenv.Dotenv;
 
 public class Settings {
