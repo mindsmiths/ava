@@ -4,8 +4,8 @@ import agents.CultureMaster;
 import signals.EmployeeUpdateSignal;
 import com.mindsmiths.employeeManager.ManualTriggerEvent;
 import com.mindsmiths.ruleEngine.util.Log;
-import models.CmLunchCycleStage;
 import com.mindsmiths.ruleEngine.model.Heartbeat;
+import models.CmLunchCycleStage;
 import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
 
 rule "Add or update Ava data"
@@ -17,7 +17,6 @@ rule "Add or update Ava data"
             addOrUpdateEmployee(signal),
             sendEmployeesToAva()
         };
-        Log.info("Added new Ava: " + signal.getEmployee());
         delete(signal);
 end
 
@@ -26,8 +25,7 @@ rule "Trigger lunch cycle for CultureMaster"
         signal: ManualTriggerEvent(triggerType == "lunch_cycle") from entry-point "signals"
         agent: CultureMaster()
     then
-        Log.info("CultureMaster: triggered lunch cycle from dashboard");
-        modify(agent) { setLunchCycleStage(CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES)};
+        modify(agent) {setLunchCycleStage(CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES)};
         delete(signal);
 end
 
@@ -36,8 +34,6 @@ rule "Trigger lunch pairing for CultureMaster"
         signal: ManualTriggerEvent(triggerType == "lunch_pairing") from entry-point "signals"
         agent: CultureMaster()
     then
-        Log.info("CultureMaster: triggered lunch pairing from dashboard");
-        Log.info("Generating matches....");
         modify(agent) {setLunchCycleStage(CmLunchCycleStage.COLLECT_GENERATED_MATCHES)};
         agent.generateMatches();
         delete(signal);
@@ -52,12 +48,12 @@ rule "Trigger familiarity quiz"
         // trigger quiz
 end
 
-
 rule "Lunch pairing"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
         eval(evaluateCronExpression("* * 12-13 ? * THU *", ts, "Europe/Zagreb"))
-        agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES || lunchCycleStage == null)
+        agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES 
+            || lunchCycleStage == null)
     then
         modify(agent) {setLunchCycleStage(CmLunchCycleStage.COLLECT_GENERATED_MATCHES)};
         agent.generateMatches();

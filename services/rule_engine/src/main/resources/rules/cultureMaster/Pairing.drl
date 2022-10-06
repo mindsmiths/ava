@@ -1,7 +1,5 @@
 package rules.cultureMaster;
 
-import java.util.Date;
-
 import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.ruleEngine.model.Heartbeat;
 import com.mindsmiths.ruleEngine.util.Agents;

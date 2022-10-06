@@ -42,25 +42,22 @@ import java.util.*;
 public class Ava extends Agent {
     private List<Days> availableDays = new ArrayList<>();
     private String match;
-    private Days matchDay;
     private List<String> matchHistory = new ArrayList<>();
-    private AvaLunchCycleStage lunchCycleStage;
-    private OnboardingStage onboardingStage;
-    private Map<String, EmployeeProfile> otherEmployees;
-    private boolean workingHours;
-    private boolean availabilityInterval;
+    private Days matchDay;
     private Date statsEmailLastSentAt;
-    private MonthlyCoreStage monthlyCoreStage;
     private Date availableDaysEmailLastSentAt;
     private Date matchedWithEmailSentAt;
-    private List<String> allQuestions = new ArrayList<>();
-    private int silosCount;
+    private AvaLunchCycleStage lunchCycleStage;
+    private OnboardingStage onboardingStage;
+    private MonthlyCoreStage monthlyCoreStage;
     private LunchReminderStage lunchReminderStage;
-    private List<String> lunchDeclineReasons = new ArrayList<>(); // track days
+    private Map<String, EmployeeProfile> otherEmployees;
     private boolean manualTrigger;
+    private boolean workingHours;
+    private boolean availabilityInterval;
+    private List<String> lunchDeclineReasons = new ArrayList<>(); // track days
     // a map of how strong MY connections are to other employees
     private Map<String, Neuron> connectionStrengths = new HashMap<>();
-
     public static final double CONNECTION_NEURON_CAPACITY = 100;
     public static final double CONNECTION_NEURON_RESISTANCE = 0.05;
 
@@ -83,7 +80,8 @@ public class Ava extends Agent {
         }
     }
 
-    // if user picked employee at any question in familiarity quiz, charge that connection to the max value
+    // if user picked employee at any question in familiarity quiz, charge that
+    // connection to the max value
     // trigger after familiarity quiz is over in Onboarding, "Finish onboarding"
     public void chargeConnectionNeurons(EmployeeProfile employeeProfile) {
         for (Map.Entry<String, Double> entry : employeeProfile.getFamiliarity().entrySet()) {
@@ -102,9 +100,11 @@ public class Ava extends Agent {
     public void decayConnectionNeurons() {
         for (String avaId : this.otherEmployees.keySet()) {
             Log.info("Decaying SPECIFIC neuron with employee id: " + otherEmployees.get(avaId).getId());
-            long daysPassed = ChronoUnit.DAYS.between(getConnectionNeuron(otherEmployees.get(avaId).getId()).getLastUpdatedAt().toInstant(),
+            long daysPassed = ChronoUnit.DAYS.between(
+                    getConnectionNeuron(otherEmployees.get(avaId).getId()).getLastUpdatedAt().toInstant(),
                     new Date().toInstant());
-            //getConnectionNeuron(otherEmployees.get(avaId).getId()).decay(daysPassed); TODO CHECK
+            // getConnectionNeuron(otherEmployees.get(avaId).getId()).decay(daysPassed);
+            // TODO CHECK
             getConnectionNeuron(otherEmployees.get(avaId).getId()).decay(7.);
         }
     }
@@ -120,7 +120,8 @@ public class Ava extends Agent {
 
     public boolean anyCronSatisfied(Date timestamp, String timezone, String... crons) throws ParseException {
         for (String cron : crons)
-            if (DateUtil.evaluateCronExpression(cron, timestamp, timezone)) return true;
+            if (DateUtil.evaluateCronExpression(cron, timestamp, timezone))
+                return true;
         return false;
     }
 
@@ -325,11 +326,6 @@ public class Ava extends Agent {
         EmailAdapterAPI.newEmail(e);
     }
 
-    public boolean allEmployeesFinishedOnboarding() {
-        return otherEmployees.values().stream().allMatch(e -> (e.getOnboardingStage() == OnboardingStage.STATS_EMAIL)
-                || (e.getOnboardingStage() == OnboardingStage.FINISHED));
-    }
-
     public void sendMonthlyCoreEmail(EmployeeProfile employee) throws IOException {
         String subject = Mitems.getText("monthly-core.welcome-email.subject");
         String description = Mitems.getText("monthly-core.welcome-email.description");
@@ -419,7 +415,7 @@ public class Ava extends Agent {
         }
 
         String htmlTemplate = new String(Objects.requireNonNull(
-                        getClass().getClassLoader().getResourceAsStream("emailTemplates/WeeklyEmailTemplate.html"))
+                getClass().getClassLoader().getResourceAsStream("emailTemplates/WeeklyEmailTemplate.html"))
                 .readAllBytes());
 
         String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
@@ -441,7 +437,8 @@ public class Ava extends Agent {
 
     public void showLunchInviteExpiredScreen() {
         BaseTemplate lunchInviteExpiredScreen = new TemplateGenerator()
-                .addComponent("title", new TitleComponent(Mitems.getText("weekly-core.message-about-not-working-hours-for-links.title")));
+                .addComponent("title", new TitleComponent(
+                        Mitems.getText("weekly-core.message-about-not-working-hours-for-links.title")));
         showScreen(lunchInviteExpiredScreen);
     }
 
@@ -485,7 +482,7 @@ public class Ava extends Agent {
     public String renderMatchmakingEmail(Days days, EmployeeProfile currentEmployee, EmployeeProfile otherEmployee)
             throws IOException {
         String htmlTemplate = new String(Objects.requireNonNull(
-                        getClass().getClassLoader().getResourceAsStream("emailTemplates/EmailTemplateCalendar.html"))
+                getClass().getClassLoader().getResourceAsStream("emailTemplates/EmailTemplateCalendar.html"))
                 .readAllBytes());
         return Templating.recursiveRender(htmlTemplate, Map.of(
                 "title", Mitems.getText("weekly-core.matching-mail.title"),

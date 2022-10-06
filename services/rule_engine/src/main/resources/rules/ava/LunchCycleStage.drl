@@ -1,15 +1,15 @@
 package rules.ava;
 
 import java.util.*;
-import java.util.ArrayList;
-import java.util.List;
 
 import com.mindsmiths.armory.events.UserConnectedEvent
 import com.mindsmiths.armory.events.SubmitEvent
 import com.mindsmiths.ruleEngine.model.Heartbeat;
 import com.mindsmiths.ruleEngine.util.Agents;
+import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.pairingalgorithm.Days;
 import com.mindsmiths.pairingalgorithm.EmployeeAvailability;
+
 import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
  
 import agents.Ava;
@@ -20,13 +20,10 @@ import signals.SendMatchesSignal;
 import signals.MatchingParametarsSignal;
 import signals.SendNoMatchesSignal;
 
-import models.CmLunchCycleStage;
 import models.AvaLunchCycleStage;
 import models.OnboardingStage;
 import models.LunchReminderStage
 import models.EmployeeProfile
-import com.mindsmiths.ruleEngine.util.Log;
-
 
 rule "Send available days email"
     when
