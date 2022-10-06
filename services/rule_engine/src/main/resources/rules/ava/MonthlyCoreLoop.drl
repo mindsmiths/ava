@@ -36,7 +36,7 @@ end
 
 rule "Start and reconnect Monthly quiz"
    when
-        signal: UserConnectedEvent(getParamAsString("trigger") == "start-monthly-Core") from entry-point "signals"
+        signal: UserConnectedEvent(getParamAsString("trigger") == "start-monthly-core") from entry-point "signals"
         agent: Ava(monthlyCoreStage in (MonthlyCoreStage.EMAIL_SENT, MonthlyCoreStage.FAMILIARITY_QUIZ))
         employee: EmployeeProfile()
    then
@@ -49,7 +49,6 @@ end
 
 rule "Finish monthly core"
    when
-        Heartbeat(ts: timestamp) from entry-point "signals"
         signal: SubmitEvent(getParamAsString("submit") == "finish-monthly-quiz") from entry-point "signals"
         agent: Ava(monthlyCoreStage == MonthlyCoreStage.FAMILIARITY_QUIZ)
         employee: EmployeeProfile(familiarity : familiarity)
@@ -57,7 +56,7 @@ rule "Finish monthly core"
         for (String paramId : signal.getParams().keySet()) 
             if (paramId.startsWith("answers"))
                 for (String em : (List<String>) signal.getParam(paramId))
-                    familiarity.put(em, (Double) familiarity.getOrDefault(em, 0.0) + 1.0);
+                    employee.getFamiliarity().put(em, (Double) familiarity.getOrDefault(em, 0.0) + 1.0);
 
         update(employee)
         modify(agent) {
@@ -73,4 +72,15 @@ rule "Reconnect monthly final screen"
    then
         agent.showFinalScreen();
         delete(signal);
+end
+
+rule "Reset monthly core loop"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        eval(evaluateCronExpression("* * * ? * 4#1 *", ts, "Europe/Zagreb"))
+        agent: Ava()
+    then
+        modify(agent) {
+            setLunchCycleStage(null)
+        };
 end

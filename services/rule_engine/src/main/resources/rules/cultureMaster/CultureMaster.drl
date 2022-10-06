@@ -56,7 +56,7 @@ end
 rule "Lunch pairing"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        eval(evaluateCronExpression("* * 12-13 ? * THU *", ts, "Europe/Zagreb"))
+        eval(evaluateCronExpression("* * 16-17 ? * FRI *", ts, "Europe/Zagreb"))
         agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES || lunchCycleStage == null)
     then
         modify(agent) {setLunchCycleStage(CmLunchCycleStage.COLLECT_GENERATED_MATCHES)};
