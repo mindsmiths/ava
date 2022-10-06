@@ -66,6 +66,8 @@ rule "Store familiarity answers"
             setStatsEmailLastSentAt(ts)
         };
         agent.send(CultureMaster.ID, new EmployeeUpdateSignal(employee));
+        agent.logEvent("Onboarding Finished", Map.of("employeeId", employee.getId(),
+                "familiarity", familiarity, "full name", employee.getFullName()));
 end
 
 rule "Reconnect final screen"
