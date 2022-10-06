@@ -36,8 +36,8 @@ global:
   secrets:
     SENTRY_DSN: '{{ env.SENTRY_DSN }}'
     POSTHOG_API_KEY: 'phc_YqtfdKl9ZJcUP7a8MAf6eVxyhp0ujS5knz70h2lsVIz'
-    
-    MONGO_CLIENT_PASSWORD: admin
+
+    MONGO_CLIENT_PASSWORD: knopso123
     POSTGRES_CLIENT_PASSWORD: admin
 
     BACKUPS_STORAGE_ACCOUNT_KEY: '{{ env.BACKUPS_STORAGE_ACCOUNT_KEY }}'
