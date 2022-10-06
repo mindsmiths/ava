@@ -2,7 +2,6 @@ package agents;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +19,6 @@ import models.EmployeeProfile;
 import models.CmLunchCycleStage;
 
 import signals.EmployeeUpdateSignal;
-import signals.AllEmployees;
 import signals.SendMatchesSignal;
 import signals.SendNoMatchesSignal;
 
@@ -96,12 +94,5 @@ public class CultureMaster extends Agent {
 
     public void addOrUpdateEmployee(EmployeeUpdateSignal signal) {
         employees.put(signal.getFrom(), signal.getEmployee());
-    }
-
-    public void sendEmployeesToAva() {
-        for (String address : employees.keySet()) {
-            AllEmployees allEmployees = new AllEmployees(employees);
-            send(address, allEmployees);
-        }
     }
 }

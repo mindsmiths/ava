@@ -29,7 +29,7 @@ rule "Send available days email"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.LUNCH_MAIL_SENDING,
-                   onboardingStage in (OnboardingStage.STATS_EMAIL, OnboardingStage.FINISHED))
+                   onboardingStage == OnboardingStage.FINISHED)
         eval(evaluateCronExpression("* * 8-17 ? * WED *", ts, "Europe/Zagreb")
             || (agent.isManualTrigger() == true))
         employee: EmployeeProfile()
@@ -47,7 +47,8 @@ rule "Send second reminder"
         Heartbeat(ts: timestamp) from entry-point "signals"
         eval(evaluateCronExpression("* * * ? * THU *", ts, "Europe/Zagreb"))
         agent: Ava(
-            (lunchReminderStage == LunchReminderStage.FIRST_EMAIL_SENT || lunchCycleStage == AvaLunchCycleStage.LUNCH_MAIL_SENDING),
+            (lunchReminderStage == LunchReminderStage.FIRST_EMAIL_SENT 
+                || lunchCycleStage == AvaLunchCycleStage.LUNCH_MAIL_SENDING),
             workingHours == true,
             (availableDaysEmailLastSentAt == null || availableDaysEmailLastSentAt before[12h] ts),
             isManualTrigger() == false
@@ -66,7 +67,8 @@ rule "Send third reminder"
         Heartbeat(ts: timestamp) from entry-point "signals"
         eval(evaluateCronExpression("* * 0-15 ? * FRI *", ts, "Europe/Zagreb"))
         agent: Ava(
-            (lunchReminderStage == LunchReminderStage.SECOND_EMAIL_SENT || lunchCycleStage == AvaLunchCycleStage.LUNCH_MAIL_SENDING),
+            (lunchReminderStage == LunchReminderStage.SECOND_EMAIL_SENT 
+                || lunchCycleStage == AvaLunchCycleStage.LUNCH_MAIL_SENDING),
             workingHours == true,
             (availableDaysEmailLastSentAt == null || availableDaysEmailLastSentAt before[12h] ts),
             isManualTrigger() == false
@@ -90,9 +92,8 @@ rule "Ask for available days"
             (availabilityInterval == true || manualTrigger == true)
         )
         employee: EmployeeProfile()
-    then 
+    then
         agent.chooseAvailableDaysScreen();
-        Log.info("Decaying connection strength neurons for: " + employee.getFullName());
         modify(agent) {
             decayConnectionNeurons(),
             setManualTrigger(false)

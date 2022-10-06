@@ -1,21 +1,15 @@
 package rules.ava;
 
-import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.ruleEngine.util.Agents;
-import com.mindsmiths.ruleEngine.model.Initialize;
-
+import com.mindsmiths.ruleEngine.model.Heartbeat;
 import com.mindsmiths.armory.events.UserConnectedEvent;
 import com.mindsmiths.armory.events.SubmitEvent;
-
 import com.mindsmiths.sdk.utils.templating.*;
-
 import com.mindsmiths.employeeManager.employees.Employee;
 
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
-import signals.AllEmployees;
 import signals.EmployeeUpdateSignal;
 
 import agents.Ava;
@@ -23,7 +17,6 @@ import agents.CultureMaster;
 import models.EmployeeProfile;
 import models.OnboardingStage;
 import models.AvaLunchCycleStage;
-import com.mindsmiths.ruleEngine.model.Heartbeat;
 
 rule "Send onboarding email"
     when
@@ -48,9 +41,9 @@ rule "Start or reconnect familiarity quiz"
         delete(signal);
 end
 
-rule "Finish onboarding"
+rule "Store familiarity answers"
    when
-        signal: SubmitEvent(getParamAsString("submit") == "finished-familiarity-quiz") from entry-point "signals"
+        signal: SubmitEvent(getParamAsString("submit") == "finish-familiarity-quiz") from entry-point "signals"
         Heartbeat(ts: timestamp) from entry-point "signals"
         agent: Ava(onboardingStage == OnboardingStage.FAMILIARITY_QUIZ)
         employee: EmployeeProfile(familiarity: familiarity)
@@ -61,18 +54,19 @@ rule "Finish onboarding"
                     employee.getFamiliarity().put(em, (Double) familiarity.getOrDefault(em, 0.0) + 1.0);
         update(employee)
         modify(agent) {
-            setOnboardingStage(OnboardingStage.STATS_EMAIL),
+            setOnboardingStage(OnboardingStage.FINISHED),
             setLunchCycleStage(AvaLunchCycleStage.LUNCH_MAIL_SENDING),
             setStatsEmailLastSentAt(ts)
         };
-        agent.showFinalScreen();
         agent.send(CultureMaster.ID, new EmployeeUpdateSignal(employee));
+        agent.logEvent("Onboarding Finished", Map.of("employeeId", employee.getId(),
+                "familiarity", familiarity, "full name", employee.getFullName()));
 end
 
 rule "Reconnect final screen"
    when
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-onboarding") from entry-point "signals"
-        agent: Ava(onboardingStage in (OnboardingStage.STATS_EMAIL, OnboardingStage.FINISHED))
+        agent: Ava(onboardingStage == OnboardingStage.FINISHED)
    then
         agent.showFinalScreen();
         delete(signal);

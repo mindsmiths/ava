@@ -1,12 +1,8 @@
 package rules.ava;
 
-import com.mindsmiths.ruleEngine.model.Heartbeat;
-import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.employeeManager.ManualTriggerEvent;
 
 import agents.Ava;
-import signals.SendMatchesSignal;
-import signals.SendNoMatchesSignal;
 
 import models.AvaLunchCycleStage;
 import models.OnboardingStage
@@ -15,22 +11,12 @@ import models.EmployeeProfile;
 rule "Trigger lunch cycle for Ava"
     when
         signal: ManualTriggerEvent(triggerType == "lunch_cycle") from entry-point "signals"
-        agent: Ava(onboardingStage in (OnboardingStage.STATS_EMAIL, OnboardingStage.FINISHED))
+        agent: Ava(onboardingStage == OnboardingStage.FINISHED)
         employee: EmployeeProfile()
     then
-        Log.info("Ava: triggered lunch cycle from dashboard");
         modify(agent) {
             setManualTrigger(true),
             setLunchCycleStage(AvaLunchCycleStage.LUNCH_MAIL_SENDING)
         };
         delete(signal);            
-end
-
-rule "Trigger familiarity quiz"
-    when
-        signal: ManualTriggerEvent(triggerType == "familiarity_quiz") from entry-point "signals"
-        agent: Ava()
-    then
-        Log.info("Ava: triggered familiarity quiz from dashboard");
-        // trigger quiz
 end

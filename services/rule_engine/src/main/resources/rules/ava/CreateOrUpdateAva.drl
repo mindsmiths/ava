@@ -5,7 +5,6 @@ import com.mindsmiths.ruleEngine.util.Agents;
 import com.mindsmiths.sdk.utils.Utils;
 
 import signals.EmployeeUpdateSignal;
-import signals.AllEmployees;
 
 import agents.CultureMaster;
 import agents.Ava;
@@ -44,17 +43,4 @@ rule "Update existing employee"
             setActive(employee.getActive())
         };
         agent.send(CultureMaster.ID, new EmployeeUpdateSignal(profile));
-end
-
-rule "Save or update all employees"
-    when
-        signal: AllEmployees(allEmployees: allEmployees) from entry-point "signals"
-        agent: Ava()
-    then
-        allEmployees.remove(agent.getId());
-        modify (agent) {
-            setOtherEmployees(allEmployees),
-            addConnectionStrengths()
-        };
-        delete(signal);
 end

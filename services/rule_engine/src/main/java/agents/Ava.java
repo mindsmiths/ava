@@ -267,7 +267,8 @@ public class Ava extends Agent {
                 PrimarySubmitButtonComponent buttonComponent = (PrimarySubmitButtonComponent) templateGenerator
                         .getComponents()
                         .get("submit");
-                buttonComponent.setValue("finishfamiliarityquiz");
+                buttonComponent.setInputId("finish-familiarity-quiz");
+                buttonComponent.setValue("finish-familiarity-quiz");
 
                 String familiarityQuizFinalButton = Mitems
                         .getText("onboarding.familiarity-quiz-goodbye.action");
@@ -275,7 +276,7 @@ public class Ava extends Agent {
                         .getHTML("onboarding.familiarity-quiz-goodbye.text");
                 String finishFamiliarityQuizTitle = Mitems
                         .getText("onboarding.familiarity-quiz-goodbye.title");
-                screens.put("finishfamiliarityquiz", new TemplateGenerator("finishfamiliarityquiz")
+                screens.put("finish-familiarity-quiz", new TemplateGenerator("finish-familiarity-quiz")
                         .addComponent("header", new HeaderComponent(null, true))
                         .addComponent("image", new ImageComponent(avaImagePath))
                         .addComponent("title", new TitleComponent(finishFamiliarityQuizTitle))
@@ -283,6 +284,9 @@ public class Ava extends Agent {
                         .addComponent("finished-familiarity-quiz", new PrimarySubmitButtonComponent(
                                 "finished-familiarity-quiz", familiarityQuizFinalButton,
                                 "finished-familiarity-quiz")));
+                String goodbyeScreen = Mitems.getText("onboarding.familiarity-quiz-goodbye.finish-screen");
+                screens.put("finished-familiarity-quiz", new TemplateGenerator("final-screen")
+                        .addComponent("title", new TitleComponent(goodbyeScreen)));
                 break;
             }
         }
@@ -326,26 +330,6 @@ public class Ava extends Agent {
         EmailAdapterAPI.newEmail(e);
     }
 
-    public void sendMonthlyCoreEmail(EmployeeProfile employee) throws IOException {
-        String subject = Mitems.getText("monthly-core.welcome-email.subject");
-        String description = Mitems.getText("monthly-core.welcome-email.description");
-        String htmlTemplate = new String(Objects.requireNonNull(
-                getClass().getClassLoader().getResourceAsStream("emailTemplates/EmailTemplate.html")).readAllBytes());
-
-        String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
-                "description", description,
-                "callToAction", Mitems.getText("monthly-core.welcome-email.action"),
-                "firstName", employee.getFirstName(),
-                "armoryUrl",
-                String.format("%s/%s?trigger=start-monthly-core", Settings.ARMORY_SITE_URL, getConnection("armory"))));
-
-        SendEmailPayload e = new SendEmailPayload();
-        e.setRecipients(List.of(getConnection("email")));
-        e.setSubject(subject);
-        e.setHtmlText(htmlBody);
-        EmailAdapterAPI.newEmail(e);
-    }
-
     public void showMonthlyQuizScreens() {
         Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
         String avaImagePath = Mitems.getText("monthly-core.ava-image-path.path");
@@ -382,17 +366,15 @@ public class Ava extends Agent {
             } catch (Exception e) {
                 // Changing button value
                 String wrongQuestionTag = "question" + String.valueOf(questionNum - 1);
-
                 TemplateGenerator templateGenerator = (TemplateGenerator) screens.get(wrongQuestionTag);
                 PrimarySubmitButtonComponent buttonComponent = (PrimarySubmitButtonComponent) templateGenerator
                         .getComponents()
                         .get("submit");
                 buttonComponent.setValue("finish-monthly-quiz");
+                buttonComponent.setInputId("finish-monthly-quiz");
 
-                String finishFamiliarityQuizText = Mitems
-                        .getText("monthly-core.familiarity-quiz-goodbye.text");
+                String finishFamiliarityQuizText = Mitems.getText("monthly-core.familiarity-quiz-goodbye.text");
                 screens.put("finish-monthly-quiz", new TemplateGenerator("finish-monthly-quiz")
-
                         .addComponent("title", new TitleComponent(finishFamiliarityQuizText)));
                 break;
             }
