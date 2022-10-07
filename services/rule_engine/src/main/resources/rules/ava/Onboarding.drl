@@ -6,6 +6,7 @@ import com.mindsmiths.armory.events.UserConnectedEvent;
 import com.mindsmiths.armory.events.SubmitEvent;
 import com.mindsmiths.sdk.utils.templating.*;
 import com.mindsmiths.employeeManager.employees.Employee;
+import com.mindsmiths.emailAdapter.SendEmailPayload;
 
 import java.util.List;
 import java.util.Map;
@@ -17,16 +18,19 @@ import agents.CultureMaster;
 import models.EmployeeProfile;
 import models.OnboardingStage;
 import models.AvaLunchCycleStage;
+import models.OnboardingTemplates;
 
 rule "Send onboarding email"
     when
         agent: Ava(workingHours == true, onboardingStage == OnboardingStage.AVA_CREATED)
         employee: EmployeeProfile()
     then
-        agent.sendWelcomeEmail(employee);
-        modify(agent) {
-            setOnboardingStage(OnboardingStage.EMAIL_SENT)
-        };
+        SendEmailPayload email = new OnboardingTemplates().welcomeEmail(
+                employee,
+                agent.getConnection("armory"),
+                agent.getConnection("email"));
+        agent.sendEmail(email);
+        modify(agent) {setOnboardingStage(OnboardingStage.EMAIL_SENT)};
 end
 
 rule "Start or reconnect familiarity quiz"

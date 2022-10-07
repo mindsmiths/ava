@@ -302,23 +302,8 @@ public class Ava extends Agent {
         showScreen(screen);
     }
 
-    public void sendWelcomeEmail(EmployeeProfile employee) throws IOException {
-        String subject = Mitems.getText("onboarding.welcome-email.subject");
-        String description = Mitems.getText("onboarding.welcome-email.description");
-        String htmlTemplate = new String(Objects.requireNonNull(
-                getClass().getClassLoader().getResourceAsStream("emailTemplates/EmailTemplate.html")).readAllBytes());
-        String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
-                "description", description,
-                "callToAction", Mitems.getText("onboarding.welcome-email.action"),
-                "firstName", employee.getFirstName(),
-                "armoryUrl",
-                String.format("%s/%s?trigger=start-onboarding", Settings.ARMORY_SITE_URL, getConnection("armory"))));
-
-        SendEmailPayload e = new SendEmailPayload();
-        e.setRecipients(List.of(getConnection("email")));
-        e.setSubject(subject);
-        e.setHtmlText(htmlBody);
-        EmailAdapterAPI.newEmail(e);
+    public void sendEmail(SendEmailPayload email) throws IOException {
+        EmailAdapterAPI.newEmail(email);
     }
 
     public void sendNoMatchEmail() throws IOException {
@@ -330,7 +315,26 @@ public class Ava extends Agent {
         e.setPlainText(description);
         EmailAdapterAPI.newEmail(e);
     }
+    
+    public void sendMonthlyCoreEmail(EmployeeProfile employee) throws IOException {
+        String subject = Mitems.getText("monthly-core.welcome-email.subject");
+        String description = Mitems.getText("monthly-core.welcome-email.description");
+        String htmlTemplate = new String(Objects.requireNonNull(
+                getClass().getClassLoader().getResourceAsStream("emailTemplates/EmailTemplate.html")).readAllBytes());
 
+        String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
+                "description", description,
+                "callToAction", Mitems.getText("monthly-core.welcome-email.action"),
+                "firstName", employee.getFirstName(),
+                "armoryUrl",
+                String.format("%s/%s?trigger=start-monthly-core", Settings.ARMORY_SITE_URL, getConnection("armory"))));
+
+        SendEmailPayload e = new SendEmailPayload();
+        e.setRecipients(List.of(getConnection("email")));
+        e.setSubject(subject);
+        e.setHtmlText(htmlBody);
+        EmailAdapterAPI.newEmail(e);
+    }
     public void showMonthlyQuizScreens() {
         Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
         String avaImagePath = Mitems.getText("monthly-core.ava-image-path.path");
