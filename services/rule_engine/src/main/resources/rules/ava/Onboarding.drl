@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import signals.EmployeeUpdateSignal;
+import com.mindsmiths.armory.templates.BaseTemplate;
 
 import agents.Ava;
 import agents.CultureMaster;
@@ -30,18 +31,18 @@ rule "Send onboarding email"
                 agent.getConnection("armory"),
                 agent.getConnection("email"));
         agent.sendEmail(email);
-        modify(agent) {setOnboardingStage(OnboardingStage.EMAIL_SENT)};
+        modify(agent) {setOnboardingStage(OnboardingStage.WELCOME_EMAIL_SENT)};
 end
 
 rule "Start or reconnect familiarity quiz"
    when
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-onboarding") from entry-point "signals"
-        agent: Ava(onboardingStage in (OnboardingStage.EMAIL_SENT, OnboardingStage.FAMILIARITY_QUIZ))
+        agent: Ava(onboardingStage in (OnboardingStage.WELCOME_EMAIL_SENT, OnboardingStage.FAMILIARITY_QUIZ))
    then
-        agent.showFamiliarityQuizScreens();
-        modify(agent) {
-            setOnboardingStage(OnboardingStage.FAMILIARITY_QUIZ)
-        };
+        Map<String, BaseTemplate> screens = new OnboardingTemplates()
+                .familiarityQuizScreens(agent.createOtherEmployeeNames());
+        agent.showScreens("introScreen", screens);
+        modify(agent) {setOnboardingStage(OnboardingStage.FAMILIARITY_QUIZ)};
         delete(signal);
 end
 
@@ -72,6 +73,7 @@ rule "Reconnect final screen"
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-onboarding") from entry-point "signals"
         agent: Ava(onboardingStage == OnboardingStage.FINISHED)
    then
-        agent.showFinalScreen();
+        BaseTemplate screen = new OnboardingTemplates().finalScreen();
+        agent.showScreen(screen);
         delete(signal);
 end

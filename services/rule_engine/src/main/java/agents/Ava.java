@@ -56,8 +56,7 @@ public class Ava extends Agent {
     private boolean manualTrigger;
     private boolean workingHours;
     private boolean availabilityInterval;
-    private List<String> lunchDeclineReasons = new ArrayList<>(); // track days
-    // a map of how strong MY connections are to other employees
+    private List<String> lunchDeclineReasons = new ArrayList<>();
     private Map<String, Neuron> connectionStrengths = new HashMap<>();
     public static final double CONNECTION_NEURON_CAPACITY = 100;
     public static final double CONNECTION_NEURON_RESISTANCE = 0.05;
@@ -204,102 +203,13 @@ public class Ava extends Agent {
         showScreens("confirmDaysScreen", screens);
     }
 
-    private Map<String, String> getOtherEmployeeNames() {
+    public Map<String, String> createOtherEmployeeNames() {
         Map<String, String> otherEmployeeNames = new HashMap<>();
 
         for (EmployeeProfile employee : otherEmployees.values()) {
             otherEmployeeNames.put(employee.getFullName(), employee.getId());
         }
         return otherEmployeeNames;
-    }
-
-    public void showFamiliarityQuizScreens() {
-        Map<String, BaseTemplate> screens = new HashMap<>();
-        String avaImagePath = Mitems.getText("onboarding.ava-image-path.path");
-        // Adding intro screens
-        String introButton = Mitems.getText("onboarding.familiarity-quiz-intro.action");
-        String introScreenTitle = Mitems.getText("onboarding.familiarity-quiz-intro.title");
-        String introScreenDescription = Mitems.getHTML("onboarding.familiarity-quiz-intro.description");
-
-        screens.put("introScreen", new TemplateGenerator()
-                .addComponent("title", new TitleComponent(introScreenTitle))
-                .addComponent("image", new ImageComponent(Mitems.getText("onboarding.silos-image-path.connected")))
-                .addComponent("description", new DescriptionComponent(introScreenDescription))
-                .addComponent("submit", new PrimarySubmitButtonComponent(introButton, "secondIntroScreen"))
-                .addComponent("pageNum", new DescriptionComponent("1/2")));
-
-        screens.put("secondIntroScreen", new TemplateGenerator()
-                .addComponent("header", new HeaderComponent(null, true))
-                .addComponent("title", new TitleComponent(
-                        Mitems.getText("onboarding.familiarity-quiz-second-intro.title")))
-                .addComponent("image", new ImageComponent(Mitems.getText("onboarding.silos-image-path.devided")))
-                .addComponent("description", new DescriptionComponent(
-                        Mitems.getText("onboarding.familiarity-quiz-second-intro.description")))
-                .addComponent("submit", new PrimarySubmitButtonComponent(
-                        Mitems.getText("onboarding.familiarity-quiz-second-intro.action"), "question1"))
-                .addComponent("pageNum", new DescriptionComponent("2/2")));
-
-        int questionNum = 1;
-        String submitButton = Mitems.getText("onboarding.familiarity-quiz-questions.action");
-        String questionDescription = Mitems.getText("onboarding.familiarity-quiz-questions.question-description");
-
-        while (true) {
-            String questionTag = "question" + questionNum;
-            String nextQuestionTag = "question" + (questionNum + 1);
-            String answersTag = "answers" + questionNum;
-
-            try {
-                String questionText = Mitems.getText("onboarding.familiarity-quiz-questions." + questionTag);
-                screens.put(questionTag, new TemplateGenerator(questionTag)
-                        .addComponent("header", new HeaderComponent(null, true))
-                        .addComponent("question", new TitleComponent(questionText))
-                        .addComponent("description", new DescriptionComponent(questionDescription))
-                        .addComponent(answersTag, new CloudSelectComponent(answersTag, getOtherEmployeeNames()))
-                        .addComponent("submit", new PrimarySubmitButtonComponent(
-                                "submit", submitButton, nextQuestionTag))
-                        .addComponent("pageNum", new DescriptionComponent(questionNum + "/3")));
-                questionNum += 1;
-
-            } catch (Exception e) {
-                // Changing button value
-                String wrongQuestionTag = "question" + (questionNum - 1);
-
-                TemplateGenerator templateGenerator = (TemplateGenerator) screens.get(wrongQuestionTag);
-                PrimarySubmitButtonComponent buttonComponent = (PrimarySubmitButtonComponent) templateGenerator
-                        .getComponents()
-                        .get("submit");
-                buttonComponent.setInputId("finish-familiarity-quiz");
-                buttonComponent.setValue("finish-familiarity-quiz");
-
-                String familiarityQuizFinalButton = Mitems
-                        .getText("onboarding.familiarity-quiz-goodbye.action");
-                String finishFamiliarityQuizText = Mitems
-                        .getHTML("onboarding.familiarity-quiz-goodbye.text");
-                String finishFamiliarityQuizTitle = Mitems
-                        .getText("onboarding.familiarity-quiz-goodbye.title");
-                screens.put("finish-familiarity-quiz", new TemplateGenerator("finish-familiarity-quiz")
-                        .addComponent("header", new HeaderComponent(null, true))
-                        .addComponent("image", new ImageComponent(avaImagePath))
-                        .addComponent("title", new TitleComponent(finishFamiliarityQuizTitle))
-                        .addComponent("description", new DescriptionComponent(finishFamiliarityQuizText))
-                        .addComponent("finished-familiarity-quiz", new PrimarySubmitButtonComponent(
-                                "finished-familiarity-quiz", familiarityQuizFinalButton,
-                                "finished-familiarity-quiz")));
-                String goodbyeScreen = Mitems.getText("onboarding.familiarity-quiz-goodbye.finish-screen");
-                screens.put("finished-familiarity-quiz", new TemplateGenerator("final-screen")
-                        .addComponent("title", new TitleComponent(goodbyeScreen)));
-                break;
-            }
-        }
-        showScreens("introScreen", screens);
-    }
-
-    public void showFinalScreen() {
-        String goodbyeScreen = Mitems.getText("onboarding.familiarity-quiz-goodbye.finish-screen");
-        BaseTemplate screen = new TemplateGenerator("goodbye")
-                .setTemplateName("CenteredContentTemplate")
-                .addComponent("title", new TitleComponent(goodbyeScreen));
-        showScreen(screen);
     }
 
     public void sendEmail(SendEmailPayload email) throws IOException {
@@ -363,7 +273,7 @@ public class Ava extends Agent {
                 screens.put(questionTag, new TemplateGenerator(questionTag)
                         .addComponent("header", new HeaderComponent(null, questionNum > 1))
                         .addComponent("question", new TitleComponent(questionText))
-                        .addComponent(answersTag, new CloudSelectComponent(answersTag, getOtherEmployeeNames()))
+                        .addComponent(answersTag, new CloudSelectComponent(answersTag, createOtherEmployeeNames()))
                         .addComponent("submit", new PrimarySubmitButtonComponent(
                                 "submit", submitButton, nextQuestionTag)));
                 questionNum += 1;
@@ -549,7 +459,6 @@ public class Ava extends Agent {
     }
 
     // Events
-
     public void identify() {
         EventTracking.identify(id, new HashMap<>() {
             {
@@ -565,5 +474,4 @@ public class Ava extends Agent {
     public void logEvent(String event, Map<String, Object> properties) {
         EventTracking.capture(id, event, properties);
     }
-
 }

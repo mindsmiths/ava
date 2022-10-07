@@ -70,7 +70,7 @@ rule "Reconnect monthly final screen"
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-monthly-core") from entry-point "signals"
         agent: Ava(monthlyCoreStage == MonthlyCoreStage.FINISHED)
    then
-        agent.showFinalScreen();
+        //agent.showFinalScreen();
         delete(signal);
 end
 

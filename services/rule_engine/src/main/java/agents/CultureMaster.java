@@ -17,7 +17,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import models.EmployeeProfile;
 import models.CmLunchCycleStage;
-
+import signals.AllEmployees;
 import signals.EmployeeUpdateSignal;
 import signals.SendMatchesSignal;
 import signals.SendNoMatchesSignal;
@@ -95,4 +95,11 @@ public class CultureMaster extends Agent {
     public void addOrUpdateEmployee(EmployeeUpdateSignal signal) {
         employees.put(signal.getFrom(), signal.getEmployee());
     }
+
+    public void sendEmployeesToAva() {
+        for (String address : employees.keySet()) {
+            AllEmployees allEmployees = new AllEmployees(employees);
+            send(address, allEmployees);
+        }
+    } 
 }
