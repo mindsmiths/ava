@@ -22,17 +22,13 @@ rule "Create new employee"
         agent: Ava(onboardingStage == null)
     then
         delete(newEmployee);
-        Log.warn("Before!!!!!");
         modify(agent) {
             addConnection("email", newEmployee.getEmail()),
             addConnection("armory", Utils.randomGenerator()),
             setOnboardingStage(OnboardingStage.AVA_CREATED)
         };
-        Log.warn("After!!!!!");
         EmployeeProfile profile = new EmployeeProfile(newEmployee);
-        Log.warn("Before2!!!!!");
         insert(profile);
-        Log.warn("After2!!!!!");
         agent.send(CultureMaster.ID, new EmployeeUpdateSignal(profile));
 end
 

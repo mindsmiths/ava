@@ -18,9 +18,7 @@ rule "Set working hours"
         eval(evaluateCronExpression("* * 00-23 ? * MON-SUN *", ts, "Europe/Zagreb"))
         agent: Ava(workingHours != true)
     then
-        modify(agent) {
-            setWorkingHours(true)
-        }
+        modify(agent) {setWorkingHours(true)}
 end
 
 rule "Set non working hours"
@@ -43,8 +41,6 @@ rule "Set availability interval"
         agent: Ava(availabilityInterval != anyCronSatisfied(ts, "Europe/Zagreb", "* * 9-23 * * WED", "* * * * * THU",
                                                             "* * 00-16 * * FRI"), interval: availabilityInterval)
     then
-        modify(agent) {
-            setAvailabilityInterval(!interval)
-        }
+        modify(agent) {setAvailabilityInterval(!interval)}
 end
 

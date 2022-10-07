@@ -22,8 +22,9 @@ import signals.SendNoMatchesSignal;
 
 import models.AvaLunchCycleStage;
 import models.OnboardingStage;
-import models.LunchReminderStage
-import models.EmployeeProfile
+import models.LunchReminderStage;
+import models.EmployeeProfile;
+import models.WeeklyCoreTemplates;
 
 rule "Send available days email"
     when
@@ -34,7 +35,12 @@ rule "Send available days email"
             || (agent.isManualTrigger() == true))
         employee: EmployeeProfile()
     then
-        agent.sendWeeklyEmail(employee);
+        SendEmailPayload email = new WeeklyCoreTemplates().weeklyEmail(
+                employee,
+                agent.getLunchReminderStage(),
+                agent.getConnection("armory"),
+                agent.getConnection("email"));
+        agent.sendEmail(email);
         modify(agent) {
             setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY),
             setLunchReminderStage(LunchReminderStage.FIRST_EMAIL_SENT),
@@ -59,7 +65,12 @@ rule "Send second reminder"
             setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY),
             setLunchReminderStage(LunchReminderStage.SECOND_EMAIL_SENT)
         }
-        agent.sendWeeklyEmail(employee);      
+        SendEmailPayload email = new WeeklyCoreTemplates().weeklyEmail(
+                employee,
+                agent.getLunchReminderStage(),
+                agent.getConnection("armory"),
+                agent.getConnection("email"));
+        agent.sendEmail(email);
 end
 
 rule "Send third reminder"
@@ -80,7 +91,12 @@ rule "Send third reminder"
             setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY),
             setLunchReminderStage(LunchReminderStage.THIRD_EMAIL_SENT)
         }
-        agent.sendWeeklyEmail(employee);
+        SendEmailPayload email = new WeeklyCoreTemplates().weeklyEmail(
+                employee,
+                agent.getLunchReminderStage(),
+                agent.getConnection("armory"),
+                agent.getConnection("email"));
+        agent.sendEmail(email);
 end
 
 rule "Ask for available days"

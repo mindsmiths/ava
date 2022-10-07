@@ -65,52 +65,34 @@ public class Ava extends Agent {
         super(connectionName, connectionId);
     }
 
-    public boolean getAvailabilityInterval() {
-        return availabilityInterval;
-    }
-
-    // trigger whenever new Ava is onboarded in CreateOrUpdateAva, "Save or update
-    // all employees"
     public void addConnectionStrengths() {
-        for (String avaId : this.otherEmployees.keySet()) {
+        for (String avaId : this.otherEmployees.keySet()) 
             if (!connectionStrengths.containsKey(otherEmployees.get(avaId).getId())) {
                 connectionStrengths.put(otherEmployees.get(avaId).getId(),
                         new Neuron(CONNECTION_NEURON_RESISTANCE, CONNECTION_NEURON_CAPACITY));
             }
-        }
     }
 
-    // if user picked employee at any question in familiarity quiz, charge that
-    // connection to the max value
-    // trigger after familiarity quiz is over in Onboarding, "Finish onboarding"
     public void chargeConnectionNeurons(EmployeeProfile employeeProfile) {
-        for (Map.Entry<String, Double> entry : employeeProfile.getFamiliarity().entrySet()) {
-            if (entry.getValue() > 0) {
+        for (Map.Entry<String, Double> entry : employeeProfile.getFamiliarity().entrySet()) 
+            if (entry.getValue() > 0)
                 this.connectionStrengths.get(entry.getKey()).setValue(CONNECTION_NEURON_CAPACITY);
-            }
-        }
     }
 
     public Neuron getConnectionNeuron(String employeeId) {
         return this.connectionStrengths.get(employeeId);
     }
 
-    // decrease the strength of connection with time (days)
-    // trigger every week in LunchCycleStage, "Ask for available days"
     public void decayConnectionNeurons() {
         for (String avaId : this.otherEmployees.keySet()) {
             Log.info("Decaying SPECIFIC neuron with employee id: " + otherEmployees.get(avaId).getId());
             long daysPassed = ChronoUnit.DAYS.between(
                     getConnectionNeuron(otherEmployees.get(avaId).getId()).getLastUpdatedAt().toInstant(),
                     new Date().toInstant());
-            // getConnectionNeuron(otherEmployees.get(avaId).getId()).decay(daysPassed);
-            // TODO CHECK
-            getConnectionNeuron(otherEmployees.get(avaId).getId()).decay(7.);
+            getConnectionNeuron(otherEmployees.get(avaId).getId()).decay(daysPassed);
         }
     }
 
-    // convert map values from Neuron to Double
-    // used when sending data to CultureMaster
     public Map<String, Double> getConnectionStrengthAsValue() {
         Map<String, Double> m = new HashMap<>();
         for (Map.Entry<String, Neuron> entry : connectionStrengths.entrySet())
@@ -123,10 +105,6 @@ public class Ava extends Agent {
             if (DateUtil.evaluateCronExpression(cron, timestamp, timezone))
                 return true;
         return false;
-    }
-
-    public String avaToEmployeeId(String avaId) {
-        return otherEmployees.get(avaId).getId();
     }
 
     public String employeeToAvaId(String employeeId) {
@@ -205,10 +183,9 @@ public class Ava extends Agent {
 
     public Map<String, String> createOtherEmployeeNames() {
         Map<String, String> otherEmployeeNames = new HashMap<>();
-
-        for (EmployeeProfile employee : otherEmployees.values()) {
+        for (EmployeeProfile employee : otherEmployees.values())
             otherEmployeeNames.put(employee.getFullName(), employee.getId());
-        }
+
         return otherEmployeeNames;
     }
 
@@ -223,112 +200,6 @@ public class Ava extends Agent {
         e.setRecipients(List.of(getConnection("email")));
         e.setSubject(subject);
         e.setPlainText(description);
-        EmailAdapterAPI.newEmail(e);
-    }
-    
-    public void sendMonthlyCoreEmail(EmployeeProfile employee) throws IOException {
-        String subject = Mitems.getText("monthly-core.welcome-email.subject");
-        String description = Mitems.getText("monthly-core.welcome-email.description");
-        String htmlTemplate = new String(Objects.requireNonNull(
-                getClass().getClassLoader().getResourceAsStream("emailTemplates/EmailTemplate.html")).readAllBytes());
-
-        String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
-                "description", description,
-                "callToAction", Mitems.getText("monthly-core.welcome-email.action"),
-                "firstName", employee.getFirstName(),
-                "armoryUrl",
-                String.format("%s/%s?trigger=start-monthly-core", Settings.ARMORY_SITE_URL, getConnection("armory"))));
-
-        SendEmailPayload e = new SendEmailPayload();
-        e.setRecipients(List.of(getConnection("email")));
-        e.setSubject(subject);
-        e.setHtmlText(htmlBody);
-        EmailAdapterAPI.newEmail(e);
-    }
-    public void showMonthlyQuizScreens() {
-        Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
-        String avaImagePath = Mitems.getText("monthly-core.ava-image-path.path");
-
-        // Adding intro screen
-        String introButton = Mitems.getText("monthly-core.familiarity-quiz-intro.action");
-        String introScreenTitle = Mitems.getText("monthly-core.familiarity-quiz-intro.title");
-        String introScreenDescription = Mitems.getText("monthly-core.familiarity-quiz-intro.description");
-
-        screens.put("introScreen", new TemplateGenerator()
-                .addComponent("image", new ImageComponent(avaImagePath))
-                .addComponent("title", new TitleComponent(introScreenTitle))
-                .addComponent("description", new DescriptionComponent(introScreenDescription))
-                .addComponent("submit", new PrimarySubmitButtonComponent(introButton, "question1")));
-        // Adding questions and final screen in familiarity quiz
-        int questionNum = 1;
-        String submitButton = Mitems.getText("monthly-core.familiarity-quiz-questions.action");
-
-        while (true) {
-            String questionTag = "question" + questionNum;
-            String nextQuestionTag = "question" + String.valueOf(questionNum + 1);
-            String answersTag = "answers" + String.valueOf(questionNum);
-
-            try {
-                String questionText = Mitems.getText("monthly-core.familiarity-quiz-questions." + questionTag);
-                screens.put(questionTag, new TemplateGenerator(questionTag)
-                        .addComponent("header", new HeaderComponent(null, questionNum > 1))
-                        .addComponent("question", new TitleComponent(questionText))
-                        .addComponent(answersTag, new CloudSelectComponent(answersTag, createOtherEmployeeNames()))
-                        .addComponent("submit", new PrimarySubmitButtonComponent(
-                                "submit", submitButton, nextQuestionTag)));
-                questionNum += 1;
-
-            } catch (Exception e) {
-                // Changing button value
-                String wrongQuestionTag = "question" + String.valueOf(questionNum - 1);
-                TemplateGenerator templateGenerator = (TemplateGenerator) screens.get(wrongQuestionTag);
-                PrimarySubmitButtonComponent buttonComponent = (PrimarySubmitButtonComponent) templateGenerator
-                        .getComponents()
-                        .get("submit");
-                buttonComponent.setValue("finish-monthly-quiz");
-                buttonComponent.setInputId("finish-monthly-quiz");
-
-                String finishFamiliarityQuizText = Mitems.getText("monthly-core.familiarity-quiz-goodbye.text");
-                screens.put("finish-monthly-quiz", new TemplateGenerator("finish-monthly-quiz")
-                        .addComponent("title", new TitleComponent(finishFamiliarityQuizText)));
-                break;
-            }
-        }
-
-        showScreens("introScreen", screens);
-    }
-
-    public void sendWeeklyEmail(EmployeeProfile employee) throws IOException {
-        String subject = Mitems.getText("weekly-core.weekly-email.subject");
-        String description = Mitems.getText("weekly-core.weekly-email.description");
-
-        if (this.lunchReminderStage == LunchReminderStage.SECOND_EMAIL_SENT) { // second mail text
-            subject = Mitems.getText("weekly-core.first-reminder-email.subject");
-            description = Mitems.getText("weekly-core.first-reminder-email.description");
-
-        } else if (this.lunchReminderStage == LunchReminderStage.THIRD_EMAIL_SENT) { // third mail text
-            subject = Mitems.getText("weekly-core.second-reminder-email.subject");
-            description = Mitems.getText("weekly-core.second-reminder-email.description");
-        }
-
-        String htmlTemplate = new String(Objects.requireNonNull(
-                getClass().getClassLoader().getResourceAsStream("emailTemplates/WeeklyEmailTemplate.html"))
-                .readAllBytes());
-
-        String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
-                "text", description,
-                "firstName", employee.getFirstName(),
-                "button1", Mitems.getText("weekly-core.weekly-email.button1"),
-                "button2", Mitems.getText("weekly-core.weekly-email.button2"),
-                "armoryUrl1",
-                String.format("%s/%s?trigger=start-weekly-core", Settings.ARMORY_SITE_URL, getConnection("armory")),
-                "armoryUrl2", String.format("%s/%s?trigger=start-lunch-decline-reason-screen", Settings.ARMORY_SITE_URL,
-                        getConnection("armory"))));
-
-        SendEmailPayload e = new SendEmailPayload();
-        e.setRecipients(List.of(getConnection("email")));
-        e.setSubject(subject);
-        e.setHtmlText(htmlBody);
         EmailAdapterAPI.newEmail(e);
     }
 
@@ -376,7 +247,7 @@ public class Ava extends Agent {
         EmailAdapterAPI.newEmail(payload);
     }
 
-    public String renderMatchmakingEmail(Days days, EmployeeProfile currentEmployee, EmployeeProfile otherEmployee)
+    private String renderMatchmakingEmail(Days days, EmployeeProfile currentEmployee, EmployeeProfile otherEmployee)
             throws IOException {
         String htmlTemplate = new String(Objects.requireNonNull(
                 getClass().getClassLoader().getResourceAsStream("emailTemplates/EmailTemplateCalendar.html"))

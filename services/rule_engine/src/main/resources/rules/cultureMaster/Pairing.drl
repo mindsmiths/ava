@@ -76,10 +76,19 @@ rule "Send match info to Ava agents"
     then
         agent.sendMatches();
         modify(agent) {
-            setLunchCycleStage(CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES),
+            setLunchCycleStage(CmLunchCycleStage.FINISHED),
             clearEmployeeAvailabilities()
         };
 end
+
+rule "Restore lunch cycle"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.FINISHED)
+        eval(evaluateCronExpression("* * 18-19 ? * FRI *", ts, "Europe/Zagreb"))
+    then
+        modify(agent) {setLunchCycleStage(CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES)};
+end 
 
 rule "Store lunch compatibilities"
     when
