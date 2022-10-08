@@ -1,10 +1,11 @@
 package rules.cultureMaster;
 
-import agents.CultureMaster;
-import signals.EmployeeUpdateSignal;
 import com.mindsmiths.employeeManager.ManualTriggerEvent;
 import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.ruleEngine.model.Heartbeat;
+
+import agents.CultureMaster;
+import signals.EmployeeUpdateSignal;
 import models.CmLunchCycleStage;
 import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
 
@@ -15,8 +16,7 @@ rule "Add or update Ava data"
     then
         modify(agent) {
             addOrUpdateEmployee(signal),
-            sendEmployeesToAva()    
-        };
+            sendEmployeesToAva()};
         delete(signal);
 end
 

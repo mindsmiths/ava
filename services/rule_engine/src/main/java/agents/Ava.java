@@ -8,14 +8,14 @@ import com.mindsmiths.pairingalgorithm.Days;
 import com.mindsmiths.ruleEngine.model.Agent;
 import com.mindsmiths.ruleEngine.util.DateUtil;
 import com.mindsmiths.ruleEngine.util.Log;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-import models.*;
 
+import models.*;
 import signals.SendMatchesSignal;
 import utils.EventTracking;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import java.io.IOException;
 import java.text.ParseException;
 import java.time.temporal.ChronoUnit;
@@ -49,8 +49,20 @@ public class Ava extends Agent {
         super(connectionName, connectionId);
     }
 
+    public void showScreen(BaseTemplate screen) {
+        ArmoryAPI.showScreen(getConnection("armory"), screen);
+    }
+
+    public void showScreens(String firstScreenId, Map<String, BaseTemplate> screens) {
+        ArmoryAPI.showScreens(getConnection("armory"), firstScreenId, screens);
+    }
+
+    public void sendEmail(SendEmailPayload email) throws IOException {
+        EmailAdapterAPI.newEmail(email);
+    }
+
     public void addConnectionStrengths() {
-        for (String avaId : this.otherEmployees.keySet()) 
+        for (String avaId : this.otherEmployees.keySet())
             if (!connectionStrengths.containsKey(otherEmployees.get(avaId).getId())) {
                 connectionStrengths.put(otherEmployees.get(avaId).getId(),
                         new Neuron(CONNECTION_NEURON_RESISTANCE, CONNECTION_NEURON_CAPACITY));
@@ -58,7 +70,7 @@ public class Ava extends Agent {
     }
 
     public void chargeConnectionNeurons(EmployeeProfile employeeProfile) {
-        for (Map.Entry<String, Double> entry : employeeProfile.getFamiliarity().entrySet()) 
+        for (Map.Entry<String, Double> entry : employeeProfile.getFamiliarity().entrySet())
             if (entry.getValue() > 0)
                 this.connectionStrengths.get(entry.getKey()).setValue(CONNECTION_NEURON_CAPACITY);
     }
@@ -114,18 +126,6 @@ public class Ava extends Agent {
         }
     }
 
-    public void showScreen(BaseTemplate screen) {
-        ArmoryAPI.showScreen(getConnection("armory"), screen);
-    }
-
-    public void showScreens(String firstScreenId, Map<String, BaseTemplate> screens) {
-        ArmoryAPI.showScreens(getConnection("armory"), firstScreenId, screens);
-    }
-    
-    public void sendEmail(SendEmailPayload email) throws IOException {
-        EmailAdapterAPI.newEmail(email);
-    }
-    
     public Map<String, String> createOtherEmployeeNames() {
         Map<String, String> otherEmployeeNames = new HashMap<>();
         for (EmployeeProfile employee : otherEmployees.values())
@@ -134,7 +134,6 @@ public class Ava extends Agent {
         return otherEmployeeNames;
     }
 
-    // Events
     public void identify() {
         EventTracking.identify(id, new HashMap<>() {
             {

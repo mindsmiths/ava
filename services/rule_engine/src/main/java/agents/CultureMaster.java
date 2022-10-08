@@ -47,6 +47,17 @@ public class CultureMaster extends Agent {
         this.employeeAvailabilities = new ArrayList<>();
     }
 
+    public void addOrUpdateEmployee(EmployeeUpdateSignal signal) {
+        employees.put(signal.getFrom(), signal.getEmployee());
+    }
+
+    public void sendEmployeesToAva() {
+        for (String address : employees.keySet()) {
+            AllEmployees allEmployees = new AllEmployees(employees);
+            send(address, allEmployees);
+        }
+    }
+
     public void generateMatches() {
         PairingAlgorithmAPI.generatePairs(
                 new ArrayList<>(employeeAvailabilities),
@@ -91,15 +102,4 @@ public class CultureMaster extends Agent {
                 return entry.getKey();
         return "";
     }
-
-    public void addOrUpdateEmployee(EmployeeUpdateSignal signal) {
-        employees.put(signal.getFrom(), signal.getEmployee());
-    }
-
-    public void sendEmployeesToAva() {
-        for (String address : employees.keySet()) {
-            AllEmployees allEmployees = new AllEmployees(employees);
-            send(address, allEmployees);
-        }
-    } 
 }

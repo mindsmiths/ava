@@ -22,7 +22,7 @@ import java.util.List;
 rule "Send monthly core email"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        //eval(evaluateCronExpression("* * * ? * 2#1 *", ts, "Europe/Zagreb"))
+        eval(evaluateCronExpression("* * * ? * 2#1 *", ts, "Europe/Zagreb"))
         agent: Ava(workingHours == true, monthlyCoreStage == null)
         employee: EmployeeProfile()
     then
@@ -30,7 +30,6 @@ rule "Send monthly core email"
             employee,
             agent.getConnection("armory"),
             agent.getConnection("email"));
-        Thread.sleep ( 1000L);
         agent.sendEmail(email);
         modify(agent) {setMonthlyCoreStage(MonthlyCoreStage.EMAIL_SENT)};
 end
