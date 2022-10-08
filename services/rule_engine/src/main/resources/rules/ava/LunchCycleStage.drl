@@ -109,7 +109,7 @@ rule "Ask for available days"
         )
         employee: EmployeeProfile()
     then
-        agent.chooseAvailableDaysScreen();
+        agent.showScreen(new WeeklyCoreTemplates().availableDaysScreen());
         modify(agent) {
             decayConnectionNeurons(),
             setManualTrigger(false)
@@ -126,7 +126,7 @@ rule "Reconnect ask for available days"
             (availabilityInterval == true || manualTrigger == true)
         )
    then
-        agent.chooseAvailableDaysScreen();
+        agent.showScreen(new WeeklyCoreTemplates().availableDaysScreen());
         delete(signal);
 end
 
@@ -138,20 +138,21 @@ rule "Confirm days"
     then
         List<String> availableDays = (ArrayList<String>)signal.getParam("availableDays");
         if(availableDays.size() > 0)
-            agent.confirmingDaysScreen();
+            agent.showScreens("confirmDaysScreen", new WeeklyCoreTemplates().confirmingDaysScreen());
         else
-            agent.showLunchDeclineReasonScreens();
+            agent.showScreens("LunchDecline", new WeeklyCoreTemplates().lunchDeclineReasonScreens());
 
         modify(agent) {
             updateAvailableDays(availableDays),
             setLunchCycleStage(AvaLunchCycleStage.ACCEPT_MATCH_INFO),
             setLunchReminderStage(LunchReminderStage.USER_RESPONDED)
         };
-
-        agent.send(CultureMaster.ID, new EmployeeAvailabilitySignal(new EmployeeAvailability(employee.getId(), agent.getAvailableDays())));
-        agent.send(CultureMaster.ID, new MatchingParametarsSignal(employee.getId(),
-                                                                  agent.getConnectionStrengthAsValue(),
-                                                                  agent.getMatchHistory()));
+        agent.send(CultureMaster.ID, new EmployeeAvailabilitySignal(
+                new EmployeeAvailability(employee.getId(), agent.getAvailableDays())));
+        agent.send(CultureMaster.ID, new MatchingParametarsSignal(
+                employee.getId(),
+                agent.getConnectionStrengthAsValue(),
+                agent.getMatchHistory()));
         delete(signal);
 end
 
@@ -161,7 +162,7 @@ rule "Lunch decline reason screen"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY,
                    lunchReminderStage != LunchReminderStage.USER_RESPONDED)
     then 
-        agent.showLunchDeclineReasonScreens();
+        agent.showScreens("LunchDecline", new WeeklyCoreTemplates().lunchDeclineReasonScreens());
         delete(signal);
 end
 
@@ -186,9 +187,12 @@ rule "Store match info"
             setMatch(match), setMatchDay(matchDay),
             getMatchHistory().add(match)
         };
-        Log.info("updated match history " + agent.getMatchHistory());
         agent.printMatchInfo(employee, signal);
-        agent.sendCalendarInvite(matchDay, employee, agent.getOtherEmployees().get(agent.employeeToAvaId(match)));
+        SendEmailPayload email = new WeeklyCoreTemplates().calendarInviteEmail(
+                matchDay,
+                employee, 
+                agent.getOtherEmployees().get(agent.employeeToAvaId(match)));
+        agent.sendEmail(email);
         delete(signal);
 end
 
@@ -197,7 +201,8 @@ rule "Send no match email"
         signal: SendNoMatchesSignal() from entry-point "signals"
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.ACCEPT_MATCH_INFO)
     then
-        agent.sendNoMatchEmail();
+        SendEmailPayload email = new WeeklyCoreTemplates().noMatchEmail(agent.getConnection("email"));
+        agent.sendEmail(email);
         delete(signal);
 end
 
@@ -213,7 +218,8 @@ rule "Auto assign days"
             setLunchReminderStage(LunchReminderStage.USER_RESPONDED),
             setAvailableDays(Arrays.asList(Days.values()))
         };
-        agent.send(CultureMaster.ID, new EmployeeAvailabilitySignal(new EmployeeAvailability(agent.getId(), agent.getAvailableDays())));
+        agent.send(CultureMaster.ID, new EmployeeAvailabilitySignal(
+                new EmployeeAvailability(agent.getId(), agent.getAvailableDays())));
 end
 
 rule "Reset Ava lunch cycle stage"
@@ -222,9 +228,7 @@ rule "Reset Ava lunch cycle stage"
         eval(evaluateCronExpression("* * 8-17 ? * SUN *", ts, "Europe/Zagreb"))
         agent: Ava(lunchCycleStage == AvaLunchCycleStage.ACCEPT_MATCH_INFO)
     then
-        modify(agent) {
-            setLunchCycleStage(AvaLunchCycleStage.LUNCH_MAIL_SENDING)
-        };
+        modify(agent) {setLunchCycleStage(AvaLunchCycleStage.LUNCH_MAIL_SENDING)};
 end
 
 rule "User already declined or confirmed available days"
@@ -232,7 +236,7 @@ rule "User already declined or confirmed available days"
         signal: UserConnectedEvent(getParamAsString("trigger") in ("start-lunch-decline-reason-screen", "start-weekly-core")) from entry-point "signals"
         agent: Ava(lunchReminderStage == LunchReminderStage.USER_RESPONDED)
     then
-        agent.showUserAlreadyRespondedScreen();
+        agent.showScreen(new WeeklyCoreTemplates().userAlreadyRespondedScreen());
         delete(signal);
 end
 
@@ -246,6 +250,6 @@ rule "Lunch invite expired"
             availabilityInterval == false
         )
     then 
-        agent.showLunchInviteExpiredScreen();
+        agent.showScreen(new WeeklyCoreTemplates().lunchInviteExpiredScreen());
         delete(signal);
 end

@@ -1,37 +1,21 @@
 package agents;
 
 import com.mindsmiths.armory.ArmoryAPI;
-import com.mindsmiths.armory.components.*;
 import com.mindsmiths.armory.templates.BaseTemplate;
-import com.mindsmiths.armory.templates.TemplateGenerator;
-import com.mindsmiths.emailAdapter.AttachmentData;
 import com.mindsmiths.emailAdapter.EmailAdapterAPI;
 import com.mindsmiths.emailAdapter.SendEmailPayload;
-import com.mindsmiths.employeeManager.employees.Employee;
-import com.mindsmiths.mitems.Mitems;
-import com.mindsmiths.mitems.Option;
 import com.mindsmiths.pairingalgorithm.Days;
 import com.mindsmiths.ruleEngine.model.Agent;
 import com.mindsmiths.ruleEngine.util.DateUtil;
 import com.mindsmiths.ruleEngine.util.Log;
-import com.mindsmiths.sdk.utils.templating.Templating;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import models.*;
-import net.fortuna.ical4j.data.CalendarOutputter;
-import net.fortuna.ical4j.model.Calendar;
-import net.fortuna.ical4j.model.DateTime;
-import net.fortuna.ical4j.model.component.VEvent;
-import net.fortuna.ical4j.model.property.CalScale;
-import net.fortuna.ical4j.model.property.Method;
-import net.fortuna.ical4j.model.property.ProdId;
-import net.fortuna.ical4j.model.property.Version;
+
 import signals.SendMatchesSignal;
-import utils.Settings;
 import utils.EventTracking;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.time.temporal.ChronoUnit;
@@ -137,196 +121,17 @@ public class Ava extends Agent {
     public void showScreens(String firstScreenId, Map<String, BaseTemplate> screens) {
         ArmoryAPI.showScreens(getConnection("armory"), firstScreenId, screens);
     }
-
-    public void chooseAvailableDaysScreen() {
-        Option[] days = Mitems.getOptions("weekly-core.days.each-day");
-        List<CloudSelectComponent.Option> options = new ArrayList<>();
-
-        for (Option option : days)
-            options.add(new CloudSelectComponent.Option(option.getText(), option.getId(), true));
-
-        BaseTemplate daysScreen = new TemplateGenerator()
-                .addComponent("title",
-                        new TitleComponent(Mitems.getText("weekly-core.title-asking-for-available-days.title")))
-                .addComponent("text",
-                        new DescriptionComponent(
-                                Mitems.getText("weekly-core.description-asking-for-available-days.text")))
-                .addComponent("cloudSelect", new CloudSelectComponent("availableDays", options))
-                .addComponent("confirmDays", new PrimarySubmitButtonComponent("confirmDays", "Submit", "confirmDays"));
-        showScreen(daysScreen);
+    
+    public void sendEmail(SendEmailPayload email) throws IOException {
+        EmailAdapterAPI.newEmail(email);
     }
-
-    public void confirmingDaysScreen() {
-        Option buttonOption = Mitems.getOptions("weekly-core.confirmation-of-choosen-available-days.button")[0];
-
-        Map<String, BaseTemplate> screens = Map.of(
-                "confirmDaysScreen",
-                new TemplateGenerator("confirmScreen")
-                        .setTemplateName("CenteredContentTemplate")
-                        .addComponent(
-                                "title",
-                                new TitleComponent(
-                                        Mitems.getHTML("weekly-core.confirmation-of-choosen-available-days.title")))
-                        .addComponent(
-                                "button",
-                                new PrimarySubmitButtonComponent(buttonOption.getText(), buttonOption.getId())),
-                "confirmDaysAndThanksScreen",
-                new TemplateGenerator("confirmAndThanksScreen")
-                        .setTemplateName("CenteredContentTemplate")
-                        .addComponent(
-                                "title",
-                                new TitleComponent(
-                                        Mitems.getText(
-                                                "weekly-core.stay-tuned-second-confirmation-of-available-days.title"))));
-        showScreens("confirmDaysScreen", screens);
-    }
-
+    
     public Map<String, String> createOtherEmployeeNames() {
         Map<String, String> otherEmployeeNames = new HashMap<>();
         for (EmployeeProfile employee : otherEmployees.values())
             otherEmployeeNames.put(employee.getFullName(), employee.getId());
 
         return otherEmployeeNames;
-    }
-
-    public void sendEmail(SendEmailPayload email) throws IOException {
-        EmailAdapterAPI.newEmail(email);
-    }
-
-    public void sendNoMatchEmail() throws IOException {
-        String subject = Mitems.getText("weekly-core.no-match-email.subject");
-        String description = Mitems.getText("weekly-core.no-match-email.description");
-        SendEmailPayload e = new SendEmailPayload();
-        e.setRecipients(List.of(getConnection("email")));
-        e.setSubject(subject);
-        e.setPlainText(description);
-        EmailAdapterAPI.newEmail(e);
-    }
-
-    public void showLunchInviteExpiredScreen() {
-        BaseTemplate lunchInviteExpiredScreen = new TemplateGenerator()
-                .addComponent("title", new TitleComponent(
-                        Mitems.getText("weekly-core.message-about-not-working-hours-for-links.title")));
-        showScreen(lunchInviteExpiredScreen);
-    }
-
-    public void showLunchDeclineReasonScreens() {
-        Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
-        String lunchDeclineScreen = Mitems.getText("weekly-core.lunch-decline-reason.title");
-        screens.put("LunchDecline", new TemplateGenerator()
-                .addComponent("title", new TitleComponent(lunchDeclineScreen))
-                .addComponent("answer", new TextAreaComponent("answer", true))
-                .addComponent("submit", new PrimarySubmitButtonComponent("Submit", "finished-lunch-decline-form")));
-        String finalScreenTitle = Mitems.getText("weekly-core.lunch-decline-reason.finalscreentitle");
-        screens.put("finished-lunch-decline-form", new TemplateGenerator()
-                .addComponent("description", new TitleComponent(finalScreenTitle)));
-        showScreens("LunchDecline", screens);
-    }
-
-    public void showUserAlreadyRespondedScreen() {
-        String goodbyeScreen = Mitems.getText("weekly-core.user-already-responded-screen.title");
-        BaseTemplate screen = new TemplateGenerator("goodbye").addComponent("title", new TitleComponent(goodbyeScreen));
-        showScreen(screen);
-    }
-
-    public void sendCalendarInvite(Days days, EmployeeProfile currentEmployee, EmployeeProfile otherEmployee)
-            throws IOException {
-        if (currentEmployee == null || otherEmployee == null)
-            throw new RuntimeException("Ava.sendCalendarInvite called with null arguments!");
-
-        String subject = Templating.recursiveRender(Mitems.getText("weekly-core.matching-mail.subject"), Map.of(
-                "employeeName", otherEmployee.getFirstName(),
-                "day", daysToPrettyString(days)));
-
-        SendEmailPayload payload = new SendEmailPayload();
-        payload.setRecipients(List.of(currentEmployee.getEmail()));
-        payload.setSubject(subject);
-        payload.setHtmlText(renderMatchmakingEmail(days, currentEmployee, otherEmployee)); // here goes HTML
-        payload.setAttachments(
-                List.of(new AttachmentData(getICSInvite(days, currentEmployee, otherEmployee), "invite.ics")));
-        EmailAdapterAPI.newEmail(payload);
-    }
-
-    private String renderMatchmakingEmail(Days days, EmployeeProfile currentEmployee, EmployeeProfile otherEmployee)
-            throws IOException {
-        String htmlTemplate = new String(Objects.requireNonNull(
-                getClass().getClassLoader().getResourceAsStream("emailTemplates/EmailTemplateCalendar.html"))
-                .readAllBytes());
-        return Templating.recursiveRender(htmlTemplate, Map.of(
-                "title", Mitems.getText("weekly-core.matching-mail.title"),
-                "description", Mitems.getHTML("weekly-core.matching-mail.description"),
-                "otherName", otherEmployee.getFirstName(),
-                "fullName", otherEmployee.getFullName(),
-                "myName", currentEmployee.getFirstName(),
-                "lunchDay", daysToPrettyString(days)));
-    }
-
-    private byte[] getICSInvite(Days day, Employee currentEmployee, Employee otherEmployee) {
-        try {
-            Calendar invite = new Calendar();
-            invite.getProperties().add(new ProdId("Ava"));
-            invite.getProperties().add(Version.VERSION_2_0);
-            invite.getProperties().add(CalScale.GREGORIAN);
-            invite.getProperties().add(Method.REQUEST);
-
-            int chosenDay = Map.of(
-                    Days.MON, java.util.Calendar.MONDAY,
-                    Days.TUE, java.util.Calendar.TUESDAY,
-                    Days.WED, java.util.Calendar.WEDNESDAY,
-                    Days.THU, java.util.Calendar.THURSDAY,
-                    Days.FRI, java.util.Calendar.FRIDAY).get(day);
-
-            java.util.Calendar now = java.util.Calendar.getInstance();
-            java.util.Calendar saturday = nextDayOfWeek(now, java.util.Calendar.SATURDAY);
-
-            java.util.Calendar lunchCalendarDate = nextDayOfWeek(saturday, chosenDay);
-            lunchCalendarDate.set(java.util.Calendar.HOUR_OF_DAY, 12);
-            lunchCalendarDate.set(java.util.Calendar.MINUTE, 0);
-            lunchCalendarDate.set(java.util.Calendar.SECOND, 0);
-
-            java.util.Calendar lunchCalendarDatePlusHour = (java.util.Calendar) lunchCalendarDate.clone();
-            lunchCalendarDatePlusHour.set(java.util.Calendar.HOUR_OF_DAY, 13);
-
-            String calendarEventName = Templating.recursiveRender(
-                    Mitems.getText("weekly-core.matching-mail.calendar-event"),
-                    Map.of(
-                            "firstName", currentEmployee.getFirstName(),
-                            "secondName", otherEmployee.getFirstName()));
-            VEvent ev = new VEvent(new DateTime(lunchCalendarDate.getTime()),
-                    new DateTime(lunchCalendarDatePlusHour.getTime()),
-                    calendarEventName);
-            ev.getProperties()
-                    .add(new net.fortuna.ical4j.model.property.Attendee("mailto:" + currentEmployee.getEmail()));
-            ev.getProperties()
-                    .add(new net.fortuna.ical4j.model.property.Attendee("mailto:" + otherEmployee.getEmail()));
-
-            invite.getComponents().add(ev);
-
-            ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-            CalendarOutputter out = new CalendarOutputter();
-            out.output(invite, byteOut);
-            return byteOut.toByteArray();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public String daysToPrettyString(Days days) {
-        for (Option option : Mitems.getOptions("weekly-core.days.each-day")) {
-            if (days.toString().equals(option.getId())) {
-                return option.getText();
-            }
-        }
-        return "Unknown";
-    }
-
-    public static java.util.Calendar nextDayOfWeek(java.util.Calendar now, int dow) {
-        int diff = dow - now.get(java.util.Calendar.DAY_OF_WEEK);
-        if (diff <= 0) {
-            diff += 7;
-        }
-        now.add(java.util.Calendar.DAY_OF_MONTH, diff);
-        return now;
     }
 
     // Events
