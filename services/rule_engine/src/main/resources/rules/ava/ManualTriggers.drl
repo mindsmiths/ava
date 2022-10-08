@@ -23,7 +23,7 @@ rule "Trigger onboarding"
                 agent.getConnection("email"));
         agent.sendEmail(email);
         modify(agent) {setOnboardingStage(OnboardingStage.WELCOME_EMAIL_SENT)};
-        modify(employee) {setFamiliarity(new HashMap<String, Double>())};
+        modify(employee) {getFamiliarity().clear()};
         delete(signal);
 end
 
