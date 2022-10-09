@@ -43,7 +43,7 @@ rule "Store Employee matching parametars"
     then
         employeeConnectionStrengths.put(employeeId, connectionStrengths);
         employeeMatchHistories.put(employeeId, matchHistory);
-        update(agent)
+        update(agent);
         delete(signal);
 end
 
@@ -65,8 +65,7 @@ rule "Store generated matches"
         Log.info("Matches from pairing algorithm: " + allMatches);
         modify(agent) {
             addMatches(allMatches),
-            setLunchCycleStage(CmLunchCycleStage.SEND_TO_AVAS)
-        };
+            setLunchCycleStage(CmLunchCycleStage.SEND_TO_AVAS)};
         delete(generatedMatches);
 end
 
@@ -77,8 +76,7 @@ rule "Send match info to Ava agents"
         agent.sendMatches();
         modify(agent) {
             setLunchCycleStage(CmLunchCycleStage.FINISHED),
-            clearEmployeeAvailabilities()
-        };
+            clearEmployeeAvailabilities()};
 end
 
 rule "Restore lunch cycle"

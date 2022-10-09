@@ -9,7 +9,7 @@ import signals.EmployeeUpdateSignal;
 import models.CmLunchCycleStage;
 import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
 
-rule "Add or update Ava data"
+rule "Update Ava data"
     when
         signal: EmployeeUpdateSignal() from entry-point "signals"
         agent: CultureMaster()

@@ -251,42 +251,7 @@
           {
             "description": "Title",
             "type": "HTML",
-            "content": "<p>Gotcha!</p>\n<p>I&rsquo;ll send you an email when I catch up with the others :)</p>"
-          }
-        ]
-      },
-      {
-        "name": "Confirming quiz guesses",
-        "elements": [
-          {
-            "description": "Button",
-            "type": "TEXT",
-            "content": "Let's see!"
-          },
-          {
-            "description": "Title",
-            "type": "TEXT",
-            "content": "Okay great!\n\nNow I will show you results."
-          }
-        ]
-      },
-      {
-        "name": "Correct screen",
-        "elements": [
-          {
-            "description": "Button",
-            "type": "TEXT",
-            "content": "Next"
-          },
-          {
-            "description": "Image",
-            "type": "TEXT",
-            "content": "/public/correct.png"
-          },
-          {
-            "description": "Title",
-            "type": "TEXT",
-            "content": "You are correct!"
+            "content": "<p>Gotcha!</p>\n<p>I&rsquo;ll send you an email when I catch up with the others&nbsp;<span class=\"emoji\">🙂</span></p>"
           }
         ]
       },
@@ -329,9 +294,9 @@
         "name": "Lunch Decline Reason",
         "elements": [
           {
-            "description": "FinalScreenTitle",
+            "description": "Final Screen Title",
             "type": "TEXT",
-            "content": "Bye now. You are the best!"
+            "content": "See you next week!"
           },
           {
             "description": "Title",
@@ -411,7 +376,7 @@
           {
             "description": "Title",
             "type": "TEXT",
-            "content": "You’re welcome. Stay tuned for the lunch :)"
+            "content": "You’re welcome. Stay tuned for the lunch 🙂"
           }
         ]
       },
@@ -467,26 +432,6 @@
             "description": "Subject",
             "type": "TEXT",
             "content": "Pick a day"
-          }
-        ]
-      },
-      {
-        "name": "Wrong screen",
-        "elements": [
-          {
-            "description": "Button",
-            "type": "TEXT",
-            "content": "Next"
-          },
-          {
-            "description": "Image",
-            "type": "TEXT",
-            "content": "/public/wrong.png"
-          },
-          {
-            "description": "Title",
-            "type": "TEXT",
-            "content": "You guessed wrong!"
           }
         ]
       }

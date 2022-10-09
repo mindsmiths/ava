@@ -44,7 +44,7 @@ rule "Update existing employee"
         agent.send(CultureMaster.ID, new EmployeeUpdateSignal(profile));
 end
 
-rule "Set other employees"
+rule "Update other employees data"
     when
         signal: AllEmployees(allEmployees: allEmployees) from entry-point "signals"
         agent: Ava()

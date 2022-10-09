@@ -106,15 +106,15 @@ public class WeeklyCoreTemplates {
 
     public Map<String, BaseTemplate> lunchDeclineReasonScreens() {
         Map<String, BaseTemplate> screens = new HashMap<>();
-
         screens.put("LunchDecline", new TemplateGenerator()
                 .addComponent("title", new TitleComponent(
                         Mitems.getText("weekly-core.lunch-decline-reason.title")))
                 .addComponent("answer", new TextAreaComponent("answer", true))
-                .addComponent("submit", new PrimarySubmitButtonComponent("Submit", "finished-lunch-decline-form")));
+                .addComponent("submit", new PrimarySubmitButtonComponent(
+                        "finished-lunch-decline-form", "Submit", "finished-lunch-decline-form")));
         screens.put("finished-lunch-decline-form", new TemplateGenerator()
                 .addComponent("description", new TitleComponent(
-                        Mitems.getText("weekly-core.lunch-decline-reason.finalscreentitle"))));
+                        Mitems.getText("weekly-core.lunch-decline-reason.final-screen-title"))));
         return screens;
     }
 
