@@ -271,7 +271,7 @@
           {
             "description": "Text",
             "type": "TEXT",
-            "content": "Choose one or more days that you’re free for lunch\n"
+            "content": "All days are preselected by default so choose one or more days that don't suit you."
           }
         ]
       },
