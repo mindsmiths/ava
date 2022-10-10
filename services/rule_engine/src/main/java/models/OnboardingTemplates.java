@@ -101,23 +101,83 @@ public class OnboardingTemplates {
                         .addComponent("image",
                                 new ImageComponent(Mitems.getText("onboarding.ava-image-path.path")))
                         .addComponent("title",
-                                new TitleComponent(Mitems.getText("onboarding.familiarity-quiz-goodbye.title")))
+                                new TitleComponent(Mitems.getText("onboarding.familiarity-quiz-outro.title")))
                         .addComponent("description",
-                                new DescriptionComponent(Mitems.getHTML("onboarding.familiarity-quiz-goodbye.text")))
+                                new DescriptionComponent(Mitems.getHTML("onboarding.familiarity-quiz-outro.text")))
                         .addComponent("final-screen",
                                 new PrimarySubmitButtonComponent(
-                                        "final-screen",
-                                        Mitems.getText("onboarding.familiarity-quiz-goodbye.action"),
-                                        "final-screen")));
-                screens.put("final-screen", new TemplateGenerator("final-screen")
-                        .addComponent("title", new TitleComponent(
-                                Mitems.getText("onboarding.familiarity-quiz-goodbye.finish-screen"))));
+                                        "final-familiarity-screen",
+                                        Mitems.getText("onboarding.familiarity-quiz-outro.action"),
+                                        "final-familiarity-screen")));
                 break;
             }
         }
         return screens;
     }
 
+    public BaseTemplate personalQuizIntroScreens() {
+        BaseTemplate screen = new TemplateGenerator("introScreen")
+                .addComponent("image", new ImageComponent(Mitems.getText("onboarding.ava-image-path.path")))
+                .addComponent("title", new TitleComponent(Mitems.getText("onboarding.personal-quiz-intro.title")))
+                .addComponent("description", new DescriptionComponent(
+                        Mitems.getText("onboarding.personal-quiz-intro.description")))
+                .addComponent("submit", new PrimarySubmitButtonComponent(
+                        "start-personal-quiz",
+                        Mitems.getText("onboarding.personal-quiz-intro.action"),
+                        "start-personal-quiz"));
+        return screen;
+    }
+
+    /*
+     * public void showPersonalQuizScreens(String questionTag, int
+     * numOfPersonalAnswers) {
+     * int questionNum = Integer.valueOf(questionTag.replace("question", ""));
+     * String answersTag = "answers" + String.valueOf(questionNum);
+     * 
+     * BaseTemplate screen = new TemplateGenerator(questionTag)
+     * .addComponent("question", new TitleComponent(
+     * Mitems.getText(String.format("onboarding.personal-quiz-%s.%s", questionTag,
+     * questionTag))))
+     * .addComponent(answersTag, new TextAreaComponent(answersTag,
+     * "Type your answer here"))
+     * .addComponent("actionGroup", new ActionGroupComponent(List.of(
+     * new PrimarySubmitButtonComponent(
+     * "submit",
+     * Mitems.getText(String.format("onboarding.personal-quiz-%s.action",
+     * questionTag)),
+     * "submit"),
+     * new PrimarySubmitButtonComponent(
+     * "skip",
+     * "Skip this question",
+     * "skip"))))
+     * .addComponent("pageNum", new
+     * DescriptionComponent(String.valueOf(numOfPersonalAnswers + 1) + "/3"));
+     * showScreen(screen);
+     * }
+     * 
+     * public void showPersonalQuizOutroScreens() {
+     * Map<String, BaseTemplate> screens = new HashMap<>();
+     * Option[] finishQuizButton =
+     * Mitems.getOptions("onboarding.finish-personal-quiz.button");
+     * String finishPersonalQuiz =
+     * Mitems.getHTML("onboarding.finish-personal-quiz.text");
+     * String avaImagePath = Mitems.getText("monthly-core.ava-image-path.path");
+     * 
+     * screens.put("finishpersonalquiz", new TemplateGenerator("finishpersonalquiz")
+     * .addComponent("image", new ImageComponent(avaImagePath))
+     * .addComponent("title", new TitleComponent(finishPersonalQuiz))
+     * .addComponent("submit", new PrimarySubmitButtonComponent(
+     * "qoodbyescreen", finishQuizButton[0].getText(), "qoodbyescreen")));
+     * 
+     * String goodbyeScreen =
+     * Mitems.getText("onboarding.finish-personal-quiz.goodbye-screen");
+     * screens.put("qoodbyescreen", new TemplateGenerator("goodbye")
+     * .setTemplateName("CenteredContentTemplate")
+     * .addComponent("title", new TitleComponent(goodbyeScreen)));
+     * 
+     * showScreens("finishpersonalquiz", screens);
+     * }
+     */
     public BaseTemplate finalScreen() {
         BaseTemplate screen = new TemplateGenerator("goodbye")
                 .setTemplateName("CenteredContentTemplate")

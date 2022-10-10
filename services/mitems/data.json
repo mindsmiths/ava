@@ -135,31 +135,6 @@
         ]
       },
       {
-        "name": "Familiarity quiz goodbye",
-        "elements": [
-          {
-            "description": "Action",
-            "type": "TEXT",
-            "content": "Great, till later"
-          },
-          {
-            "description": "Finish screen",
-            "type": "TEXT",
-            "content": "You are the best 😘"
-          },
-          {
-            "description": "Text",
-            "type": "HTML",
-            "content": "<p>WooHoo! You did it! 🙌</p>\n<p>You can expect an email from me soon.</p>\n<p>&nbsp;</p>"
-          },
-          {
-            "description": "Title",
-            "type": "TEXT",
-            "content": "Well done!"
-          }
-        ]
-      },
-      {
         "name": "Familiarity quiz intro",
         "elements": [
           {
@@ -176,6 +151,31 @@
             "description": "Title",
             "type": "TEXT",
             "content": "This is how a healthy, silos-free organization looks like"
+          }
+        ]
+      },
+      {
+        "name": "Familiarity quiz outro",
+        "elements": [
+          {
+            "description": "Action",
+            "type": "TEXT",
+            "content": "Sure, let’s go"
+          },
+          {
+            "description": "Finish screen",
+            "type": "TEXT",
+            "content": "You are the best 😘"
+          },
+          {
+            "description": "Text",
+            "type": "HTML",
+            "content": "<p><span style=\"font-weight: 400;\">You did a great job and don&rsquo;t worry about the absolute accuracy of your answers, your best guess is good enough for me to do my math 😁</span></p>\n<p>&nbsp;</p>\n<p><span style=\"font-weight: 400;\">Now let me get to know YOU a bit better.</span></p>"
+          },
+          {
+            "description": "Title",
+            "type": "TEXT",
+            "content": "Well done!"
           }
         ]
       },
