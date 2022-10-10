@@ -19,6 +19,7 @@ import models.EmployeeProfile;
 import models.CmLunchCycleStage;
 import signals.AllEmployees;
 import signals.EmployeeUpdateSignal;
+import signals.OtherEmployees;
 import signals.SendMatchesSignal;
 import signals.SendNoMatchesSignal;
 
@@ -101,5 +102,12 @@ public class CultureMaster extends Agent {
             if (entry.getValue().getId().equals(employeeId))
                 return entry.getKey();
         return "";
+    }
+
+    public OtherEmployees createOtherEmployees(String senderId, OtherEmployees otherEmployees) {
+        for (Map.Entry<String, EmployeeProfile> employee : employees.entrySet())
+            if(!employee.getKey().equals(senderId))
+                otherEmployees.getOtherEmployees().put(employee.getKey(), employee.getValue());
+        return otherEmployees;
     }
 }

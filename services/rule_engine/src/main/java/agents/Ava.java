@@ -35,6 +35,7 @@ public class Ava extends Agent {
     private OnboardingStage onboardingStage;
     private MonthlyCoreStage monthlyCoreStage;
     private LunchReminderStage lunchReminderStage;
+    private IceBreakerStage iceBreakerStage;
     private Map<String, EmployeeProfile> otherEmployees;
     private boolean manualTrigger;
     private boolean workingHours;

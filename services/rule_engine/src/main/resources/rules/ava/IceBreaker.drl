@@ -1,0 +1,78 @@
+package rules.ava;
+
+import com.mindsmiths.armory.events.SubmitEvent;
+import com.mindsmiths.armory.events.UserConnectedEvent;
+
+import models.AvaLunchCycleStage;
+import models.EmployeeProfile;
+import models.IceBreakerStage;
+import models.IceBreaker;
+
+import signals.OtherEmployees;
+
+import agents.Ava;
+import java.util.List;
+
+rule "Request other employees"
+    when
+        agent: Ava (
+            iceBreakerStage == null,
+            lunchCycleStage == AvaLunchCycleStage.ACCEPT_MATCH_INFO,
+            match != null)
+    then
+        agent.send(CultureMaster.ID, new OtherEmployees());
+        modify(agent) {setIceBreakerStage(IceBreakerStage.REQUEST_SENT)};
+end
+
+rule "Create ice-breaker screens"
+    when
+        signal: OtherEmployees() from entry-point "signals"
+        agent: Ava (iceBreakerStage == IceBreakerStage.REQUEST_SENT)
+    then
+        EmployeeProfile match = signal.getOtherEmployees().get(signal.employeeToAvaId(agent.getMatch()));
+        IceBreaker questions = new IceBreaker(
+            match.getPersonalAnswers(),
+            new ArrayList<EmployeeProfile>(signal.getOtherEmployees().values()),
+            match.getFirstName());
+        insert(questions);
+        modify(agent) {setIceBreakerStage(IceBreakerStage.SHOW_QUESTION)};
+        delete(signal);
+end
+
+rule "Show question screen"
+    when
+        signal: SubmitEvent(getParamAsString("trigger") == "ice-breaker") from entry-point "signals"
+        agent: Ava(iceBreakerStage == IceBreakerStage.SHOW_QUESTION)
+        questions: IceBreaker(shownQuestions.size() < OPTIONS_COUNT)
+    then
+        String questionId = questions.nextQuestionId();
+        agent.showScreen(questions.buildQuestionScreen(questionId));
+        modify(questions) {updateShownScreens(questionId)}
+        modify(agent) {setIceBreakerStage(IceBreakerStage.WAIT_FOR_ANSWER)}
+        delete(signal);
+end
+
+rule "Show result screen"
+    when
+        signal: SubmitEvent(getParamAsString("trigger") == "ice-breaker") from entry-point "signals"
+        agent: Ava(iceBreakerStage == IceBreakerStage.WAIT_FOR_ANSWER)
+        questions: IceBreaker()
+    then
+        String lastShownQuestionId = questions.getShownQuestions().get(questions.getShownQuestions().size() - 1);
+        String answerValue = signal.getParamAsString(lastShownQuestionId);
+        agent.showScreen(questions.buildResultScreen(answerValue));
+        modify(agent) {setIceBreakerStage(IceBreakerStage.SHOW_QUESTION)}
+        modify(questions) {updateNumOfCorrectAnswers(answerValue)}
+        delete(signal);
+end
+
+rule "Show score screens"
+    when
+        signal: SubmitEvent(getParamAsString("trigger") == "ice-breaker") from entry-point "signals"
+        agent: Ava(iceBreakerStage == IceBreakerStage.SHOW_QUESTION)
+        questions: IceBreaker(shownQuestions.size() == OPTIONS_COUNT)
+    then
+        agent.showScreens(questions.getScoreFirstScreenId(), questions.buildScoreScreens());
+        modify(agent) {setIceBreakerStage(IceBreakerStage.FINISHED)}
+        delete(signal);
+end

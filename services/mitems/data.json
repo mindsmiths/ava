@@ -1,5 +1,101 @@
 [
   {
+    "title": "Ice Breaker",
+    "description": "Ice-Breaker quiz is part of weekly core loop.",
+    "items": [
+      {
+        "name": "Correct answer",
+        "elements": [
+          {
+            "description": "Button",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"Next\",\"id\":\"next-screen\"}]"
+          },
+          {
+            "description": "Image path",
+            "type": "TEXT",
+            "content": "/public/correct.png"
+          },
+          {
+            "description": "Text",
+            "type": "TEXT",
+            "content": "You are correct!"
+          }
+        ]
+      },
+      {
+        "name": "Final screen",
+        "elements": [
+          {
+            "description": "Text",
+            "type": "TEXT",
+            "content": "Enjoy your lunch 😊"
+          }
+        ]
+      },
+      {
+        "name": "Message screen",
+        "elements": [
+          {
+            "description": "Button",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"Next\",\"id\":\"score-screen\"}]"
+          },
+          {
+            "description": "Text",
+            "type": "TEXT",
+            "content": "Great, that’s it.\n<br>\nI will now show you your results and prepare a cheat sheet for your lunch. \n</br>"
+          }
+        ]
+      },
+      {
+        "name": "Score screen",
+        "elements": [
+          {
+            "description": "Button",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"Goodbye\",\"id\":\"final-screen\"}]"
+          },
+          {
+            "description": "Description",
+            "type": "TEXT",
+            "content": "Find out more about your colleague during lunch today.\n\nHave a great day!!"
+          },
+          {
+            "description": "Match results",
+            "type": "TEXT",
+            "content": "{{firstName}}'s answers:\n<br>\n1. {{answerOne}}\n</br>\n<br>\n2. {{answerTwo}}\n</br>\n<br>\n3. {{answerThree}}\n</br>"
+          },
+          {
+            "description": "My result",
+            "type": "TEXT",
+            "content": "Your results of the quiz:\n<br>\n{{ numOfCorrectAnswers }}/3\n</br>"
+          }
+        ]
+      },
+      {
+        "name": "Wrong answer",
+        "elements": [
+          {
+            "description": "Button",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"Next\",\"id\":\"next-screen\"}]"
+          },
+          {
+            "description": "Image path",
+            "type": "TEXT",
+            "content": "/public/wrong.png"
+          },
+          {
+            "description": "Text",
+            "type": "TEXT",
+            "content": "You guessed wrong!"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "title": "Monthly core",
     "description": "",
     "items": [
@@ -311,7 +407,7 @@
           {
             "description": "Fake answers",
             "type": "OPTIONS",
-            "content": "[{\"text\":\"Kongo,Finland,Brasilia\",\"id\":\"ideal-place\"},{\"text\":\"Pencil,Socks,Bills\",\"id\":\"missing-object\"},{\"text\":\"Amber Heard,Jake Paul,James Charles\",\"id\":\"annoying-celebrity\"},{\"text\":\"Magic tricks|Singing|Drawing\",\"id\":\"hidden-talent\"},{\"text\":\"Bolognese|Hamburgers|Sushi\",\"id\":\"best-dish\"},{\"text\":\"Monopoly|Catan|Carcassone\",\"id\":\"board-game\"},{\"text\":\"Food|Clothes|Traveling\",\"id\":\"spending-money\"},{\"text\":\"Snickers|Mars|Bueno\",\"id\":\"snack\"},{\"text\":\"Vacuuming|Public speaking|Waking up early\",\"id\":\"big-deal\"},{\"text\":\"An orchid|Taylor Swift poster|Headphones\",\"id\":\"impulse-buy\"},{\"text\":\"Dumb, boring and annoying|Optimistic, smelly, rude|Smart sporty creative\",\"id\":\"least-likely\"},{\"text\":\"Pizza|Burgers|Wok\",\"id\":\"lunch-food\"},{\"text\":\"Mocha|Cappuccino|Coca Cola\",\"id\":\"coffee-or-tea\"},{\"text\":\"Right before|A lot earlier|I wake up late\",\"id\":\"waking-up\"}]"
+            "content": "[{\"text\":\"Kongo|Finland|Brasilia\",\"id\":\"ideal-place\"},{\"text\":\"Pencil|Socks|Bills\",\"id\":\"missing-object\"},{\"text\":\"Amber Heard|Jake Paul|James Charles\",\"id\":\"annoying-celebrity\"},{\"text\":\"Magic tricks|Singing|Drawing\",\"id\":\"hidden-talent\"},{\"text\":\"Bolognese|Hamburgers|Sushi\",\"id\":\"best-dish\"},{\"text\":\"Monopoly|Catan|Carcassone\",\"id\":\"board-game\"},{\"text\":\"Food|Clothes|Traveling\",\"id\":\"spending-money\"},{\"text\":\"Snickers|Mars|Bueno\",\"id\":\"snack\"},{\"text\":\"Vacuuming|Public speaking|Waking up early\",\"id\":\"big-deal\"},{\"text\":\"An orchid|Taylor Swift poster|Headphones\",\"id\":\"impulse-buy\"},{\"text\":\"Dumb, boring and annoying|Optimistic, smelly, rude|Smart, sporty, creative\",\"id\":\"least-likely\"},{\"text\":\"Pizza|Burgers|Wok\",\"id\":\"lunch-food\"},{\"text\":\"Mocha|Cappuccino|Coca Cola\",\"id\":\"coffee-or-tea\"},{\"text\":\"Right before|A lot earlier|I wake up late\",\"id\":\"waking-up\"}]"
           },
           {
             "description": "Hidden talent",

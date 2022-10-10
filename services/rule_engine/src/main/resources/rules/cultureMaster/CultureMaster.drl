@@ -6,6 +6,7 @@ import com.mindsmiths.ruleEngine.model.Heartbeat;
 
 import agents.CultureMaster;
 import signals.EmployeeUpdateSignal;
+import signals.OtherEmployees;
 import models.CmLunchCycleStage;
 import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
 
@@ -47,5 +48,15 @@ rule "Trigger lunch pairing for CultureMaster"
     then
         modify(agent) {setLunchCycleStage(CmLunchCycleStage.COLLECT_GENERATED_MATCHES)};
         agent.generateMatches();
+        delete(signal);
+end
+
+rule "Handle Ava's request"
+    when
+        signal: OtherEmployees() from entry-point "signals"
+        agent: CultureMaster()
+    then
+        OtherEmployees processedSignal = agent.createOtherEmployees(signal.getFrom(), signal);
+        agent.send(signal.getFrom(), processedSignal);
         delete(signal);
 end
