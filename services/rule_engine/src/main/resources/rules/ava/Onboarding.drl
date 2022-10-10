@@ -60,11 +60,10 @@ rule "Store familiarity answers"
         update(employee)
         modify(agent) {
             setOnboardingStage(OnboardingStage.FINISHED),
-            setLunchCycleStage(AvaLunchCycleStage.LUNCH_MAIL_SENDING),
-            setStatsEmailLastSentAt(ts)};
+            setLunchCycleStage(AvaLunchCycleStage.LUNCH_MAIL_SENDING)};
         agent.send(CultureMaster.ID, new EmployeeUpdateSignal(employee));
-        //agent.logEvent("Onboarding Finished", Map.of("employeeId", employee.getId(),
-        //        "familiarity", familiarity, "full name", employee.getFullName()));
+        agent.logEvent("Onboarding Finished", Map.of("employeeId", employee.getId(),
+                "familiarity", familiarity, "full name", employee.getFullName()));
 end
 
 rule "Reconnect final screen"

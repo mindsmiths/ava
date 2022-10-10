@@ -29,7 +29,6 @@ public class Ava extends Agent {
     private String match;
     private List<String> matchHistory = new ArrayList<>();
     private Days matchDay;
-    private Date statsEmailLastSentAt;
     private Date availableDaysEmailLastSentAt;
     private Date matchedWithEmailSentAt;
     private AvaLunchCycleStage lunchCycleStage;

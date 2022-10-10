@@ -42,12 +42,12 @@ public class WeeklyCoreTemplates {
         String description = Mitems.getText("weekly-core.weekly-email.description");
 
         if (lunchReminderStage == LunchReminderStage.SECOND_EMAIL_SENT) {
-            subject = Mitems.getText("weekly-core.first-reminder-email.subject");
-            description = Mitems.getText("weekly-core.first-reminder-email.description");
-
-        } else if (lunchReminderStage == LunchReminderStage.THIRD_EMAIL_SENT) {
             subject = Mitems.getText("weekly-core.second-reminder-email.subject");
             description = Mitems.getText("weekly-core.second-reminder-email.description");
+
+        } else if (lunchReminderStage == LunchReminderStage.THIRD_EMAIL_SENT) {
+            subject = Mitems.getText("weekly-core.third-reminder-email.subject");
+            description = Mitems.getText("weekly-core.third-reminder-email.description");
         }
         String htmlTemplate = new String(Objects.requireNonNull(
                 getClass().getClassLoader().getResourceAsStream("emailTemplates/WeeklyEmailTemplate.html"))

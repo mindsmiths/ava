@@ -276,21 +276,6 @@
         ]
       },
       {
-        "name": "First reminder email",
-        "elements": [
-          {
-            "description": "Description",
-            "type": "HTML",
-            "content": "<p><span style=\"font-weight: 400;\">Dear {{ firstName }},</span></p>\n<p>You haven't picked your preffered days, please hurry up because I will start matching people for lunch.</p>"
-          },
-          {
-            "description": "Subject",
-            "type": "TEXT",
-            "content": "Pick a day"
-          }
-        ]
-      },
-      {
         "name": "Lunch Decline Reason",
         "elements": [
           {
@@ -361,7 +346,7 @@
           {
             "description": "Description",
             "type": "HTML",
-            "content": "<p><span style=\"font-weight: 400;\">Dear {{ firstName }},</span></p>\n<p>This is your last chance to pick a preferred day for your lunch meeting with an interesting colleague next week.</p>\n<p>If you don't make a pick in the next hour, I will match you randomly on any day next week</p>"
+            "content": "<p><span style=\"font-weight: 400;\">Dear {{ firstName }},</span></p>\n<p>You haven't picked your preffered days, please hurry up because I will start matching people for lunch.</p>"
           },
           {
             "description": "Subject",
@@ -377,6 +362,21 @@
             "description": "Title",
             "type": "TEXT",
             "content": "You’re welcome. Stay tuned for the lunch 🙂"
+          }
+        ]
+      },
+      {
+        "name": "Third reminder email",
+        "elements": [
+          {
+            "description": "Description",
+            "type": "HTML",
+            "content": "<p><span style=\"font-weight: 400;\">Dear {{ firstName }},</span></p>\n<p>This is your last chance to pick a preferred day for your lunch meeting with an interesting colleague next week.</p>\n<p>If you don't make a pick in the next few hours, I will match you randomly on any day next week</p>"
+          },
+          {
+            "description": "Subject",
+            "type": "TEXT",
+            "content": "Pick a day"
           }
         ]
       },

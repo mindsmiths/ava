@@ -29,7 +29,6 @@ public class MonthlyCoreTemplates {
         email.setRecipients(List.of(emailConnectionId));
         email.setSubject(Mitems.getText("monthly-core.welcome-email.subject"));
         email.setHtmlText(htmlBody);
-        EmailAdapterAPI.newEmail(email);
         return email;
     }
 
