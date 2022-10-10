@@ -16,6 +16,7 @@ public class EmployeeUpdateSignal extends Signal {
     public EmployeeUpdateSignal(EmployeeProfile employee) {
         this.employee = new EmployeeProfile(
             employee.getFamiliarity(),
+            employee.getPersonalAnswers(),
             employee.getId(),
             employee.getFirstName(),
             employee.getLastName(),
