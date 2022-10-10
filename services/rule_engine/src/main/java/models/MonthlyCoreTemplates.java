@@ -1,6 +1,5 @@
 package models;
 
-import com.mindsmiths.emailAdapter.EmailAdapterAPI;
 import com.mindsmiths.emailAdapter.SendEmailPayload;
 import com.mindsmiths.mitems.Mitems;
 import com.mindsmiths.sdk.utils.templating.Templating;
