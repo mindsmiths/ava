@@ -30,7 +30,6 @@ public class CultureMaster extends Agent {
     private CmLunchCycleStage lunchCycleStage = CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES;
     private Map<String, EmployeeProfile> employees = new HashMap<>();
     private Map<String, Map<String, Double>> employeeConnectionStrengths = new HashMap<>();
-    private Map<String, List<String>> employeeMatchHistories = new HashMap<>();
     private LunchCompatibilities lunchCompatibilities;
 
     public static String ID = "CULTURE_MASTER";
@@ -61,8 +60,7 @@ public class CultureMaster extends Agent {
     public void generateMatches() {
         PairingAlgorithmAPI.generatePairs(
                 new ArrayList<>(employeeAvailabilities),
-                new HashMap<>(employeeConnectionStrengths),
-                new HashMap<>(employeeMatchHistories));
+                new HashMap<>(employeeConnectionStrengths));
     }
 
     public void addMatches(List<Match> allMatches) {

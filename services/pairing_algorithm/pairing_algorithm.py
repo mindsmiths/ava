@@ -25,8 +25,7 @@ class PairingAlgorithm(BaseService):
     def generate_pairs(
             self,
             employeeAvailabilities: List[EmployeeAvailability],
-            employeeConnectionStrengths: Dict[str, Dict[str, float]],
-            employeeMatchHistories: Dict[str, List[str]]) -> Matches:
+            employeeConnectionStrengths: Dict[str, Dict[str, float]]) -> Matches:
         all_matches: List[Match] = []
         edges = list()
         lunch_compatibilities = []
@@ -61,22 +60,6 @@ class PairingAlgorithm(BaseService):
             availability_intersections[tuple(employee_pair)] = intersection
             if not intersection:
                 continue
-            # calculate lunch recency
-            match_history_first = employeeMatchHistories[employee_id_mapping[pair[0]]]
-            lunch_recency_first = 1
-            for index, past_match in reversed(list(enumerate(match_history_first))):
-                if past_match == employee_id_mapping[pair[1]]:
-                    lunch_recency_first = index / \
-                        (len(match_history_first)*len(employeeAvailabilities))
-                    break
-            match_history_second = employeeMatchHistories[employee_id_mapping[pair[1]]]
-            lunch_recency_second = 1
-            for index, past_match in reversed(list(enumerate(match_history_second))):
-                if past_match == employee_id_mapping[pair[1]]:
-                    lunch_recency_second = index / \
-                        (len(match_history_second)*len(employeeAvailabilities))
-                    break
-            lunch_recency = (lunch_recency_first + lunch_recency_second) / 2
             # calculate connection strength
             first_score_second = employeeConnectionStrengths[
                 employee_id_mapping[pair[0]]][employee_id_mapping[pair[1]]]
@@ -86,7 +69,6 @@ class PairingAlgorithm(BaseService):
                 first_score_second + second_score_first) / 200
             # calculate compatibility
             compatibility = compatibility * (1 - connection_strength)
-            compatibility = compatibility * lunch_recency
             if compatibility == 0:
                 compatibility = 1
             # create tuple readable to blossom algorithm

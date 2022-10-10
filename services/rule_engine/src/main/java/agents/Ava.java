@@ -27,7 +27,6 @@ import java.util.*;
 public class Ava extends Agent {
     private List<Days> availableDays = new ArrayList<>();
     private String match;
-    private List<String> matchHistory = new ArrayList<>();
     private Days matchDay;
     private Date availableDaysEmailLastSentAt;
     private Date matchedWithEmailSentAt;
@@ -68,24 +67,30 @@ public class Ava extends Agent {
             }
     }
 
-    public void chargeConnectionNeurons(EmployeeProfile employeeProfile) {
-        for (Map.Entry<String, Double> entry : employeeProfile.getFamiliarity().entrySet())
-            if (entry.getValue() > 0)
-                this.connectionStrengths.get(entry.getKey()).setValue(CONNECTION_NEURON_CAPACITY);
-    }
-
     public Neuron getConnectionNeuron(String employeeId) {
         return this.connectionStrengths.get(employeeId);
     }
 
+    public void chargeConnectionNeurons(EmployeeProfile employeeProfile) {
+        for (Map.Entry<String, Double> entry : employeeProfile.getFamiliarity().entrySet())
+            this.getConnectionNeuron(entry.getKey()).charge(entry.getValue() * 30);
+            //remove
+            Log.info("aaaa charging by " + this.connectionStrengths);
+    }
+
     public void decayConnectionNeurons() {
         for (String avaId : this.otherEmployees.keySet()) {
+            // remove 
             Log.info("Decaying SPECIFIC neuron with employee id: " + otherEmployees.get(avaId).getId());
             long daysPassed = ChronoUnit.DAYS.between(
                     getConnectionNeuron(otherEmployees.get(avaId).getId()).getLastUpdatedAt().toInstant(),
                     new Date().toInstant());
             getConnectionNeuron(otherEmployees.get(avaId).getId()).decay(daysPassed);
         }
+    }
+
+    public void chargeAfterMatch(String employeeId) {
+        getConnectionNeuron(employeeId).charge(30.);
     }
 
     public Map<String, Double> getConnectionStrengthAsValue() {

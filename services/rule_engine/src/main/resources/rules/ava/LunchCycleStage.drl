@@ -16,7 +16,7 @@ import agents.CultureMaster;
 
 import signals.EmployeeAvailabilitySignal;
 import signals.SendMatchesSignal;
-import signals.MatchingParametarsSignal;
+import signals.EmployeeConnectionStrengthsSignal;
 import signals.SendNoMatchesSignal;
 
 import models.AvaLunchCycleStage;
@@ -137,10 +137,9 @@ rule "Confirm days"
             setLunchReminderStage(LunchReminderStage.USER_RESPONDED)};
         agent.send(CultureMaster.ID, new EmployeeAvailabilitySignal(
                 new EmployeeAvailability(employee.getId(), agent.getAvailableDays())));
-        agent.send(CultureMaster.ID, new MatchingParametarsSignal(
+        agent.send(CultureMaster.ID, new EmployeeConnectionStrengthsSignal(
                 employee.getId(),
-                agent.getConnectionStrengthAsValue(),
-                agent.getMatchHistory()));
+                agent.getConnectionStrengthAsValue()));
         delete(signal);
 end
 
@@ -174,7 +173,9 @@ rule "Store match info"
         modify(agent) {
             setMatch(match),
             setMatchDay(matchDay),
-            getMatchHistory().add(match)};
+            chargeAfterMatch(match)};
+        // remove
+        Log.info("Im " + employee.getId() + " and charging after match for " + match + " neuroni: " + agent.getConnectionStrengths());
         agent.printMatchInfo(employee, signal);
         SendEmailPayload email = new WeeklyCoreTemplates().calendarInviteEmail(
                 matchDay,

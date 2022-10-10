@@ -14,8 +14,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MatchingParametarsSignal extends Signal {
+public class EmployeeConnectionStrengthsSignal extends Signal {
     private String employeeId;
     private Map<String, Double> connectionStrengths = new HashMap<>();
-    private List<String> matchHistory = new ArrayList<>();
 }

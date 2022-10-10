@@ -7,7 +7,7 @@ import com.mindsmiths.ruleEngine.model.Initialize;
 import com.mindsmiths.pairingalgorithm.Matches;
 import com.mindsmiths.pairingalgorithm.LunchCompatibilities;
 
-import signals.MatchingParametarsSignal;
+import signals.EmployeeConnectionStrengthsSignal;
 import signals.EmployeeAvailabilitySignal;
 
 import agents.CultureMaster;
@@ -34,15 +34,12 @@ rule "Store Employee availability"
         delete(signal);
 end
 
-rule "Store Employee matching parametars"
+rule "Store employee connection strengths"
     when
-        signal: MatchingParametarsSignal(employeeId: employeeId, connectionStrengths: connectionStrengths,
-                                         matchHistory: matchHistory) from entry-point "signals"
-        agent: CultureMaster(employeeConnectionStrengths: employeeConnectionStrengths,
-                             employeeMatchHistories: employeeMatchHistories)
+        signal: EmployeeConnectionStrengthsSignal(employeeId: employeeId, connectionStrengths: connectionStrengths) from entry-point "signals"
+        agent: CultureMaster(employeeConnectionStrengths: employeeConnectionStrengths)
     then
         employeeConnectionStrengths.put(employeeId, connectionStrengths);
-        employeeMatchHistories.put(employeeId, matchHistory);
         update(agent);
         delete(signal);
 end

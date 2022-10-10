@@ -12,10 +12,9 @@ public class PairingAlgorithmAPI {
     private static final String topic = Messaging.getInputTopicName("pairing_algorithm");
 
     public static void generatePairs(List<EmployeeAvailability> employeeAvailabilities,
-                                     Map<String, Map<String, Double>> employeeConnectionStrengths,
-                                     Map<String, List<String>> employeeMatchHistories) {
+                                     Map<String, Map<String, Double>> employeeConnectionStrengths) {
                                          
-        Serializable payload = new MatchingPayload(employeeAvailabilities, employeeConnectionStrengths, employeeMatchHistories); 
+        Serializable payload = new MatchingPayload(employeeAvailabilities, employeeConnectionStrengths); 
         BaseMessage message = new BaseMessage("GENERATE_PAIRS", payload);
         message.send(topic); 
         new CallbackResult(message.getConfiguration().getMessageId(), Matches.class).save(); 
