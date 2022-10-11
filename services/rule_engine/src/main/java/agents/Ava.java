@@ -74,14 +74,10 @@ public class Ava extends Agent {
     public void chargeConnectionNeurons(EmployeeProfile employeeProfile) {
         for (Map.Entry<String, Double> entry : employeeProfile.getFamiliarity().entrySet())
             this.getConnectionNeuron(entry.getKey()).charge(entry.getValue() * 30);
-            //remove
-            Log.info("aaaa charging by " + this.connectionStrengths);
     }
 
     public void decayConnectionNeurons() {
         for (String avaId : this.otherEmployees.keySet()) {
-            // remove 
-            Log.info("Decaying SPECIFIC neuron with employee id: " + otherEmployees.get(avaId).getId());
             long daysPassed = ChronoUnit.DAYS.between(
                     getConnectionNeuron(otherEmployees.get(avaId).getId()).getLastUpdatedAt().toInstant(),
                     new Date().toInstant());
