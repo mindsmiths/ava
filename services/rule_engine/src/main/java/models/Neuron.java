@@ -18,7 +18,6 @@ public class Neuron {
 
     private Date lastUpdatedAt = new Date();
 
-
     public Neuron(double R_in, double C) {
         this.R_in = R_in;
         this.C = C;
