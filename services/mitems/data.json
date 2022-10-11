@@ -34,6 +34,26 @@
         ]
       },
       {
+        "name": "Intro email",
+        "elements": [
+          {
+            "description": "Action",
+            "type": "TEXT",
+            "content": "Start the quiz"
+          },
+          {
+            "description": "Description",
+            "type": "HTML",
+            "content": "<p>Hope you're looking forward to your lunch with {{ matchName }} today.</p>\n<p>&nbsp;</p>\n<p>I prepared a short quiz about {{ matchName }} for you, try to get as many right answers as you can.</p>\n<p>&nbsp;</p>\n<p>Use some of these as icebreakers and don't forget to have fun!</p>"
+          },
+          {
+            "description": "Subject",
+            "type": "TEXT",
+            "content": "Break the ice!"
+          }
+        ]
+      },
+      {
         "name": "Message screen",
         "elements": [
           {

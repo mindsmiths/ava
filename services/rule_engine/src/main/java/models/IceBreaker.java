@@ -7,7 +7,7 @@ import com.mindsmiths.armory.components.PrimarySubmitButtonComponent;
 import com.mindsmiths.armory.components.TitleComponent;
 import com.mindsmiths.armory.templates.BaseTemplate;
 import com.mindsmiths.armory.templates.TemplateGenerator;
-
+import com.mindsmiths.emailAdapter.SendEmailPayload;
 import com.mindsmiths.sdk.utils.templating.Templating;
 import com.mindsmiths.sdk.core.db.PrimaryKey;
 import com.mindsmiths.mitems.Mitems;
@@ -15,8 +15,10 @@ import com.mindsmiths.mitems.Option;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import utils.Settings;
 import lombok.Data;
 
+import java.io.IOException;
 import java.util.*;
 
 @AllArgsConstructor
@@ -90,6 +92,25 @@ public class IceBreaker {
     public void updateNumOfCorrectAnswers(String answerValue) {
         if (answerValue.equals("correct-answer"))
             this.numOfCorrectAnswers++;
+    }
+
+    public SendEmailPayload introEmail(String matchName, String armoryConnectionId,
+            String emailConnectionId) throws IOException {
+        String htmlTemplate = new String(Objects.requireNonNull(
+                getClass().getClassLoader().getResourceAsStream(
+                        "emailTemplates/EmailTemplate.html"))
+                .readAllBytes());
+        String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
+                "description", Mitems.getText("ice-breaker.intro-email.description"),
+                "callToAction", Mitems.getText("ice-breaker.intro-email.action"),
+                "matchName", matchName,
+                "armoryUrl",
+                String.format("%s/%s?trigger=ice-breaker", Settings.ARMORY_SITE_URL, armoryConnectionId)));
+        SendEmailPayload email = new SendEmailPayload();
+        email.setRecipients(List.of(emailConnectionId));
+        email.setSubject(Mitems.getText("ice-breaker.intro-email.subject"));
+        email.setHtmlText(htmlBody);
+        return email;
     }
 
     private List<BaseSubmitButtonComponent> buildAnswerButtons(String questionId) {

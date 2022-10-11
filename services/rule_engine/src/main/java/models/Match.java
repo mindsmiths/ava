@@ -7,7 +7,6 @@ import java.util.Date;
 import com.mindsmiths.mitems.Mitems;
 import com.mindsmiths.mitems.Option;
 import com.mindsmiths.pairingalgorithm.Days;
-import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.sdk.core.db.DataModel;
 
 import lombok.AllArgsConstructor;

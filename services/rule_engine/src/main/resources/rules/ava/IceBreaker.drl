@@ -2,6 +2,9 @@ package rules.ava;
 
 import com.mindsmiths.armory.events.SubmitEvent;
 import com.mindsmiths.armory.events.UserConnectedEvent;
+import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 import models.AvaLunchCycleStage;
 import models.EmployeeProfile;
@@ -35,8 +38,33 @@ rule "Create ice-breaker screens"
             new ArrayList<EmployeeProfile>(signal.getOtherEmployees().values()),
             match.getFirstName());
         insert(questions);
-        modify(agent) {setIceBreakerStage(IceBreakerStage.SHOW_QUESTION)};
+        modify(agent) {setIceBreakerStage(IceBreakerStage.CALCULATE_LUNCH_DATE)};
         delete(signal);
+end
+
+rule "Calculate lunch date"
+    when
+        agent: Ava(iceBreakerStage == IceBreakerStage.CALCULATE_LUNCH_DATE, lunchDate == null)
+    then
+        modify(agent) {
+            setLunchDate(agent.calculateLunchDate("Europe/Zagreb")),
+            setIceBreakerStage(IceBreakerStage.SEND_EMAIL)};
+end
+
+rule "Send ice-breaker mail"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        agent: Ava(
+            iceBreakerStage == IceBreakerStage.SEND_EMAIL,
+            lunchDate.isEqual(ts.toInstant().atZone(ZoneId.of("Europe/Zagreb")).toLocalDate()),
+            workingHours == true)
+    then
+        SendEmailPayload email = new IceBreaker().introEmail(
+                agent.getOtherEmployees().get(agent.employeeToAvaId(agent.getMatch())).getFirstName(),
+                agent.getConnection("armory"),
+                agent.getConnection("email"));
+        agent.sendEmail(email);
+        modify(agent) {setIceBreakerStage(IceBreakerStage.SHOW_QUESTION)};
 end
 
 rule "Show question screen"
@@ -75,4 +103,15 @@ rule "Show score screens"
         agent.showScreens(questions.getScoreFirstScreenId(), questions.buildScoreScreens());
         modify(agent) {setIceBreakerStage(IceBreakerStage.FINISHED)}
         delete(signal);
+end
+
+rule "Reset ice-breaker"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        eval(evaluateCronExpression("* * 13-15 ? * FRI *", ts, "Europe/Zagreb"))
+        agent: Ava(iceBreakerStage != IceBreakerStage.REQUEST_SENT)
+    then
+        modify(agent) {
+            setIceBreakerStage(IceBreakerStage.REQUEST_SENT),
+            setLunchDate(null)};
 end

@@ -15,9 +15,11 @@ import models.OnboardingStage;
 
 rule "Create new employee"
     when
+        Heartbeat(ts: timestamp) from entry-point "signals"
         newEmployee: Employee() from entry-point "signals"
         agent: Ava(onboardingStage == null)
     then
+        Log.warn(ts.getClass());
         delete(newEmployee);
         modify(agent) {
             addConnection("email", newEmployee.getEmail()),

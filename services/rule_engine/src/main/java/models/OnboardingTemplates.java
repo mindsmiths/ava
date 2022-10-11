@@ -18,7 +18,6 @@ import com.mindsmiths.armory.templates.BaseTemplate;
 import com.mindsmiths.armory.templates.TemplateGenerator;
 import com.mindsmiths.emailAdapter.SendEmailPayload;
 import com.mindsmiths.mitems.Mitems;
-import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.sdk.utils.templating.Templating;
 
 import utils.Settings;

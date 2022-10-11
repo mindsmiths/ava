@@ -32,6 +32,10 @@ class CustomIndexDashboard(Dashboard):
                         'title': _('Trigger monthly core'),
                         'url': '/trigger/monthly_core',
                     },
+                    {
+                        'title': _('Trigger ice-breaker'),
+                        'url': '/trigger/ice_breaker',
+                    },
                 ],
                 column=0,
                 order=0

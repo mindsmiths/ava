@@ -91,7 +91,7 @@ public class WeeklyCoreTemplates {
     public Map<String, BaseTemplate> confirmingDaysScreen() {
         Option buttonOption = Mitems.getOptions("weekly-core.confirmation-of-choosen-available-days.button")[0];
         Map<String, BaseTemplate> screens = Map.of(
-                "confirmDaysScreen", new TemplateGenerator("confirmScreen")
+                "confirm-days-screen", new TemplateGenerator("confirmScreen")
                         .setTemplateName("CenteredContentTemplate")
                         .addComponent("title", new TitleComponent(
                                 Mitems.getHTML("weekly-core.confirmation-of-choosen-available-days.title")))
@@ -106,7 +106,7 @@ public class WeeklyCoreTemplates {
 
     public Map<String, BaseTemplate> lunchDeclineReasonScreens() {
         Map<String, BaseTemplate> screens = new HashMap<>();
-        screens.put("LunchDecline", new TemplateGenerator()
+        screens.put("lunch-decline", new TemplateGenerator()
                 .addComponent("title", new TitleComponent(
                         Mitems.getText("weekly-core.lunch-decline-reason.title")))
                 .addComponent("answer", new TextAreaComponent("answer", true))

@@ -18,7 +18,11 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import java.io.IOException;
 import java.text.ParseException;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 
 @Data
@@ -29,6 +33,7 @@ public class Ava extends Agent {
     private String match;
     private List<String> matchHistory = new ArrayList<>();
     private Days matchDay;
+    private LocalDate lunchDate;
     private Date availableDaysEmailLastSentAt;
     private Date matchedWithEmailSentAt;
     private AvaLunchCycleStage lunchCycleStage;
@@ -148,5 +153,15 @@ public class Ava extends Agent {
 
     public void logEvent(String event, Map<String, Object> properties) {
         EventTracking.capture(id, event, properties);
+    }
+
+    public LocalDate calculateLunchDate(String timeZone) {
+        DayOfWeek formattedDay = Map.of(
+            Days.MON, DayOfWeek.MONDAY,
+            Days.TUE, DayOfWeek.TUESDAY,
+            Days.WED, DayOfWeek.WEDNESDAY,
+            Days.THU, DayOfWeek.THURSDAY,
+            Days.FRI, DayOfWeek.FRIDAY).get(this.matchDay);
+        return LocalDate.now(ZoneId.of(timeZone)).with(TemporalAdjusters.next(formattedDay));
     }
 }

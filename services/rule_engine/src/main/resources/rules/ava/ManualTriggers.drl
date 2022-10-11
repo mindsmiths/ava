@@ -39,6 +39,20 @@ rule "Trigger lunch cycle for Ava"
         delete(signal);            
 end
 
+rule "Trigger ice-breaker"
+    when
+        signal: ManualTriggerEvent(triggerType == "ice_breaker") from entry-point "signals"
+        agent: Ava(iceBreakerStage != IceBreakerStage.REQUEST_SENT)
+    then
+        SendEmailPayload email = new IceBreaker().introEmail(
+                agent.getOtherEmployees().get(agent.employeeToAvaId(agent.getMatch())).getFirstName(),
+                agent.getConnection("armory"),
+                agent.getConnection("email"));
+        agent.sendEmail(email);
+        modify(agent) {setIceBreakerStage(IceBreakerStage.SHOW_QUESTION)};
+        delete(signal);
+end
+
 rule "Trigger monthly core"
     when
         signal: ManualTriggerEvent(triggerType == "monthly_core") from entry-point "signals"
