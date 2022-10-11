@@ -2,6 +2,7 @@ from datetime import date
 from math import exp
 
 
+
 class Neuron:
     value: float = 0
     __R_in: float = 1
@@ -23,5 +24,5 @@ class Neuron:
         self._update(-1, amount, self.__R_in)
 
     def _update(self, target: int, amount: float, resistance: float):
-        self.__value += (target - self.__value) * \
+        self.value += (target - self.value) * \
             (1 - exp(-amount / (resistance * self.__C)))

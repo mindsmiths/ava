@@ -61,6 +61,9 @@ class PairingAlgorithm(BaseService):
             if not intersection:
                 continue
             # calculate connection strength
+            print(employeeConnectionStrengths)
+            print(employee_id_mapping[pair[0]])
+            print(employee_id_mapping[pair[1]])
             first_score_second = employeeConnectionStrengths[
                 employee_id_mapping[pair[0]]][employee_id_mapping[pair[1]]]
             second_score_first = employeeConnectionStrengths[
