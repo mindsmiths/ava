@@ -271,7 +271,7 @@
           {
             "description": "Text",
             "type": "TEXT",
-            "content": "All days are preselected by default so choose one or more days that don't suit you."
+            "content": "All days are preselected by default so choose ones that don't suit you."
           }
         ]
       },

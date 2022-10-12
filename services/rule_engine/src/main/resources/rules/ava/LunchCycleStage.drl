@@ -127,20 +127,21 @@ rule "Confirm days"
         employee: EmployeeProfile()
     then
         List<String> availableDays = (ArrayList<String>)signal.getParam("availableDays");
-        if(availableDays.size() > 0)
+        if(availableDays.size() > 0) {
             agent.showScreens("confirmDaysScreen", new WeeklyCoreTemplates().confirmingDaysScreen());
-        else
-            agent.showScreens("LunchDecline", new WeeklyCoreTemplates().lunchDeclineReasonScreens());
-        modify(agent) {
-            updateAvailableDays(availableDays),
-            setLunchCycleStage(AvaLunchCycleStage.ACCEPT_MATCH_INFO),
-            setLunchReminderStage(LunchReminderStage.USER_RESPONDED)};
-        agent.send(CultureMaster.ID, new EmployeeAvailabilitySignal(
+            modify(agent) {
+                updateAvailableDays(availableDays),
+                setLunchCycleStage(AvaLunchCycleStage.ACCEPT_MATCH_INFO),
+                setLunchReminderStage(LunchReminderStage.USER_RESPONDED)};
+            agent.send(CultureMaster.ID, new EmployeeAvailabilitySignal(
                 new EmployeeAvailability(employee.getId(), agent.getAvailableDays())));
-        agent.send(CultureMaster.ID, new MatchingParametarsSignal(
+            agent.send(CultureMaster.ID, new MatchingParametarsSignal(
                 employee.getId(),
                 agent.getConnectionStrengthAsValue(),
                 agent.getMatchHistory()));
+        }
+        else
+            agent.showScreens("LunchDecline", new WeeklyCoreTemplates().lunchDeclineReasonScreens());
         delete(signal);
 end
 
