@@ -1,4 +1,4 @@
-from typing import List, Dict, Any
+from typing import List, Dict
 
 from services.pairing_algorithm.api.api import EmployeeAvailability
 from services.pairing_algorithm.api.api import Days
@@ -9,6 +9,9 @@ from .Neuron import Neuron
 from .initial_data import familiarity_answers
 from .initial_data import id_to_name
 import json
+
+CHARGE_RATE = 2
+DECAY_RATE = 0.1
 
 
 class Simulation:
@@ -50,11 +53,20 @@ class Simulation:
     def neuron_charge(self):
         for match in self.matches.allMatches:
             neuron = self.employee_connections_neuron[match.first][match.second]
-            neuron.charge(10 * 2)
+            neuron.charge(10 * CHARGE_RATE)
             self.employee_connections_neuron[match.first][match.second] = neuron
             neuron = self.employee_connections_neuron[match.second][match.first]
-            neuron.charge(10 * 2)
+            neuron.charge(10 * CHARGE_RATE)
             self.employee_connections_neuron[match.second][match.first] = neuron
+            self.neuron_to_float()
+
+    def neuron_decay(self):
+        for first, connections in self.employee_connections_neuron.items():
+            for second, neuron in connections.items():
+                neuron = self.employee_connections_neuron[first][second]
+                neuron.decay(10 * DECAY_RATE)
+                self.employee_connections_neuron[first][second] = neuron
+        self.neuron_to_float()
 
     def neuron_to_float(self):
         self.employee_connections_float = {}
@@ -84,8 +96,8 @@ class Simulation:
             self.call_pairing()
             print(f"{i+1}. tjedan: ")
             for match in self.matches.allMatches:
-                if (match.first == '1'):
+                if (match.first == '11'):
                     print(match)
             self.store_data(i)
             self.neuron_charge()
-            self.neuron_to_float()
+            self.neuron_decay()

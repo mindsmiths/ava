@@ -76,7 +76,7 @@ class PairingAlgorithm(BaseService):
                 first=employee_id_mapping[pair[0]],
                 second=employee_id_mapping[pair[1]],
                 edgeWeight=compatibility))
-        #LunchCompatibilities(edges=lunch_compatibilities).emit()  fixxxxxxx
+        # LunchCompatibilities(edges=lunch_compatibilities).emit()  fixxxxxxx
 
         # RUN BLOSSOM
         matching = max_weight_matching(edges, False)

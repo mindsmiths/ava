@@ -2,7 +2,6 @@ from datetime import date
 from math import exp
 
 
-
 class Neuron:
     value: float = 0
     __R_in: float = 1
