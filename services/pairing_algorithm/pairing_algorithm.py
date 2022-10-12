@@ -61,11 +61,7 @@ class PairingAlgorithm(BaseService):
             if not intersection:
                 continue
             # calculate connection strength
-            print(employeeConnectionStrengths)
-            print(employee_id_mapping[pair[0]])
-            print(employee_id_mapping[pair[1]])
-            first_score_second = employeeConnectionStrengths[
-                employee_id_mapping[pair[0]]][employee_id_mapping[pair[1]]]
+            first_score_second = employeeConnectionStrengths[employee_id_mapping[pair[0]]][employee_id_mapping[pair[1]]]
             second_score_first = employeeConnectionStrengths[
                 employee_id_mapping[pair[1]]][employee_id_mapping[pair[0]]]
             connection_strength = (
@@ -80,7 +76,7 @@ class PairingAlgorithm(BaseService):
                 first=employee_id_mapping[pair[0]],
                 second=employee_id_mapping[pair[1]],
                 edgeWeight=compatibility))
-        LunchCompatibilities(edges=lunch_compatibilities).emit()
+        #LunchCompatibilities(edges=lunch_compatibilities).emit()  fixxxxxxx
 
         # RUN BLOSSOM
         matching = max_weight_matching(edges, False)
