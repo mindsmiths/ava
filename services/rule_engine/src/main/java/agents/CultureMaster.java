@@ -2,41 +2,24 @@ package agents;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import com.mindsmiths.pairingalgorithm.EmployeeAvailability;
 import com.mindsmiths.pairingalgorithm.Match;
 import com.mindsmiths.pairingalgorithm.PairingAlgorithmAPI;
+import com.mindsmiths.pairingalgorithm.LunchCompatibilities;
 import com.mindsmiths.ruleEngine.model.Agent;
 import com.mindsmiths.sdk.core.db.DataUtils;
 import com.mindsmiths.sdk.core.db.EmitType;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import models.EmployeeProfile;
 import models.CmLunchCycleStage;
-
-import com.mindsmiths.pairingalgorithm.LunchCompatibilities;
-
-import com.mindsmiths.pairingalgorithm.PairingAlgorithmAPI;
-import com.mindsmiths.mitems.Option;
-import com.mindsmiths.mitems.Mitems;
-import com.mindsmiths.pairingalgorithm.Days;
-import com.mindsmiths.pairingalgorithm.Match;
-import com.mindsmiths.ruleEngine.util.Log;
-
-import signals.EmployeeUpdateSignal;
-import signals.AllEmployees;
-import signals.SendMatchesSignal;
-
-import models.EmployeeProfile;
 import signals.AllEmployees;
 import signals.EmployeeUpdateSignal;
-import signals.AllEmployees;
 import signals.SendMatchesSignal;
-
-import models.EmployeeProfile;
 import signals.SendNoMatchesSignal;
 
 @Data
@@ -64,8 +47,20 @@ public class CultureMaster extends Agent {
         this.employeeAvailabilities = new ArrayList<>();
     }
 
+    public void addOrUpdateEmployee(EmployeeUpdateSignal signal) {
+        employees.put(signal.getFrom(), signal.getEmployee());
+    }
+
+    public void sendEmployeesToAva() {
+        for (String address : employees.keySet()) {
+            AllEmployees allEmployees = new AllEmployees(employees);
+            send(address, allEmployees);
+        }
+    }
+
     public void generateMatches() {
-        PairingAlgorithmAPI.generatePairs(new ArrayList<>(employeeAvailabilities),
+        PairingAlgorithmAPI.generatePairs(
+                new ArrayList<>(employeeAvailabilities),
                 new HashMap<>(employeeConnectionStrengths),
                 new HashMap<>(employeeMatchHistories));
     }
@@ -106,87 +101,5 @@ public class CultureMaster extends Agent {
             if (entry.getValue().getId().equals(employeeId))
                 return entry.getKey();
         return "";
-    }
-
-    public void addOrUpdateEmployee(EmployeeUpdateSignal signal) {
-        employees.put(signal.getFrom(), signal.getEmployee());
-    }
-
-    public void sendEmployeesToAva() {
-        int silosCount = calculateSilosCount();
-        for (String address : employees.keySet()) {
-            AllEmployees allEmployees = new AllEmployees(employees, silosCount);
-            send(address, allEmployees);
-        }
-    }
-
-    public boolean[][] calculateEmployeeConnections(Map<String, EmployeeProfile> employees) {
-
-        Double[][] matrix = new Double[employees.values().size()][employees.values().size()]; // weight matrix
-        boolean[][] binaryMatrix = new boolean[employees.values().size()][employees.values().size()]; // binary matrix
-
-        List<String> list = new LinkedList<>();
-        int limit = 1;
-
-        for (int i = 0; i < employees.values().size(); i++) {
-            for (int j = 0; j < employees.values().size(); j++) {
-                matrix[i][j] = 0.0;
-            }
-        }
-        int i = 0, j = 0;
-
-        for (EmployeeProfile employee : employees.values()) {
-            for (Map.Entry<String, Double> entry : employee.getFamiliarity().entrySet()) {
-                if (j == i) {
-                    matrix[i][j] = 0.0;
-                    binaryMatrix[i][j] = false;
-                    j++;
-                }
-
-                matrix[i][j] = entry.getValue();
-                j++;
-            }
-            if (i == employees.values().size() - 1) {
-                matrix[i][j] = 0.0;
-            }
-
-            list.add(employee.getId());
-            i++;
-            j = 0;
-        }
-
-        for (i = 0; i < employees.values().size(); i++) {
-            for (j = 0; j < employees.values().size(); j++) {
-                binaryMatrix[i][j] = (matrix[i][j] > limit) && (matrix[j][i] > limit);
-            }
-        }
-        return binaryMatrix;
-    }
-
-    public void gatherAllConnections(boolean[][] matrix, boolean[] visited, int node) {
-        for (int i = 0; i < matrix[0].length; i++) {
-            if (matrix[node][i] && !visited[i]) {
-                visited[i] = true;
-                gatherAllConnections(matrix, visited, i);
-            }
-        }
-    }
-
-    public int calculateSilosCount() {
-
-        boolean[][] matrix = calculateEmployeeConnections(employees);
-
-        int groupCount = 0;
-        int size = matrix[0].length;
-        boolean[] visited = new boolean[size];
-
-        for (int i = 0; i < size; i++) {
-            if (!visited[i]) {
-                groupCount++;
-                visited[i] = true;
-                gatherAllConnections(matrix, visited, i);
-            }
-        }
-        return groupCount;
     }
 }

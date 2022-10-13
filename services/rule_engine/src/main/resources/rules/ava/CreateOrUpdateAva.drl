@@ -1,8 +1,5 @@
 package rules.ava;
 
-import java.util.HashMap;
-import java.util.Map;
-import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.employeeManager.employees.Employee;
 import com.mindsmiths.sdk.utils.Utils;
 import com.mindsmiths.ruleEngine.util.Agents;
@@ -25,8 +22,7 @@ rule "Create new employee"
         modify(agent) {
             addConnection("email", newEmployee.getEmail()),
             addConnection("armory", Utils.randomGenerator()),
-             setOnboardingStage(OnboardingStage.AVA_CREATED)
-        };
+            setOnboardingStage(OnboardingStage.AVA_CREATED)};
         EmployeeProfile profile = new EmployeeProfile(newEmployee);
         insert(profile);
         agent.send(CultureMaster.ID, new EmployeeUpdateSignal(profile));
@@ -34,31 +30,28 @@ end
 
 rule "Update existing employee"
     when
-        newEmployee: Employee() from entry-point "signals"
+        employee: Employee() from entry-point "signals"
         profile: EmployeeProfile()
         agent: Ava(onboardingStage != null)
     then
-        delete(newEmployee);
-        modify(agent) {addConnection("email", newEmployee.getEmail())};
+        delete(employee);
+        modify(agent) {addConnection("email", employee.getEmail())};
         modify(profile) {
-            setFirstName(newEmployee.getFirstName()),
-            setLastName(newEmployee.getLastName()),
-            setEmail(newEmployee.getEmail()),
-            setActive(newEmployee.getActive())
-        };
+            setFirstName(employee.getFirstName()),
+            setLastName(employee.getLastName()),
+            setEmail(employee.getEmail()),
+            setActive(employee.getActive())};
         agent.send(CultureMaster.ID, new EmployeeUpdateSignal(profile));
 end
 
-rule "Save or update all employees"
+rule "Update other employees data"
     when
         signal: AllEmployees(allEmployees: allEmployees) from entry-point "signals"
         agent: Ava()
     then
         allEmployees.remove(agent.getId());
-        modify (agent) {
+        modify(agent) {
             setOtherEmployees(allEmployees),
-            addConnectionStrengths(),
-            setSilosCount(signal.getSilosCount())
-        };
+            addConnectionStrengths()};
         delete(signal);
 end

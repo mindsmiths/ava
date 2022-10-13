@@ -2,8 +2,8 @@ package signals;
 
 import com.mindsmiths.sdk.core.api.Signal;
 
-import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Data;
 
 import models.EmployeeProfile;
 
@@ -19,8 +19,7 @@ public class EmployeeUpdateSignal extends Signal {
             employee.getId(),
             employee.getFirstName(),
             employee.getLastName(),
-            employee.getEmail(),
-            employee.getOnboardingStage()
+            employee.getEmail()
         );
     }
 }

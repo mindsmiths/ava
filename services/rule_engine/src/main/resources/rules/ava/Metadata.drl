@@ -15,35 +15,26 @@ rule "Set working hours"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
         eval(evaluateCronExpression("* * 8-17 ? * MON-FRI *", ts, "Europe/Zagreb"))
-
         agent: Ava(workingHours != true)
     then
-        modify(agent) {
-            setWorkingHours(true)
-        }
+        modify(agent) {setWorkingHours(true)}
 end
 
 rule "Set non working hours"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
         eval(!evaluateCronExpression("* * 8-17 ? * MON-FRI *", ts, "Europe/Zagreb"))
-        agent: Ava(
-            workingHours != false
-        )
+        agent: Ava(workingHours != false)
     then
-        modify(agent) {
-            setWorkingHours(false)
-        }
+        modify(agent) {setWorkingHours(false)};
 end
 
 rule "Set availability interval"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        agent: Ava(availabilityInterval != anyCronSatisfied(ts, "Europe/Zagreb", "* * 9-23 * * WED", "* * * * * THU",
+        agent: Ava(availabilityInterval != anyCronSatisfied(ts, "Europe/Zagreb", "* * 8-23 * * WED", "* * * * * THU",
                                                             "* * 00-16 * * FRI"), interval: availabilityInterval)
     then
-        modify(agent) {
-            setAvailabilityInterval(!interval)
-        }
+        modify(agent) {setAvailabilityInterval(!interval)};
 end
 

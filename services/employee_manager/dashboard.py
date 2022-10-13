@@ -25,8 +25,12 @@ class CustomIndexDashboard(Dashboard):
                         'url': '/trigger/lunch_pairing',
                     },
                     {
-                        'title': _('Trigger familiarity quiz'),
-                        'url': '/trigger/familiarity_quiz',
+                        'title': _('Trigger onboarding'),
+                        'url': '/trigger/onboarding',
+                    },
+                    {
+                        'title': _('Trigger monthly core'),
+                        'url': '/trigger/monthly_core',
                     },
                 ],
                 column=0,
