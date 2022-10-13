@@ -14,7 +14,7 @@ import models.MonthlyCoreTemplates;
 rule "Trigger onboarding"
     when
         signal: ManualTriggerEvent(triggerType == "onboarding") from entry-point "signals"
-        agent: Ava(onboardingStage != null)
+        agent: Ava()
         employee: EmployeeProfile(familiarity: familiarity)
     then
         SendEmailPayload email = new OnboardingTemplates().welcomeEmail(

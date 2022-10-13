@@ -16,7 +16,7 @@ import agents.CultureMaster;
 
 import signals.EmployeeAvailabilitySignal;
 import signals.SendMatchesSignal;
-import signals.MatchingParametarsSignal;
+import signals.MatchingParametersSignal;
 import signals.SendNoMatchesSignal;
 
 import models.AvaLunchCycleStage;
@@ -135,7 +135,7 @@ rule "Confirm days"
                 setLunchReminderStage(LunchReminderStage.USER_RESPONDED)};
             agent.send(CultureMaster.ID, new EmployeeAvailabilitySignal(
                 new EmployeeAvailability(employee.getId(), agent.getAvailableDays())));
-            agent.send(CultureMaster.ID, new MatchingParametarsSignal(
+            agent.send(CultureMaster.ID, new MatchingParametersSignal(
                 employee.getId(),
                 agent.getConnectionStrengthAsValue(),
                 agent.getMatchHistory()));

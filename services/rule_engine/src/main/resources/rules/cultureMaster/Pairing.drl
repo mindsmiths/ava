@@ -7,7 +7,7 @@ import com.mindsmiths.ruleEngine.model.Initialize;
 import com.mindsmiths.pairingalgorithm.Matches;
 import com.mindsmiths.pairingalgorithm.LunchCompatibilities;
 
-import signals.MatchingParametarsSignal;
+import signals.MatchingParametersSignal;
 import signals.EmployeeAvailabilitySignal;
 
 import agents.CultureMaster;
@@ -34,9 +34,9 @@ rule "Store Employee availability"
         delete(signal);
 end
 
-rule "Store Employee matching parametars"
+rule "Store Employee matching parameters"
     when
-        signal: MatchingParametarsSignal(employeeId: employeeId, connectionStrengths: connectionStrengths,
+        signal: MatchingParametersSignal(employeeId: employeeId, connectionStrengths: connectionStrengths,
                                          matchHistory: matchHistory) from entry-point "signals"
         agent: CultureMaster(employeeConnectionStrengths: employeeConnectionStrengths,
                              employeeMatchHistories: employeeMatchHistories)
@@ -79,7 +79,7 @@ rule "Send match info to Ava agents"
             clearEmployeeAvailabilities()};
 end
 
-rule "Restore lunch cycle"
+rule "Reset lunch cycle"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
         agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.FINISHED)
