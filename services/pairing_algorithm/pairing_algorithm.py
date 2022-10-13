@@ -1,12 +1,16 @@
 import logging
 from typing import List
 from typing import Dict
+import os
 
 from itertools import combinations
 
 from forge.conf import settings as forge_settings
 from forge.core.api import api
 from forge.core.base import BaseService
+from forge_cli.admin import cli
+from forge.utils.mongo import MongoClientKeeper
+import forge
 
 from .api import Matches
 from .api import EmployeeAvailability
@@ -16,6 +20,8 @@ from .api import LunchCompatibilityEdge
 
 from .blossom_algorithm import max_weight_matching
 
+import matplotlib.pyplot as plt
+import networkx as nx
 logger = logging.getLogger(forge_settings.DEFAULT_LOGGER)
 
 
@@ -137,3 +143,46 @@ class PairingAlgorithm(BaseService):
                     break
 
         return Matches(allMatches=all_matches)
+    
+    @api
+    def generate_connections_graphs(self):
+        graphs_path = "./services/armory/public/"
+        if not os.path.exists(graphs_path):
+            os.makedirs(graphs_path)
+
+        forge.setup("rule_engine")
+        keeper = MongoClientKeeper()
+        culture_master = keeper.ruleEngineDB.summary.find_one({"agentId": "CULTURE_MASTER"})
+        employee_dictionary = culture_master["agents#CultureMaster"]["CULTURE_MASTER"]["employeeConnectionStrengths"]
+        ava_employees = culture_master["agents#CultureMaster"]["CULTURE_MASTER"]["employees"]
+
+        matches = employee_dictionary["edges"]
+
+        all_ids = set()
+        for emp in matches:
+            all_ids.add(emp["first"])
+            all_ids.add(emp["second"])
+
+        ava_name_keeper = {}
+        for _, val in ava_employees.items():
+            if val["id"] not in all_ids:
+                # Employee didn't answer
+                continue
+            else:
+                ava_name_keeper[val["id"]] = val["firstName"]
+
+        G = nx.Graph()
+
+        for match in matches:
+            G.add_node(ava_name_keeper[match["first"]])
+            G.add_node(ava_name_keeper[match["second"]])
+
+        for match in matches:
+            G.add_edge(ava_name_keeper[match["first"]], ava_name_keeper[match["second"]], width=float(match["edgeWeight"]))
+
+        nx.draw(G, node_size=450, with_labels=True)
+
+        plt.axis('equal')
+        plt.show()
+        plt.savefig(f"{graphs_path}connection_graph.png", format="PNG")
+        plt.close()

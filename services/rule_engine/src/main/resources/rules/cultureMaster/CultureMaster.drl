@@ -8,6 +8,7 @@ import agents.CultureMaster;
 import signals.EmployeeUpdateSignal;
 import models.CmLunchCycleStage;
 import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
+import com.mindsmiths.pairingalgorithm.PairingAlgorithmAPI;
 
 rule "Update Ava data"
     when
@@ -48,4 +49,12 @@ rule "Trigger lunch pairing for CultureMaster"
         modify(agent) {setLunchCycleStage(CmLunchCycleStage.COLLECT_GENERATED_MATCHES)};
         agent.generateMatches();
         delete(signal);
+end
+
+rule "Trigger connections graph"
+    when
+        signal: ManualTriggerEvent(triggerType == "connections_graph") from entry-point "signals"
+    then
+        PairingAlgorithmAPI.generateConnectionsGraphs();
+        delete(signal);            
 end

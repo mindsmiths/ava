@@ -15,9 +15,16 @@ public class PairingAlgorithmAPI {
                                      Map<String, Map<String, Double>> employeeConnectionStrengths,
                                      Map<String, List<String>> employeeMatchHistories) {
                                          
-        Serializable payload = new MatchingPayload(employeeAvailabilities, employeeConnectionStrengths, employeeMatchHistories); 
+        Serializable payload = new MatchingPayload(employeeAvailabilities, employeeConnectionStrengths, employeeMatchHistories);
         BaseMessage message = new BaseMessage("GENERATE_PAIRS", payload);
-        message.send(topic); 
+        message.send(topic);
         new CallbackResult(message.getConfiguration().getMessageId(), Matches.class).save(); 
+    }
+
+    public static void generateConnectionsGraphs() {
+        Serializable payload = new MatchingPayload();
+        BaseMessage message = new BaseMessage("GENERATE_CONNECTIONS_GRAPHS", payload);
+        message.send(topic);
+        new CallbackResult(message.getConfiguration().getMessageId(), Matches.class).save();
     }
 }

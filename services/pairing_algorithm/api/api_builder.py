@@ -20,3 +20,7 @@ class PairingAlgorithmAPI(BaseAPI):
             employeeConnectionStrengths: Dict[str, Dict[str, float]],
             employeeMatchHistories: Dict[str, List[str]]) -> Future[Matches]:
         """Generates pairs of people that should go on a lunch together"""
+    
+    @staticmethod
+    def generate_connections_graphs():
+        "Generates graph of connections between employees"
