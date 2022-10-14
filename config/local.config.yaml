@@ -3,8 +3,7 @@ global:
     PULSAR_URL: '{{ env.PULSAR_URL | default("pulsar://localhost:6650", true) }}'
     PULSAR_ENDPOINT_URL: '{{ env.PULSAR_ENDPOINT_URL  | default("pulsar://localhost:6650", true) }}'
 
-    MONGO_CLIENT_HOST: '{{ env.MONGO_CLIENT_HOST | default("localhost:27017", true) }}'
-    MONGO_CLIENT_USERNAME: '{{ env.MONGO_CLIENT_USERNAME | default("", true) }}'
+    MONGO_CLIENT_CONNECTION_STRING: mongodb+srv://root:knopso123@avadevelopment.goc6r.mongodb.net/?retryWrites=true&w=majority
 
     POSTGRES_CLIENT_HOST: '{{ env.POSTGRES_CLIENT_HOST | default("localhost", true) }}'
     POSTGRES_CLIENT_PORT: '{{ env.POSTGRES_CLIENT_PORT | default("5432", true) }}'
@@ -17,6 +16,7 @@ global:
   secrets:
     MONGO_CLIENT_PASSWORD: '{{ env.MONGO_CLIENT_PASSWORD }}'
     POSTGRES_CLIENT_PASSWORD: '{{ env.POSTGRES_CLIENT_PASSWORD | default("postgres", true) }}'
+
 services:
   mitems:
     env:
