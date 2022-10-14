@@ -4,12 +4,15 @@ import com.mindsmiths.employeeManager.ManualTriggerEvent;
 import com.mindsmiths.emailAdapter.SendEmailPayload;
 
 import agents.Ava;
+import agents.CultureMaster;
 
 import models.AvaLunchCycleStage;
 import models.OnboardingStage
 import models.EmployeeProfile;
 import models.OnboardingTemplates;
 import models.MonthlyCoreTemplates;
+
+import signals.MatchingParametersSignal;
 
 rule "Trigger onboarding"
     when
@@ -51,4 +54,18 @@ rule "Trigger monthly core"
             agent.getConnection("email"));
         agent.sendEmail(email);
         modify(agent) {setMonthlyCoreStage(MonthlyCoreStage.EMAIL_SENT)};
+end
+
+rule "Trigger charge neurons"
+    when
+        signal: ManualTriggerEvent(triggerType == "charge_neurons") from entry-point "signals"
+        agent: Ava(onboardingStage == OnboardingStage.FINISHED)
+        employee: EmployeeProfile()
+    then
+        modify(agent) {chargeConnectionNeurons(employee)};
+        agent.send(CultureMaster.ID, new MatchingParametersSignal(
+                employee.getId(),
+                agent.getConnectionStrengthAsValue(),
+                agent.getMatchHistory()));
+        delete(signal);
 end
