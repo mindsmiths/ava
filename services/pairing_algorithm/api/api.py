@@ -34,6 +34,10 @@ class LunchCompatibilityEdge(ExtendableModel):
     edgeWeight: float
 
 
+class Image(ExtendableModel):
+    image: str
+
+
 class LunchCompatibilities(DBView):
     edges: List[LunchCompatibilityEdge]
 

@@ -7,6 +7,7 @@ from forge.core.api import api_interface
 from services import pairing_algorithm
 from .api import Matches
 from .api import EmployeeAvailability
+from .api import Image
 
 
 @api_interface
@@ -22,5 +23,5 @@ class PairingAlgorithmAPI(BaseAPI):
         """Generates pairs of people that should go on a lunch together"""
     
     @staticmethod
-    def generate_connections_graphs():
+    def generate_connections_graphs() -> Future[Image]:
         "Generates graph of connections between employees"

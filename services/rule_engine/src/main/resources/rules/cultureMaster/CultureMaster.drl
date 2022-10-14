@@ -3,6 +3,7 @@ package rules.cultureMaster;
 import com.mindsmiths.employeeManager.ManualTriggerEvent;
 import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.ruleEngine.model.Heartbeat;
+import com.mindsmiths.pairingalgorithm.Image;
 
 import agents.CultureMaster;
 import signals.EmployeeUpdateSignal;
@@ -57,4 +58,13 @@ rule "Trigger connections graph"
     then
         PairingAlgorithmAPI.generateConnectionsGraphs();
         delete(signal);            
+end
+
+rule "Send stats email"
+    when
+        signal: Image(image: image) from entry-point "signals"
+        agent: CultureMaster()
+    then
+        agent.statsEmail(image);
+        delete(signal);
 end

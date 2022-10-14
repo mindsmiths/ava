@@ -17,6 +17,7 @@ from .api import EmployeeAvailability
 from .api import Match
 from .api import LunchCompatibilities
 from .api import LunchCompatibilityEdge
+from .api import Image
 
 from .blossom_algorithm import max_weight_matching
 
@@ -24,6 +25,10 @@ import matplotlib.pyplot as plt
 import networkx as nx
 logger = logging.getLogger(forge_settings.DEFAULT_LOGGER)
 
+####################
+import io
+import numpy as np
+import base64
 
 class PairingAlgorithm(BaseService):
 
@@ -147,7 +152,7 @@ class PairingAlgorithm(BaseService):
     @api
     def generate_connections_graphs(self):
         graphs_path = "./services/armory/public/"
-        if not os.path.exists(graphs_path):
+        """if not os.path.exists(graphs_path):
             os.makedirs(graphs_path)
 
         forge.setup("rule_engine")
@@ -185,4 +190,15 @@ class PairingAlgorithm(BaseService):
         plt.axis('equal')
         plt.show()
         plt.savefig(f"{graphs_path}connection_graph.png", format="PNG")
-        plt.close()
+        plt.close()"""
+
+        plt.plot(np.linspace(0, 10, 100), np.linspace(0, 10, 100))
+        plt.show()
+        my_stringIObytes = io.BytesIO()
+        plt.savefig(my_stringIObytes, format='png')
+        my_stringIObytes.seek(0)
+        my_base64_jpgData = base64.b64encode(my_stringIObytes.read())
+        print(my_base64_jpgData)
+        decoded_str = my_base64_jpgData.decode('utf-8')
+        print(decoded_str)
+        return Image(image=decoded_str)

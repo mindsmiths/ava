@@ -22,6 +22,15 @@ import signals.EmployeeUpdateSignal;
 import signals.SendMatchesSignal;
 import signals.SendNoMatchesSignal;
 
+import java.io.IOException;
+import com.mindsmiths.sdk.utils.templating.Templating;
+import com.mindsmiths.emailAdapter.SendEmailPayload;
+import java.util.Objects;
+import com.mindsmiths.emailAdapter.EmailAdapterAPI;
+import com.mindsmiths.ruleEngine.util.Log;
+import java.io.FileOutputStream;  
+import com.mindsmiths.emailAdapter.AttachmentData;
+
 @Data
 @AllArgsConstructor
 public class CultureMaster extends Agent {
@@ -102,5 +111,30 @@ public class CultureMaster extends Agent {
             if (entry.getValue().getId().equals(employeeId))
                 return entry.getKey();
         return "";
+    }
+
+    public void statsEmail(String base64) throws IOException {
+        String htmlTemplate = new String(Objects.requireNonNull(
+                getClass().getClassLoader().getResourceAsStream(
+                        "emailTemplates/StatEmailTemplate.html"))
+                .readAllBytes());
+        String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
+                "description", "Description1",
+                "description2", "Description2",
+                "image", "data:image/png;base64, " + base64 ));
+
+        FileOutputStream outputStream = new FileOutputStream("email.html");
+        byte[] strToBytes = htmlBody.getBytes();
+        outputStream.write(strToBytes);
+        outputStream.close();
+
+        //AttachmentData data = new AttachmentData();
+        //data.setFileBytes(base64);
+        SendEmailPayload email = new SendEmailPayload();
+        email.setRecipients(List.of("ivan.dukic@mindsmiths.com"));
+        email.setSubject("Stats email");
+        email.setHtmlText(htmlBody);
+        //email.setAttachments(List.of(data));
+        EmailAdapterAPI.newEmail(email);
     }
 }

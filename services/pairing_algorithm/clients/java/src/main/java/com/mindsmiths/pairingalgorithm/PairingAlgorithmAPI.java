@@ -25,6 +25,6 @@ public class PairingAlgorithmAPI {
         Serializable payload = new MatchingPayload();
         BaseMessage message = new BaseMessage("GENERATE_CONNECTIONS_GRAPHS", payload);
         message.send(topic);
-        new CallbackResult(message.getConfiguration().getMessageId(), Matches.class).save();
+        new CallbackResult(message.getConfiguration().getMessageId(), Image.class).save();
     }
 }
