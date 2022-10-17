@@ -242,3 +242,21 @@ rule "Lunch invite expired"
         agent.showScreen(new WeeklyCoreTemplates().lunchInviteExpiredScreen());
         delete(signal);
 end
+
+rule "Temporary fix"
+    when
+        agent: Ava(fixed == false, availableDays.size() > 0)
+        employee: EmployeeProfile()
+    then
+        modify(agent){
+            setLunchCycleStage(AvaLunchCycleStage.ACCEPT_MATCH_INFO),
+            setLunchReminderStage(LunchReminderStage.USER_RESPONDED),
+            setFixed(true)
+        }
+        agent.send(CultureMaster.ID, new EmployeeAvailabilitySignal(
+            new EmployeeAvailability(employee.getId(), agent.getAvailableDays())));
+        agent.send(CultureMaster.ID, new MatchingParametersSignal(
+            employee.getId(),
+            agent.getConnectionStrengthAsValue(),
+            agent.getMatchHistory()));
+end

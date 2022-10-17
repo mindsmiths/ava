@@ -47,16 +47,6 @@ rule "Store Employee matching parameters"
         delete(signal);
 end
 
-rule "Generate this weeks matches"
-    when
-        Heartbeat(ts: timestamp) from entry-point "signals"
-        agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.GENERATE_MATCHES)
-    then
-        Log.info("Generating matches....");
-        modify(agent) {setLunchCycleStage(CmLunchCycleStage.COLLECT_GENERATED_MATCHES)};
-        agent.generateMatches();
-end
-
 rule "Store generated matches"
     when
         generatedMatches: Matches(allMatches: allMatches) from entry-point "signals"

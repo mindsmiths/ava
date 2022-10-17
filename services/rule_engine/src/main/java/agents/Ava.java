@@ -44,6 +44,9 @@ public class Ava extends Agent {
     public static final double CONNECTION_NEURON_CAPACITY = 100;
     public static final double CONNECTION_NEURON_RESISTANCE = 0.05;
 
+    // TEMPORARY
+    private boolean fixed;
+
     public Ava(String connectionName, String connectionId) {
         super(connectionName, connectionId);
     }
