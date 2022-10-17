@@ -1,6 +1,7 @@
 import logging
 from typing import List
 from typing import Dict
+from collections import defaultdict
 
 from itertools import combinations
 
@@ -34,7 +35,7 @@ class PairingAlgorithm(BaseService):
         not_matched = set()
         availability_intersections = {}
 
-        employee_availabilities = {}
+        employee_availabilities = defaultdict(list)
         for availability in employeeAvailabilities:
             employee_availabilities[
                 availability.employeeId] = availability.availableDays
