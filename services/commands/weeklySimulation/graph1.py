@@ -1,15 +1,16 @@
 import networkx as nx
 import matplotlib.pyplot as plt
-
+from typing import List, Dict
 from itertools import combinations
 
-from test_data import employeeConnectionStrengths
-from test_data import id_to_name
+# from test_data import employeeConnectionStrengths
+from .initial_data import id_to_name
 
 MAX_CONNECTION_STRENGTH = 6
+graphs_path = "./services/armory/public/"
 
 
-def draw_connections_graph():
+def draw_connections_graph(employeeConnectionStrengths: Dict[str, Dict[str, float]]):
     G = nx.Graph()
 
     pairs = combinations(employeeConnectionStrengths.keys(), 2)
@@ -35,6 +36,8 @@ def draw_connections_graph():
     nx.draw_networkx_edges(G, pos, edgelist=edge_small, width=0.5, alpha=0.5, edge_color="b", style="dashed")
     plt.axis("equal")
     plt.show()
+    plt.savefig(f"{graphs_path}connection_graph.png", format="PNG")
+    plt.close()
     # save it
     # plt.close()
-    draw_connections_graph()
+    # draw_connections_graph()

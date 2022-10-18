@@ -5,13 +5,14 @@ from services.pairing_algorithm.api.api import Days
 from services.pairing_algorithm.api.api import Matches
 from services.pairing_algorithm.pairing_algorithm import PairingAlgorithm
 
+from .graph3 import draw_connections_graph
 from .Neuron import Neuron
 from .initial_data import familiarity_answers
 from .initial_data import id_to_name
 import json
 
-CHARGE_RATE = 2
-DECAY_RATE = 0.1
+CHARGE_RATE = 1
+DECAY_RATE = 0.02
 
 
 class Simulation:
@@ -96,8 +97,9 @@ class Simulation:
             self.call_pairing()
             print(f"{i+1}. tjedan: ")
             for match in self.matches.allMatches:
-                if (match.first == '11'):
+                if (match.first == '4'):
                     print(match)
             self.store_data(i)
+            draw_connections_graph(self.employee_connections_float, i)
             self.neuron_charge()
             self.neuron_decay()

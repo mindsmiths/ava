@@ -3,13 +3,16 @@ import networkx.algorithms.community as community
 import matplotlib.pyplot as plt
 import random
 
+from typing import List, Dict
 from itertools import combinations
 
-from test_data import employeeConnectionStrengths
-from test_data import id_to_name
+# from test_data import employeeConnectionStrengths
+from .initial_data import id_to_name
+
+graphs_path = "./services/armory/public/"
 
 
-def draw_connections_graph():
+def draw_connections_graph(employeeConnectionStrengths: Dict[str, Dict[str, float]]):
     G = nx.Graph()
     N = nx.Graph()
     colors = ['green', 'orange', 'red', 'blue', 'yellow', 'purple']
@@ -20,7 +23,7 @@ def draw_connections_graph():
         if pair[0] in employeeConnectionStrengths and pair[1] in employeeConnectionStrengths[pair[0]] and \
                 pair[1] in employeeConnectionStrengths and pair[0] in employeeConnectionStrengths[pair[1]]:
             weight = (employeeConnectionStrengths[pair[0]][pair[1]] + employeeConnectionStrengths[pair[1]][pair[0]])
-            if weight >= 6:
+            if weight >= 3:
                 G.add_edge(pair[0], pair[1], weight=weight)
 
     # create communities and color the nodes
@@ -63,7 +66,7 @@ def draw_connections_graph():
     # draw G
     plt.subplot(121)
     nx.make_max_clique_graph(G)
-    nx.draw(G, with_labels=True, labels=id_to_name_g, node_color=node_color, node_size=400)
+    nx.draw(G, with_labels=True, labels=id_to_name_g, node_color=node_color, node_size = 400)
 
     # clean N node labels
     id_to_name_n = id_to_name.copy()
@@ -75,13 +78,13 @@ def draw_connections_graph():
     ax = plt.subplot(122)
     pos = nx.spring_layout(N, seed=7)
     nx.draw_networkx_nodes(N.nodes, pos)
-    nx.draw_networkx_labels(N, pos, labels=id_to_name_n)
+    nx.draw_networkx_labels(N, pos, labels=id_to_name_n, font_size=5)
 
     # show graphs
     ax.axis("off")
-    plt.show()
+    #plt.show()
     # save it
     # plt.close()
 
-
-draw_connections_graph()
+    plt.savefig(f"{graphs_path}connection_graph.png", format="PNG")
+    plt.close()
