@@ -26,7 +26,6 @@ import java.util.*;
 public class Ava extends Agent {
     private List<String> matchHistory = new ArrayList<>();
     private Date availableDaysEmailLastSentAt;
-    private Date matchedWithEmailSentAt;
     private AvaLunchCycleStage lunchCycleStage;
     private OnboardingStage onboardingStage;
     private MonthlyCoreStage monthlyCoreStage;
