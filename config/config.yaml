@@ -99,6 +99,8 @@ services:
     type: python
     db:
       mongo: true
+    dependencies:
+      - forge-storage==1.1.1
     resources:
       cpu: 100m
       memory: 100Mi

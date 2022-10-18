@@ -8,8 +8,9 @@ from itertools import combinations
 from forge.conf import settings as forge_settings
 from forge.core.api import api
 from forge.core.base import BaseService
-from forge_cli.admin import cli
 from forge.utils.mongo import MongoClientKeeper
+from forge_storage import CloudStorageHandler
+
 import forge
 
 from .api import Matches
@@ -22,13 +23,13 @@ from .api import Image
 from .blossom_algorithm import max_weight_matching
 
 import matplotlib.pyplot as plt
-import networkx as nx
 logger = logging.getLogger(forge_settings.DEFAULT_LOGGER)
 
 ####################
 import io
 import numpy as np
 import base64
+
 
 class PairingAlgorithm(BaseService):
 
@@ -202,3 +203,7 @@ class PairingAlgorithm(BaseService):
         decoded_str = my_base64_jpgData.decode('utf-8')
         print(decoded_str)
         return Image(image=decoded_str)
+
+    def upload_media(name: str, data: bytes) -> str:
+        storage = CloudStorageHandler()
+        return storage.upload(name, data)
