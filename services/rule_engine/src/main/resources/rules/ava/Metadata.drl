@@ -10,7 +10,6 @@ import agents.Ava;
 import models.AvaLunchCycleStage;
 import models.OnboardingStage;
 
-
 rule "Set working hours"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"

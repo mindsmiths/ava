@@ -34,4 +34,3 @@ public class LunchCycleData {
             this.availableDays.add(Days.valueOf(day));
     }
 }
-
