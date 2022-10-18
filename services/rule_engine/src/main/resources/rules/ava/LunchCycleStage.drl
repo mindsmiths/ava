@@ -202,7 +202,7 @@ end
 rule "Auto assign days"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        eval(evaluateCronExpression("* * 15-16 ? * FRI *", ts, "Europe/Zagreb"))//
+        //eval(evaluateCronExpression("* * 15-16 ? * FRI *", ts, "Europe/Zagreb"))//
         agent: Ava(
             lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY,
             lunchReminderStage != LunchReminderStage.USER_RESPONDED)
@@ -216,7 +216,7 @@ rule "Auto assign days"
             setLunchCycleStage(AvaLunchCycleStage.ACCEPT_MATCH_INFO),
             setLunchReminderStage(LunchReminderStage.USER_RESPONDED)};
         agent.send(CultureMaster.ID, new EmployeeAvailabilitySignal(
-                new EmployeeAvailability(agent.getId(), lunchCycleData.getAvailableDays())));
+                new EmployeeAvailability(employee.getId(), lunchCycleData.getAvailableDays())));
         agent.send(CultureMaster.ID, new MatchingParametersSignal(
                 employee.getId(),
                 agent.getConnectionStrengthAsValue(),
