@@ -202,7 +202,7 @@ end
 rule "Auto assign days"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        //eval(evaluateCronExpression("* * 15-16 ? * FRI *", ts, "Europe/Zagreb"))//
+        eval(evaluateCronExpression("* * 15-16 ? * FRI *", ts, "Europe/Zagreb"))//
         agent: Ava(
             lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY,
             lunchReminderStage != LunchReminderStage.USER_RESPONDED)
