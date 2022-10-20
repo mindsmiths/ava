@@ -25,13 +25,8 @@ import java.util.*;
 @NoArgsConstructor
 public class Ava extends Agent {
     private List<String> matchHistory = new ArrayList<>();
-    private Date availableDaysEmailLastSentAt;
-    private AvaLunchCycleStage lunchCycleStage;
     private OnboardingStage onboardingStage;
-    private MonthlyCoreStage monthlyCoreStage;
-    private LunchReminderStage lunchReminderStage;
     private Map<String, EmployeeProfile> otherEmployees;
-    private boolean manualTrigger;
     private boolean workingHours;
     private boolean availabilityInterval;
     private List<String> lunchDeclineReasons = new ArrayList<>();

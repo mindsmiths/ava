@@ -18,7 +18,6 @@ import agents.Ava;
 import agents.CultureMaster;
 import models.EmployeeProfile;
 import models.OnboardingStage;
-import models.AvaLunchCycleStage;
 import models.OnboardingTemplates;
 
 rule "Send onboarding email"
@@ -60,7 +59,6 @@ rule "Store familiarity answers"
         update(employee)
         modify(agent) {
             setOnboardingStage(OnboardingStage.FINISHED),
-            setLunchCycleStage(AvaLunchCycleStage.LUNCH_MAIL_SENDING),
             chargeConnectionNeurons(employee)};
         agent.send(CultureMaster.ID, new EmployeeUpdateSignal(employee));
         agent.logEvent("Onboarding Finished", Map.of("employeeId", employee.getId(),

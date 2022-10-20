@@ -5,11 +5,12 @@ import com.mindsmiths.emailAdapter.SendEmailPayload;
 
 import agents.Ava;
 
-import models.AvaLunchCycleStage;
 import models.OnboardingStage
 import models.EmployeeProfile;
 import models.OnboardingTemplates;
 import models.MonthlyCoreTemplates;
+import models.LunchCycleData;
+import models.MonthlyCoreData
 
 rule "Trigger onboarding"
     when
@@ -27,28 +28,42 @@ rule "Trigger onboarding"
         delete(signal);
 end
 
+rule "Manual delete lunch cycle data"
+    salience 100
+    when
+        signal: ManualTriggerEvent(triggerType == "lunch_cycle") from entry-point "signals"
+        agent: Ava(onboardingStage == OnboardingStage.FINISHED)
+        lunchCycleData: LunchCycleData()
+    then
+        delete(lunchCycleData);
+end
+
 rule "Trigger lunch cycle for Ava"
     when
         signal: ManualTriggerEvent(triggerType == "lunch_cycle") from entry-point "signals"
         agent: Ava(onboardingStage == OnboardingStage.FINISHED)
-        employee: EmployeeProfile()
+        not LunchCycleData()
     then
-        modify(agent) {
-            setManualTrigger(true),
-            setLunchCycleStage(AvaLunchCycleStage.LUNCH_MAIL_SENDING)};
-        delete(signal);            
+        insert(new LunchCycleData(true));
+        delete(signal);
+end
+
+rule "Manual delete monthly core data"
+    salience 100
+    when
+        signal: ManualTriggerEvent(triggerType == "monthly_core") from entry-point "signals"
+        agent: Ava(onboardingStage == OnboardingStage.FINISHED)
+        monthlyCoreData: MonthlyCoreData()
+    then
+        delete(monthlyCoreData);
 end
 
 rule "Trigger monthly core"
     when
         signal: ManualTriggerEvent(triggerType == "monthly_core") from entry-point "signals"
-        agent: Ava(monthlyCoreStage == null)
-        employee: EmployeeProfile()
+        agent: Ava(onboardingStage == OnboardingStage.FINISHED)
+        not MonthlyCoreData()
     then
-        SendEmailPayload email = new MonthlyCoreTemplates().monthlyCoreEmail(
-            employee,
-            agent.getConnection("armory"),
-            agent.getConnection("email"));
-        agent.sendEmail(email);
-        modify(agent) {setMonthlyCoreStage(MonthlyCoreStage.EMAIL_SENT)};
+        insert(new MonthlyCoreData(true));
+        delete(signal)
 end

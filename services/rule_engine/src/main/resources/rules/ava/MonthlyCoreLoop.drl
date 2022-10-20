@@ -14,43 +14,59 @@ import agents.Ava;
 import models.EmployeeProfile;
 import models.MonthlyCoreStage;
 import models.MonthlyCoreTemplates;
+import models.MonthlyCoreData
 
 import java.util.Map;
 import java.util.List;
-
 
 rule "Send monthly core email"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
         eval(evaluateCronExpression("* * * ? * 2#1 *", ts, "Europe/Zagreb"))
-        agent: Ava(workingHours == true, monthlyCoreStage == null)
+        agent: Ava(workingHours == true)
         employee: EmployeeProfile()
+        not MonthlyCoreData()
     then
-        SendEmailPayload email = new MonthlyCoreTemplates().monthlyCoreEmail(
+        SendEmailPayload email = MonthlyCoreTemplates.monthlyCoreEmail(
             employee,
             agent.getConnection("armory"),
             agent.getConnection("email"));
         agent.sendEmail(email);
-        modify(agent) {setMonthlyCoreStage(MonthlyCoreStage.EMAIL_SENT)};
+        insert(new MonthlyCoreData());
+end
+
+rule "Manuel Send monthly core email"
+    when
+        monthlyCoreData: MonthlyCoreData(manualTrigger == true) 
+        agent: Ava(workingHours == true)
+        employee: EmployeeProfile()
+    then
+        SendEmailPayload email = MonthlyCoreTemplates.monthlyCoreEmail(
+            employee,
+            agent.getConnection("armory"),
+            agent.getConnection("email"));
+        agent.sendEmail(email);
+        modify(monthlyCoreData){setManualTrigger(false)}
 end
 
 rule "Start and reconnect monthly quiz"
    when
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-monthly-core") from entry-point "signals"
-        agent: Ava(monthlyCoreStage in (MonthlyCoreStage.EMAIL_SENT, MonthlyCoreStage.FAMILIARITY_QUIZ))
+        agent: Ava()
+        monthlyCoreData: MonthlyCoreData(monthlyCoreStage in (MonthlyCoreStage.EMAIL_SENT, MonthlyCoreStage.FAMILIARITY_QUIZ))
         employee: EmployeeProfile()
    then
-        Map<String, BaseTemplate> screens = new MonthlyCoreTemplates()
+        Map<String, BaseTemplate> screens = MonthlyCoreTemplates
                 .monthlyQuizScreens(agent.createOtherEmployeeNames());
         agent.showScreens("introScreen", screens);
-        modify(agent) {setMonthlyCoreStage(MonthlyCoreStage.FAMILIARITY_QUIZ)};
+        modify(monthlyCoreData) {setMonthlyCoreStage(MonthlyCoreStage.FAMILIARITY_QUIZ)};
         delete(signal);
 end
 
 rule "Store monthly core answers"
    when
         signal: SubmitEvent(getParamAsString("submit") == "finish-monthly-quiz") from entry-point "signals"
-        agent: Ava(monthlyCoreStage == MonthlyCoreStage.FAMILIARITY_QUIZ)
+        monthlyCoreData: MonthlyCoreData(monthlyCoreStage == MonthlyCoreStage.FAMILIARITY_QUIZ)
         employee: EmployeeProfile(familiarity : familiarity)
    then
         for (String paramId : signal.getParams().keySet()) 
@@ -59,16 +75,17 @@ rule "Store monthly core answers"
                     employee.getFamiliarity().put(em, (Double) familiarity.getOrDefault(em, 0.0) + 1.0);
 
         update(employee)
-        modify(agent) {setMonthlyCoreStage(MonthlyCoreStage.FINISHED)};
+        modify(monthlyCoreData) {setMonthlyCoreStage(MonthlyCoreStage.FINISHED)};
         delete(signal);
 end
 
 rule "Reconnect monthly core final screen"
    when
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-monthly-core") from entry-point "signals"
-        agent: Ava(monthlyCoreStage == MonthlyCoreStage.FINISHED)
+        agent: Ava()
+        monthlyCoreData: MonthlyCoreData(monthlyCoreStage == MonthlyCoreStage.FINISHED)
    then
-        BaseTemplate screen = new MonthlyCoreTemplates().finalScreen();
+        BaseTemplate screen = MonthlyCoreTemplates.finalScreen();
         agent.showScreen(screen);
         delete(signal);
 end
@@ -77,9 +94,7 @@ rule "Reset monthly core loop"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
         eval(evaluateCronExpression("* * * ? * 4#1 *", ts, "Europe/Zagreb"))
-        agent: Ava()
+        monthlyCoreData: MonthlyCoreData()
     then
-        modify(agent) {
-            setLunchCycleStage(null)
-        };
+     delete(monthlyCoreData);
 end

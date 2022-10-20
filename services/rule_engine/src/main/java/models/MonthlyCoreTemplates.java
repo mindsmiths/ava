@@ -11,10 +11,10 @@ import java.io.IOException;
 
 public class MonthlyCoreTemplates {
 
-    public SendEmailPayload monthlyCoreEmail(EmployeeProfile employee, String armoryConnectionId,
+    public static SendEmailPayload monthlyCoreEmail(EmployeeProfile employee, String armoryConnectionId,
             String emailConnectionId) throws IOException {
         String htmlTemplate = new String(Objects.requireNonNull(
-                getClass().getClassLoader().getResourceAsStream(
+                MonthlyCoreTemplates.class.getClassLoader().getResourceAsStream(
                         "emailTemplates/EmailTemplate.html"))
                 .readAllBytes());
         String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
@@ -76,7 +76,7 @@ public class MonthlyCoreTemplates {
         return screens;
     }
 
-    public BaseTemplate finalScreen() {
+    public static BaseTemplate finalScreen() {
         BaseTemplate screen = new TemplateGenerator("goodbye")
                 .setTemplateName("CenteredContentTemplate")
                 .addComponent("title", new TitleComponent(
