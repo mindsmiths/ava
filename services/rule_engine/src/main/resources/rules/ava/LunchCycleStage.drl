@@ -183,7 +183,7 @@ rule "Finish lunch decline form"
         agent: Ava(lunchDeclineReasons : lunchDeclineReasons)
         lunchCycleData: LunchCycleData(lunchReminderStage != LunchReminderStage.USER_RESPONDED)
    then
-        lunchDeclineReasons.put(ts,signal.getParamAsString("answer"));
+        lunchDeclineReasons.put(signal.getParamAsString("answer"), ts);
         modify(lunchCycleData){
             setLunchReminderStage(LunchReminderStage.USER_RESPONDED),
             setManualTrigger(false)}

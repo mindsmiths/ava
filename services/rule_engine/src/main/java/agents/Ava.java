@@ -11,7 +11,7 @@ import com.mindsmiths.ruleEngine.util.Log;
 import models.*;
 import signals.SendMatchesSignal;
 import utils.EventTracking;
-
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -21,14 +21,15 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Data
-@ToString(callSuper = true)
+@AllArgsConstructor
 @NoArgsConstructor
+@ToString(callSuper = true)
 public class Ava extends Agent {
     private OnboardingStage onboardingStage;
     private Map<String, EmployeeProfile> otherEmployees;
     private boolean workingHours;
     private boolean availabilityInterval;
-    private Map<Date, String> lunchDeclineReasons = new HashMap<>();
+    private Map<String, Date> lunchDeclineReasons = new HashMap<>();
     private Map<String, Neuron> connectionStrengths = new HashMap<>();
     public static final double CONNECTION_NEURON_CAPACITY = 100;
     public static final double CONNECTION_NEURON_RESISTANCE = 0.05;
