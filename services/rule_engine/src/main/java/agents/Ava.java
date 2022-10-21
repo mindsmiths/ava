@@ -4,7 +4,6 @@ import com.mindsmiths.armory.ArmoryAPI;
 import com.mindsmiths.armory.templates.BaseTemplate;
 import com.mindsmiths.emailAdapter.EmailAdapterAPI;
 import com.mindsmiths.emailAdapter.SendEmailPayload;
-import com.mindsmiths.pairingalgorithm.Days;
 import com.mindsmiths.ruleEngine.model.Agent;
 import com.mindsmiths.ruleEngine.util.DateUtil;
 import com.mindsmiths.ruleEngine.util.Log;
@@ -25,20 +24,11 @@ import java.util.*;
 @ToString(callSuper = true)
 @NoArgsConstructor
 public class Ava extends Agent {
-    private List<Days> availableDays = new ArrayList<>();
-    private String match;
-    private Days matchDay;
-    private Date availableDaysEmailLastSentAt;
-    private Date matchedWithEmailSentAt;
-    private AvaLunchCycleStage lunchCycleStage;
     private OnboardingStage onboardingStage;
-    private MonthlyCoreStage monthlyCoreStage;
-    private LunchReminderStage lunchReminderStage;
     private Map<String, EmployeeProfile> otherEmployees;
-    private boolean manualTrigger;
     private boolean workingHours;
     private boolean availabilityInterval;
-    private List<String> lunchDeclineReasons = new ArrayList<>();
+    private Map<Date, String> lunchDeclineReasons = new HashMap<>();
     private Map<String, Neuron> connectionStrengths = new HashMap<>();
     public static final double CONNECTION_NEURON_CAPACITY = 100;
     public static final double CONNECTION_NEURON_RESISTANCE = 0.05;
@@ -108,12 +98,6 @@ public class Ava extends Agent {
             if (entry.getValue().getId().equals(employeeId))
                 return entry.getKey();
         return "";
-    }
-
-    public void updateAvailableDays(List<String> availableDaysStr) {
-        this.availableDays = new ArrayList<>();
-        for (String day : availableDaysStr)
-            this.availableDays.add(Days.valueOf(day));
     }
 
     public void printMatchInfo(EmployeeProfile employee, SendMatchesSignal signal) {

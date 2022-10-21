@@ -58,9 +58,7 @@ public class CultureMaster extends Agent {
     }
 
     public void generateMatches() {
-        PairingAlgorithmAPI.generatePairs(
-                new ArrayList<>(employeeAvailabilities),
-                new HashMap<>(employeeConnectionStrengths));
+        PairingAlgorithmAPI.generatePairs(new ArrayList<>(employeeAvailabilities), new HashMap<>(employeeConnectionStrengths));
     }
 
     public void addMatches(List<Match> allMatches) {

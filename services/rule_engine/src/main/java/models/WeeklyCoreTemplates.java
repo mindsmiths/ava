@@ -36,7 +36,7 @@ import utils.Settings;
 
 public class WeeklyCoreTemplates {
 
-    public SendEmailPayload weeklyEmail(EmployeeProfile employee, LunchReminderStage lunchReminderStage,
+    public static SendEmailPayload weeklyEmail(EmployeeProfile employee, LunchReminderStage lunchReminderStage,
             String armoryConnectionId, String emailConnectionId) throws IOException {
         String subject = Mitems.getText("weekly-core.weekly-email.subject");
         String description = Mitems.getText("weekly-core.weekly-email.description");
@@ -50,7 +50,7 @@ public class WeeklyCoreTemplates {
             description = Mitems.getText("weekly-core.third-reminder-email.description");
         }
         String htmlTemplate = new String(Objects.requireNonNull(
-                getClass().getClassLoader().getResourceAsStream("emailTemplates/WeeklyEmailTemplate.html"))
+            WeeklyCoreTemplates.class.getClassLoader().getResourceAsStream("emailTemplates/WeeklyEmailTemplate.html"))
                 .readAllBytes());
         String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
                 "text", description,
@@ -68,7 +68,7 @@ public class WeeklyCoreTemplates {
         return email;
     }
 
-    public BaseTemplate availableDaysScreen() {
+    public static BaseTemplate availableDaysScreen() {
         Option[] days = Mitems.getOptions("weekly-core.days.each-day");
         List<CloudSelectComponent.Option> options = new ArrayList<>();
 
@@ -88,7 +88,7 @@ public class WeeklyCoreTemplates {
         return screen;
     }
 
-    public Map<String, BaseTemplate> confirmingDaysScreen() {
+    public static Map<String, BaseTemplate> confirmingDaysScreen() {
         Option buttonOption = Mitems.getOptions("weekly-core.confirmation-of-choosen-available-days.button")[0];
         Map<String, BaseTemplate> screens = Map.of(
                 "confirmDaysScreen", new TemplateGenerator("confirmScreen")
@@ -104,7 +104,7 @@ public class WeeklyCoreTemplates {
         return screens;
     }
 
-    public Map<String, BaseTemplate> lunchDeclineReasonScreens() {
+    public static Map<String, BaseTemplate> lunchDeclineReasonScreens() {
         Map<String, BaseTemplate> screens = new HashMap<>();
         screens.put("LunchDecline", new TemplateGenerator()
                 .addComponent("title", new TitleComponent(
@@ -118,7 +118,7 @@ public class WeeklyCoreTemplates {
         return screens;
     }
 
-    public SendEmailPayload calendarInviteEmail(Days days, EmployeeProfile currentEmployee,
+    public static SendEmailPayload calendarInviteEmail(Days days, EmployeeProfile currentEmployee,
             EmployeeProfile otherEmployee) throws IOException {
 
         if (currentEmployee == null || otherEmployee == null)
@@ -137,10 +137,10 @@ public class WeeklyCoreTemplates {
         return payload;
     }
 
-    private String renderMatchmakingEmail(Days days, EmployeeProfile currentEmployee, EmployeeProfile otherEmployee)
+    private static String renderMatchmakingEmail(Days days, EmployeeProfile currentEmployee, EmployeeProfile otherEmployee)
             throws IOException {
         String htmlTemplate = new String(Objects.requireNonNull(
-                getClass().getClassLoader().getResourceAsStream("emailTemplates/EmailTemplateCalendar.html"))
+            WeeklyCoreTemplates.class.getClassLoader().getResourceAsStream("emailTemplates/EmailTemplateCalendar.html"))
                 .readAllBytes());
         return Templating.recursiveRender(htmlTemplate, Map.of(
                 "title", Mitems.getText("weekly-core.matching-mail.title"),
@@ -151,7 +151,7 @@ public class WeeklyCoreTemplates {
                 "lunchDay", daysToPrettyString(days)));
     }
 
-    private byte[] getICSInvite(Days day, Employee currentEmployee, Employee otherEmployee) {
+    private static byte[] getICSInvite(Days day, Employee currentEmployee, Employee otherEmployee) {
         try {
             Calendar invite = new Calendar();
             invite.getProperties().add(new ProdId("Ava"));
@@ -201,7 +201,7 @@ public class WeeklyCoreTemplates {
         }
     }
 
-    public String daysToPrettyString(Days days) {
+    public static String daysToPrettyString(Days days) {
         for (Option option : Mitems.getOptions("weekly-core.days.each-day")) {
             if (days.toString().equals(option.getId())) {
                 return option.getText();
@@ -219,7 +219,7 @@ public class WeeklyCoreTemplates {
         return now;
     }
 
-    public SendEmailPayload noMatchEmail(String emailConnectionId) throws IOException {
+    public static SendEmailPayload noMatchEmail(String emailConnectionId) throws IOException {
         SendEmailPayload email = new SendEmailPayload();
         email.setRecipients(List.of(emailConnectionId));
         email.setSubject(Mitems.getText("weekly-core.no-match-email.subject"));
@@ -227,14 +227,14 @@ public class WeeklyCoreTemplates {
         return email;
     }
 
-    public BaseTemplate userAlreadyRespondedScreen() {
+    public static BaseTemplate userAlreadyRespondedScreen() {
         BaseTemplate screen = new TemplateGenerator("goodbye")
                 .addComponent("title", new TitleComponent(
                         Mitems.getText("weekly-core.user-already-responded-screen.title")));
         return screen;
     }
 
-    public BaseTemplate lunchInviteExpiredScreen() {
+    public static BaseTemplate lunchInviteExpiredScreen() {
         BaseTemplate lunchInviteExpiredScreen = new TemplateGenerator()
                 .addComponent("title", new TitleComponent(
                         Mitems.getText("weekly-core.message-about-not-working-hours-for-links.title")));
