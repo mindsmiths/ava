@@ -29,7 +29,7 @@ public class Ava extends Agent {
     private Map<String, EmployeeProfile> otherEmployees;
     private boolean workingHours;
     private boolean availabilityInterval;
-    private List<String> lunchDeclineReasons = new ArrayList<>();
+    private Map<Date, String> lunchDeclineReasons = new HashMap<>();
     private Map<String, Neuron> connectionStrengths = new HashMap<>();
     public static final double CONNECTION_NEURON_CAPACITY = 100;
     public static final double CONNECTION_NEURON_RESISTANCE = 0.05;

@@ -18,7 +18,7 @@ rule "Trigger onboarding"
         agent: Ava()
         employee: EmployeeProfile(familiarity: familiarity)
     then
-        SendEmailPayload email = new OnboardingTemplates().welcomeEmail(
+        SendEmailPayload email = OnboardingTemplates.welcomeEmail(
                 employee,
                 agent.getConnection("armory"),
                 agent.getConnection("email"));

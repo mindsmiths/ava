@@ -23,10 +23,10 @@ import utils.Settings;
 
 public class OnboardingTemplates {
 
-    public SendEmailPayload welcomeEmail(EmployeeProfile employee, String armoryConnectionId, String emailConnectionId)
+    public static SendEmailPayload welcomeEmail(EmployeeProfile employee, String armoryConnectionId, String emailConnectionId)
             throws IOException {
         String htmlTemplate = new String(Objects.requireNonNull(
-                getClass().getClassLoader().getResourceAsStream(
+                OnboardingTemplates.class.getClassLoader().getResourceAsStream(
                         "emailTemplates/EmailTemplate.html"))
                 .readAllBytes());
         Log.warn(htmlTemplate);
@@ -44,7 +44,7 @@ public class OnboardingTemplates {
         return email;
     }
 
-    public Map<String, BaseTemplate> familiarityQuizScreens(Map<String, String> otherEmployeeNames) {
+    public static Map<String, BaseTemplate> familiarityQuizScreens(Map<String, String> otherEmployeeNames) {
         Map<String, BaseTemplate> screens = new HashMap<>();
         screens.put("introScreen", new TemplateGenerator()
                 .addComponent("title",
@@ -118,7 +118,7 @@ public class OnboardingTemplates {
         return screens;
     }
 
-    public BaseTemplate finalScreen() {
+    public static BaseTemplate finalScreen() {
         BaseTemplate screen = new TemplateGenerator("goodbye")
                 .setTemplateName("CenteredContentTemplate")
                 .addComponent("title", new TitleComponent(

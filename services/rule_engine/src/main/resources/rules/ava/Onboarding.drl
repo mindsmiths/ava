@@ -25,7 +25,7 @@ rule "Send onboarding email"
         agent: Ava(workingHours == true, onboardingStage == OnboardingStage.AVA_CREATED)
         employee: EmployeeProfile()
     then
-        SendEmailPayload email = new OnboardingTemplates().welcomeEmail(
+        SendEmailPayload email = OnboardingTemplates.welcomeEmail(
                 employee,
                 agent.getConnection("armory"),
                 agent.getConnection("email"));
@@ -38,7 +38,7 @@ rule "Start or reconnect familiarity quiz"
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-onboarding") from entry-point "signals"
         agent: Ava(onboardingStage in (OnboardingStage.WELCOME_EMAIL_SENT, OnboardingStage.FAMILIARITY_QUIZ))
    then
-        Map<String, BaseTemplate> screens = new OnboardingTemplates()
+        Map<String, BaseTemplate> screens = OnboardingTemplates
                 .familiarityQuizScreens(agent.createOtherEmployeeNames());
         agent.showScreens("introScreen", screens);
         modify(agent) {setOnboardingStage(OnboardingStage.FAMILIARITY_QUIZ)};
@@ -70,7 +70,7 @@ rule "Reconnect final screen"
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-onboarding") from entry-point "signals"
         agent: Ava(onboardingStage == OnboardingStage.FINISHED)
    then
-        BaseTemplate screen = new OnboardingTemplates().finalScreen();
+        BaseTemplate screen = OnboardingTemplates.finalScreen();
         agent.showScreen(screen);
         delete(signal);
 end
