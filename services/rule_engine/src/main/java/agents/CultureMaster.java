@@ -10,9 +10,9 @@ import com.mindsmiths.pairingalgorithm.Match;
 import com.mindsmiths.pairingalgorithm.PairingAlgorithmAPI;
 import com.mindsmiths.pairingalgorithm.LunchCompatibilities;
 import com.mindsmiths.ruleEngine.model.Agent;
-import com.mindsmiths.sdk.core.db.DataUtils;
-import com.mindsmiths.sdk.core.db.EmitType;
-
+import com.mindsmiths.sdk.core.api.DataChangeType;
+import com.mindsmiths.sdk.core.api.Message;
+import com.mindsmiths.sdk.core.db.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import models.EmployeeProfile;
@@ -46,14 +46,18 @@ public class CultureMaster extends Agent {
         this.employeeAvailabilities = new ArrayList<>();
     }
 
+    public void addNewEmployee(String id,EmployeeProfile employeeProfile) {
+        employees.put(id, employeeProfile);
+    }
+
     public void addOrUpdateEmployee(EmployeeUpdateSignal signal) {
         employees.put(signal.getFrom(), signal.getEmployee());
     }
 
     public void sendEmployeesToAva() {
-        for (String address : employees.keySet()) {
-            AllEmployees allEmployees = new AllEmployees(employees);
-            send(address, allEmployees);
+        for (String avaId : employees.keySet()) {
+            Message allEmployees = new AllEmployees(employees);
+            send(avaId, allEmployees);
         }
     }
 
@@ -88,7 +92,8 @@ public class CultureMaster extends Agent {
             send(employeeToAvaId(m.getSecond()), new SendMatchesSignal(m.getFirst(), m.getDay()));
         }
         for (Match m : allMatches)
-            DataUtils.emit(new models.Match(m), EmitType.CREATE);
+            Database.emitChange(new models.Match(m), DataChangeType.CREATED);
+         
 
     }
 

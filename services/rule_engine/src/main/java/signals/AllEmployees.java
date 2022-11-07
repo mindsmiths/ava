@@ -1,6 +1,6 @@
 package signals;
 
-import com.mindsmiths.sdk.core.api.Signal;
+import com.mindsmiths.sdk.core.api.Message;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,6 +14,6 @@ import lombok.Data;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class AllEmployees extends Signal {
+public class AllEmployees extends Message {
     private Map<String, EmployeeProfile> allEmployees = new HashMap<>();
 }

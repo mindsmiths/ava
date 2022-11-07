@@ -1,8 +1,9 @@
 package models;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Calendar;
-import java.util.Date;
 
 import com.mindsmiths.mitems.Mitems;
 import com.mindsmiths.mitems.Option;
@@ -16,12 +17,12 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@DataModel(serviceName = "rule_engine")
+@DataModel
 public class Match implements Serializable {
     private String firstEmployeeId;
     private String secondEmployeeId;
     private String dayOfWeek;
-    private Date date;
+    private LocalDateTime date;
 
     public Match(com.mindsmiths.pairingalgorithm.Match match){
         this.firstEmployeeId = match.getFirst();
@@ -30,7 +31,7 @@ public class Match implements Serializable {
         this.date = nextDayOfWeek(match.getDay());
     }
 
-    public Date nextDayOfWeek(Days dow) {
+    public LocalDateTime nextDayOfWeek(Days dow) {
         Calendar now = Calendar.getInstance();
         
         int diff = dow.ordinal() - now.get(java.util.Calendar.DAY_OF_WEEK);
@@ -38,7 +39,7 @@ public class Match implements Serializable {
             diff += 7;
 
         now.add(java.util.Calendar.DAY_OF_MONTH, diff + 2);
-        return now.getTime();
+        return  now.getTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
 
     public String daysToPrettyString(Days days) {

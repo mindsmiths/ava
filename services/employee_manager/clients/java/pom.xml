@@ -6,7 +6,7 @@
 
     <groupId>com.mindsmiths</groupId>
     <artifactId>employee-manager</artifactId>
-    <version>4.0.0a0</version>
+    <version>5.0.0b0</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -24,7 +24,7 @@
         <dependency>
             <groupId>com.mindsmiths</groupId>
             <artifactId>forge-sdk</artifactId>
-            <version>4.0.0a11</version>
+            <version>5.0.0b0</version>
         </dependency>
     </dependencies>
 

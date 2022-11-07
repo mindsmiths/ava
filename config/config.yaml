@@ -1,8 +1,8 @@
 global:
   dependencies:
     python:
-      - forge-sdk==4.0.0a13
-      - forge-cli==4.0.0a29
+      - forge-sdk==5.0.0b0
+      - forge-cli==5.0.0b0
       - cecs==4.0.0a3
       - pymongo[srv]
       - services/*.py
@@ -70,31 +70,19 @@ services:
       - pairing-algorithm
       - employee-manager
 
-  heartbeat-scheduler:
+  heartbeat:
     package: heartbeat
     type: python
-    version: 4.0.0a4
+    version: 5.0.0b0
     env:
       HEARTBEAT_CYCLE: 30
     db:
       mongo: true
     dependencies:
-      - rule-engine-api==4.0.0a21
+      - rule-engine-api==5.0.0b0
     resources:
       cpu: 69m
       memory: 65Mi
-
-  heartbeat-sender:
-    package: heartbeat
-    type: python
-    version: 4.0.0a4
-    db:
-      mongo: true
-    dependencies:
-      - rule-engine-api==4.0.0a21
-    resources:
-      cpu: 84m
-      memory: 94Mi
 
   pairing-algorithm:
     type: python
@@ -106,7 +94,7 @@ services:
 
   mitems:
     type: django
-    version: 4.0.0a12
+    version: 5.0.0b0
     db:
       postgres: true
     image:
@@ -126,9 +114,10 @@ services:
       memory: 67Mi
 
   email-adapter:
+    
     type: python
-    version: 4.0.0a12
-    env:
+    version: 5.0.0b0
+    env: 
       PROJECT_EMAIL_NAME: "{{env.PROJECT_EMAIL_NAME}}"
       PROJECT_EMAIL_ADDRESS: "{{env.PROJECT_EMAIL_ADDRESS}}"
       PROJECT_EMAIL_PASSWORD: "{{env.PROJECT_EMAIL_PASSWORD}}"
@@ -147,7 +136,7 @@ services:
     type: python
     package: email-adapter
     subservice: email_receiver
-    version: 4.0.0a10
+    version: 5.0.0b0
     db:
       mongo: true
     resources:
@@ -165,7 +154,7 @@ services:
       - django-import-export==2.8.0
       - psycopg2-binary==2.9.3
       - gunicorn==20.1.0
-      - rule-engine-api==4.0.0a20
+      - rule-engine-api==5.0.0b0
       - rule-engine
     env:
       DJANGO_SUPERUSER_USERNAME: admin
@@ -179,7 +168,7 @@ services:
 
   armory:
     type: django
-    version: 4.0.0a15
+    version: 5.0.0b0
     command:
       run: "daphne -b 0.0.0.0 armory.config.asgi:application"
     db:

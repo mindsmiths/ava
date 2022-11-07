@@ -7,9 +7,8 @@ from collections import defaultdict
 from itertools import combinations
 
 from forge.conf import settings as forge_settings
-from forge.core.api import api
 from forge.core.base import BaseService
-
+from forge.core.api.decorators import api
 from .api import Matches
 from .api import EmployeeAvailability
 from .api import Match
@@ -24,7 +23,7 @@ logger = logging.getLogger(forge_settings.DEFAULT_LOGGER)
 class PairingAlgorithm(BaseService):
 
     @api
-    def generate_pairs(
+    async def generate_pairs(
             self,
             employeeAvailabilities: List[EmployeeAvailability],
             employeeConnectionStrengths: Dict[str, Dict[str, float]]) -> Matches:

@@ -1,9 +1,10 @@
 package models;
 
-import java.util.Date;
-
+import com.mindsmiths.armory.event.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 import com.mindsmiths.sdk.utils.Utils;
 
@@ -16,7 +17,7 @@ public class Neuron {
     private double R_in = 1; // resistance
     private double C = 10; // capacity
 
-    private Date lastUpdatedAt = new Date();
+    private LocalDateTime lastUpdatedAt = Utils.getUtcDatetime();
 
     public Neuron(double R_in, double C) {
         this.R_in = R_in;
@@ -26,7 +27,7 @@ public class Neuron {
 
     public void decay(double amount) {
         this.update(0, amount, 1);
-        lastUpdatedAt = new Date();
+        lastUpdatedAt = Utils.getUtcDatetime();
     }
 
     public void charge(double amount) {

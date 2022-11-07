@@ -1,7 +1,7 @@
 package models;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import com.mindsmiths.pairingalgorithm.Days;
@@ -19,7 +19,7 @@ public class LunchCycleData {
     private List<Days> availableDays = new ArrayList<>();
     private String match;
     private Days matchDay;
-    private Date availableDaysEmailLastSentAt;
+    private LocalDateTime availableDaysEmailLastSentAt;
     private AvaLunchCycleStage lunchCycleStage = AvaLunchCycleStage.LUNCH_MAIL_SENDING;
     private LunchReminderStage lunchReminderStage;
     private boolean manualTrigger;

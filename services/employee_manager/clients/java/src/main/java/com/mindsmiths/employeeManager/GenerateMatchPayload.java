@@ -3,7 +3,7 @@ package com.mindsmiths.employeeManager;
 import lombok.*;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -13,6 +13,6 @@ import java.util.Date;
 public class GenerateMatchPayload implements Serializable {
     private String firstEmployeeId;
     private String secondEmployeeId;
-    private Date date;
+    private LocalDateTime date;
     private String dayOfWeek;
 }

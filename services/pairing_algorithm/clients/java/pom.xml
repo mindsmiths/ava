@@ -6,7 +6,7 @@
 
     <groupId>com.mindsmiths</groupId>
     <artifactId>pairing-algorithm-client</artifactId>
-    <version>4.0.0a0</version>
+    <version>5.0.0b0</version>
 
     <properties>
         <jackson.version>2.13.1</jackson.version>
@@ -25,7 +25,7 @@
         <dependency>
             <groupId>com.mindsmiths</groupId>
             <artifactId>forge-sdk</artifactId>
-            <version>4.0.0a10</version>
+            <version>5.0.0b0</version>
         </dependency>
     </dependencies>
 

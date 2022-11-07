@@ -1,6 +1,7 @@
 package models;
 
 import com.mindsmiths.employeeManager.employees.Employee;
+import com.mindsmiths.sdk.core.db.DataModel;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -24,11 +25,11 @@ public class EmployeeProfile extends Employee {
 
     public EmployeeProfile(Map<String, Double> familiarity, String id,
             String firstName, String lastName, String email) {
-        this.setId(id);
-        this.setFirstName(firstName);
-        this.setLastName(lastName);
-        this.setEmail(email);
-        this.familiarity = familiarity;
+                this.setId(id);
+                this.setFirstName(firstName);
+                this.setLastName(lastName);
+                this.setEmail(email);
+                this.familiarity = familiarity;
     }
 
     public String getFullName() {

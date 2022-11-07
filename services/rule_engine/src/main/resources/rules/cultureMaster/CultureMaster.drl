@@ -3,11 +3,17 @@ package rules.cultureMaster;
 import com.mindsmiths.employeeManager.ManualTriggerEvent;
 import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.ruleEngine.model.Heartbeat;
+import com.mindsmiths.employeeManager.employees.Employee;
 
+import com.mindsmiths.ruleEngine.util.Agents;
 import agents.CultureMaster;
 import signals.EmployeeUpdateSignal;
+import signals.EmployeeTestSignal;
+import models.EmployeeProfile;
 import models.CmLunchCycleStage;
+import com.mindsmiths.sdk.core.api.DataChangeType;
 import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
+import agents.Ava;
 
 rule "Update Ava data"
     when
@@ -17,7 +23,21 @@ rule "Update Ava data"
         modify(agent) {
             addOrUpdateEmployee(signal),
             sendEmployeesToAva()};
-        delete(signal);
+    delete(signal);
+end
+
+rule "Create or update employee"
+    when
+        employee: Employee() from entry-point "signals"
+        agent: CultureMaster()
+        DataChangeType(this == CREATED || this == UPDATED) from entry-point "signals"
+    then
+        delete(employee);
+        
+        modify(agent) {
+            send(Agents.createAgent(new Ava()).getId(), new EmployeeTestSignal(employee)),
+            //addNewEmployee(tempId, new EmployeeProfile(employee)),
+            sendEmployeesToAva()};
 end
 
 rule "Trigger lunch cycle for CultureMaster"

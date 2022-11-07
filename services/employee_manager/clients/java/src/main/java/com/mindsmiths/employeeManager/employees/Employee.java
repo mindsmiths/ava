@@ -15,7 +15,7 @@ import java.io.Serializable;
 @ToString(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@DataModel(serviceName = "employee_manager")
+@DataModel(emit = true)
 public class Employee implements Serializable {
     String id;
     String firstName;

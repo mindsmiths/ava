@@ -2,7 +2,7 @@ from jet.dashboard.modules import DashboardModule
 
 from matches.models import Match
 from datetime import timedelta
-from forge.utils.datetime_helpers import get_utc_datetime
+from forge.utils.datetime import get_utc_datetime
 
 
 class MatchesModule(DashboardModule):

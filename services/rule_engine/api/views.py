@@ -1,8 +1,8 @@
-from forge.core.db import DBView
+from forge.core.db import EmittableDataModel
 from datetime import datetime
 
 
-class Match(DBView):
+class Match(EmittableDataModel):
     firstEmployeeId: str
     secondEmployeeId: str
     dayOfWeek: str

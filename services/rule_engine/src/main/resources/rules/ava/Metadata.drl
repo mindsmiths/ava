@@ -31,9 +31,7 @@ end
 rule "Set availability interval"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        agent: Ava(availabilityInterval != anyCronSatisfied(ts, "Europe/Zagreb", "* * 8-23 * * WED", "* * * * * THU",
-                                                            "* * 00-16 * * FRI"), interval: availabilityInterval)
+        agent: Ava(availabilityInterval != anyCronSatisfied(ts, "Europe/Zagreb","* * 8-23 ? * WED", "* * * ? * THU", "* * 00-16 ? * FRI"), interval: availabilityInterval)
     then
         modify(agent) {setAvailabilityInterval(!interval)};
 end
-

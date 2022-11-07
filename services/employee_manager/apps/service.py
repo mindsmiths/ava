@@ -2,7 +2,7 @@ import logging
 
 from forge.conf import settings as forge_settings
 from forge.core.base import BaseService
-from forge.core.api import on_event
+from forge.core.api.decorators import on_change
 
 from matches.models import Match
 from services.rule_engine.api.views import Match as MatchView
@@ -13,8 +13,8 @@ logger = logging.getLogger(forge_settings.DEFAULT_LOGGER)
 
 class EmployeeManagerListener(BaseService):
 
-    @on_event(MatchView)
-    def create_match(self, match: MatchView):
+    @on_change(MatchView)
+    async def create_match(self, match: MatchView):
         firstEmployee = Employee.objects.get(id=match.firstEmployeeId)
         secondEmployee = Employee.objects.get(id=match.secondEmployeeId)
 

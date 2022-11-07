@@ -1,1 +1,1 @@
-SERVICE_NAME = 'pairing_algorithm'
+SERVICE_ID = 'pairing_algorithm'

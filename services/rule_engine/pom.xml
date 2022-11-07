@@ -4,7 +4,7 @@
 	<artifactId>RuleEngine</artifactId>
 	<name>Rule Engine</name>
 	<description>Rule engine</description>
-	<version>4.0.0</version>
+	<version>5.0.0b0</version>
 	<packaging>kjar</packaging>
 	<properties>
 		<drools.version>7.68.0.Final</drools.version>
@@ -34,22 +34,22 @@
 		<dependency>
 			<groupId>com.mindsmiths</groupId>
 			<artifactId>rule-engine</artifactId>
-			<version>4.0.0a21</version>
+			<version>5.0.0b0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.mindsmiths</groupId>
 			<artifactId>forge-sdk</artifactId>
-			<version>4.0.0a13</version>
+			<version>5.0.0b0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.mindsmiths</groupId>
 			<artifactId>mitems-client</artifactId>
-			<version>4.0.0a11</version>
+			<version>5.0.0b0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.mindsmiths</groupId>
 			<artifactId>email-adapter-client</artifactId>
-			<version>4.0.0a10</version>
+			<version>4.0.0a12</version>
 		</dependency>
 		<dependency>
 		    <groupId>com.mindsmiths</groupId>
@@ -59,12 +59,12 @@
 		<dependency>
 			<groupId>com.mindsmiths</groupId>
 			<artifactId>employee-manager</artifactId>
-			<version>4.0.0a0</version>
+			<version>5.0.0b0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.mindsmiths</groupId>
 			<artifactId>armory-client</artifactId>
-			<version>4.0.0a15</version>
+			<version>5.0.0b0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -85,6 +85,11 @@
             <groupId>com.posthog.java</groupId>
             <artifactId>posthog</artifactId>
             <version>1.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.cdimascio</groupId>
+            <artifactId>java-dotenv </artifactId>
+            <version>5.2.2</version>
         </dependency>
 	</dependencies>
 	<build>

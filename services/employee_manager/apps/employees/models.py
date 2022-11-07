@@ -1,8 +1,10 @@
 from django.db import models
+from typing import Type
 from django.db.models.signals import post_save
+from forge.core.api.base import DataChangeType
 from django.dispatch import receiver
 
-from services.employee_manager.api.views import Employee as EmployeeView
+from services.employee_manager.api.views import Employee as EmployeeEvent
 from base.models import BaseModel
 
 
@@ -27,5 +29,5 @@ class Employee(BaseModel):
 
 
 @receiver(post_save, sender=Employee)
-def employee_emit(sender, instance: Employee, *args, **kwargs):
-    EmployeeView(**instance.to_dict()).emit()
+def employee_emit(sender: Type[Employee], instance: Employee, created: bool, *_, **__):
+    EmployeeEvent(**instance.to_dict()).emit(DataChangeType.CREATED if created else DataChangeType.UPDATED)

@@ -1,10 +1,11 @@
 package agents;
 
 import com.mindsmiths.armory.ArmoryAPI;
-import com.mindsmiths.armory.templates.BaseTemplate;
+import com.mindsmiths.armory.template.BaseTemplate;
 import com.mindsmiths.emailAdapter.EmailAdapterAPI;
 import com.mindsmiths.emailAdapter.SendEmailPayload;
 import com.mindsmiths.ruleEngine.model.Agent;
+import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
 import com.mindsmiths.ruleEngine.util.DateUtil;
 import com.mindsmiths.ruleEngine.util.Log;
 
@@ -17,6 +18,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import java.io.IOException;
 import java.text.ParseException;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
@@ -29,14 +32,14 @@ public class Ava extends Agent {
     private Map<String, EmployeeProfile> otherEmployees;
     private boolean workingHours;
     private boolean availabilityInterval;
-    private Map<String, Date> lunchDeclineReasons = new HashMap<>();
+    private Map<String, LocalDateTime> lunchDeclineReasons = new HashMap<>();
     private Map<String, Neuron> connectionStrengths = new HashMap<>();
     public static final double CONNECTION_NEURON_CAPACITY = 100;
     public static final double CONNECTION_NEURON_RESISTANCE = 0.05;
 
-    public Ava(String connectionName, String connectionId) {
-        super(connectionName, connectionId);
-    }
+    //public Ava(String connectionName, String connectionId) {
+      //  super(connectionName, connectionId);
+    //}
 
     public void showScreen(BaseTemplate screen) {
         ArmoryAPI.showScreen(getConnection("armory"), screen);
@@ -70,7 +73,7 @@ public class Ava extends Agent {
     public void decayConnectionNeurons() {
         for (String avaId : this.otherEmployees.keySet()) {
             long daysPassed = ChronoUnit.DAYS.between(
-                    getConnectionNeuron(otherEmployees.get(avaId).getId()).getLastUpdatedAt().toInstant(),
+                    getConnectionNeuron(otherEmployees.get(avaId).getId()).getLastUpdatedAt().toInstant(ZoneOffset.UTC),
                     new Date().toInstant());
             getConnectionNeuron(otherEmployees.get(avaId).getId()).decay(daysPassed);
         }
@@ -87,9 +90,9 @@ public class Ava extends Agent {
         return m;
     }
 
-    public boolean anyCronSatisfied(Date timestamp, String timezone, String... crons) throws ParseException {
+    public boolean anyCronSatisfied(LocalDateTime timestamp, String timezone, String... crons) throws ParseException {
         for (String cron : crons)
-            if (DateUtil.evaluateCronExpression(cron, timestamp, timezone))
+            if (evaluateCronExpression(cron, timestamp, timezone))
                 return true;
         return false;
     }

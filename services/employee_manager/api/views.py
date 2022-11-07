@@ -1,7 +1,7 @@
-from forge.core.db import DBView
+from forge.core.db import EmittableDataModel
 
 
-class Employee(DBView):
+class Employee(EmittableDataModel):
     id: str
     firstName: str
     lastName: str

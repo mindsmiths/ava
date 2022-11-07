@@ -5,6 +5,7 @@ import com.mindsmiths.sdk.utils.Utils;
 import com.mindsmiths.ruleEngine.util.Agents;
 
 import signals.EmployeeUpdateSignal;
+import signals.EmployeeTestSignal;
 import signals.AllEmployees;
 import signals.EmployeeConnectionStrengthsSignal;
 
@@ -16,32 +17,31 @@ import models.OnboardingStage;
 
 rule "Create new employee"
     when
-        newEmployee: Employee() from entry-point "signals"
+        newEmployee: EmployeeTestSignal() from entry-point "signals"
         agent: Ava(onboardingStage == null)
     then
-        delete(newEmployee);
         modify(agent) {
-            addConnection("email", newEmployee.getEmail()),
+            addConnection("email", newEmployee.employee.getEmail()),
             addConnection("armory", Utils.randomGenerator()),
             setOnboardingStage(OnboardingStage.AVA_CREATED)};
-        EmployeeProfile profile = new EmployeeProfile(newEmployee);
+        EmployeeProfile profile = new EmployeeProfile(newEmployee.employee);
         insert(profile);
-        agent.send(CultureMaster.ID, new EmployeeUpdateSignal(profile));
+        delete(newEmployee);
 end
 
 rule "Update existing employee"
     when
-        employee: Employee() from entry-point "signals"
+        employee: EmployeeTestSignal() from entry-point "signals"
         profile: EmployeeProfile()
         agent: Ava(onboardingStage != null)
     then
         delete(employee);
-        modify(agent) {addConnection("email", employee.getEmail())};
+        modify(agent) {addConnection("email", employee.getEmployee().getEmail())};
         modify(profile) {
-            setFirstName(employee.getFirstName()),
-            setLastName(employee.getLastName()),
-            setEmail(employee.getEmail()),
-            setActive(employee.getActive())};
+            setFirstName(employee.getEmployee().getFirstName()),
+            setLastName(employee.getEmployee().getLastName()),
+            setEmail(employee.getEmployee().getEmail()),
+            setActive(employee.getEmployee().getActive())};
         agent.send(CultureMaster.ID, new EmployeeUpdateSignal(profile));
 end
 

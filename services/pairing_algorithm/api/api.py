@@ -2,7 +2,7 @@ from typing import List
 from enum import Enum
 
 from forge.core.models import ExtendableModel
-from forge.core.db import DBView
+from forge.core.db import EmittableDataModel
 
 
 class Days(str, Enum):
@@ -34,7 +34,7 @@ class LunchCompatibilityEdge(ExtendableModel):
     edgeWeight: float
 
 
-class LunchCompatibilities(DBView):
+class LunchCompatibilities(EmittableDataModel):
     edges: List[LunchCompatibilityEdge]
 
     @classmethod

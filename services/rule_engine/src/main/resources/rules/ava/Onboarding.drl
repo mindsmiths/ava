@@ -2,17 +2,18 @@ package rules.ava;
 
 import com.mindsmiths.ruleEngine.util.Agents;
 import com.mindsmiths.ruleEngine.model.Heartbeat;
-import com.mindsmiths.armory.events.UserConnectedEvent;
-import com.mindsmiths.armory.events.SubmitEvent;
+import com.mindsmiths.armory.event.UserConnectedEvent;
+import com.mindsmiths.armory.event.SubmitEvent;
 import com.mindsmiths.sdk.utils.templating.*;
 import com.mindsmiths.employeeManager.employees.Employee;
 import com.mindsmiths.emailAdapter.SendEmailPayload;
+import com.mindsmiths.ruleEngine.util.Log;
 
 import java.util.List;
 import java.util.Map;
 
 import signals.EmployeeUpdateSignal;
-import com.mindsmiths.armory.templates.BaseTemplate;
+import com.mindsmiths.armory.template.BaseTemplate;
 
 import agents.Ava;
 import agents.CultureMaster;
@@ -25,11 +26,12 @@ rule "Send onboarding email"
         agent: Ava(workingHours == true, onboardingStage == OnboardingStage.AVA_CREATED)
         employee: EmployeeProfile()
     then
-        SendEmailPayload email = OnboardingTemplates.welcomeEmail(
+        /*SendEmailPayload email = OnboardingTemplates.welcomeEmail(
                 employee,
                 agent.getConnection("armory"),
                 agent.getConnection("email"));
-        agent.sendEmail(email);
+        agent.sendEmail(email);*/
+        Log.warn("ONBOARDING");
         modify(agent) {setOnboardingStage(OnboardingStage.WELCOME_EMAIL_SENT)};
 end
 
