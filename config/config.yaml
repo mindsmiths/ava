@@ -210,8 +210,8 @@ services:
       - pandas==1.5.0
       - networkx==2.8.6
       - pyvis==0.2.1
-      - matplotlib==3.6.0
       - scipy==1.9.1
+      - matplotlib==3.6.0
     resources:
       cpu: 50m
       memory: 75Mi
