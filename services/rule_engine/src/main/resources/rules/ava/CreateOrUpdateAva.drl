@@ -5,7 +5,6 @@ import com.mindsmiths.sdk.utils.Utils;
 import com.mindsmiths.ruleEngine.util.Agents;
 
 import signals.EmployeeUpdateSignal;
-import signals.EmployeeTestSignal;
 import signals.AllEmployees;
 import signals.EmployeeConnectionStrengthsSignal;
 
@@ -17,31 +16,28 @@ import models.OnboardingStage;
 
 rule "Create new employee"
     when
-        newEmployee: EmployeeTestSignal() from entry-point "signals"
+        newEmployee: EmployeeUpdateSignal(email: employee.email, profile: employeeProfile) from entry-point "signals"
         agent: Ava(onboardingStage == null)
     then
         modify(agent) {
-            addConnection("email", newEmployee.employee.getEmail()),
+            addConnection("email", email),
             addConnection("armory", Utils.randomGenerator()),
             setOnboardingStage(OnboardingStage.AVA_CREATED)};
-        EmployeeProfile profile = new EmployeeProfile(newEmployee.employee);
         insert(profile);
         delete(newEmployee);
 end
 
 rule "Update existing employee"
     when
-        employee: EmployeeTestSignal() from entry-point "signals"
-        profile: EmployeeProfile()
+        employee: EmployeeUpdateSignal(profile: employeeProfile,
+                                       email: employeeProfile.email) from entry-point "signals"
+        employeeProfile: EmployeeProfile()
         agent: Ava(onboardingStage != null)
     then
         delete(employee);
-        modify(agent) {addConnection("email", employee.getEmployee().getEmail())};
-        modify(profile) {
-            setFirstName(employee.getEmployee().getFirstName()),
-            setLastName(employee.getEmployee().getLastName()),
-            setEmail(employee.getEmployee().getEmail()),
-            setActive(employee.getEmployee().getActive())};
+        delete(employeeProfile);
+        modify(agent) {addConnection("email", email)};
+        insert(profile);
         agent.send(CultureMaster.ID, new EmployeeUpdateSignal(profile));
 end
 

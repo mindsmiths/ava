@@ -2,7 +2,7 @@ global:
   dependencies:
     python:
       - forge-sdk==5.0.0b0
-      - forge-cli==5.0.0b0
+      - forge-cli==5.0.0b1
       - cecs==4.0.0a3
       - pymongo[srv]
       - services/*.py
@@ -94,7 +94,7 @@ services:
 
   mitems:
     type: django
-    version: 5.0.0b0
+    version: 5.0.0b1
     db:
       postgres: true
     image:
@@ -114,7 +114,6 @@ services:
       memory: 67Mi
 
   email-adapter:
-    
     type: python
     version: 5.0.0b0
     env: 
@@ -168,7 +167,7 @@ services:
 
   armory:
     type: django
-    version: 5.0.0b0
+    version: 5.0.0b1
     command:
       run: "daphne -b 0.0.0.0 armory.config.asgi:application"
     db:

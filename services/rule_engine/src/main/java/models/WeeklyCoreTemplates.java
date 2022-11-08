@@ -1,27 +1,15 @@
 package models;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
-import com.mindsmiths.armory.component.CloudSelectComponent;
-import com.mindsmiths.armory.component.DescriptionComponent;
-import com.mindsmiths.armory.component.PrimarySubmitButtonComponent;
-import com.mindsmiths.armory.component.TextAreaComponent;
-import com.mindsmiths.armory.component.TitleComponent;
+import com.mindsmiths.armory.component.*;
 import com.mindsmiths.armory.template.BaseTemplate;
 import com.mindsmiths.armory.template.TemplateGenerator;
-import com.mindsmiths.emailAdapter.AttachmentData;
-import com.mindsmiths.emailAdapter.SendEmailPayload;
+import com.mindsmiths.emailAdapter.NewEmail;
+import com.mindsmiths.emailAdapter.api.AttachmentData;
 import com.mindsmiths.employeeManager.employees.Employee;
 import com.mindsmiths.mitems.Mitems;
 import com.mindsmiths.mitems.Option;
 import com.mindsmiths.pairingalgorithm.Days;
 import com.mindsmiths.sdk.utils.templating.Templating;
-
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.DateTime;
@@ -30,28 +18,27 @@ import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.Method;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.Version;
-import java.io.ByteArrayOutputStream;
-
 import utils.Settings;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.*;
 
 public class WeeklyCoreTemplates {
 
-    public static SendEmailPayload weeklyEmail(EmployeeProfile employee, LunchReminderStage lunchReminderStage,
-            String armoryConnectionId, String emailConnectionId) throws IOException {
-        String subject = Mitems.getText("weekly-core.weekly-email.subject");
-        String description = Mitems.getText("weekly-core.weekly-email.description");
-
-        if (lunchReminderStage == LunchReminderStage.SECOND_EMAIL_SENT) {
-            subject = Mitems.getText("weekly-core.second-reminder-email.subject");
-            description = Mitems.getText("weekly-core.second-reminder-email.description");
-
-        } else if (lunchReminderStage == LunchReminderStage.THIRD_EMAIL_SENT) {
-            subject = Mitems.getText("weekly-core.third-reminder-email.subject");
-            description = Mitems.getText("weekly-core.third-reminder-email.description");
+    public static NewEmail weeklyEmail(EmployeeProfile employee, LunchReminderStage lunchReminderStage,
+                                       String armoryConnectionId, String emailConnectionId) throws IOException {
+        String emailSlug = "";
+        switch (lunchReminderStage) {
+            case FIRST_EMAIL_SENT -> emailSlug = "weekly-email";
+            case SECOND_EMAIL_SENT -> emailSlug = "second-reminder-email";
+            case THIRD_EMAIL_SENT -> emailSlug = "third-reminder-email";
         }
-        String htmlTemplate = new String(Objects.requireNonNull(
-            WeeklyCoreTemplates.class.getClassLoader().getResourceAsStream("emailTemplates/WeeklyEmailTemplate.html"))
-                .readAllBytes());
+        String subject = Mitems.getText("weekly-core." + emailSlug + ".subject");
+        String description = Mitems.getText("weekly-core." + emailSlug + ".description");
+
+        String htmlTemplate = new String(Objects.requireNonNull(WeeklyCoreTemplates.class.getClassLoader()
+                        .getResourceAsStream("emailTemplates/WeeklyEmailTemplate.html")).readAllBytes());
         String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
                 "text", description,
                 "firstName", employee.getFirstName(),
@@ -61,7 +48,8 @@ public class WeeklyCoreTemplates {
                 String.format("%s/%s?trigger=start-weekly-core", Settings.ARMORY_SITE_URL, armoryConnectionId),
                 "armoryUrl2", String.format("%s/%s?trigger=start-lunch-decline-reason-screen",
                         Settings.ARMORY_SITE_URL, armoryConnectionId)));
-        SendEmailPayload email = new SendEmailPayload();
+
+        NewEmail email = new NewEmail();
         email.setRecipients(List.of(emailConnectionId));
         email.setSubject(subject);
         email.setHtmlText(htmlBody);
@@ -75,7 +63,7 @@ public class WeeklyCoreTemplates {
         for (Option option : days)
             options.add(new CloudSelectComponent.Option(option.getText(), option.getId(), true));
 
-        BaseTemplate screen = new TemplateGenerator()
+        return new TemplateGenerator()
                 .addComponent("title",
                         new TitleComponent(Mitems.getText("weekly-core.title-asking-for-available-days.title")))
                 .addComponent("text",
@@ -85,12 +73,11 @@ public class WeeklyCoreTemplates {
                         new CloudSelectComponent("availableDays", options))
                 .addComponent("confirmDays",
                         new PrimarySubmitButtonComponent("confirmDays", "Submit", "confirmDays"));
-        return screen;
     }
 
     public static Map<String, BaseTemplate> confirmingDaysScreen() {
         Option buttonOption = Mitems.getOptions("weekly-core.confirmation-of-choosen-available-days.button")[0];
-        Map<String, BaseTemplate> screens = Map.of(
+        return Map.of(
                 "confirmDaysScreen", new TemplateGenerator("confirmScreen")
                         .setTemplateName("CenteredContentTemplate")
                         .addComponent("title", new TitleComponent(
@@ -101,7 +88,6 @@ public class WeeklyCoreTemplates {
                         .setTemplateName("CenteredContentTemplate")
                         .addComponent("title", new TitleComponent(
                                 Mitems.getText("weekly-core.stay-tuned-second-confirmation-of-available-days.title"))));
-        return screens;
     }
 
     public static Map<String, BaseTemplate> lunchDeclineReasonScreens() {
@@ -118,8 +104,8 @@ public class WeeklyCoreTemplates {
         return screens;
     }
 
-    public static SendEmailPayload calendarInviteEmail(Days days, EmployeeProfile currentEmployee,
-            EmployeeProfile otherEmployee) throws IOException {
+    public static NewEmail calendarInviteEmail(Days days, EmployeeProfile currentEmployee,
+                                               EmployeeProfile otherEmployee) throws IOException {
 
         if (currentEmployee == null || otherEmployee == null)
             throw new RuntimeException("Ava.sendCalendarInvite called with null arguments!");
@@ -128,7 +114,7 @@ public class WeeklyCoreTemplates {
                 "employeeName", otherEmployee.getFirstName(),
                 "day", daysToPrettyString(days)));
 
-        SendEmailPayload payload = new SendEmailPayload();
+        NewEmail payload = new NewEmail();
         payload.setRecipients(List.of(currentEmployee.getEmail()));
         payload.setSubject(subject);
         payload.setHtmlText(renderMatchmakingEmail(days, currentEmployee, otherEmployee));
@@ -139,9 +125,8 @@ public class WeeklyCoreTemplates {
 
     private static String renderMatchmakingEmail(Days days, EmployeeProfile currentEmployee, EmployeeProfile otherEmployee)
             throws IOException {
-        String htmlTemplate = new String(Objects.requireNonNull(
-            WeeklyCoreTemplates.class.getClassLoader().getResourceAsStream("emailTemplates/EmailTemplateCalendar.html"))
-                .readAllBytes());
+        String htmlTemplate = new String(Objects.requireNonNull(WeeklyCoreTemplates.class.getClassLoader().
+                        getResourceAsStream("emailTemplates/EmailTemplateCalendar.html")).readAllBytes());
         return Templating.recursiveRender(htmlTemplate, Map.of(
                 "title", Mitems.getText("weekly-core.matching-mail.title"),
                 "description", Mitems.getHTML("weekly-core.matching-mail.description"),
@@ -219,8 +204,8 @@ public class WeeklyCoreTemplates {
         return now;
     }
 
-    public static SendEmailPayload noMatchEmail(String emailConnectionId) throws IOException {
-        SendEmailPayload email = new SendEmailPayload();
+    public static NewEmail noMatchEmail(String emailConnectionId) throws IOException {
+        NewEmail email = new NewEmail();
         email.setRecipients(List.of(emailConnectionId));
         email.setSubject(Mitems.getText("weekly-core.no-match-email.subject"));
         email.setPlainText(Mitems.getText("weekly-core.no-match-email.description"));
@@ -228,16 +213,14 @@ public class WeeklyCoreTemplates {
     }
 
     public static BaseTemplate userAlreadyRespondedScreen() {
-        BaseTemplate screen = new TemplateGenerator("goodbye")
+        return new TemplateGenerator("goodbye")
                 .addComponent("title", new TitleComponent(
                         Mitems.getText("weekly-core.user-already-responded-screen.title")));
-        return screen;
     }
 
     public static BaseTemplate lunchInviteExpiredScreen() {
-        BaseTemplate lunchInviteExpiredScreen = new TemplateGenerator()
+        return new TemplateGenerator()
                 .addComponent("title", new TitleComponent(
                         Mitems.getText("weekly-core.message-about-not-working-hours-for-links.title")));
-        return lunchInviteExpiredScreen;
     }
 }

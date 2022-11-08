@@ -1,34 +1,29 @@
 package models;
 
+import com.mindsmiths.armory.component.*;
+import com.mindsmiths.armory.template.BaseTemplate;
+import com.mindsmiths.armory.template.TemplateGenerator;
+import com.mindsmiths.emailAdapter.NewEmail;
+import com.mindsmiths.mitems.Mitems;
+import com.mindsmiths.ruleEngine.util.Log;
+import com.mindsmiths.sdk.utils.templating.Templating;
+import utils.Settings;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import com.mindsmiths.armory.component.CloudSelectComponent;
-import com.mindsmiths.armory.component.DescriptionComponent;
-import com.mindsmiths.armory.component.HeaderComponent;
-import com.mindsmiths.armory.component.ImageComponent;
-import com.mindsmiths.armory.component.PrimarySubmitButtonComponent;
-import com.mindsmiths.armory.component.TitleComponent;
-import com.mindsmiths.armory.template.BaseTemplate;
-import com.mindsmiths.armory.template.TemplateGenerator;
-import com.mindsmiths.emailAdapter.SendEmailPayload;
-import com.mindsmiths.mitems.Mitems;
-import com.mindsmiths.ruleEngine.util.Log;
-import com.mindsmiths.sdk.utils.templating.Templating;
-
-import utils.Settings;
-
 public class OnboardingTemplates {
 
-    public static SendEmailPayload welcomeEmail(EmployeeProfile employee, String armoryConnectionId, String emailConnectionId)
+    public static NewEmail welcomeEmail(EmployeeProfile employee, String armoryConnectionId, String emailConnectionId)
             throws IOException {
         String htmlTemplate = new String(Objects.requireNonNull(
-                OnboardingTemplates.class.getClassLoader().getResourceAsStream(
-                        "emailTemplates/EmailTemplate.html"))
+                        OnboardingTemplates.class.getClassLoader().getResourceAsStream(
+                                "emailTemplates/EmailTemplate.html"))
                 .readAllBytes());
+        Log.warn("SENT MAIL ARMORY_URL=" + Settings.ARMORY_SITE_URL);
         Log.warn(htmlTemplate);
         String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
                 "description", Mitems.getText("onboarding.welcome-email.description"),
@@ -37,7 +32,7 @@ public class OnboardingTemplates {
                 "armoryUrl",
                 String.format("%s/%s?trigger=start-onboarding", Settings.ARMORY_SITE_URL, armoryConnectionId)));
         Log.warn(htmlBody);
-        SendEmailPayload email = new SendEmailPayload();
+        NewEmail email = new NewEmail();
         email.setRecipients(List.of(emailConnectionId));
         email.setSubject(Mitems.getText("onboarding.welcome-email.subject"));
         email.setHtmlText(htmlBody);
@@ -119,10 +114,9 @@ public class OnboardingTemplates {
     }
 
     public static BaseTemplate finalScreen() {
-        BaseTemplate screen = new TemplateGenerator("goodbye")
+        return new TemplateGenerator("goodbye")
                 .setTemplateName("CenteredContentTemplate")
                 .addComponent("title", new TitleComponent(
                         Mitems.getText("onboarding.familiarity-quiz-goodbye.finish-screen")));
-        return screen;
     }
 }

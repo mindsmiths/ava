@@ -7,7 +7,6 @@ import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
 import com.mindsmiths.employeeManager.employees.Employee;
 import com.mindsmiths.armory.event.UserConnectedEvent;
 import com.mindsmiths.armory.event.SubmitEvent;
-import com.mindsmiths.armory.template.BaseTemplate;
 
 import agents.Ava;
 
@@ -17,21 +16,19 @@ import models.MonthlyCoreTemplates;
 import models.MonthlyCoreData
 
 import java.util.Map;
-import java.util.List;
+import java.util.List
+import models.OnboardingStage;
 
 rule "Send monthly core email"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
         eval(evaluateCronExpression("* * * ? * 2#1 *", ts, "Europe/Zagreb"))
-        agent: Ava(workingHours == true)
+        agent: Ava(workingHours == true, onboardingStage == OnboardingStage.FINISHED)
         employee: EmployeeProfile()
         not MonthlyCoreData()
     then
-        SendEmailPayload email = MonthlyCoreTemplates.monthlyCoreEmail(
-            employee,
-            agent.getConnection("armory"),
-            agent.getConnection("email"));
-        agent.sendEmail(email);
+        agent.sendEmail(MonthlyCoreTemplates.monthlyCoreEmail(employee, agent.getConnection("armory"),
+                                    agent.getConnection("email")));
         insert(new MonthlyCoreData());
 end
 
@@ -41,11 +38,8 @@ rule "Manuel Send monthly core email"
         agent: Ava(workingHours == true)
         employee: EmployeeProfile()
     then
-        SendEmailPayload email = MonthlyCoreTemplates.monthlyCoreEmail(
-            employee,
-            agent.getConnection("armory"),
-            agent.getConnection("email"));
-        agent.sendEmail(email);
+        agent.sendEmail(MonthlyCoreTemplates.monthlyCoreEmail(employee, agent.getConnection("armory"),
+                                    agent.getConnection("email")));
         modify(monthlyCoreData){setManualTrigger(false)}
 end
 
@@ -56,9 +50,7 @@ rule "Start and reconnect monthly quiz"
         monthlyCoreData: MonthlyCoreData(monthlyCoreStage in (MonthlyCoreStage.EMAIL_SENT, MonthlyCoreStage.FAMILIARITY_QUIZ))
         employee: EmployeeProfile()
    then
-        Map<String, BaseTemplate> screens = MonthlyCoreTemplates
-                .monthlyQuizScreens(agent.createOtherEmployeeNames());
-        agent.showScreens("introScreen", screens);
+        agent.showScreens("introScreen", MonthlyCoreTemplates.monthlyQuizScreens(agent.createOtherEmployeeNames()));
         modify(monthlyCoreData) {setMonthlyCoreStage(MonthlyCoreStage.FAMILIARITY_QUIZ)};
         delete(signal);
 end
@@ -85,8 +77,7 @@ rule "Reconnect monthly core final screen"
         agent: Ava()
         monthlyCoreData: MonthlyCoreData(monthlyCoreStage == MonthlyCoreStage.FINISHED)
    then
-        BaseTemplate screen = MonthlyCoreTemplates.finalScreen();
-        agent.showScreen(screen);
+        agent.showScreen(MonthlyCoreTemplates.finalScreen());
         delete(signal);
 end
 

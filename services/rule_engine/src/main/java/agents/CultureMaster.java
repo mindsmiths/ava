@@ -51,7 +51,7 @@ public class CultureMaster extends Agent {
     }
 
     public void addOrUpdateEmployee(EmployeeUpdateSignal signal) {
-        employees.put(signal.getFrom(), signal.getEmployee());
+        employees.put(signal.getFrom(), signal.getEmployeeProfile());
     }
 
     public void sendEmployeesToAva() {

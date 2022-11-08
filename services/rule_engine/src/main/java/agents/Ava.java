@@ -3,25 +3,29 @@ package agents;
 import com.mindsmiths.armory.ArmoryAPI;
 import com.mindsmiths.armory.template.BaseTemplate;
 import com.mindsmiths.emailAdapter.EmailAdapterAPI;
-import com.mindsmiths.emailAdapter.SendEmailPayload;
+import com.mindsmiths.emailAdapter.NewEmail;
 import com.mindsmiths.ruleEngine.model.Agent;
-import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
-import com.mindsmiths.ruleEngine.util.DateUtil;
 import com.mindsmiths.ruleEngine.util.Log;
-
-import models.*;
-import signals.SendMatchesSignal;
-import utils.EventTracking;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import models.EmployeeProfile;
+import models.Neuron;
+import models.OnboardingStage;
+import signals.SendMatchesSignal;
+import utils.EventTracking;
+
 import java.io.IOException;
 import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
 
 @Data
 @AllArgsConstructor
@@ -38,7 +42,7 @@ public class Ava extends Agent {
     public static final double CONNECTION_NEURON_RESISTANCE = 0.05;
 
     //public Ava(String connectionName, String connectionId) {
-      //  super(connectionName, connectionId);
+    //  super(connectionName, connectionId);
     //}
 
     public void showScreen(BaseTemplate screen) {
@@ -49,7 +53,7 @@ public class Ava extends Agent {
         ArmoryAPI.showScreens(getConnection("armory"), firstScreenId, screens);
     }
 
-    public void sendEmail(SendEmailPayload email) throws IOException {
+    public void sendEmail(NewEmail email) throws IOException {
         EmailAdapterAPI.newEmail(email);
     }
 

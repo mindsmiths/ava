@@ -39,17 +39,12 @@ rule "Send available days email"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
         agent: Ava(workingHours == true)
-        lunchCycleData: LunchCycleData(lunchCycleStage == AvaLunchCycleStage.LUNCH_MAIL_SENDING, 
-                                      (evaluateCronExpression("* * * ? * WED *", ts, "Europe/Zagreb") || manualTrigger == true),
-                                      (availableDaysEmailLastSentAt == null || availableDaysEmailLastSentAt before[12h] ts))
         employee: EmployeeProfile()
+        lunchCycleData: LunchCycleData(lunchCycleStage == AvaLunchCycleStage.LUNCH_MAIL_SENDING, (evaluateCronExpression("* * * ? * WED *", ts, "Europe/Zagreb"),
+                                      (availableDaysEmailLastSentAt == null || availableDaysEmailLastSentAt before[12h] ts) )  manualTrigger == true)
     then
-        SendEmailPayload email = WeeklyCoreTemplates.weeklyEmail(
-                employee,
-                lunchCycleData.getLunchReminderStage(),
-                agent.getConnection("armory"),
-                agent.getConnection("email"));
-        agent.sendEmail(email);
+        agent.sendEmail(WeeklyCoreTemplates.weeklyEmail(employee, lunchCycleData.getLunchReminderStage(),
+                                                        agent.getConnection("armory"), agent.getConnection("email")));
 
         modify(lunchCycleData){
             setAvailableDaysEmailLastSentAt(ts),
@@ -68,16 +63,13 @@ rule "Send second reminder"
             (availableDaysEmailLastSentAt == null || availableDaysEmailLastSentAt before[12h] ts)
         )
     then
+        agent.sendEmail(WeeklyCoreTemplates.weeklyEmail(employee, lunchCycleData.getLunchReminderStage(),
+                                                        agent.getConnection("armory"), agent.getConnection("email")));
         modify(lunchCycleData){
             setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY),
             setLunchReminderStage(LunchReminderStage.SECOND_EMAIL_SENT),
             setAvailableDaysEmailLastSentAt(ts)};
-        SendEmailPayload email = WeeklyCoreTemplates.weeklyEmail(
-            employee,
-            lunchCycleData.getLunchReminderStage(),
-            agent.getConnection("armory"),
-            agent.getConnection("email"));
-        agent.sendEmail(email);
+
 end
 
 rule "Send third reminder"
@@ -91,16 +83,13 @@ rule "Send third reminder"
             (availableDaysEmailLastSentAt == null || availableDaysEmailLastSentAt before[12h] ts)
         )
     then
+        agent.sendEmail(WeeklyCoreTemplates.weeklyEmail(employee, lunchCycleData.getLunchReminderStage(),
+                                                        agent.getConnection("armory"), agent.getConnection("email")));
         modify(lunchCycleData){
             setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY),
             setLunchReminderStage(LunchReminderStage.THIRD_EMAIL_SENT),
             setAvailableDaysEmailLastSentAt(ts)};
-        SendEmailPayload email = WeeklyCoreTemplates.weeklyEmail(
-                employee,
-                lunchCycleData.getLunchReminderStage(),
-                agent.getConnection("armory"),
-                agent.getConnection("email"));
-        agent.sendEmail(email);
+
 end
 
 rule "Ask for available days"
@@ -144,7 +133,7 @@ rule "Confirm days"
     then
         List<String> availableDays = (ArrayList<String>)signal.getParam("availableDays");
         if(availableDays.size() > 0) {
-            agent.showScreens("confirmDaysScreen", new WeeklyCoreTemplates().confirmingDaysScreen());
+            agent.showScreens("confirmDaysScreen", WeeklyCoreTemplates.confirmingDaysScreen());
 
             modify(lunchCycleData){
                 setLunchCycleStage(AvaLunchCycleStage.ACCEPT_MATCH_INFO),
@@ -202,11 +191,9 @@ rule "Store match info"
             setMatchDay(matchDay)};
         modify(agent){chargeAfterMatch(match)}
         agent.printMatchInfo(employee, signal);
-        SendEmailPayload email = WeeklyCoreTemplates.calendarInviteEmail(
-                matchDay,
-                employee, 
-                agent.getOtherEmployees().get(agent.employeeToAvaId(match)));
-        agent.sendEmail(email);
+        agent.sendEmail(
+            WeeklyCoreTemplates.calendarInviteEmail(matchDay, employee,
+                                                    agent.getOtherEmployees().get(agent.employeeToAvaId(match))));
         delete(signal);
 end
 
@@ -216,8 +203,7 @@ rule "Send no match email"
         agent: Ava()
         lunchCycleData: LunchCycleData(lunchCycleStage == AvaLunchCycleStage.ACCEPT_MATCH_INFO)
     then
-        SendEmailPayload email = WeeklyCoreTemplates.noMatchEmail(agent.getConnection("email"));
-        agent.sendEmail(email);
+        agent.sendEmail(WeeklyCoreTemplates.noMatchEmail(agent.getConnection("email")));
         delete(signal);
 end
 

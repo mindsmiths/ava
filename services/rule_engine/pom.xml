@@ -44,17 +44,17 @@
 		<dependency>
 			<groupId>com.mindsmiths</groupId>
 			<artifactId>mitems-client</artifactId>
-			<version>5.0.0b0</version>
+			<version>5.0.0b1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.mindsmiths</groupId>
 			<artifactId>email-adapter-client</artifactId>
-			<version>4.0.0a12</version>
+			<version>5.0.0b0</version>
 		</dependency>
 		<dependency>
 		    <groupId>com.mindsmiths</groupId>
 			<artifactId>pairing-algorithm-client</artifactId>
-			<version>4.0.0a0</version>
+			<version>5.0.0b0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.mindsmiths</groupId>

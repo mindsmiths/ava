@@ -1,21 +1,26 @@
 package models;
 
-import com.mindsmiths.emailAdapter.SendEmailPayload;
+import com.mindsmiths.armory.component.*;
+import com.mindsmiths.armory.template.BaseTemplate;
+import com.mindsmiths.armory.template.TemplateGenerator;
+import com.mindsmiths.emailAdapter.NewEmail;
 import com.mindsmiths.mitems.Mitems;
 import com.mindsmiths.sdk.utils.templating.Templating;
-import com.mindsmiths.armory.component.*;
-import com.mindsmiths.armory.template.*;
 import utils.Settings;
-import java.util.*;
+
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class MonthlyCoreTemplates {
 
-    public static SendEmailPayload monthlyCoreEmail(EmployeeProfile employee, String armoryConnectionId,
-            String emailConnectionId) throws IOException {
+    public static NewEmail monthlyCoreEmail(EmployeeProfile employee, String armoryConnectionId,
+                                            String emailConnectionId) throws IOException {
         String htmlTemplate = new String(Objects.requireNonNull(
-                MonthlyCoreTemplates.class.getClassLoader().getResourceAsStream(
-                        "emailTemplates/EmailTemplate.html"))
+                        MonthlyCoreTemplates.class.getClassLoader().getResourceAsStream(
+                                "emailTemplates/EmailTemplate.html"))
                 .readAllBytes());
         String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
                 "description", Mitems.getText("monthly-core.welcome-email.description"),
@@ -24,7 +29,7 @@ public class MonthlyCoreTemplates {
                 "armoryUrl",
                 String.format("%s/%s?trigger=start-monthly-core", Settings.ARMORY_SITE_URL, armoryConnectionId)));
 
-        SendEmailPayload email = new SendEmailPayload();
+        NewEmail email = new NewEmail();
         email.setRecipients(List.of(emailConnectionId));
         email.setSubject(Mitems.getText("monthly-core.welcome-email.subject"));
         email.setHtmlText(htmlBody);
@@ -77,11 +82,10 @@ public class MonthlyCoreTemplates {
     }
 
     public static BaseTemplate finalScreen() {
-        BaseTemplate screen = new TemplateGenerator("goodbye")
+        return new TemplateGenerator("goodbye")
                 .setTemplateName("CenteredContentTemplate")
                 .addComponent("title", new TitleComponent(
                         Mitems.getText("monthly-core.familiarity-quiz-goodbye.text")));
-        return screen;
     }
 
 }

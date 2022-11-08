@@ -1,7 +1,6 @@
 package rules.ava;
 
 import com.mindsmiths.employeeManager.ManualTriggerEvent;
-import com.mindsmiths.emailAdapter.SendEmailPayload;
 
 import agents.Ava;
 
@@ -18,11 +17,8 @@ rule "Trigger onboarding"
         agent: Ava()
         employee: EmployeeProfile(familiarity: familiarity)
     then
-        SendEmailPayload email = OnboardingTemplates.welcomeEmail(
-                employee,
-                agent.getConnection("armory"),
-                agent.getConnection("email"));
-        agent.sendEmail(email);
+        agent.sendEmail(OnboardingTemplates.welcomeEmail(employee, agent.getConnection("armory"),
+                                        agent.getConnection("email")));
         modify(agent) {setOnboardingStage(OnboardingStage.WELCOME_EMAIL_SENT)};
         modify(employee) {getFamiliarity().clear()};
         delete(signal);
@@ -65,5 +61,5 @@ rule "Trigger monthly core"
         not MonthlyCoreData()
     then
         insert(new MonthlyCoreData(true));
-        delete(signal)
+        delete(signal);
 end

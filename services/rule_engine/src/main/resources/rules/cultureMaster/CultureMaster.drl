@@ -8,7 +8,6 @@ import com.mindsmiths.employeeManager.employees.Employee;
 import com.mindsmiths.ruleEngine.util.Agents;
 import agents.CultureMaster;
 import signals.EmployeeUpdateSignal;
-import signals.EmployeeTestSignal;
 import models.EmployeeProfile;
 import models.CmLunchCycleStage;
 import com.mindsmiths.sdk.core.api.DataChangeType;
@@ -35,8 +34,7 @@ rule "Create or update employee"
         delete(employee);
         
         modify(agent) {
-            send(Agents.createAgent(new Ava()).getId(), new EmployeeTestSignal(employee)),
-            //addNewEmployee(tempId, new EmployeeProfile(employee)),
+            send(Agents.createAgent(new Ava()).getId(), new EmployeeUpdateSignal(employee)),
             sendEmployeesToAva()};
 end
 
