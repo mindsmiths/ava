@@ -15,6 +15,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EmployeeConnectionStrengthsSignal extends Message {
-    private String employeeId;
     private Map<String, Double> connectionStrengths = new HashMap<>();
 }

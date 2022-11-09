@@ -26,8 +26,8 @@ import java.util.*;
 
 public class WeeklyCoreTemplates {
 
-    public static NewEmail weeklyEmail(Employee employee, int numberOfMailsSent,
-                                       String armoryConnectionId, String emailConnectionId) throws IOException {
+    public static NewEmail weeklyEmail(Employee employee, int numberOfMailsSent, String armoryConnectionId,
+                                       String emailConnectionId) throws IOException {
         String emailSlug = "";
         switch (numberOfMailsSent) {
             case 0 -> emailSlug = "weekly-email";
@@ -204,7 +204,7 @@ public class WeeklyCoreTemplates {
         return now;
     }
 
-    public static NewEmail noMatchEmail(String emailConnectionId) throws IOException {
+    public static NewEmail noMatchEmail(String emailConnectionId) {
         NewEmail email = new NewEmail();
         email.setRecipients(List.of(emailConnectionId));
         email.setSubject(Mitems.getText("weekly-core.no-match-email.subject"));

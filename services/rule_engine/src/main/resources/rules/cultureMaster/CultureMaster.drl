@@ -13,28 +13,16 @@ import com.mindsmiths.sdk.core.api.DataChangeType;
 import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
 import agents.Ava;
 
-rule "Update Ava data"
+rule "Update employee data"
     when
-        signal: EmployeeUpdateSignal() from entry-point "signals"
+        signal: EmployeeUpdateSignal(agentId: agentId, employee: employee) from entry-point "signals"
         agent: CultureMaster()
     then
         modify(agent) {
-            addOrUpdateEmployee(signal),
-            sendEmployeesToAva()};
-    delete(signal);
-end
-
-rule "Create or update employee"
-    when
-        employee: Employee() from entry-point "signals"
-        agent: CultureMaster()
-        DataChangeType(this == CREATED || this == UPDATED) from entry-point "signals"
-    then
-        delete(employee);
-        
-        modify(agent) {
-            send(Agents.createAgent(new Ava()).getId(), new EmployeeUpdateSignal(employee)),
-            sendEmployeesToAva()};
+            addOrUpdateEmployee(agentId, employee),
+            sendEmployeesToAva(signal)
+        };
+        delete(signal);
 end
 
 rule "Trigger lunch cycle for CultureMaster"

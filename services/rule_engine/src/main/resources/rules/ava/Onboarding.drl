@@ -41,17 +41,15 @@ end
 rule "Store familiarity answers"
    when
         signal: SubmitEvent(getParamAsString("submit") == "finish-familiarity-quiz") from entry-point "signals"
-        Heartbeat(ts: timestamp) from entry-point "signals"
         agent: Ava(onboardingStage == OnboardingStage.FAMILIARITY_QUIZ, familiarity: familiarity)
-        employee: Employee()
+        employee: Employee(employeeId: id, firstName: firstName, lastName: lastName)
    then
         modify(agent) {
             setOnboardingStage(OnboardingStage.FINISHED),
             chargeConnectionNeurons(signal)
-            };
-        agent.send(CultureMaster.ID, new EmployeeUpdateSignal(employee));
-        agent.logEvent("Onboarding Finished", Map.of("employeeId", employee.getId(),
-                "familiarity", familiarity, "full name", String.join(" ", employee.getFirstName(), employee.getLastName())));
+        };
+        agent.logEvent("Onboarding Finished", Map.of("employeeId", employeeId, "familiarity", familiarity,
+                       "full name", String.join(" ", firstName, lastName)));
 end
 
 rule "Reconnect final screen"

@@ -1,13 +1,12 @@
 package com.mindsmiths.pairingalgorithm;
 
-import java.io.Serializable;
-import java.util.*;
-
 import com.mindsmiths.sdk.core.api.Message;
-
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+
+import java.util.List;
+import java.util.Map;
 
 @Data
 @NoArgsConstructor

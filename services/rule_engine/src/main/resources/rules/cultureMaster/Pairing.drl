@@ -23,10 +23,10 @@ end
 
 rule "Store employee connection strengths"
     when
-        signal: EmployeeConnectionStrengthsSignal(employeeId: employeeId, connectionStrengths: connectionStrengths) from entry-point "signals"
+        signal: EmployeeConnectionStrengthsSignal(connectionStrengths: connectionStrengths) from entry-point "signals"
         agent: CultureMaster(employeeConnectionStrengths: employeeConnectionStrengths)
     then
-        employeeConnectionStrengths.put(employeeId, connectionStrengths);
+        employeeConnectionStrengths.put(signal.getFrom(), connectionStrengths);
         update(agent);
         delete(signal);
 end
@@ -37,19 +37,11 @@ rule "Store generated matches"
         agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.COLLECT_GENERATED_MATCHES)
     then
         modify(agent) {
-            addMatches(allMatches),
-            setLunchCycleStage(CmLunchCycleStage.SEND_TO_AVAS)};
-        delete(generatedMatches);
-end
-
-rule "Send match info to Ava agents"
-    when 
-        agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.SEND_TO_AVAS)
-    then
-        agent.sendMatches();
-        modify(agent) {
+            sendMatches(allMatches),
             setLunchCycleStage(CmLunchCycleStage.FINISHED),
-            clearEmployeeAvailabilities()};
+            clearEmployeeAvailabilities()
+        };
+        delete(generatedMatches);
 end
 
 rule "Reset lunch cycle"

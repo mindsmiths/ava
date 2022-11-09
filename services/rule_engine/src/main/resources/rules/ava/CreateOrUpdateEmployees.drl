@@ -1,0 +1,52 @@
+package rules.ava;
+
+import com.mindsmiths.employeeManager.employees.Employee;
+import com.mindsmiths.sdk.utils.Utils;
+import com.mindsmiths.ruleEngine.util.Agents;
+
+import signals.EmployeeUpdateSignal;
+import signals.EmployeeConnectionStrengthsSignal;
+
+import agents.CultureMaster;
+import agents.Ava;
+
+import models.OnboardingStage;
+
+rule "Intialize employee"
+    when
+        employee: Employee(email: email, employeeId: id) from entry-point "signals"
+        agent: Ava(onboardingStage == null, agentId: id)
+        not Employee()
+    then
+        modify(agent) {
+            addConnection("email", email),
+            addConnection("armory", Utils.randomGenerator()),
+            setOnboardingStage(OnboardingStage.AVA_CREATED),
+            send(CultureMaster.ID, new EmployeeUpdateSignal(agentId, employee))
+        };
+        delete(employee);
+        insert(employee);
+end
+
+rule "Update employee"
+    when
+        employee: Employee(email: email, employeeId: id) from entry-point "signals"
+        oldEmployee : Employee()
+        agent: Ava(agentId: id)
+    then
+        delete(employee);
+        delete(oldEmployee);
+        agent.send(CultureMaster.ID, new EmployeeUpdateSignal(agentId, employee));
+        insert(employee);
+end
+
+rule "Other employees updated"
+    when
+        updateSignal: EmployeeUpdateSignal(agentId: agentId, employee: employee) from entry-point "signals"
+        agent: Ava()
+    then
+        modify(agent){
+            addOrUpdateEmployee(agentId, employee)
+        }
+        delete(updateSignal);
+end

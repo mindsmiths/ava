@@ -31,13 +31,12 @@ import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
 @NoArgsConstructor
 @ToString(callSuper = true)
 public class Ava extends Agent {
-    private String employeeId;
     private OnboardingStage onboardingStage;
-    private Map<String, Employee> otherEmployees;
 
     private Map<String, LocalDateTime> lunchDeclineReasons = new HashMap<>();
     private Map<String, Neuron> connectionStrengths = new HashMap<>();
     private Map<String, Double> familiarity = new HashMap<>();
+    private Map<String, Employee> otherEmployees = new HashMap<>();
 
     public static final double CONNECTION_NEURON_CAPACITY = 100;
     public static final double CONNECTION_NEURON_RESISTANCE = 0.05;
@@ -46,11 +45,6 @@ public class Ava extends Agent {
     private boolean onboarded;
     private boolean workingHours;
     private boolean availabilityInterval;
-
-    public Ava(String employeeId) {
-        addConnection("employeeId", employeeId);
-        this.employeeId = employeeId;
-    }
 
     public void showScreen(BaseTemplate screen) {
         ArmoryAPI.showScreen(getConnection("armory"), screen);
@@ -64,15 +58,9 @@ public class Ava extends Agent {
         EmailAdapterAPI.newEmail(email);
     }
 
-    public void addConnectionStrengths() {
-        for (String avaId : this.otherEmployees.keySet())
-            if (!connectionStrengths.containsKey(otherEmployees.get(avaId).getId())) {
-                connectionStrengths.put(otherEmployees.get(avaId).getId(),
-                        new Neuron(CONNECTION_NEURON_RESISTANCE, CONNECTION_NEURON_CAPACITY));
-            }
-    }
-
     public Neuron getConnectionNeuron(String employeeId) {
+        if (!connectionStrengths.containsKey(employeeId))
+            connectionStrengths.put(employeeId, new Neuron(CONNECTION_NEURON_RESISTANCE, CONNECTION_NEURON_CAPACITY));
         return this.connectionStrengths.get(employeeId);
     }
 
@@ -87,7 +75,7 @@ public class Ava extends Agent {
     }
 
     public void decayConnectionNeurons() {
-        for (String avaId : this.otherEmployees.keySet()) {
+        for (String avaId : this.connectionStrengths.keySet()) {
             long daysPassed = ChronoUnit.DAYS.between(
                     getConnectionNeuron(otherEmployees.get(avaId).getId()).getLastUpdatedAt().toInstant(ZoneOffset.UTC),
                     new Date().toInstant());
@@ -99,6 +87,10 @@ public class Ava extends Agent {
         getConnectionNeuron(employeeId).charge(30.);
     }
 
+    public void addOrUpdateEmployee(String agentId, Employee employee) {
+        otherEmployees.put(agentId, employee);
+    }
+
     public Map<String, Double> getConnectionStrengthAsValue() {
         Map<String, Double> m = new HashMap<>();
         for (Map.Entry<String, Neuron> entry : connectionStrengths.entrySet())
@@ -106,18 +98,11 @@ public class Ava extends Agent {
         return m;
     }
 
-    public boolean anyCronSatisfied(LocalDateTime timestamp, String timezone, String... crons) throws ParseException {
+    public boolean anyCronSatisfied(LocalDateTime timestamp, String timezone, String... crons) {
         for (String cron : crons)
             if (evaluateCronExpression(cron, timestamp, timezone))
                 return true;
         return false;
-    }
-
-    public String employeeToAvaId(String employeeId) {
-        for (Map.Entry<String, Employee> entry : otherEmployees.entrySet())
-            if (entry.getValue().getId().equals(employeeId))
-                return entry.getKey();
-        return "";
     }
 
     public Map<String, String> createOtherEmployeeNames() {
@@ -129,11 +114,9 @@ public class Ava extends Agent {
     }
 
     public void identify() {
-        EventTracking.identify(id, new HashMap<>() {
-            {
-                put("agentType", getClass().getSimpleName());
-            }
-        });
+        EventTracking.identify(id, new HashMap<>() {{
+            put("agentType", getClass().getSimpleName());
+        }});
     }
 
     public void logEvent(String event) {

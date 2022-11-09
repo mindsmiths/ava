@@ -1,12 +1,10 @@
 package models;
 
-import com.mindsmiths.armory.event.*;
+import com.mindsmiths.sdk.utils.Utils;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-
-import com.mindsmiths.sdk.utils.Utils;
 
 @Data
 @NoArgsConstructor
@@ -23,7 +21,6 @@ public class Neuron {
         this.R_in = R_in;
         this.C = C;
     }
-
 
     public void decay(double amount) {
         this.update(0, amount, 1);

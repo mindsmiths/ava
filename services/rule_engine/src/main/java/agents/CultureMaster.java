@@ -1,34 +1,25 @@
 package agents;
 
 import com.mindsmiths.employeeManager.employees.Employee;
-import com.mindsmiths.pairingalgorithm.EmployeeAvailability;
-import com.mindsmiths.pairingalgorithm.LunchCompatibilities;
-import com.mindsmiths.pairingalgorithm.Match;
-import com.mindsmiths.pairingalgorithm.PairingAlgorithmAPI;
+import com.mindsmiths.pairingalgorithm.*;
 import com.mindsmiths.ruleEngine.model.Agent;
 import com.mindsmiths.sdk.core.api.DataChangeType;
-import com.mindsmiths.sdk.core.api.Message;
 import com.mindsmiths.sdk.core.db.Database;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import models.CmLunchCycleStage;
-import signals.AllEmployees;
 import signals.EmployeeUpdateSignal;
 import signals.SendMatchesSignal;
 import signals.SendNoMatchesSignal;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Data
 @AllArgsConstructor
 public class CultureMaster extends Agent {
     private List<EmployeeAvailability> employeeAvailabilities = new ArrayList<>();
-    private List<Match> allMatches = new ArrayList<>();
     private CmLunchCycleStage lunchCycleStage = CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES;
-    private Map<String, Employee> employees = new HashMap<>();
+    private Map<String, String> agentToEmployeeMapping = new HashMap<>();
     private Map<String, Map<String, Double>> employeeConnectionStrengths = new HashMap<>();
     private LunchCompatibilities lunchCompatibilities;
 
@@ -46,61 +37,33 @@ public class CultureMaster extends Agent {
         this.employeeAvailabilities = new ArrayList<>();
     }
 
-    public void addNewEmployee(String id, Employee employee) {
-        employees.put(id, employee);
+    public void addOrUpdateEmployee(String agentId, Employee employee) {
+        agentToEmployeeMapping.put(agentId, employee.getId());
     }
 
-    public void addOrUpdateEmployee(EmployeeUpdateSignal signal) {
-        employees.put(signal.getFrom(), signal.getEmployee());
-    }
-
-    public void sendEmployeesToAva() {
-        for (String avaId : employees.keySet()) {
-            Message allEmployees = new AllEmployees(employees);
-            send(avaId, allEmployees);
-        }
+    public void sendEmployeesToAva(EmployeeUpdateSignal signal) {
+        for (String avaId : agentToEmployeeMapping.keySet())
+            if (!Objects.equals(avaId, signal.getAgentId()))
+                send(avaId, signal);
     }
 
     public void generateMatches() {
         PairingAlgorithmAPI.generatePairs(new ArrayList<>(employeeAvailabilities), new HashMap<>(employeeConnectionStrengths));
     }
 
-    public void addMatches(List<Match> allMatches) {
-        this.allMatches = allMatches;
-    }
-
-    public void sendMatches() {
-        List<String> matchedPeople = new ArrayList<>();
-        for (String employeeKey : employees.keySet()) {
-            for (Match m : allMatches) {
-                if (employees.get(employeeKey).getId().equals(m.getFirst())) {
-                    matchedPeople.add(m.getFirst());
-                    break;
-                }
-                if (employees.get(employeeKey).getId().equals(m.getSecond())) {
-                    matchedPeople.add(m.getSecond());
-                    break;
-                }
-            }
-        }
-        for (String employeeKey : employees.keySet())
-            if (!matchedPeople.contains(employees.get(employeeKey).getId()))
-                send(employeeKey, new SendNoMatchesSignal());
-
-        for (Match m : allMatches) {
-            send(employeeToAvaId(m.getFirst()), new SendMatchesSignal(m.getSecond(), m.getDay()));
-            send(employeeToAvaId(m.getSecond()), new SendMatchesSignal(m.getFirst(), m.getDay()));
-        }
-        for (Match m : allMatches)
+    public void sendMatches(List<Match> matches) {
+        Set<String> matchedPeople = new HashSet<>();
+        for (Match m : matches) {
+            String firstMatch = m.getFirst(), secondMatch = m.getSecond();
+            Days matchDay = m.getDay();
+            matchedPeople.add(firstMatch);
+            matchedPeople.add(secondMatch);
+            send(firstMatch, new SendMatchesSignal(secondMatch, matchDay));
+            send(secondMatch, new SendMatchesSignal(firstMatch, matchDay));
             Database.emitChange(new models.Match(m), DataChangeType.CREATED);
-
-
-    }
-
-    public String employeeToAvaId(String employeeId) {
-        for (Map.Entry<String, Employee> entry : employees.entrySet())
-            if (entry.getValue().getId().equals(employeeId))
-                return entry.getKey();
-        return "";
+        }
+        for (String agentId : agentToEmployeeMapping.keySet())
+            if (!matchedPeople.contains(agentId))
+                send(agentId, new SendNoMatchesSignal());
     }
 }
