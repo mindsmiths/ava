@@ -5,12 +5,12 @@ import java.util.*;
 import com.mindsmiths.armory.event.UserConnectedEvent
 import com.mindsmiths.armory.event.SubmitEvent
 import com.mindsmiths.ruleEngine.model.Heartbeat;
-import com.mindsmiths.ruleEngine.util.Agents;
 import com.mindsmiths.pairingalgorithm.Days;
 import com.mindsmiths.pairingalgorithm.EmployeeAvailability;
+import com.mindsmiths.employeeManager.employees.Employee;
 
 import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
- 
+
 import agents.Ava;
 import agents.CultureMaster;
 
@@ -20,10 +20,8 @@ import signals.EmployeeConnectionStrengthsSignal;
 import signals.SendNoMatchesSignal;
 
 import models.AvaLunchCycleStage;
-import models.OnboardingStage;
 import models.WeeklyCoreTemplates;
 import models.LunchCycleData
-import com.mindsmiths.employeeManager.employees.Employee;
 
 
 rule "Create Lunch Cycle data"
@@ -64,7 +62,7 @@ end
 rule "Ask for available days"
     when
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-weekly-core") from entry-point "signals"
-        agent: Ava()
+        agent: Ava(onboarded == true)
         employee: Employee()
         lunchCycleData: LunchCycleData(userResponded == false, lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY)
     then
@@ -77,6 +75,7 @@ rule "User selected days"
         signal: SubmitEvent(getParamAsString("submit") == "confirmDays",
                             availableDays : getParam("availableDays")) from entry-point "signals"
         lunchCycleData: LunchCycleData()
+        agent: Ava(onboarded == true)
     then
         modify(lunchCycleData){
             updateAvailableDays((ArrayList<String>) availableDays)
@@ -159,7 +158,7 @@ end
 rule "Auto assign days"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        eval(evaluateCronExpression("* * 15-16 ? * FRI *", ts, "Europe/Zagreb"))//
+        eval(evaluateCronExpression("* * 15-16 ? * FRI *", ts, "Europe/Zagreb"))
         agent: Ava(agentId: id, connectionStrengths: getConnectionStrengthAsValue())
         lunchCycleData: LunchCycleData(lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY,
                                        userResponded == false, availableDays == null, availableDays: availableDays)

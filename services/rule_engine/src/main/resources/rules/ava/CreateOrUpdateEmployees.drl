@@ -2,10 +2,8 @@ package rules.ava;
 
 import com.mindsmiths.employeeManager.employees.Employee;
 import com.mindsmiths.sdk.utils.Utils;
-import com.mindsmiths.ruleEngine.util.Agents;
 
 import signals.EmployeeUpdateSignal;
-import signals.EmployeeConnectionStrengthsSignal;
 
 import agents.CultureMaster;
 import agents.Ava;

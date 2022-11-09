@@ -2,15 +2,12 @@ package rules.ava;
 
 import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
 import com.mindsmiths.ruleEngine.model.Heartbeat;
-import com.mindsmiths.ruleEngine.util.Log;
-import com.mindsmiths.employeeManager.ManualTriggerEvent;
+import com.mindsmiths.employeeManager.employees.Employee;
 
 import agents.Ava;
 
-import models.AvaLunchCycleStage;
 import models.OnboardingStage
 import models.LunchCycleData
-import com.mindsmiths.employeeManager.employees.Employee;
 
 rule "Set working hours"
     when
