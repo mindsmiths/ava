@@ -15,14 +15,13 @@ import signals.EmployeeUpdateSignal;
 
 import agents.Ava;
 import agents.CultureMaster;
-import models.EmployeeProfile;
 import models.OnboardingStage;
 import models.OnboardingTemplates
 
 rule "Send onboarding email"
     when
         agent: Ava(workingHours == true, onboardingStage == OnboardingStage.AVA_CREATED)
-        employee: EmployeeProfile()
+        employee: Employee()
     then
         agent.sendEmail(OnboardingTemplates.welcomeEmail(employee, agent.getConnection("armory"),
                                                          agent.getConnection("email")));
@@ -43,20 +42,16 @@ rule "Store familiarity answers"
    when
         signal: SubmitEvent(getParamAsString("submit") == "finish-familiarity-quiz") from entry-point "signals"
         Heartbeat(ts: timestamp) from entry-point "signals"
-        agent: Ava(onboardingStage == OnboardingStage.FAMILIARITY_QUIZ)
-        employee: EmployeeProfile(familiarity: familiarity)
+        agent: Ava(onboardingStage == OnboardingStage.FAMILIARITY_QUIZ, familiarity: familiarity)
+        employee: Employee()
    then
-        for (String paramId : signal.getParams().keySet())
-            if (paramId.startsWith("answers"))
-                for (String em : (List<String>) signal.getParam(paramId))
-                    employee.getFamiliarity().put(em, (Double) familiarity.getOrDefault(em, 0.0) + 1.0);
-        update(employee)
         modify(agent) {
             setOnboardingStage(OnboardingStage.FINISHED),
-            chargeConnectionNeurons(employee)};
+            chargeConnectionNeurons(signal)
+            };
         agent.send(CultureMaster.ID, new EmployeeUpdateSignal(employee));
         agent.logEvent("Onboarding Finished", Map.of("employeeId", employee.getId(),
-                "familiarity", familiarity, "full name", employee.getFullName()));
+                "familiarity", familiarity, "full name", String.join(" ", employee.getFirstName(), employee.getLastName())));
 end
 
 rule "Reconnect final screen"

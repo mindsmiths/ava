@@ -13,9 +13,4 @@ import lombok.NoArgsConstructor;
 public class MonthlyCoreData {
     private String  id = Utils.randomGenerator();
     private MonthlyCoreStage monthlyCoreStage = MonthlyCoreStage.EMAIL_SENT;
-    private boolean manualTrigger;
-    
-    public MonthlyCoreData(boolean manualTrigger){
-        this.manualTrigger = manualTrigger;
-    }
 }

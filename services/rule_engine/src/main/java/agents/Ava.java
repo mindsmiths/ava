@@ -1,28 +1,27 @@
 package agents;
 
 import com.mindsmiths.armory.ArmoryAPI;
+import com.mindsmiths.armory.event.SubmitEvent;
 import com.mindsmiths.armory.template.BaseTemplate;
 import com.mindsmiths.emailAdapter.EmailAdapterAPI;
 import com.mindsmiths.emailAdapter.NewEmail;
+import com.mindsmiths.employeeManager.employees.Employee;
 import com.mindsmiths.ruleEngine.model.Agent;
-import com.mindsmiths.ruleEngine.util.Log;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import models.EmployeeProfile;
 import models.Neuron;
 import models.OnboardingStage;
-import signals.SendMatchesSignal;
 import utils.EventTracking;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
@@ -32,18 +31,26 @@ import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
 @NoArgsConstructor
 @ToString(callSuper = true)
 public class Ava extends Agent {
+    private String employeeId;
     private OnboardingStage onboardingStage;
-    private Map<String, EmployeeProfile> otherEmployees;
-    private boolean workingHours;
-    private boolean availabilityInterval;
+    private Map<String, Employee> otherEmployees;
+
     private Map<String, LocalDateTime> lunchDeclineReasons = new HashMap<>();
     private Map<String, Neuron> connectionStrengths = new HashMap<>();
+    private Map<String, Double> familiarity = new HashMap<>();
+
     public static final double CONNECTION_NEURON_CAPACITY = 100;
     public static final double CONNECTION_NEURON_RESISTANCE = 0.05;
 
-    //public Ava(String connectionName, String connectionId) {
-    //  super(connectionName, connectionId);
-    //}
+    // Metadata
+    private boolean onboarded;
+    private boolean workingHours;
+    private boolean availabilityInterval;
+
+    public Ava(String employeeId) {
+        addConnection("employeeId", employeeId);
+        this.employeeId = employeeId;
+    }
 
     public void showScreen(BaseTemplate screen) {
         ArmoryAPI.showScreen(getConnection("armory"), screen);
@@ -53,7 +60,7 @@ public class Ava extends Agent {
         ArmoryAPI.showScreens(getConnection("armory"), firstScreenId, screens);
     }
 
-    public void sendEmail(NewEmail email) throws IOException {
+    public void sendEmail(NewEmail email) {
         EmailAdapterAPI.newEmail(email);
     }
 
@@ -69,8 +76,13 @@ public class Ava extends Agent {
         return this.connectionStrengths.get(employeeId);
     }
 
-    public void chargeConnectionNeurons(EmployeeProfile employeeProfile) {
-        for (Map.Entry<String, Double> entry : employeeProfile.getFamiliarity().entrySet())
+    public void chargeConnectionNeurons(SubmitEvent signal) {
+        for (String paramId : signal.getParams().keySet())
+            if (paramId.startsWith("answers"))
+                for (String em : (List<String>) signal.getParam(paramId))
+                    familiarity.put(em, familiarity.getOrDefault(em, 0.0) + 1.0);
+
+        for (Map.Entry<String, Double> entry : familiarity.entrySet())
             this.getConnectionNeuron(entry.getKey()).charge(entry.getValue() * 30);
     }
 
@@ -102,26 +114,16 @@ public class Ava extends Agent {
     }
 
     public String employeeToAvaId(String employeeId) {
-        for (Map.Entry<String, EmployeeProfile> entry : otherEmployees.entrySet())
+        for (Map.Entry<String, Employee> entry : otherEmployees.entrySet())
             if (entry.getValue().getId().equals(employeeId))
                 return entry.getKey();
         return "";
     }
 
-    public void printMatchInfo(EmployeeProfile employee, SendMatchesSignal signal) {
-        for (Map.Entry<String, EmployeeProfile> entry : otherEmployees.entrySet()) {
-            if (entry.getValue().getId().equals(signal.getMatch())) {
-                Log.info("I'm " + employee.getFullName() + " my match is " + entry.getValue().getFullName() + " on "
-                        + signal.getMatchDay());
-                break;
-            }
-        }
-    }
-
     public Map<String, String> createOtherEmployeeNames() {
         Map<String, String> otherEmployeeNames = new HashMap<>();
-        for (EmployeeProfile employee : otherEmployees.values())
-            otherEmployeeNames.put(employee.getFullName(), employee.getId());
+        for (Employee employee : otherEmployees.values())
+            otherEmployeeNames.put(String.join(" ", employee.getFirstName(), employee.getLastName()), employee.getId());
 
         return otherEmployeeNames;
     }

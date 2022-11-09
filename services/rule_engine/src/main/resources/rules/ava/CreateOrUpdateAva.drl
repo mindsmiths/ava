@@ -11,31 +11,29 @@ import signals.EmployeeConnectionStrengthsSignal;
 import agents.CultureMaster;
 import agents.Ava;
 
-import models.EmployeeProfile;
 import models.OnboardingStage;
 
 rule "Create new employee"
     when
-        newEmployee: EmployeeUpdateSignal(email: employee.email, profile: employeeProfile) from entry-point "signals"
+        newEmployee: EmployeeUpdateSignal(email: employee.email, employee: employee) from entry-point "signals"
         agent: Ava(onboardingStage == null)
     then
         modify(agent) {
             addConnection("email", email),
             addConnection("armory", Utils.randomGenerator()),
             setOnboardingStage(OnboardingStage.AVA_CREATED)};
-        insert(profile);
+        insert(employee);
         delete(newEmployee);
 end
 
 rule "Update existing employee"
     when
-        employee: EmployeeUpdateSignal(profile: employeeProfile,
-                                       email: employeeProfile.email) from entry-point "signals"
-        employeeProfile: EmployeeProfile()
+        employeeSignal: EmployeeUpdateSignal(profile: employee, email: employee.email) from entry-point "signals"
+        employee: Employee()
         agent: Ava(onboardingStage != null)
     then
         delete(employee);
-        delete(employeeProfile);
+        delete(employeeSignal);
         modify(agent) {addConnection("email", email)};
         insert(profile);
         agent.send(CultureMaster.ID, new EmployeeUpdateSignal(profile));
@@ -45,7 +43,7 @@ rule "Update other employees data"
     when
         signal: AllEmployees(allEmployees: allEmployees) from entry-point "signals"
         agent: Ava()
-        employee: EmployeeProfile()
+        employee: Employee()
     then
         allEmployees.remove(agent.getId());
         modify(agent) {

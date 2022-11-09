@@ -26,19 +26,19 @@ import java.util.*;
 
 public class WeeklyCoreTemplates {
 
-    public static NewEmail weeklyEmail(EmployeeProfile employee, LunchReminderStage lunchReminderStage,
+    public static NewEmail weeklyEmail(Employee employee, int numberOfMailsSent,
                                        String armoryConnectionId, String emailConnectionId) throws IOException {
         String emailSlug = "";
-        switch (lunchReminderStage) {
-            case FIRST_EMAIL_SENT -> emailSlug = "weekly-email";
-            case SECOND_EMAIL_SENT -> emailSlug = "second-reminder-email";
-            case THIRD_EMAIL_SENT -> emailSlug = "third-reminder-email";
+        switch (numberOfMailsSent) {
+            case 0 -> emailSlug = "weekly-email";
+            case 1 -> emailSlug = "second-reminder-email";
+            case 2 -> emailSlug = "third-reminder-email";
         }
         String subject = Mitems.getText("weekly-core." + emailSlug + ".subject");
         String description = Mitems.getText("weekly-core." + emailSlug + ".description");
 
         String htmlTemplate = new String(Objects.requireNonNull(WeeklyCoreTemplates.class.getClassLoader()
-                        .getResourceAsStream("emailTemplates/WeeklyEmailTemplate.html")).readAllBytes());
+                .getResourceAsStream("emailTemplates/WeeklyEmailTemplate.html")).readAllBytes());
         String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
                 "text", description,
                 "firstName", employee.getFirstName(),
@@ -104,8 +104,8 @@ public class WeeklyCoreTemplates {
         return screens;
     }
 
-    public static NewEmail calendarInviteEmail(Days days, EmployeeProfile currentEmployee,
-                                               EmployeeProfile otherEmployee) throws IOException {
+    public static NewEmail calendarInviteEmail(Days days, Employee currentEmployee,
+                                               Employee otherEmployee) throws IOException {
 
         if (currentEmployee == null || otherEmployee == null)
             throw new RuntimeException("Ava.sendCalendarInvite called with null arguments!");
@@ -123,15 +123,15 @@ public class WeeklyCoreTemplates {
         return payload;
     }
 
-    private static String renderMatchmakingEmail(Days days, EmployeeProfile currentEmployee, EmployeeProfile otherEmployee)
+    private static String renderMatchmakingEmail(Days days, Employee currentEmployee, Employee otherEmployee)
             throws IOException {
         String htmlTemplate = new String(Objects.requireNonNull(WeeklyCoreTemplates.class.getClassLoader().
-                        getResourceAsStream("emailTemplates/EmailTemplateCalendar.html")).readAllBytes());
+                getResourceAsStream("emailTemplates/EmailTemplateCalendar.html")).readAllBytes());
         return Templating.recursiveRender(htmlTemplate, Map.of(
                 "title", Mitems.getText("weekly-core.matching-mail.title"),
                 "description", Mitems.getHTML("weekly-core.matching-mail.description"),
                 "otherName", otherEmployee.getFirstName(),
-                "fullName", otherEmployee.getFullName(),
+                "fullName", String.join(" ", otherEmployee.getFirstName(), otherEmployee.getLastName()),
                 "myName", currentEmployee.getFirstName(),
                 "lunchDay", daysToPrettyString(days)));
     }

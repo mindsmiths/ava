@@ -8,7 +8,6 @@ import com.mindsmiths.employeeManager.employees.Employee;
 import com.mindsmiths.ruleEngine.util.Agents;
 import agents.CultureMaster;
 import signals.EmployeeUpdateSignal;
-import models.EmployeeProfile;
 import models.CmLunchCycleStage;
 import com.mindsmiths.sdk.core.api.DataChangeType;
 import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;

@@ -1,26 +1,26 @@
 package agents;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.mindsmiths.employeeManager.employees.Employee;
 import com.mindsmiths.pairingalgorithm.EmployeeAvailability;
+import com.mindsmiths.pairingalgorithm.LunchCompatibilities;
 import com.mindsmiths.pairingalgorithm.Match;
 import com.mindsmiths.pairingalgorithm.PairingAlgorithmAPI;
-import com.mindsmiths.pairingalgorithm.LunchCompatibilities;
 import com.mindsmiths.ruleEngine.model.Agent;
 import com.mindsmiths.sdk.core.api.DataChangeType;
 import com.mindsmiths.sdk.core.api.Message;
-import com.mindsmiths.sdk.core.db.*;
+import com.mindsmiths.sdk.core.db.Database;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import models.EmployeeProfile;
 import models.CmLunchCycleStage;
 import signals.AllEmployees;
 import signals.EmployeeUpdateSignal;
 import signals.SendMatchesSignal;
 import signals.SendNoMatchesSignal;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
@@ -28,7 +28,7 @@ public class CultureMaster extends Agent {
     private List<EmployeeAvailability> employeeAvailabilities = new ArrayList<>();
     private List<Match> allMatches = new ArrayList<>();
     private CmLunchCycleStage lunchCycleStage = CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES;
-    private Map<String, EmployeeProfile> employees = new HashMap<>();
+    private Map<String, Employee> employees = new HashMap<>();
     private Map<String, Map<String, Double>> employeeConnectionStrengths = new HashMap<>();
     private LunchCompatibilities lunchCompatibilities;
 
@@ -46,12 +46,12 @@ public class CultureMaster extends Agent {
         this.employeeAvailabilities = new ArrayList<>();
     }
 
-    public void addNewEmployee(String id,EmployeeProfile employeeProfile) {
-        employees.put(id, employeeProfile);
+    public void addNewEmployee(String id, Employee employee) {
+        employees.put(id, employee);
     }
 
     public void addOrUpdateEmployee(EmployeeUpdateSignal signal) {
-        employees.put(signal.getFrom(), signal.getEmployeeProfile());
+        employees.put(signal.getFrom(), signal.getEmployee());
     }
 
     public void sendEmployeesToAva() {
@@ -93,12 +93,12 @@ public class CultureMaster extends Agent {
         }
         for (Match m : allMatches)
             Database.emitChange(new models.Match(m), DataChangeType.CREATED);
-         
+
 
     }
 
     public String employeeToAvaId(String employeeId) {
-        for (Map.Entry<String, EmployeeProfile> entry : employees.entrySet())
+        for (Map.Entry<String, Employee> entry : employees.entrySet())
             if (entry.getValue().getId().equals(employeeId))
                 return entry.getKey();
         return "";

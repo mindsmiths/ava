@@ -10,7 +10,6 @@ import com.mindsmiths.armory.event.SubmitEvent;
 
 import agents.Ava;
 
-import models.EmployeeProfile;
 import models.MonthlyCoreStage;
 import models.MonthlyCoreTemplates;
 import models.MonthlyCoreData
@@ -23,8 +22,8 @@ rule "Send monthly core email"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
         eval(evaluateCronExpression("* * * ? * 2#1 *", ts, "Europe/Zagreb"))
-        agent: Ava(workingHours == true, onboardingStage == OnboardingStage.FINISHED)
-        employee: EmployeeProfile()
+        agent: Ava(workingHours == true, onboarded == true)
+        employee: Employee()
         not MonthlyCoreData()
     then
         agent.sendEmail(MonthlyCoreTemplates.monthlyCoreEmail(employee, agent.getConnection("armory"),
@@ -32,23 +31,12 @@ rule "Send monthly core email"
         insert(new MonthlyCoreData());
 end
 
-rule "Manuel Send monthly core email"
-    when
-        monthlyCoreData: MonthlyCoreData(manualTrigger == true) 
-        agent: Ava(workingHours == true)
-        employee: EmployeeProfile()
-    then
-        agent.sendEmail(MonthlyCoreTemplates.monthlyCoreEmail(employee, agent.getConnection("armory"),
-                                    agent.getConnection("email")));
-        modify(monthlyCoreData){setManualTrigger(false)}
-end
-
-rule "Start and reconnect monthly quiz"
+rule "Start or reconnect monthly quiz"
    when
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-monthly-core") from entry-point "signals"
         agent: Ava()
         monthlyCoreData: MonthlyCoreData(monthlyCoreStage in (MonthlyCoreStage.EMAIL_SENT, MonthlyCoreStage.FAMILIARITY_QUIZ))
-        employee: EmployeeProfile()
+        employee: Employee()
    then
         agent.showScreens("introScreen", MonthlyCoreTemplates.monthlyQuizScreens(agent.createOtherEmployeeNames()));
         modify(monthlyCoreData) {setMonthlyCoreStage(MonthlyCoreStage.FAMILIARITY_QUIZ)};
@@ -59,14 +47,9 @@ rule "Store monthly core answers"
    when
         signal: SubmitEvent(getParamAsString("submit") == "finish-monthly-quiz") from entry-point "signals"
         monthlyCoreData: MonthlyCoreData(monthlyCoreStage == MonthlyCoreStage.FAMILIARITY_QUIZ)
-        employee: EmployeeProfile(familiarity : familiarity)
+        agent: Ava()
    then
-        for (String paramId : signal.getParams().keySet()) 
-            if (paramId.startsWith("answers"))
-                for (String em : (List<String>) signal.getParam(paramId))
-                    employee.getFamiliarity().put(em, (Double) familiarity.getOrDefault(em, 0.0) + 1.0);
-
-        update(employee)
+        modify(agent) {chargeConnectionNeurons(signal)}
         modify(monthlyCoreData) {setMonthlyCoreStage(MonthlyCoreStage.FINISHED)};
         delete(signal);
 end
@@ -84,7 +67,7 @@ end
 rule "Reset monthly core loop"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        eval(evaluateCronExpression("* * * ? * 4#1 *", ts, "Europe/Zagreb"))
+        eval(!evaluateCronExpression("* * * ? * 2#1 *", ts, "Europe/Zagreb"))
         monthlyCoreData: MonthlyCoreData()
     then
      delete(monthlyCoreData);

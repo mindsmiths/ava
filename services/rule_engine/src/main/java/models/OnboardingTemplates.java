@@ -4,6 +4,7 @@ import com.mindsmiths.armory.component.*;
 import com.mindsmiths.armory.template.BaseTemplate;
 import com.mindsmiths.armory.template.TemplateGenerator;
 import com.mindsmiths.emailAdapter.NewEmail;
+import com.mindsmiths.employeeManager.employees.Employee;
 import com.mindsmiths.mitems.Mitems;
 import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.sdk.utils.templating.Templating;
@@ -17,21 +18,18 @@ import java.util.Objects;
 
 public class OnboardingTemplates {
 
-    public static NewEmail welcomeEmail(EmployeeProfile employee, String armoryConnectionId, String emailConnectionId)
+    public static NewEmail welcomeEmail(Employee employee, String armoryConnectionId, String emailConnectionId)
             throws IOException {
         String htmlTemplate = new String(Objects.requireNonNull(
                         OnboardingTemplates.class.getClassLoader().getResourceAsStream(
                                 "emailTemplates/EmailTemplate.html"))
                 .readAllBytes());
-        Log.warn("SENT MAIL ARMORY_URL=" + Settings.ARMORY_SITE_URL);
-        Log.warn(htmlTemplate);
         String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
                 "description", Mitems.getText("onboarding.welcome-email.description"),
                 "callToAction", Mitems.getText("onboarding.welcome-email.action"),
                 "firstName", employee.getFirstName(),
                 "armoryUrl",
                 String.format("%s/%s?trigger=start-onboarding", Settings.ARMORY_SITE_URL, armoryConnectionId)));
-        Log.warn(htmlBody);
         NewEmail email = new NewEmail();
         email.setRecipients(List.of(emailConnectionId));
         email.setSubject(Mitems.getText("onboarding.welcome-email.subject"));

@@ -4,6 +4,7 @@ import com.mindsmiths.armory.component.*;
 import com.mindsmiths.armory.template.BaseTemplate;
 import com.mindsmiths.armory.template.TemplateGenerator;
 import com.mindsmiths.emailAdapter.NewEmail;
+import com.mindsmiths.employeeManager.employees.Employee;
 import com.mindsmiths.mitems.Mitems;
 import com.mindsmiths.sdk.utils.templating.Templating;
 import utils.Settings;
@@ -16,7 +17,7 @@ import java.util.Objects;
 
 public class MonthlyCoreTemplates {
 
-    public static NewEmail monthlyCoreEmail(EmployeeProfile employee, String armoryConnectionId,
+    public static NewEmail monthlyCoreEmail(Employee employee, String armoryConnectionId,
                                             String emailConnectionId) throws IOException {
         String htmlTemplate = new String(Objects.requireNonNull(
                         MonthlyCoreTemplates.class.getClassLoader().getResourceAsStream(
@@ -51,8 +52,8 @@ public class MonthlyCoreTemplates {
         int questionNum = 1;
         while (true) {
             String questionTag = "question" + questionNum;
-            String nextQuestionTag = "question" + String.valueOf(questionNum + 1);
-            String answersTag = "answers" + String.valueOf(questionNum);
+            String nextQuestionTag = "question" + (questionNum + 1);
+            String answersTag = "answers" + questionNum;
             try {
                 screens.put(questionTag, new TemplateGenerator(questionTag)
                         .addComponent("header", new HeaderComponent(null, questionNum > 1))
@@ -64,7 +65,7 @@ public class MonthlyCoreTemplates {
                                 nextQuestionTag)));
                 questionNum += 1;
             } catch (Exception e) {
-                String wrongQuestionTag = "question" + String.valueOf(questionNum - 1);
+                String wrongQuestionTag = "question" + (questionNum - 1);
                 TemplateGenerator templateGenerator = (TemplateGenerator) screens.get(wrongQuestionTag);
                 PrimarySubmitButtonComponent buttonComponent = (PrimarySubmitButtonComponent) templateGenerator
                         .getComponents()

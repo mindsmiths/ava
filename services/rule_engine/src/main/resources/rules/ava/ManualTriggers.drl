@@ -5,27 +5,24 @@ import com.mindsmiths.employeeManager.ManualTriggerEvent;
 import agents.Ava;
 
 import models.OnboardingStage
-import models.EmployeeProfile;
 import models.OnboardingTemplates;
-import models.MonthlyCoreTemplates;
 import models.LunchCycleData;
 import models.MonthlyCoreData
+import com.mindsmiths.employeeManager.employees.Employee
 
 rule "Trigger onboarding"
     when
         signal: ManualTriggerEvent(triggerType == "onboarding") from entry-point "signals"
-        agent: Ava()
-        employee: EmployeeProfile(familiarity: familiarity)
+        agent: Ava(familiarity: familiarity, onboarded == false)
+        employee: Employee()
     then
         agent.sendEmail(OnboardingTemplates.welcomeEmail(employee, agent.getConnection("armory"),
                                         agent.getConnection("email")));
         modify(agent) {setOnboardingStage(OnboardingStage.WELCOME_EMAIL_SENT)};
-        modify(employee) {getFamiliarity().clear()};
         delete(signal);
 end
 
 rule "Manual delete lunch cycle data"
-    salience 100
     when
         signal: ManualTriggerEvent(triggerType == "lunch_cycle") from entry-point "signals"
         agent: Ava(onboardingStage == OnboardingStage.FINISHED)
@@ -34,32 +31,12 @@ rule "Manual delete lunch cycle data"
         delete(lunchCycleData);
 end
 
-rule "Trigger lunch cycle for Ava"
-    when
-        signal: ManualTriggerEvent(triggerType == "lunch_cycle") from entry-point "signals"
-        agent: Ava(onboardingStage == OnboardingStage.FINISHED)
-        not LunchCycleData()
-    then
-        insert(new LunchCycleData(true));
-        delete(signal);
-end
 
 rule "Manual delete monthly core data"
-    salience 100
     when
         signal: ManualTriggerEvent(triggerType == "monthly_core") from entry-point "signals"
         agent: Ava(onboardingStage == OnboardingStage.FINISHED)
         monthlyCoreData: MonthlyCoreData()
     then
         delete(monthlyCoreData);
-end
-
-rule "Trigger monthly core"
-    when
-        signal: ManualTriggerEvent(triggerType == "monthly_core") from entry-point "signals"
-        agent: Ava(onboardingStage == OnboardingStage.FINISHED)
-        not MonthlyCoreData()
-    then
-        insert(new MonthlyCoreData(true));
-        delete(signal);
 end

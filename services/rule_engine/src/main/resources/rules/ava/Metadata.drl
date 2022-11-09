@@ -8,7 +8,9 @@ import com.mindsmiths.employeeManager.ManualTriggerEvent;
 import agents.Ava;
 
 import models.AvaLunchCycleStage;
-import models.OnboardingStage;
+import models.OnboardingStage
+import models.LunchCycleData
+import com.mindsmiths.employeeManager.employees.Employee;
 
 rule "Set working hours"
     when
@@ -31,7 +33,32 @@ end
 rule "Set availability interval"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        agent: Ava(availabilityInterval != anyCronSatisfied(ts, "Europe/Zagreb","* * 8-23 ? * WED", "* * * ? * THU", "* * 00-16 ? * FRI"), interval: availabilityInterval)
+        agent: Ava(interval: availabilityInterval, availabilityInterval !=
+                   anyCronSatisfied(ts, "Europe/Zagreb", "* * 8-23 ? * WED", "* * * ? * THU", "* * 00-16 ? * FRI"))
     then
         modify(agent) {setAvailabilityInterval(!interval)};
+end
+
+rule "Set onboarded"
+    when
+        agent: Ava(onboarded == false, onboardingStage == OnboardingStage.FINISHED)
+        profile: Employee(active == true)
+    then
+        modify(agent) {setOnboarded(true)};
+end
+
+rule "Unset onboarded"
+    when
+        agent: Ava(onboarded == true)
+        profile: Employee(active == false)
+    then
+        modify(agent) {setOnboarded(false)};
+end
+
+rule "Set can send mail"
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        lunchCycleData: LunchCycleData(canSend: canSendMail, canSendMail == sentMailRecently(ts))
+    then
+        modify(lunchCycleData) {setCanSendMail(!canSend)};
 end
