@@ -45,8 +45,8 @@ rule "Store familiarity answers"
         employee: Employee(employeeId: id, firstName: firstName, lastName: lastName)
    then
         modify(agent) {
-            setOnboardingStage(OnboardingStage.FINISHED),
-            chargeConnectionNeurons(signal)
+            chargeConnectionNeurons(signal),
+            setOnboardingStage(OnboardingStage.FINISHED)
         };
         agent.logEvent("Onboarding Finished", Map.of("employeeId", employeeId, "familiarity", familiarity,
                        "full name", String.join(" ", firstName, lastName)));

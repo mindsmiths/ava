@@ -9,6 +9,7 @@ import com.mindsmiths.employeeManager.employees.Employee;
 import com.mindsmiths.mitems.Mitems;
 import com.mindsmiths.mitems.Option;
 import com.mindsmiths.pairingalgorithm.Days;
+import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.sdk.utils.templating.Templating;
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.model.Calendar;
@@ -34,6 +35,7 @@ public class WeeklyCoreTemplates {
             case 1 -> emailSlug = "second-reminder-email";
             case 2 -> emailSlug = "third-reminder-email";
         }
+        Log.warn("Number of mails sent: " + numberOfMailsSent);
         String subject = Mitems.getText("weekly-core." + emailSlug + ".subject");
         String description = Mitems.getText("weekly-core." + emailSlug + ".description");
 

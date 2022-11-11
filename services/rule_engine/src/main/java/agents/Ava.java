@@ -15,7 +15,6 @@ import models.Neuron;
 import models.OnboardingStage;
 import utils.EventTracking;
 
-import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
@@ -58,10 +57,10 @@ public class Ava extends Agent {
         EmailAdapterAPI.newEmail(email);
     }
 
-    public Neuron getConnectionNeuron(String employeeId) {
-        if (!connectionStrengths.containsKey(employeeId))
-            connectionStrengths.put(employeeId, new Neuron(CONNECTION_NEURON_RESISTANCE, CONNECTION_NEURON_CAPACITY));
-        return this.connectionStrengths.get(employeeId);
+    public Neuron getConnectionNeuron(String employeeAvaId) {
+        if (!connectionStrengths.containsKey(employeeAvaId))
+            connectionStrengths.put(employeeAvaId, new Neuron(CONNECTION_NEURON_RESISTANCE, CONNECTION_NEURON_CAPACITY));
+        return this.connectionStrengths.get(employeeAvaId);
     }
 
     public void chargeConnectionNeurons(SubmitEvent signal) {
@@ -77,14 +76,14 @@ public class Ava extends Agent {
     public void decayConnectionNeurons() {
         for (String avaId : this.connectionStrengths.keySet()) {
             long daysPassed = ChronoUnit.DAYS.between(
-                    getConnectionNeuron(otherEmployees.get(avaId).getId()).getLastUpdatedAt().toInstant(ZoneOffset.UTC),
+                    getConnectionNeuron(avaId).getLastUpdatedAt().toInstant(ZoneOffset.UTC),
                     new Date().toInstant());
-            getConnectionNeuron(otherEmployees.get(avaId).getId()).decay(daysPassed);
+            getConnectionNeuron(avaId).decay(daysPassed);
         }
     }
 
-    public void chargeAfterMatch(String employeeId) {
-        getConnectionNeuron(employeeId).charge(30.);
+    public void chargeAfterMatch(String employeeAvaId) {
+        getConnectionNeuron(employeeAvaId).charge(30.);
     }
 
     public void addOrUpdateEmployee(String agentId, Employee employee) {

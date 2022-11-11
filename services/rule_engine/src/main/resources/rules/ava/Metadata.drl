@@ -10,6 +10,7 @@ import models.OnboardingStage
 import models.LunchCycleData
 
 rule "Set working hours"
+    salience 500
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
         eval(evaluateCronExpression("* * 8-17 ? * MON-FRI *", ts, "Europe/Zagreb"))
@@ -19,6 +20,7 @@ rule "Set working hours"
 end
 
 rule "Set non working hours"
+    salience 500
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
         eval(!evaluateCronExpression("* * 8-17 ? * MON-FRI *", ts, "Europe/Zagreb"))
@@ -28,6 +30,7 @@ rule "Set non working hours"
 end
 
 rule "Set availability interval"
+    salience 500
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
         agent: Ava(interval: availabilityInterval, availabilityInterval !=
@@ -37,6 +40,7 @@ rule "Set availability interval"
 end
 
 rule "Set onboarded"
+    salience 500
     when
         agent: Ava(onboarded == false, onboardingStage == OnboardingStage.FINISHED)
         profile: Employee(active == true)
@@ -45,6 +49,7 @@ rule "Set onboarded"
 end
 
 rule "Unset onboarded"
+    salience 500
     when
         agent: Ava(onboarded == true)
         profile: Employee(active == false)
@@ -53,6 +58,7 @@ rule "Unset onboarded"
 end
 
 rule "Set can send mail"
+    salience 500
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
         lunchCycleData: LunchCycleData(canSend: canSendMail, canSendMail == sentMailRecently(ts))

@@ -1,5 +1,6 @@
 package models;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LunchCycleData {
+public class LunchCycleData implements Serializable {
     private String id = Utils.randomGenerator();
     private static final int EMAIL_HOUR_DELAY = 12;
     private List<Days> availableDays;
@@ -34,6 +35,6 @@ public class LunchCycleData {
 
     public boolean sentMailRecently(LocalDateTime ts){
         if (availableDaysEmailLastSentAt == null) return false;
-        return !availableDaysEmailLastSentAt.isBefore(ts.minusHours(EMAIL_HOUR_DELAY));
+        return availableDaysEmailLastSentAt.isAfter(ts.minusHours(EMAIL_HOUR_DELAY));
     }
 }
