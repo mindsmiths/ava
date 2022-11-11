@@ -206,7 +206,7 @@ rule "Auto assign days"
         agent: Ava(
             lunchCycleStage == AvaLunchCycleStage.FIND_AVAILABILITY,
             lunchReminderStage != LunchReminderStage.USER_RESPONDED)
-        employee: EmployeeProfile()
+        employee: EmployeeProfile(active == true)
     then
         LunchCycleData lunchCycleData = new LunchCycleData(
                 Utils.randomGenerator(),
