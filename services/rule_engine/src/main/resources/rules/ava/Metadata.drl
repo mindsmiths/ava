@@ -13,28 +13,19 @@ rule "Set working hours"
     salience 500
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        eval(evaluateCronExpression("* * 8-17 ? * MON-FRI *", ts, "Europe/Zagreb"))
-        agent: Ava(workingHours != true)
+        agent: Ava(workingHours != evaluateCronExpression("* * 8-23 ? * MON-FRI *", ts, "Europe/Zagreb"),
+                  workingHours: workingHours)
     then
-        modify(agent) {setWorkingHours(true)}
+        modify(agent) {setWorkingHours(!workingHours)}
 end
 
-rule "Set non working hours"
-    salience 500
-    when
-        Heartbeat(ts: timestamp) from entry-point "signals"
-        eval(!evaluateCronExpression("* * 8-17 ? * MON-FRI *", ts, "Europe/Zagreb"))
-        agent: Ava(workingHours != false)
-    then
-        modify(agent) {setWorkingHours(false)};
-end
 
 rule "Set availability interval"
     salience 500
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
         agent: Ava(interval: availabilityInterval, availabilityInterval !=
-                   anyCronSatisfied(ts, "Europe/Zagreb", "* * 8-23 ? * WED", "* * * ? * THU", "* * 00-16 ? * FRI"))
+                   anyCronSatisfied(ts, "Europe/Zagreb", "* * 8-23 ? * WED", "* * * ? * THU", "* * 00-23 ? * FRI"))
     then
         modify(agent) {setAvailabilityInterval(!interval)};
 end

@@ -22,6 +22,7 @@ import signals.SendNoMatchesSignal;
 import models.AvaLunchCycleStage;
 import models.WeeklyCoreTemplates;
 import models.LunchCycleData
+import com.mindsmiths.ruleEngine.util.Log
 
 
 rule "Create Lunch Cycle data"
@@ -55,7 +56,8 @@ rule "Send available days email"
         modify(lunchCycleData){
             setAvailableDaysEmailLastSentAt(ts),
             setLunchCycleStage(AvaLunchCycleStage.FIND_AVAILABILITY),
-            setMailsSent(count + 1)
+            setMailsSent(count + 1),
+            setCanSendMail(false)
         }
 end
 

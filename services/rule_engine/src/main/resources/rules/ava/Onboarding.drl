@@ -57,7 +57,6 @@ rule "Reconnect final screen"
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-onboarding") from entry-point "signals"
         agent: Ava(onboardingStage == OnboardingStage.FINISHED)
    then
-        com.mindsmiths.armory.template.BaseTemplate screen = OnboardingTemplates.finalScreen();
-        agent.showScreen(screen);
+        agent.showScreen(OnboardingTemplates.finalScreen());
         delete(signal);
 end
