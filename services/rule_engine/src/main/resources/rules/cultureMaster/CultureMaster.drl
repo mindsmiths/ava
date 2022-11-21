@@ -11,17 +11,13 @@ import signals.EmployeeUpdateSignal;
 import models.CmLunchCycleStage;
 import com.mindsmiths.sdk.core.api.DataChangeType;
 import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
-import agents.Ava;
 
 rule "Update employee data"
     when
-        signal: EmployeeUpdateSignal(agentId: agentId, employee: employee) from entry-point "signals"
+        signal: EmployeeUpdateSignal() from entry-point "signals"
         agent: CultureMaster()
     then
-        modify(agent) {
-            addOrUpdateEmployee(agentId, employee),
-            sendEmployeesToAva(signal)
-        };
+        modify(agent) { addOrUpdateEmployee(signal) }
         delete(signal);
 end
 

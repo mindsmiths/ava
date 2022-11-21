@@ -184,6 +184,7 @@ services:
     env:
       SITE_URL: '{{ "armory." + env.get("HOST_DOMAIN", "") }}'
       INTERNAL_SITE_URL: "armory"
+      ALLOW_EVERYONE: "false"
     resources:
       cpu: 50m
       memory: 75Mi

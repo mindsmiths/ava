@@ -32,9 +32,11 @@ rule "Update employee"
         oldEmployee : Employee()
         agent: Ava(agentId: id)
     then
+        modify(agent){ addConnection("email", email) }
+        agent.send(CultureMaster.ID, new EmployeeUpdateSignal(agentId, employee));
+
         delete(employee);
         delete(oldEmployee);
-        agent.send(CultureMaster.ID, new EmployeeUpdateSignal(agentId, employee));
         insert(employee);
 end
 

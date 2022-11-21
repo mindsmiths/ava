@@ -10,16 +10,16 @@ import lombok.Data;
 import models.CmLunchCycleStage;
 import signals.EmployeeUpdateSignal;
 import signals.SendMatchesSignal;
-import signals.SendNoMatchesSignal;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 @Data
 @AllArgsConstructor
 public class CultureMaster extends Agent {
     private List<EmployeeAvailability> employeeAvailabilities = new ArrayList<>();
     private CmLunchCycleStage lunchCycleStage = CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES;
-    private Map<String, String> agentToEmployeeMapping = new HashMap<>();
+    private Map<String, Employee> agentToEmployeeMapping = new HashMap<>();
     private Map<String, Map<String, Double>> employeeConnectionStrengths = new HashMap<>();
     private LunchCompatibilities lunchCompatibilities;
 
@@ -37,11 +37,21 @@ public class CultureMaster extends Agent {
         this.employeeAvailabilities = new ArrayList<>();
     }
 
-    public void addOrUpdateEmployee(String agentId, Employee employee) {
-        agentToEmployeeMapping.put(agentId, employee.getId());
+    public void addOrUpdateEmployee(EmployeeUpdateSignal signal) {
+        String agentId = signal.getAgentId();
+        if (!agentToEmployeeMapping.containsKey(agentId)) sendNewAvaAllEmployees(agentId);
+
+        agentToEmployeeMapping.put(agentId, signal.getEmployee());
+
+        sendEmployeeToAvas(signal);
     }
 
-    public void sendEmployeesToAva(EmployeeUpdateSignal signal) {
+    public void sendNewAvaAllEmployees(String agentId) {
+        for (Entry<String, Employee> otherEmployee : agentToEmployeeMapping.entrySet())
+            send(agentId, new EmployeeUpdateSignal(otherEmployee.getKey(), otherEmployee.getValue()));
+    }
+
+    public void sendEmployeeToAvas(EmployeeUpdateSignal signal) {
         for (String avaId : agentToEmployeeMapping.keySet())
             if (!Objects.equals(avaId, signal.getAgentId()))
                 send(avaId, signal);
@@ -64,6 +74,6 @@ public class CultureMaster extends Agent {
         }
         for (String agentId : agentToEmployeeMapping.keySet())
             if (!matchedPeople.contains(agentId))
-                send(agentId, new SendNoMatchesSignal());
+                send(agentId, new SendMatchesSignal());
     }
 }

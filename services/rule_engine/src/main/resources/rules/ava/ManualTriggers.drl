@@ -21,22 +21,3 @@ rule "Trigger onboarding"
         modify(agent) {setOnboardingStage(OnboardingStage.WELCOME_EMAIL_SENT)};
         delete(signal);
 end
-
-rule "Manual delete lunch cycle data"
-    when
-        signal: ManualTriggerEvent(triggerType == "lunch_cycle") from entry-point "signals"
-        agent: Ava(onboarded == true)
-        lunchCycleData: LunchCycleData()
-    then
-        delete(lunchCycleData);
-end
-
-
-rule "Manual delete monthly core data"
-    when
-        signal: ManualTriggerEvent(triggerType == "monthly_core") from entry-point "signals"
-        agent: Ava(onboarded == true)
-        monthlyCoreData: MonthlyCoreData()
-    then
-        delete(monthlyCoreData);
-end
