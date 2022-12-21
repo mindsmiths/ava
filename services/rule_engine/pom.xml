@@ -34,12 +34,12 @@
 		<dependency>
 			<groupId>com.mindsmiths</groupId>
 			<artifactId>rule-engine</artifactId>
-			<version>5.0.0b0</version>
+			<version>5.0.0b5</version>
 		</dependency>
 		<dependency>
 			<groupId>com.mindsmiths</groupId>
 			<artifactId>forge-sdk</artifactId>
-			<version>5.0.0b0</version>
+			<version>5.0.0b1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.mindsmiths</groupId>

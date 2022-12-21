@@ -13,7 +13,7 @@ class Employee(BaseModel):
     id = models.AutoField(primary_key=True, db_index=True)
     first_name = models.CharField(max_length=200)
     last_name = models.CharField(max_length=200)
-    email = models.EmailField()
+    email = models.EmailField(unique=True)
     active = models.BooleanField(default=True)
 
     def __str__(self):
