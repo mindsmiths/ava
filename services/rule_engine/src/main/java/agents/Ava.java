@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Data
 @ToString(callSuper = true)
@@ -69,6 +70,12 @@ public class Ava extends Agent {
                 this.connectionStrengths.get(entry.getKey()).setValue(CONNECTION_NEURON_CAPACITY);
     }
 
+    /*public void chargeConnectionNeurons2(EmployeeProfile employeeProfile) {
+        employeeProfile.getFamiliarity().entrySet().stream().filter(entry -> entry.getValue() > 0)
+                .forEach(entry -> connectionStrengths.get(entry.getKey()).setValue(CONNECTION_NEURON_CAPACITY));
+    }*/
+    // add this ?
+
     public Neuron getConnectionNeuron(String employeeId) {
         return this.connectionStrengths.get(employeeId);
     }
@@ -89,6 +96,14 @@ public class Ava extends Agent {
             m.put(entry.getKey(), entry.getValue().getValue());
         return m;
     }
+
+    /*
+     * public Map<String, Double> getConnectionStrengthAsValue() {
+     * return connectionStrengths.entrySet().stream()
+     * .collect(Collectors.toMap(entry -> entry.getKey(), entry ->
+     * entry.getValue().getValue()));
+     * }
+     */ // add this
 
     public boolean anyCronSatisfied(Date timestamp, String timezone, String... crons) throws ParseException {
         for (String cron : crons)
@@ -121,6 +136,14 @@ public class Ava extends Agent {
 
         return otherEmployeeNames;
     }
+
+    /*
+     * public Map<String, String> createOtherEmployeeNames() {
+     * return otherEmployees.values().stream()
+     * .collect(Collectors.toMap(employee -> employee.getFullName(), employee ->
+     * employee.getId()));
+     * }
+     */ // add this ?
 
     public void identify() {
         EventTracking.identify(id, new HashMap<>() {

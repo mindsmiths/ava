@@ -37,11 +37,7 @@ rule "Update existing employee"
     then
         delete(employee);
         modify(agent) {addConnection("email", employee.getEmail())};
-        modify(profile) {
-            setFirstName(employee.getFirstName()),
-            setLastName(employee.getLastName()),
-            setEmail(employee.getEmail()),
-            setActive(employee.getActive())};
+        modify(profile) {updateProfile(employee)};
         agent.send(CultureMaster.ID, new EmployeeUpdateSignal(profile));
 end
 

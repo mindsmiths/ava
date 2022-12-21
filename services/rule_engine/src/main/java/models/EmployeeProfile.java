@@ -31,6 +31,13 @@ public class EmployeeProfile extends Employee {
         this.familiarity = familiarity;
     }
 
+    public void updateProfile(Employee employee) {
+        setFirstName(employee.getFirstName());
+        setLastName(employee.getLastName());
+        setEmail(employee.getEmail());
+        setActive(employee.getActive());
+    }
+
     public String getFullName() {
         return getFirstName() + " " + getLastName();
     }

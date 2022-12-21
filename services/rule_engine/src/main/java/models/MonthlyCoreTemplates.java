@@ -2,6 +2,7 @@ package models;
 
 import com.mindsmiths.emailAdapter.SendEmailPayload;
 import com.mindsmiths.mitems.Mitems;
+import com.mindsmiths.sdk.utils.Utils;
 import com.mindsmiths.sdk.utils.templating.Templating;
 import com.mindsmiths.armory.components.*;
 import com.mindsmiths.armory.templates.*;
@@ -13,21 +14,21 @@ public class MonthlyCoreTemplates {
 
     public SendEmailPayload monthlyCoreEmail(EmployeeProfile employee, String armoryConnectionId,
             String emailConnectionId) throws IOException {
+
+        SendEmailPayload email = new SendEmailPayload();
         String htmlTemplate = new String(Objects.requireNonNull(
                 getClass().getClassLoader().getResourceAsStream(
                         "emailTemplates/EmailTemplate.html"))
                 .readAllBytes());
-        String htmlBody = Templating.recursiveRender(htmlTemplate, Map.of(
+        email.setRecipients(List.of(emailConnectionId));
+        email.setSubject(Mitems.getText("monthly-core.welcome-email.subject"));
+        email.setHtmlText(Templating.recursiveRender(htmlTemplate, Map.of(
                 "description", Mitems.getText("monthly-core.welcome-email.description"),
                 "callToAction", Mitems.getText("monthly-core.welcome-email.action"),
                 "firstName", employee.getFirstName(),
+                "now", Utils.getUtcDatetimeStr(),
                 "armoryUrl",
-                String.format("%s/%s?trigger=start-monthly-core", Settings.ARMORY_SITE_URL, armoryConnectionId)));
-
-        SendEmailPayload email = new SendEmailPayload();
-        email.setRecipients(List.of(emailConnectionId));
-        email.setSubject(Mitems.getText("monthly-core.welcome-email.subject"));
-        email.setHtmlText(htmlBody);
+                String.format("%s/%s?trigger=start-monthly-core", Settings.ARMORY_SITE_URL, armoryConnectionId))));
         return email;
     }
 

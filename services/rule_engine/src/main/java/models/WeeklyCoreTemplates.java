@@ -20,6 +20,7 @@ import com.mindsmiths.employeeManager.employees.Employee;
 import com.mindsmiths.mitems.Mitems;
 import com.mindsmiths.mitems.Option;
 import com.mindsmiths.pairingalgorithm.Days;
+import com.mindsmiths.sdk.utils.Utils;
 import com.mindsmiths.sdk.utils.templating.Templating;
 
 import net.fortuna.ical4j.data.CalendarOutputter;
@@ -57,6 +58,7 @@ public class WeeklyCoreTemplates {
                 "firstName", employee.getFirstName(),
                 "button1", Mitems.getText("weekly-core.weekly-email.button1"),
                 "button2", Mitems.getText("weekly-core.weekly-email.button2"),
+                "now", Utils.getUtcDatetimeStr(),
                 "armoryUrl1",
                 String.format("%s/%s?trigger=start-weekly-core", Settings.ARMORY_SITE_URL, armoryConnectionId),
                 "armoryUrl2", String.format("%s/%s?trigger=start-lunch-decline-reason-screen",
@@ -148,6 +150,7 @@ public class WeeklyCoreTemplates {
                 "otherName", otherEmployee.getFirstName(),
                 "fullName", otherEmployee.getFullName(),
                 "myName", currentEmployee.getFirstName(),
+                "now", Utils.getUtcDatetimeStr(),
                 "lunchDay", daysToPrettyString(days)));
     }
 
