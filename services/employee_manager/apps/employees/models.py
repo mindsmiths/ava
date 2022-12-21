@@ -31,4 +31,6 @@ class Employee(BaseModel):
 
 @receiver(post_save, sender=Employee)
 def employee_emit(sender: Type[Employee], instance: Employee, created: bool, *_, **__):
+    if getattr(instance, 'dry_run', None):
+        return
     EmployeeEvent(**instance.to_dict()).emit(DataChangeType.CREATED if created else DataChangeType.UPDATED)
