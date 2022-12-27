@@ -21,3 +21,4 @@ rule "Trigger onboarding"
         modify(agent) {setOnboardingStage(OnboardingStage.WELCOME_EMAIL_SENT)};
         delete(signal);
 end
+

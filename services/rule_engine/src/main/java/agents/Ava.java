@@ -58,8 +58,8 @@ public class Ava extends Agent {
     }
 
     public Neuron getConnectionNeuron(String employeeAvaId) {
-        if (!connectionStrengths.containsKey(employeeAvaId))
-            connectionStrengths.put(employeeAvaId, new Neuron(CONNECTION_NEURON_RESISTANCE, CONNECTION_NEURON_CAPACITY));
+        connectionStrengths.putIfAbsent(employeeAvaId,
+                new Neuron(CONNECTION_NEURON_RESISTANCE, CONNECTION_NEURON_CAPACITY));
         return this.connectionStrengths.get(employeeAvaId);
     }
 
@@ -88,6 +88,8 @@ public class Ava extends Agent {
 
     public void addOrUpdateEmployee(String agentId, Employee employee) {
         otherEmployees.put(agentId, employee);
+        familiarity.putIfAbsent(agentId, 0.0);
+        connectionStrengths.putIfAbsent(agentId,new Neuron(CONNECTION_NEURON_RESISTANCE, CONNECTION_NEURON_CAPACITY));
     }
 
     public Map<String, Double> getConnectionStrengthAsValue() {
@@ -113,9 +115,11 @@ public class Ava extends Agent {
     }
 
     public void identify() {
-        EventTracking.identify(id, new HashMap<>() {{
-            put("agentType", getClass().getSimpleName());
-        }});
+        EventTracking.identify(id, new HashMap<>() {
+            {
+                put("agentType", getClass().getSimpleName());
+            }
+        });
     }
 
     public void logEvent(String event) {

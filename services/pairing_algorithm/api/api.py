@@ -3,7 +3,7 @@ from enum import Enum
 
 from forge.core.models import ExtendableModel
 from forge.core.db import EmittableDataModel
-
+from forge.core.api.base import Reply
 
 class Days(str, Enum):
     MON = "MON"
@@ -24,7 +24,7 @@ class Match(ExtendableModel):
     day: Days
 
 
-class Matches(ExtendableModel):
+class Matches(Reply):
     allMatches: List[Match]
 
 

@@ -17,6 +17,8 @@ import agents.CultureMaster;
 import signals.EmployeeAvailabilitySignal;
 import signals.SendMatchesSignal;
 import signals.EmployeeConnectionStrengthsSignal;
+import signals.DeleteLunchCycleDataSignal;
+import signals.EmployeeConnectionStrengthsRequest;
 
 import models.WeeklyCoreTemplates;
 import models.LunchCycleData
@@ -43,6 +45,15 @@ rule "Delete lunch cycle data"
         delete(lunchCycleData);
 end
 
+rule "Manually delete lunch cycle data"
+    when
+        signal: DeleteLunchCycleDataSignal() from entry-point "signals"
+        lunchCycleData: LunchCycleData()
+    then
+        delete(signal);
+        delete(lunchCycleData);
+end
+
 rule "Send available days email"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
@@ -64,7 +75,7 @@ rule "Ask for available days"
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-weekly-core") from entry-point "signals"
         agent: Ava(onboarded == true)
         employee: Employee()
-        lunchCycleData: LunchCycleData()
+        lunchCycleData: LunchCycleData(userResponded == false)
     then
         agent.showScreen(WeeklyCoreTemplates.availableDaysScreen());
         delete(signal);
@@ -90,12 +101,11 @@ rule "Confirm days"
         agent: Ava(connectionStrengths: getConnectionStrengthAsValue(), agentId: id)
     then
         agent.showScreens("confirmDaysScreen", WeeklyCoreTemplates.confirmingDaysScreen());
-
         modify(lunchCycleData){
             setUserResponded(true)
         }
         agent.send(CultureMaster.ID, new EmployeeAvailabilitySignal(new EmployeeAvailability(agentId, availableDays)));
-        agent.send(CultureMaster.ID, new EmployeeConnectionStrengthsSignal(connectionStrengths));
+        //agent.send(CultureMaster.ID, new EmployeeConnectionStrengthsSignal(connectionStrengths));
 end
 
 rule "No days selected"
@@ -110,7 +120,7 @@ rule "Lunch decline reason screen"
     when
         signal: UserConnectedEvent(getParamAsString("trigger") == "start-lunch-decline-reason-screen") from entry-point "signals"
         agent: Ava()
-        lunchCycleData: LunchCycleData()
+        lunchCycleData: LunchCycleData(userResponded == false)
     then 
         agent.showScreens("LunchDecline", WeeklyCoreTemplates.lunchDeclineReasonScreens());
         delete(signal);
@@ -157,7 +167,7 @@ rule "Auto assign days"
                                        availableDays == null, availableDays: availableDays)
     then
         agent.send(CultureMaster.ID, new EmployeeAvailabilitySignal(new EmployeeAvailability(agentId, availableDays)));
-        agent.send(CultureMaster.ID, new EmployeeConnectionStrengthsSignal(connectionStrengths));
+        //agent.send(CultureMaster.ID, new EmployeeConnectionStrengthsSignal(connectionStrengths));
         modify(lunchCycleData){
             setUserResponded(true)
         }
@@ -182,4 +192,13 @@ rule "Lunch invite expired"
     then 
         agent.showScreen(WeeklyCoreTemplates.lunchInviteExpiredScreen());
         delete(signal);
+end
+
+rule "Send employeeConnectionStrengths"
+    when
+        singal: EmployeeConnectionStrengthsRequest() from entry-point "signals"
+        lunchCycleData: LunchCycleData(userResponded == true)
+        agent: Ava(connectionStrengths: getConnectionStrengthAsValue(), agentId: id)
+    then
+        agent.send(CultureMaster.ID, new EmployeeConnectionStrengthsSignal(connectionStrengths));
 end

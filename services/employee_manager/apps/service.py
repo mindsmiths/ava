@@ -1,5 +1,7 @@
 import logging
 
+from asgiref.sync import sync_to_async
+
 from forge.conf import settings as forge_settings
 from forge.core.base import BaseService
 from forge.core.api.decorators import on_change
@@ -14,15 +16,18 @@ logger = logging.getLogger(forge_settings.DEFAULT_LOGGER)
 class EmployeeManagerListener(BaseService):
 
     @on_change(MatchView)
+    
     async def create_match(self, match: MatchView):
-        firstEmployee = Employee.objects.get(id=match.firstEmployeeId)
-        secondEmployee = Employee.objects.get(id=match.secondEmployeeId)
+        def inner():
+            firstEmployee = Employee.objects.get(id=match.firstEmployeeId)
+            secondEmployee = Employee.objects.get(id=match.secondEmployeeId)
 
-        match = Match.objects.create(
-            first_employee=firstEmployee,
-            second_employee=secondEmployee,
-            day_of_week=match.dayOfWeek,
-            date=match.date
-        )
+            new_match = Match(
+                first_employee=firstEmployee,
+                second_employee=secondEmployee,
+                day_of_week=match.dayOfWeek,
+                date=match.date
+                )
+            new_match.save()
 
-        match.save()
+        await sync_to_async(inner)()

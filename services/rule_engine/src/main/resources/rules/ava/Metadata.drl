@@ -20,7 +20,7 @@ rule "Set working hours"
 end
 
 
-rule "Set availability interval"
+/*rule "Set availability interval"
     salience 500
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
@@ -28,6 +28,15 @@ rule "Set availability interval"
                    anyCronSatisfied(ts, "Europe/Zagreb", "* * 8-23 ? * WED", "* * * ? * THU", "* * 00-15 ? * FRI"))
     then
         modify(agent) {setAvailabilityInterval(!interval)};
+end
+*/
+rule "Set availability interval true"
+    salience 500
+    when
+        Heartbeat(ts: timestamp) from entry-point "signals"
+        agent: Ava(availabilityInterval != true)
+    then
+        modify(agent) {setAvailabilityInterval(true)};
 end
 
 rule "Set onboarded"
@@ -42,10 +51,10 @@ end
 rule "Unset onboarded"
     salience 500
     when
-        agent: Ava(onboarded == true)
+        agent: Ava(onboarded == true) 
         profile: Employee(active == false)
     then
-        modify(agent) {setOnboarded(false)};
+        modify(agent) {setOnboarded(false)}; //TODO: smislit bolji naziv
 end
 
 rule "Set can send mail"

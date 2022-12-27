@@ -24,10 +24,10 @@ end
 rule "Store employee connection strengths"
     when
         signal: EmployeeConnectionStrengthsSignal(connectionStrengths: connectionStrengths) from entry-point "signals"
-        agent: CultureMaster(employeeConnectionStrengths: employeeConnectionStrengths)
+        agent: CultureMaster()
     then
-        employeeConnectionStrengths.put(signal.getFrom(), connectionStrengths);
-        update(agent);
+        
+        modify(agent){getEmployeeConnectionStrengths().put(signal.getFrom(), connectionStrengths)};
         delete(signal);
 end
 

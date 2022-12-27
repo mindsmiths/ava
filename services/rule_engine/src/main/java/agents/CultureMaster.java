@@ -8,6 +8,8 @@ import com.mindsmiths.sdk.core.db.Database;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import models.CmLunchCycleStage;
+import signals.DeleteLunchCycleDataSignal;
+import signals.EmployeeConnectionStrengthsRequest;
 import signals.EmployeeUpdateSignal;
 import signals.SendMatchesSignal;
 
@@ -75,5 +77,15 @@ public class CultureMaster extends Agent {
         for (String agentId : agentToEmployeeMapping.keySet())
             if (!matchedPeople.contains(agentId))
                 send(agentId, new SendMatchesSignal());
+    }
+
+    public void deleteLunchCycleDataOnAvas(){
+        for (String avaId : agentToEmployeeMapping.keySet()) 
+            send(avaId, new DeleteLunchCycleDataSignal());
+    }
+
+    public void requestEmployeeConnectionStrengths(){
+        for (String avaId : agentToEmployeeMapping.keySet()) 
+            send(avaId, new EmployeeConnectionStrengthsRequest());
     }
 }

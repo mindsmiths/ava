@@ -43,7 +43,6 @@ class PairingAlgorithm(BaseService):
         employee_id_mapping = {}
         for index, employee_id in enumerate(employeeConnectionStrengths):
             employee_id_mapping[index] = employee_id
-
         # FIND COMPATIBILITY BETWEEN ALL EMPLOYEES
         pairs = combinations(employee_id_mapping.keys(), 2)
         for pair in pairs:
@@ -63,8 +62,7 @@ class PairingAlgorithm(BaseService):
                 continue
             # calculate connection strength
             first_score_second = employeeConnectionStrengths[employee_id_mapping[pair[0]]][employee_id_mapping[pair[1]]]
-            second_score_first = employeeConnectionStrengths[
-                employee_id_mapping[pair[1]]][employee_id_mapping[pair[0]]]
+            second_score_first = employeeConnectionStrengths[employee_id_mapping[pair[1]]][employee_id_mapping[pair[0]]]
             connection_strength = (
                 first_score_second + second_score_first) / 200
             # calculate compatibility
@@ -117,5 +115,4 @@ class PairingAlgorithm(BaseService):
                     not_matched.remove(first)
                     already_matched_twice.add(second)
                     break
-
         return Matches(allMatches=all_matches)

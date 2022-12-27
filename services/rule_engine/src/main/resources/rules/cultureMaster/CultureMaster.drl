@@ -26,7 +26,10 @@ rule "Trigger lunch cycle for CultureMaster"
         signal: ManualTriggerEvent(triggerType == "lunch_cycle") from entry-point "signals"
         agent: CultureMaster()
     then
-        modify(agent) {setLunchCycleStage(CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES)};
+        modify(agent) {
+            setLunchCycleStage(CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES),
+            deleteLunchCycleDataOnAvas()
+        };
         delete(signal);
 end
 
@@ -37,7 +40,10 @@ rule "Lunch pairing"
         agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES 
                 || lunchCycleStage == null)
     then
-        modify(agent) {setLunchCycleStage(CmLunchCycleStage.COLLECT_GENERATED_MATCHES)};
+        modify(agent) {
+            setLunchCycleStage(CmLunchCycleStage.COLLECT_GENERATED_MATCHES),
+            requestEmployeeConnectionStrengths()
+        };
         agent.generateMatches();
 end
 
@@ -46,7 +52,10 @@ rule "Trigger lunch pairing for CultureMaster"
         signal: ManualTriggerEvent(triggerType == "lunch_pairing") from entry-point "signals"
         agent: CultureMaster()
     then
-        modify(agent) {setLunchCycleStage(CmLunchCycleStage.COLLECT_GENERATED_MATCHES)};
+        modify(agent) {
+            setLunchCycleStage(CmLunchCycleStage.COLLECT_GENERATED_MATCHES),
+            requestEmployeeConnectionStrengths()
+        };
         agent.generateMatches();
         delete(signal);
 end

@@ -18,8 +18,3 @@ com.mindsmiths.armory.event.UserDisconnectedEvent:
 #    connectionName: employeeId
 #    connectionField: id
 #    agentType: agents.Ava
-com.mindsmiths.employeeManager.ManualTriggerEvent:
-  - !GetOrCreateAgentByConnection
-    connectionName: employeeId
-    connectionField: id
-    agentType: agents.Ava

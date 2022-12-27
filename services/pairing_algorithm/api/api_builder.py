@@ -14,7 +14,7 @@ class PairingAlgorithmAPI(BaseAPI):
     service_id = pairing_algorithm.SERVICE_ID
 
     @staticmethod
-    async def generate_pairs(
+    async def generatePairs(
             self,
             employeeAvailabilities: List[EmployeeAvailability],
             employeeConnectionStrengths: Dict[str, Dict[str, float]]) -> Future[Matches]:
