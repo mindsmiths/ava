@@ -21,16 +21,20 @@ import java.util.Map.Entry;
 public class CultureMaster extends Agent {
     private List<EmployeeAvailability> employeeAvailabilities = new ArrayList<>();
     private CmLunchCycleStage lunchCycleStage = CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES;
-    private Map<String, Employee> agentToEmployeeMapping = new HashMap<>();
+    private Map<String, Employee> agentToEmployeeMapping = new HashMap<>(); // TODO: premimenovat u employees ?
     private Map<String, Map<String, Double>> employeeConnectionStrengths = new HashMap<>();
     private LunchCompatibilities lunchCompatibilities;
-
+    private int connectionStrengthCounter = 0;
     public static String ID = "CULTURE_MASTER";
 
     public CultureMaster() {
         id = ID;
     }
-
+    public boolean checkAllCOnnectionStrengthsArrived(){
+        if(agentToEmployeeMapping.size() == connectionStrengthCounter)
+            return true;
+        return false;
+    }
     public void addEmployeeAvailability(EmployeeAvailability employeeAvailability) {
         employeeAvailabilities.add(employeeAvailability);
     }

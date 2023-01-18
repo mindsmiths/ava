@@ -26,8 +26,11 @@ rule "Store employee connection strengths"
         signal: EmployeeConnectionStrengthsSignal(connectionStrengths: connectionStrengths) from entry-point "signals"
         agent: CultureMaster()
     then
-        
-        modify(agent){getEmployeeConnectionStrengths().put(signal.getFrom(), connectionStrengths)};
+        int counter = agent.getConnectionStrengthCounter();
+        modify(agent){
+            getEmployeeConnectionStrengths().put(signal.getFrom(), connectionStrengths),            
+            setConnectionStrengthCounter(counter+1)
+        };
         delete(signal);
 end
 

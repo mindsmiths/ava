@@ -41,10 +41,11 @@ rule "Lunch pairing"
                 || lunchCycleStage == null)
     then
         modify(agent) {
-            setLunchCycleStage(CmLunchCycleStage.COLLECT_GENERATED_MATCHES),
-            requestEmployeeConnectionStrengths()
+            setLunchCycleStage(CmLunchCycleStage.LUNCH_PAIRING),
+            requestEmployeeConnectionStrengths(),
+            setConnectionStrengthCounter(0)
         };
-        agent.generateMatches();
+        //agent.generateMatches();
 end
 
 rule "Trigger lunch pairing for CultureMaster"
@@ -53,9 +54,21 @@ rule "Trigger lunch pairing for CultureMaster"
         agent: CultureMaster()
     then
         modify(agent) {
-            setLunchCycleStage(CmLunchCycleStage.COLLECT_GENERATED_MATCHES),
-            requestEmployeeConnectionStrengths()
+            setLunchCycleStage(CmLunchCycleStage.LUNCH_PAIRING),
+            requestEmployeeConnectionStrengths(),
+            setConnectionStrengthCounter(0)
         };
-        agent.generateMatches();
+        //agent.generateMatches();
         delete(signal);
+end
+
+rule "Generate matches"
+    when
+        agent: CultureMaster(checkAllCOnnectionStrengthsArrived() == true, lunchCycleStage == CmLunchCycleStage.LUNCH_PAIRING)
+    then
+        agent.generateMatches();
+        modify(agent) {
+            setLunchCycleStage(CmLunchCycleStage.COLLECT_GENERATED_MATCHES),
+            setConnectionStrengthCounter(0)
+        };
 end

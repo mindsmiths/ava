@@ -33,7 +33,6 @@ class PairingAlgorithm(BaseService):
         already_matched = set()
         not_matched = set()
         availability_intersections = {}
-
         employee_availabilities = defaultdict(list)
         for availability in employeeAvailabilities:
             employee_availabilities[
@@ -94,9 +93,8 @@ class PairingAlgorithm(BaseService):
             day = availability_intersections[tuple(employee_pair)].pop()
             match = Match(first=first, second=second, day=day)
             all_matches.append(match)
-
         # DOUBLE LUNCHES
-        already_matched_twice = set()
+        """already_matched_twice = set()
         not_matched_ = list(not_matched)
         already_matched_ = list(already_matched)
         for first in not_matched_:
@@ -114,5 +112,6 @@ class PairingAlgorithm(BaseService):
                     already_matched.add(second)
                     not_matched.remove(first)
                     already_matched_twice.add(second)
-                    break
+                    break"""
+        
         return Matches(allMatches=all_matches)

@@ -25,6 +25,7 @@ public class LunchCycleData implements Serializable {
     private int mailsSent = 0;
     private boolean canSendMail;
     private boolean userResponded;
+    private boolean noDaysSelected;
 
     public void updateAvailableDays(List<String> availableDaysStr) {
         this.availableDays = new ArrayList<>();

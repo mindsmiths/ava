@@ -13,31 +13,31 @@ rule "Set working hours"
     salience 500
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        agent: Ava(workingHours != evaluateCronExpression("* * 8-23 ? * MON-FRI *", ts, "Europe/Zagreb"),
+        agent: Ava(workingHours != evaluateCronExpression("* * 8-18 ? * MON-FRI *", ts, "Europe/Zagreb"),
                   workingHours: workingHours)
     then
         modify(agent) {setWorkingHours(!workingHours)}
 end
 
 
-/*rule "Set availability interval"
+rule "Set availability interval"
     salience 500
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
         agent: Ava(interval: availabilityInterval, availabilityInterval !=
-                   anyCronSatisfied(ts, "Europe/Zagreb", "* * 8-23 ? * WED", "* * * ? * THU", "* * 00-15 ? * FRI"))
+                   anyCronSatisfied(ts, "Europe/Zagreb", "* * 8-18 ? * WED", "* * * ? * THU", "* * 00-15 ? * FRI")):// TODO: PROVJERI OVO
     then
         modify(agent) {setAvailabilityInterval(!interval)};
 end
-*/
-rule "Set availability interval true"
+
+/*rule "Set availability interval true"  // TEST RULE
     salience 500
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
         agent: Ava(availabilityInterval != true)
     then
         modify(agent) {setAvailabilityInterval(true)};
-end
+end*/
 
 rule "Set onboarded"
     salience 500
@@ -54,7 +54,7 @@ rule "Unset onboarded"
         agent: Ava(onboarded == true) 
         profile: Employee(active == false)
     then
-        modify(agent) {setOnboarded(false)}; //TODO: smislit bolji naziv
+        modify(agent) {setOnboarded(false)}; //TODO: smislit bolji naziv  za onboarded
 end
 
 rule "Set can send mail"

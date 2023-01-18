@@ -110,9 +110,12 @@ end
 
 rule "No days selected"
     when
-        lunchCycleData: LunchCycleData(availableDays != null, availableDays.size() == 0)
+        lunchCycleData: LunchCycleData(availableDays != null, availableDays.size() == 0, noDaysSelected == false)
         agent: Ava()
     then
+        modify(lunchCycleData){
+            setNoDaysSelected(true);
+        }
         agent.showScreens("LunchDecline", WeeklyCoreTemplates.lunchDeclineReasonScreens());
 end
 
