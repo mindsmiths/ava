@@ -13,3 +13,7 @@ tolerations:
     operator: "Equal"
     value: '{{ env.CI_PROJECT_NAME }}-{{ env.CI_COMMIT_REF_SLUG }}'
     effect: "NoSchedule"
+readinessProbe:
+  periodSeconds: 120
+livenessProbe:
+  periodSeconds: 180
