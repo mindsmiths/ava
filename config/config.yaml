@@ -46,13 +46,13 @@ global:
 
   backups:
     mongo:
-      enabled: false
+      enabled: true
       cron: 3 5,17 * * *
     postgres:
-      enabled: false
+      enabled: true
       cron: 8 5,17 * * *
     redis:
-      enabled: false
+      enabled: true
       cron: 13 5,17 * * *
 
   cecs:
