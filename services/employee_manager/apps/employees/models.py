@@ -4,23 +4,21 @@ from base.models import BaseModel
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from forge.core.api.base import DataChangeType, random_generator
+from forge.core.api.base import DataChangeType, random_string
 
 from services.employee_manager.api.views import Employee as EmployeeEvent
 
 
 class Employee(BaseModel):
     def create_id():
-        return random_generator(length=10)
+        return random_string(length=10)
 
-    #id = models.AutoField(primary_key=True, db_index=True)
+    # id = models.AutoField(primary_key=True, db_index=True)
     id = models.CharField(primary_key=True, db_index=True, editable=False, max_length=10, default=create_id)
     first_name = models.CharField(max_length=200)
     last_name = models.CharField(max_length=200)
     email = models.EmailField(unique=True)
     active = models.BooleanField(default=True)
-
-
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"

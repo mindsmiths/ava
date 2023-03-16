@@ -7,6 +7,7 @@ import com.mindsmiths.emailAdapter.EmailAdapterAPI;
 import com.mindsmiths.emailAdapter.NewEmail;
 import com.mindsmiths.employeeManager.employees.Employee;
 import com.mindsmiths.ruleEngine.model.Agent;
+import com.mindsmiths.sdk.utils.Utils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -73,8 +74,7 @@ public class Ava extends Agent {
     public void decayConnectionNeurons() {
         for (String avaId : this.connectionStrengths.keySet()) {
             long daysPassed = ChronoUnit.DAYS.between(
-                    getConnectionNeuron(avaId).getLastUpdatedAt().toInstant(ZoneOffset.UTC),
-                    new Date().toInstant());
+                    getConnectionNeuron(avaId).getLastUpdatedAt().toInstant(ZoneOffset.UTC), Utils.now());
             getConnectionNeuron(avaId).decay(daysPassed);
         }
     }

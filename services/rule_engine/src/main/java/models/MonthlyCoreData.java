@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MonthlyCoreData {
-    private String id = Utils.randomGenerator();
+    private String id = Utils.randomString();
     private MonthlyCoreStage monthlyCoreStage = MonthlyCoreStage.EMAIL_SENT;
 }
