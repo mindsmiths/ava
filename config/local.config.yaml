@@ -19,18 +19,19 @@ global:
     POSTGRES_CLIENT_PASSWORD: '{{ env.POSTGRES_CLIENT_PASSWORD | default("postgres", true) }}'
 
 services:
-  mitems:
-    env:
-      SITE_URL: localhost:8001
-    port: 8001
 
   armory:
     command:
       build: "./build.sh"
-      run: "armory runserver"
+      run: "armory runserver 8000"
     env:
       SITE_URL: '{{ env.ARMORY_SITE_URL | default("http://localhost:8000", true) }}'
     port: 8000
 
   employee-manager:
-    port: 8002
+    port: 8001
+
+  mitems:
+    env:
+      SITE_URL: localhost:8004
+    port: 8004

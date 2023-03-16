@@ -18,8 +18,8 @@ import java.util.List;
 @NoArgsConstructor
 @DataModel
 public class LunchCycleData implements Serializable {
-    private String id = Utils.randomGenerator();
     private static final int EMAIL_HOUR_DELAY = 12;
+    private String id = Utils.randomGenerator();
     private List<Days> availableDays;
     private LocalDateTime availableDaysEmailLastSentAt;
     private int mailsSent = 0;

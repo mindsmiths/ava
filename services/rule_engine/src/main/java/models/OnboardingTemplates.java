@@ -1,17 +1,16 @@
 package models;
 
+import com.mindsmiths.armory.Screen;
 import com.mindsmiths.armory.component.*;
-import com.mindsmiths.armory.template.BaseTemplate;
-import com.mindsmiths.armory.template.TemplateGenerator;
 import com.mindsmiths.emailAdapter.NewEmail;
 import com.mindsmiths.employeeManager.employees.Employee;
 import com.mindsmiths.mitems.Mitems;
-import com.mindsmiths.ruleEngine.util.Log;
+import com.mindsmiths.mitems.Option;
 import com.mindsmiths.sdk.utils.templating.Templating;
 import utils.Settings;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -37,84 +36,50 @@ public class OnboardingTemplates {
         return email;
     }
 
-    public static Map<String, BaseTemplate> familiarityQuizScreens(Map<String, String> otherEmployeeNames) {
-        Map<String, BaseTemplate> screens = new HashMap<>();
-        screens.put("introScreen", new TemplateGenerator()
-                .addComponent("title",
-                        new TitleComponent(Mitems.getText("onboarding.familiarity-quiz-intro.title")))
-                .addComponent("image",
-                        new ImageComponent(Mitems.getText("onboarding.silos-image-path.connected")))
-                .addComponent("description",
-                        new DescriptionComponent(Mitems.getHTML("onboarding.familiarity-quiz-intro.description")))
-                .addComponent("submit",
-                        new PrimarySubmitButtonComponent(Mitems.getText("onboarding.familiarity-quiz-intro.action"),
-                                "secondIntroScreen"))
-                .addComponent("pageNum", new DescriptionComponent("1/2")));
-        screens.put("secondIntroScreen", new TemplateGenerator()
-                .addComponent("header", new HeaderComponent(null, true))
-                .addComponent("title",
-                        new TitleComponent(Mitems.getText("onboarding.familiarity-quiz-second-intro.title")))
-                .addComponent("image",
-                        new ImageComponent(Mitems.getText("onboarding.silos-image-path.devided")))
-                .addComponent("description",
-                        new DescriptionComponent(
-                                Mitems.getText("onboarding.familiarity-quiz-second-intro.description")))
-                .addComponent("submit",
-                        new PrimarySubmitButtonComponent(
-                                Mitems.getText("onboarding.familiarity-quiz-second-intro.action"), "question1"))
-                .addComponent("pageNum", new DescriptionComponent("2/2")));
-        int questionNum = 1;
-        while (true) {
-            String questionTag = "question" + questionNum;
-            String nextQuestionTag = "question" + (questionNum + 1);
-            String answersTag = "answers" + questionNum;
-            try {
-                String questionText = Mitems.getText("onboarding.familiarity-quiz-questions." + questionTag);
-                screens.put(questionTag, new TemplateGenerator(questionTag)
-                        .addComponent("header", new HeaderComponent(null, true))
-                        .addComponent("question", new TitleComponent(questionText))
-                        .addComponent("description", new DescriptionComponent(
-                                Mitems.getText("onboarding.familiarity-quiz-questions.question-description")))
-                        .addComponent(answersTag, new CloudSelectComponent(answersTag, otherEmployeeNames))
-                        .addComponent("submit", new PrimarySubmitButtonComponent(
-                                "submit", Mitems.getText("onboarding.familiarity-quiz-questions.action"),
-                                nextQuestionTag))
-                        .addComponent("pageNum", new DescriptionComponent(questionNum + "/3")));
-                questionNum += 1;
-            } catch (Exception e) {
-                String wrongQuestionTag = "question" + (questionNum - 1);
-                TemplateGenerator templateGenerator = (TemplateGenerator) screens.get(wrongQuestionTag);
-                PrimarySubmitButtonComponent buttonComponent = (PrimarySubmitButtonComponent) templateGenerator
-                        .getComponents().get("submit");
-                buttonComponent.setInputId("finish-familiarity-quiz");
-                buttonComponent.setValue("finish-familiarity-quiz");
+    public static List<Screen> familiarityQuizScreens(Map<String, String> otherEmployeeNames) {
+        List<Screen> screens = new ArrayList<>(List.of(new Screen("introScreen")
+                        .add(new Title(Mitems.getText("onboarding.familiarity-quiz-intro.title")))
+                        .add(new Image(Mitems.getText("onboarding.silos-image-path.connected")))
+                        .add(new Description(Mitems.getHTML("onboarding.familiarity-quiz-intro.description")))
+                        .add(new SubmitButton(Mitems.getText("onboarding.familiarity-quiz-intro.action"), "secondIntroScreen"))
+                        .add(new Description("1/2")),
+                new Screen("secondIntroScreen")
+                        .add(new Header(null, true))
+                        .add(new Title(Mitems.getText("onboarding.familiarity-quiz-second-intro.title")))
+                        .add(new Image(Mitems.getText("onboarding.silos-image-path.devided")))
+                        .add(new Description(Mitems.getText("onboarding.familiarity-quiz-second-intro.description")))
+                        .add(new SubmitButton(Mitems.getText("onboarding.familiarity-quiz-second-intro.action"), "question1"))
+                        .add(new Description("2/2")))
 
-                screens.put("finish-familiarity-quiz", new TemplateGenerator("finish-familiarity-quiz")
-                        .addComponent("header", new HeaderComponent(null, true))
-                        .addComponent("image",
-                                new ImageComponent(Mitems.getText("onboarding.ava-image-path.path")))
-                        .addComponent("title",
-                                new TitleComponent(Mitems.getText("onboarding.familiarity-quiz-goodbye.title")))
-                        .addComponent("description",
-                                new DescriptionComponent(Mitems.getHTML("onboarding.familiarity-quiz-goodbye.text")))
-                        .addComponent("final-screen",
-                                new PrimarySubmitButtonComponent(
-                                        "final-screen",
-                                        Mitems.getText("onboarding.familiarity-quiz-goodbye.action"),
-                                        "final-screen")));
-                screens.put("final-screen", new TemplateGenerator("final-screen")
-                        .addComponent("title", new TitleComponent(
-                                Mitems.getText("onboarding.familiarity-quiz-goodbye.finish-screen"))));
-                break;
-            }
+        );
+
+        Option[] questions = Mitems.getOptions("onboarding.familiarity-quiz-questions.questions");
+
+        for (int i = 0; i < questions.length; i++) {
+            String nextScreen = i == questions.length - 1 ? "finish-familiarity-quiz" : questions[i + 1].getId();
+            screens.add(new Screen(questions[i].getId())
+                    .add(new Header(null, true))
+                    .add(new Title(questions[i].getText()))
+                    .add(new Description(Mitems.getText("onboarding.familiarity-quiz-questions.question-description")))
+                    .add(new CloudSelect("answers" + (i + 1), otherEmployeeNames))
+                    .add(new SubmitButton("submit", Mitems.getText("onboarding.familiarity-quiz-questions.action"), nextScreen))
+                    .add(new Description((i + 1) + "/" + questions.length)));
         }
+
+        screens.add(new Screen("finish-familiarity-quiz")
+                .add(new Header(null, true))
+                .add(new Image(Mitems.getText("onboarding.ava-image-path.path")))
+                .add(new Title(Mitems.getText("onboarding.familiarity-quiz-goodbye.title")))
+                .add(new Description(Mitems.getText("onboarding.familiarity-quiz-goodbye.text")))
+                .add(new SubmitButton("final-screen", Mitems.getText("onboarding.familiarity-quiz-goodbye.action"), "final-screen")));
+        screens.add(new Screen("final-screen")
+                .add(new Title(Mitems.getText("onboarding.familiarity-quiz-goodbye.finish-screen"))));
         return screens;
     }
 
-    public static BaseTemplate finalScreen() {
-        return new TemplateGenerator("goodbye")
-                .setTemplateName("CenteredContentTemplate")
-                .addComponent("title", new TitleComponent(
-                        Mitems.getText("onboarding.familiarity-quiz-goodbye.finish-screen")));
+    public static Screen finalScreen() {
+        return new Screen("goodbye")
+                .setTemplate("CenteredContent")
+                .add(new Title(Mitems.getText("onboarding.familiarity-quiz-goodbye.finish-screen")));
     }
 }

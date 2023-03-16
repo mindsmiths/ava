@@ -1,8 +1,8 @@
 package agents;
 
 import com.mindsmiths.armory.ArmoryAPI;
-import com.mindsmiths.armory.event.SubmitEvent;
-import com.mindsmiths.armory.template.BaseTemplate;
+import com.mindsmiths.armory.Screen;
+import com.mindsmiths.armory.event.Submit;
 import com.mindsmiths.emailAdapter.EmailAdapterAPI;
 import com.mindsmiths.emailAdapter.NewEmail;
 import com.mindsmiths.employeeManager.employees.Employee;
@@ -30,27 +30,24 @@ import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
 @NoArgsConstructor
 @ToString(callSuper = true)
 public class Ava extends Agent {
+    public static final double CONNECTION_NEURON_CAPACITY = 100;
+    public static final double CONNECTION_NEURON_RESISTANCE = 0.05;
     private OnboardingStage onboardingStage;
-
     private Map<String, LocalDateTime> lunchDeclineReasons = new HashMap<>();
     private Map<String, Neuron> connectionStrengths = new HashMap<>();
     private Map<String, Double> familiarity = new HashMap<>();
     private Map<String, Employee> otherEmployees = new HashMap<>();
-
-    public static final double CONNECTION_NEURON_CAPACITY = 100;
-    public static final double CONNECTION_NEURON_RESISTANCE = 0.05;
-
     // Metadata
     private boolean onboarded;
     private boolean workingHours;
     private boolean availabilityInterval;
 
-    public void showScreen(BaseTemplate screen) {
-        ArmoryAPI.showScreen(getConnection("armory"), screen);
+    public void showScreen(Screen screen) {
+        ArmoryAPI.show(getConnection("armory"), screen);
     }
 
-    public void showScreens(String firstScreenId, Map<String, BaseTemplate> screens) {
-        ArmoryAPI.showScreens(getConnection("armory"), firstScreenId, screens);
+    public void showScreens(String firstScreenId, List<Screen> screens) {
+        ArmoryAPI.show(getConnection("armory"), firstScreenId, screens);
     }
 
     public void sendEmail(NewEmail email) {
@@ -63,7 +60,7 @@ public class Ava extends Agent {
         return this.connectionStrengths.get(employeeAvaId);
     }
 
-    public void chargeConnectionNeurons(SubmitEvent signal) {
+    public void chargeConnectionNeurons(Submit signal) {
         for (String paramId : signal.getParams().keySet())
             if (paramId.startsWith("answers"))
                 for (String em : (List<String>) signal.getParam(paramId))
@@ -89,7 +86,7 @@ public class Ava extends Agent {
     public void addOrUpdateEmployee(String agentId, Employee employee) {
         otherEmployees.put(agentId, employee);
         familiarity.putIfAbsent(agentId, 0.0);
-        connectionStrengths.putIfAbsent(agentId,new Neuron(CONNECTION_NEURON_RESISTANCE, CONNECTION_NEURON_CAPACITY));
+        connectionStrengths.putIfAbsent(agentId, new Neuron(CONNECTION_NEURON_RESISTANCE, CONNECTION_NEURON_CAPACITY));
     }
 
     public Map<String, Double> getConnectionStrengthAsValue() {

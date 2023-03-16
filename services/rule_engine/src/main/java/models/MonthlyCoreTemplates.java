@@ -1,16 +1,16 @@
 package models;
 
+import com.mindsmiths.armory.Screen;
 import com.mindsmiths.armory.component.*;
-import com.mindsmiths.armory.template.BaseTemplate;
-import com.mindsmiths.armory.template.TemplateGenerator;
 import com.mindsmiths.emailAdapter.NewEmail;
 import com.mindsmiths.employeeManager.employees.Employee;
 import com.mindsmiths.mitems.Mitems;
+import com.mindsmiths.mitems.Option;
 import com.mindsmiths.sdk.utils.templating.Templating;
 import utils.Settings;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -37,56 +37,34 @@ public class MonthlyCoreTemplates {
         return email;
     }
 
-    public static Map<String, BaseTemplate> monthlyQuizScreens(Map<String, String> otherEmployeeNames) {
-        Map<String, BaseTemplate> screens = new HashMap<String, BaseTemplate>();
-        screens.put("introScreen", new TemplateGenerator()
-                .addComponent("image",
-                        new ImageComponent(Mitems.getText("monthly-core.ava-image-path.path")))
-                .addComponent("title",
-                        new TitleComponent(Mitems.getText("monthly-core.familiarity-quiz-intro.title")))
-                .addComponent("description",
-                        new DescriptionComponent(Mitems.getText("monthly-core.familiarity-quiz-intro.description")))
-                .addComponent("submit",
-                        new PrimarySubmitButtonComponent(
-                                Mitems.getText("monthly-core.familiarity-quiz-intro.action"), "question1")));
-        int questionNum = 1;
-        while (true) {
-            String questionTag = "question" + questionNum;
-            String nextQuestionTag = "question" + (questionNum + 1);
-            String answersTag = "answers" + questionNum;
-            try {
-                screens.put(questionTag, new TemplateGenerator(questionTag)
-                        .addComponent("header", new HeaderComponent(null, questionNum > 1))
-                        .addComponent("question", new TitleComponent(
-                                Mitems.getText("monthly-core.familiarity-quiz-questions." + questionTag)))
-                        .addComponent(answersTag, new CloudSelectComponent(answersTag, otherEmployeeNames))
-                        .addComponent("submit", new PrimarySubmitButtonComponent(
-                                "submit", Mitems.getText("monthly-core.familiarity-quiz-questions.action"),
-                                nextQuestionTag)));
-                questionNum += 1;
-            } catch (Exception e) {
-                String wrongQuestionTag = "question" + (questionNum - 1);
-                TemplateGenerator templateGenerator = (TemplateGenerator) screens.get(wrongQuestionTag);
-                PrimarySubmitButtonComponent buttonComponent = (PrimarySubmitButtonComponent) templateGenerator
-                        .getComponents()
-                        .get("submit");
-                buttonComponent.setValue("finish-monthly-quiz");
-                buttonComponent.setInputId("finish-monthly-quiz");
+    public static List<Screen> monthlyQuizScreens(Map<String, String> otherEmployeeNames) {
+        Option[] questions = Mitems.getOptions("onboarding.familiarity-quiz-questions.questions");
+        List<Screen> screens = new ArrayList<>(
+                List.of(new Screen("introScreen")
+                        .add(new Image(Mitems.getText("monthly-core.ava-image-path.path")))
+                        .add(new Title(Mitems.getText("monthly-core.familiarity-quiz-intro.title")))
+                        .add(new Description(Mitems.getText("monthly-core.familiarity-quiz-intro.description")))
+                        .add(new SubmitButton("submit", Mitems.getText("monthly-core.familiarity-quiz-intro.action"), questions[0].getId()))));
 
-                screens.put("finish-monthly-quiz", new TemplateGenerator("finish-monthly-quiz")
-                        .addComponent("title", new TitleComponent(
-                                Mitems.getText("monthly-core.familiarity-quiz-goodbye.text"))));
-                break;
-            }
+        for (int i = 0; i < questions.length; i++) {
+            String nextScreen = i == questions.length - 1 ? "finish-monthly-quiz" : questions[i + 1].getId();
+            screens.add(new Screen(questions[i].getId())
+                    .add(new Header(null, i > 0))
+                    .add(new Title(questions[i].getText()))
+                    .add(new Description(Mitems.getText("onboarding.familiarity-quiz-questions.question-description")))
+                    .add(new CloudSelect("answers" + (i + 1), otherEmployeeNames))
+                    .add(new SubmitButton("submit", Mitems.getText("onboarding.familiarity-quiz-questions.action"), nextScreen))
+                    .add(new Description((i + 1) + "/" + questions.length)));
         }
+        screens.add(new Screen("finish-monthly-quiz")
+                .add(new Title(Mitems.getText("monthly-core.familiarity-quiz-goodbye.text"))));
         return screens;
     }
 
-    public static BaseTemplate finalScreen() {
-        return new TemplateGenerator("goodbye")
-                .setTemplateName("CenteredContentTemplate")
-                .addComponent("title", new TitleComponent(
-                        Mitems.getText("monthly-core.familiarity-quiz-goodbye.text")));
+    public static Screen finalScreen() {
+        return new Screen("goodbye")
+                .setTemplate("CenteredContent")
+                .add(new Title(Mitems.getText("monthly-core.familiarity-quiz-goodbye.text")));
     }
 
 }

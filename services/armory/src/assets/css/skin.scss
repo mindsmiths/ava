@@ -1,49 +1,33 @@
-body {
-    background-color: rgb(255, 255, 255);
-}
+// Override variables here
 
-.GenericTemplate {
-    h2 {
-        text-align: center;
-        color: rgb(0, 0, 0);
-    }
-}
+/*
+$body-size: 18px;
+$primary: #472183;
+$family-primary: "Helvetica", sans-serif;
+*/
 
-.CenteredContentTemplate {
-    justify-content: center !important;
-}
 
-.DescriptionComponent {
-    color: rgb(0, 0, 0);
-    text-align: center;
-}
+//.CloudSelectComponent {
+//    color: rgb(0, 0, 0);
+//    text-align: center;
+//
+//    div.field {
+//        place-content: center;
+//    }
+//
+//    label.checkbox {
+//        background-color: #fff;
+//        color: #4a4a4a;
+//        border-color: #4a4a4a;
+//    }
+//
+//    label.checkbox.is-primary {
+//        background-color: #7DD86F;
+//        color: #ffffff;
+//        border-color: #7DD86F;
+//    }
+//}
 
-.CloudSelectComponent {
-    color: rgb(0, 0, 0);
-    text-align: center;
 
-    div.field {
-        place-content: center;
-    }
-    
-    label.checkbox { 
-        background-color: #fff;
-        color: #4a4a4a;
-        border-color: #4a4a4a;
-    }
-    
-    label.checkbox.is-primary { 
-        background-color: #7DD86F;
-        color: #ffffff;
-        border-color: #7DD86F;
-    }
-}
-
-#image {
-    display: flex;
-    justify-content: center;
-}
-
-img {
-    width: 50%;
-}
+@import "armory-sdk/src/assets/css/override.scss";
+@import "armory-sdk/src/assets/css/default-skin.scss";

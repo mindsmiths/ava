@@ -2,8 +2,8 @@ package rules.ava;
 
 import java.util.*;
 
-import com.mindsmiths.armory.event.UserConnectedEvent
-import com.mindsmiths.armory.event.SubmitEvent
+import com.mindsmiths.armory.event.UserConnected
+import com.mindsmiths.armory.event.Submit
 import com.mindsmiths.ruleEngine.model.Heartbeat;
 import com.mindsmiths.pairingalgorithm.Days;
 import com.mindsmiths.pairingalgorithm.EmployeeAvailability;
@@ -72,7 +72,7 @@ end
 
 rule "Ask for available days"
     when
-        signal: UserConnectedEvent(getParamAsString("trigger") == "start-weekly-core") from entry-point "signals"
+        signal: UserConnected(getParamAsString("trigger") == "start-weekly-core") from entry-point "signals"
         agent: Ava(onboarded == true)
         employee: Employee()
         lunchCycleData: LunchCycleData(userResponded == false)
@@ -83,7 +83,7 @@ end
 
 rule "User selected days"
     when
-        signal: SubmitEvent(getParamAsString("submit") == "confirmDays",
+        signal: Submit(getParamAsString("submit") == "confirmDays",
                             availableDays : getParam("availableDays")) from entry-point "signals"
         lunchCycleData: LunchCycleData()
         agent: Ava(onboarded == true)
@@ -121,7 +121,7 @@ end
 
 rule "Lunch decline reason screen"
     when
-        signal: UserConnectedEvent(getParamAsString("trigger") == "start-lunch-decline-reason-screen") from entry-point "signals"
+        signal: UserConnected(getParamAsString("trigger") == "start-lunch-decline-reason-screen") from entry-point "signals"
         agent: Ava()
         lunchCycleData: LunchCycleData(userResponded == false)
     then 
@@ -131,7 +131,7 @@ end
 
 rule "Finish lunch decline form"
    when
-        signal: SubmitEvent(getParamAsString("submit") == "finished-lunch-decline-form") from entry-point "signals"
+        signal: Submit(getParamAsString("submit") == "finished-lunch-decline-form") from entry-point "signals"
         agent: Ava(lunchDeclineReasons : lunchDeclineReasons)
         lunchCycleData: LunchCycleData(userResponded == false)
    then
@@ -179,7 +179,7 @@ end
 
 rule "User already declined or confirmed available days"
     when 
-        signal: UserConnectedEvent(getParamAsString("trigger") in ("start-lunch-decline-reason-screen", "start-weekly-core")) from entry-point "signals"
+        signal: UserConnected(getParamAsString("trigger") in ("start-lunch-decline-reason-screen", "start-weekly-core")) from entry-point "signals"
         agent: Ava()
         LunchCycleData(userResponded == true)
     then
@@ -189,7 +189,7 @@ end
 
 rule "Lunch invite expired"
     when
-        signal: UserConnectedEvent(getParamAsString("trigger") == "start-weekly-core") from entry-point "signals"
+        signal: UserConnected(getParamAsString("trigger") == "start-weekly-core") from entry-point "signals"
         agent: Ava()
         not LunchCycleData()
     then 

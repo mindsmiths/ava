@@ -19,22 +19,24 @@ import java.util.Map.Entry;
 @Data
 @AllArgsConstructor
 public class CultureMaster extends Agent {
+    public static String ID = "CULTURE_MASTER";
     private List<EmployeeAvailability> employeeAvailabilities = new ArrayList<>();
     private CmLunchCycleStage lunchCycleStage = CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES;
     private Map<String, Employee> agentToEmployeeMapping = new HashMap<>(); // TODO: premimenovat u employees ?
     private Map<String, Map<String, Double>> employeeConnectionStrengths = new HashMap<>();
     private LunchCompatibilities lunchCompatibilities;
     private int connectionStrengthCounter = 0;
-    public static String ID = "CULTURE_MASTER";
 
     public CultureMaster() {
         id = ID;
     }
-    public boolean checkAllCOnnectionStrengthsArrived(){
-        if(agentToEmployeeMapping.size() == connectionStrengthCounter)
+
+    public boolean checkAllCOnnectionStrengthsArrived() {
+        if (agentToEmployeeMapping.size() == connectionStrengthCounter)
             return true;
         return false;
     }
+
     public void addEmployeeAvailability(EmployeeAvailability employeeAvailability) {
         employeeAvailabilities.add(employeeAvailability);
     }
@@ -83,13 +85,13 @@ public class CultureMaster extends Agent {
                 send(agentId, new SendMatchesSignal());
     }
 
-    public void deleteLunchCycleDataOnAvas(){
-        for (String avaId : agentToEmployeeMapping.keySet()) 
+    public void deleteLunchCycleDataOnAvas() {
+        for (String avaId : agentToEmployeeMapping.keySet())
             send(avaId, new DeleteLunchCycleDataSignal());
     }
 
-    public void requestEmployeeConnectionStrengths(){
-        for (String avaId : agentToEmployeeMapping.keySet()) 
+    public void requestEmployeeConnectionStrengths() {
+        for (String avaId : agentToEmployeeMapping.keySet())
             send(avaId, new EmployeeConnectionStrengthsRequest());
     }
 }

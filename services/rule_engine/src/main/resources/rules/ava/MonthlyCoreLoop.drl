@@ -3,8 +3,8 @@ package rules.ava;
 import com.mindsmiths.ruleEngine.model.Heartbeat;
 import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
 import com.mindsmiths.employeeManager.employees.Employee;
-import com.mindsmiths.armory.event.UserConnectedEvent;
-import com.mindsmiths.armory.event.SubmitEvent;
+import com.mindsmiths.armory.event.UserConnected;
+import com.mindsmiths.armory.event.Submit;
 
 import agents.Ava;
 
@@ -28,7 +28,7 @@ end
 
 rule "Start or reconnect monthly quiz"
    when
-        signal: UserConnectedEvent(getParamAsString("trigger") == "start-monthly-core") from entry-point "signals"
+        signal: UserConnected(getParamAsString("trigger") == "start-monthly-core") from entry-point "signals"
         agent: Ava()
         monthlyCoreData: MonthlyCoreData(monthlyCoreStage in (MonthlyCoreStage.EMAIL_SENT, MonthlyCoreStage.FAMILIARITY_QUIZ))
         employee: Employee()
@@ -40,7 +40,7 @@ end
 
 rule "Store monthly core answers"
    when
-        signal: SubmitEvent(getParamAsString("submit") == "finish-monthly-quiz") from entry-point "signals"
+        signal: Submit(getParamAsString("submit") == "finish-monthly-quiz") from entry-point "signals"
         monthlyCoreData: MonthlyCoreData(monthlyCoreStage == MonthlyCoreStage.FAMILIARITY_QUIZ)
         agent: Ava()
    then
@@ -51,7 +51,7 @@ end
 
 rule "Reconnect monthly core final screen"
    when
-        signal: UserConnectedEvent(getParamAsString("trigger") == "start-monthly-core") from entry-point "signals"
+        signal: UserConnected(getParamAsString("trigger") == "start-monthly-core") from entry-point "signals"
         agent: Ava()
         monthlyCoreData: MonthlyCoreData(monthlyCoreStage == MonthlyCoreStage.FINISHED)
    then
