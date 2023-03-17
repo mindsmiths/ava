@@ -80,12 +80,12 @@ end
 
 rule "User selected days"
     when
-        signal: Submit(buttonId == "confirmDays", availableDays : getParam("availableDays")) from entry-point "signals"
+        signal: Submit(buttonId == "confirmDays", availableDays : getParamAsList("availableDays", String.class)) from entry-point "signals"
         lunchCycleData: LunchCycleData()
         agent: Ava(onboarded == true)
     then
         modify(lunchCycleData){
-            updateAvailableDays((ArrayList<String>) availableDays)
+            updateAvailableDays(availableDays)
         }
         delete(signal);
 end

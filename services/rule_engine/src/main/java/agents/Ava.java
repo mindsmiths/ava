@@ -61,10 +61,11 @@ public class Ava extends Agent {
     }
 
     public void chargeConnectionNeurons(Submit signal) {
-        for (String paramId : signal.getParams().keySet())
+        signal.getParams().fieldNames().forEachRemaining(paramId -> {
             if (paramId.startsWith("answers"))
-                for (String em : (List<String>) signal.getParam(paramId))
+                for (String em : signal.getParamAsList(paramId, String.class))
                     familiarity.put(em, familiarity.getOrDefault(em, 0.0) + 1.0);
+        });
 
         for (Map.Entry<String, Double> entry : familiarity.entrySet())
             this.getConnectionNeuron(entry.getKey()).charge(entry.getValue() * 30);
@@ -82,10 +83,11 @@ public class Ava extends Agent {
         getConnectionNeuron(employeeAvaId).charge(30.);
     }
 
-    public void updateEmployeeData(Employee employee){
+    public void updateEmployeeData(Employee employee) {
         setConnection("email", employee.getEmail());
         send(CultureMaster.ID, new EmployeeUpdateSignal(id, employee));
     }
+
     public void addOrUpdateEmployee(String agentId, Employee employee) {
         otherEmployees.put(agentId, employee);
         familiarity.putIfAbsent(agentId, 0.0);

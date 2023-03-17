@@ -158,7 +158,7 @@ services:
 
   armory:
     type: django
-    version: 5.1.9
+    version: 5.1.10
     command:
       run: "daphne -b 0.0.0.0 armory.config.asgi:application"
     db:

@@ -12,7 +12,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "armory-sdk": "5.1.9",
+    "armory-sdk": "5.1.10",
     "vue": "^2.6.11",
     "sass-loader": "^10.2.0",
     "@sentry/vue": "^7.9.0"
