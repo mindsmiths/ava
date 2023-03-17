@@ -40,7 +40,7 @@ end
 
 rule "Store familiarity answers"
    when
-        signal: Submit(getParamAsString("submit") == "finish-familiarity-quiz") from entry-point "signals"
+        signal: Submit(buttonId == "finish-familiarity-quiz") from entry-point "signals"
         agent: Ava(onboardingStage == OnboardingStage.FAMILIARITY_QUIZ, familiarity: familiarity)
         employee: Employee(employeeId: id, firstName: firstName, lastName: lastName)
    then

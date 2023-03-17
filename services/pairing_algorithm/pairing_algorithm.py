@@ -38,7 +38,7 @@ class PairingAlgorithm(BaseService):
             employee_availabilities[
                 availability.employeeId] = availability.availableDays
 
-        # blossom requires vertices to be labaled starting from 0
+        # blossom requires vertices to be labeled starting from 0
         employee_id_mapping = {}
         for index, employee_id in enumerate(employeeConnectionStrengths):
             employee_id_mapping[index] = employee_id

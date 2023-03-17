@@ -13,11 +13,10 @@ import com.mindsmiths.employeeManager.employees.Employee
 rule "Trigger onboarding"
     when
         signal: ManualTriggerEvent(triggerType == "onboarding") from entry-point "signals"
-        agent: Ava(familiarity: familiarity, onboarded == false)
+        agent: Ava(onboarded == false, armory: getConnection("armory"), email: getConnection("email"))
         employee: Employee()
     then
-        agent.sendEmail(OnboardingTemplates.welcomeEmail(employee, agent.getConnection("armory"),
-                                        agent.getConnection("email")));
+        agent.sendEmail(OnboardingTemplates.welcomeEmail(employee,  armory, email));
         modify(agent) {setOnboardingStage(OnboardingStage.WELCOME_EMAIL_SENT)};
         delete(signal);
 end

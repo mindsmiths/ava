@@ -6,9 +6,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Map;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class EmployeeAvailabilitySignal extends Message {
+public class PairingRequest extends Message {
     private EmployeeAvailability employeeAvailability;
+    private Map<String, Double> connectionStrengths;
 }

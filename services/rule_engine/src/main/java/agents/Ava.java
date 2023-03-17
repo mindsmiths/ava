@@ -14,12 +14,12 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import models.Neuron;
 import models.OnboardingStage;
+import signals.EmployeeUpdateSignal;
 import utils.EventTracking;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +34,7 @@ public class Ava extends Agent {
     public static final double CONNECTION_NEURON_CAPACITY = 100;
     public static final double CONNECTION_NEURON_RESISTANCE = 0.05;
     private OnboardingStage onboardingStage;
-    private Map<String, LocalDateTime> lunchDeclineReasons = new HashMap<>();
+    private Map<String, String> lunchDeclineReasons = new HashMap<>();
     private Map<String, Neuron> connectionStrengths = new HashMap<>();
     private Map<String, Double> familiarity = new HashMap<>();
     private Map<String, Employee> otherEmployees = new HashMap<>();
@@ -56,8 +56,7 @@ public class Ava extends Agent {
     }
 
     public Neuron getConnectionNeuron(String employeeAvaId) {
-        connectionStrengths.putIfAbsent(employeeAvaId,
-                new Neuron(CONNECTION_NEURON_RESISTANCE, CONNECTION_NEURON_CAPACITY));
+        connectionStrengths.putIfAbsent(employeeAvaId, new Neuron(CONNECTION_NEURON_RESISTANCE, CONNECTION_NEURON_CAPACITY));
         return this.connectionStrengths.get(employeeAvaId);
     }
 
@@ -83,6 +82,10 @@ public class Ava extends Agent {
         getConnectionNeuron(employeeAvaId).charge(30.);
     }
 
+    public void updateEmployeeData(Employee employee){
+        setConnection("email", employee.getEmail());
+        send(CultureMaster.ID, new EmployeeUpdateSignal(id, employee));
+    }
     public void addOrUpdateEmployee(String agentId, Employee employee) {
         otherEmployees.put(agentId, employee);
         familiarity.putIfAbsent(agentId, 0.0);
@@ -105,9 +108,8 @@ public class Ava extends Agent {
 
     public Map<String, String> createOtherEmployeeNames() {
         Map<String, String> otherEmployeeNames = new HashMap<>();
-        for (Employee employee : otherEmployees.values())
-            otherEmployeeNames.put(String.join(" ", employee.getFirstName(), employee.getLastName()), employee.getId());
-
+        for (Employee employee : otherEmployees.values().stream().filter(Employee::getActive).toList())
+            otherEmployeeNames.put(employee.getId(), String.join(" ", employee.getFirstName(), employee.getLastName()));
         return otherEmployeeNames;
     }
 

@@ -40,7 +40,7 @@ end
 
 rule "Store monthly core answers"
    when
-        signal: Submit(getParamAsString("submit") == "finish-monthly-quiz") from entry-point "signals"
+        signal: Submit(buttonId == "finish-monthly-quiz") from entry-point "signals"
         monthlyCoreData: MonthlyCoreData(monthlyCoreStage == MonthlyCoreStage.FAMILIARITY_QUIZ)
         agent: Ava()
    then
