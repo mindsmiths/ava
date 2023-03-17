@@ -159,9 +159,10 @@ rule "Auto assign days"
         Heartbeat(ts: timestamp) from entry-point "signals"
         eval(evaluateCronExpression("* * 15-16 ? * FRI *", ts, "Europe/Zagreb"))
         agent: Ava(agentId: id, connectionStrengths: getConnectionStrengthAsValue())
-        lunchCycleData: LunchCycleData(mailsSent > 0, availableDays: availableDays == null)
+        lunchCycleData: LunchCycleData(mailsSent > 0, availableDays == null)
     then
-        agent.send(CultureMaster.ID, new PairingRequest(new EmployeeAvailability(agentId, availableDays), connectionStrengths));
+        agent.send(CultureMaster.ID, new PairingRequest(
+                new EmployeeAvailability(agentId, Arrays.asList(Days.values())), connectionStrengths));
         modify(lunchCycleData){
             setUserResponded(true)
         }
