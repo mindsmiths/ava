@@ -9,11 +9,12 @@ public class Settings {
     private static final Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
     public static String ARMORY_SITE_URL;
     public static String MODULE;
-    public static String POSTHOG_API_KEY = env.get("POSTHOG_API_KEY");
+    public static String DEFAULT_TIME_ZONE;
 
     static {
         ARMORY_SITE_URL = dotenv.get("ARMORY_SITE_URL", "");
         MODULE = dotenv.get("MODULE", "local");
+        DEFAULT_TIME_ZONE = dotenv.get("DEFAULT_TIME_ZONE", "Europe/Zagreb");
     }
 
     public Settings() {

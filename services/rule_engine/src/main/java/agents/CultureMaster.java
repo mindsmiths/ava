@@ -88,6 +88,4 @@ public class CultureMaster extends Agent {
             send(avaId, new DeleteLunchCycleDataSignal());
         resetLunchCycle();
     }
-
-
 }

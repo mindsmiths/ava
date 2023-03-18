@@ -1,6 +1,7 @@
 package models;
 
 import com.mindsmiths.pairingalgorithm.Days;
+import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.sdk.core.db.DataModel;
 import com.mindsmiths.sdk.utils.Utils;
 import lombok.AllArgsConstructor;
@@ -35,6 +36,6 @@ public class LunchCycleData implements Serializable {
 
     public boolean sentMailRecently(LocalDateTime timestamp) {
         if (availableDaysEmailLastSentAt == null) return false;
-        return ChronoUnit.HOURS.between(timestamp, availableDaysEmailLastSentAt) < EMAIL_HOUR_DELAY;
+        return Math.abs(ChronoUnit.HOURS.between(timestamp, availableDaysEmailLastSentAt)) < EMAIL_HOUR_DELAY;
     }
 }

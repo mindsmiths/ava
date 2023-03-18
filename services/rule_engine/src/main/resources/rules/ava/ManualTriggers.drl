@@ -14,7 +14,7 @@ rule "Trigger onboarding"
     when
         signal: ManualTriggerEvent(triggerType == "onboarding") from entry-point "signals"
         agent: Ava(onboarded == false, armory: getConnection("armory"), email: getConnection("email"))
-        employee: Employee()
+        employee: Employee(active == true)
     then
         agent.sendEmail(OnboardingTemplates.welcomeEmail(employee,  armory, email));
         modify(agent) {setOnboardingStage(OnboardingStage.WELCOME_EMAIL_SENT)};

@@ -15,12 +15,10 @@ import com.mindsmiths.pairingalgorithm.Days;
 import com.mindsmiths.pairingalgorithm.EmployeeAvailability;
 import com.mindsmiths.employeeManager.employees.Employee;
 
-import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
-
-
 
 import com.mindsmiths.ruleEngine.util.Log
 import com.mindsmiths.sdk.utils.Utils
+import models.CronTime
 
 
 rule "Create Lunch Cycle data"
@@ -93,9 +91,9 @@ end
 rule "Confirm days"
     when
         lunchCycleData: LunchCycleData(availableDays: availableDays != null, availableDays.size() > 0, userResponded == false)
-        agent: Ava(connectionStrengths: getConnectionStrengthAsValue(), agentId: id)
+        agent: Ava(onboarded == true, connectionStrengths: getConnectionStrengthAsValue(), agentId: id)
     then
-        agent.showScreens("confirmDaysScreen", WeeklyCoreTemplates.confirmingDaysScreen());
+        agent.showScreens("confirmScreen", WeeklyCoreTemplates.confirmingDaysScreen());
         modify(lunchCycleData){
             setUserResponded(true)
         }
@@ -105,7 +103,7 @@ end
 rule "No days selected"
     when
         lunchCycleData: LunchCycleData(availableDays != null, availableDays.size() == 0, noDaysSelected == false)
-        agent: Ava()
+        agent: Ava(onboarded == true)
     then
         modify(lunchCycleData){
             setNoDaysSelected(true)
@@ -116,7 +114,7 @@ end
 rule "Lunch decline reason screen"
     when
         signal: UserConnected(getParamAsString("trigger") == "start-lunch-decline-reason-screen") from entry-point "signals"
-        agent: Ava()
+        agent: Ava(onboarded == true)
         lunchCycleData: LunchCycleData(userResponded == false)
     then 
         agent.showScreens("LunchDecline", WeeklyCoreTemplates.lunchDeclineReasonScreens());
@@ -126,7 +124,7 @@ end
 rule "Finish lunch decline form"
    when
         signal: Submit(buttonId == "finished-lunch-decline-form") from entry-point "signals"
-        agent: Ava(lunchDeclineReasons : lunchDeclineReasons)
+        agent: Ava(onboarded == true, lunchDeclineReasons : lunchDeclineReasons)
         lunchCycleData: LunchCycleData(userResponded == false)
    then
         modify(lunchCycleData){ setUserResponded(true) }
@@ -137,7 +135,7 @@ end
 rule "Send calendar invite"
     when
         signal: SendMatchesSignal(match : match != null, matchDay : matchDay) from entry-point "signals"
-        agent: Ava(otherEmployees : otherEmployees)
+        agent: Ava(onboarded == true, otherEmployees : otherEmployees)
         employee: Employee()
     then
         modify(agent){chargeAfterMatch(match)}
@@ -148,7 +146,7 @@ end
 rule "Send no match email"
     when
         signal: SendMatchesSignal(match == null) from entry-point "signals"
-        agent: Ava()
+        agent: Ava(onboarded == true)
     then
         agent.sendEmail(WeeklyCoreTemplates.noMatchEmail(agent.getConnection("email")));
         delete(signal);
@@ -157,12 +155,11 @@ end
 rule "Auto assign days"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        eval(evaluateCronExpression("* * 15-16 ? * FRI *", ts, "Europe/Zagreb"))
-        agent: Ava(agentId: id, connectionStrengths: getConnectionStrengthAsValue())
-        lunchCycleData: LunchCycleData(mailsSent > 0, availableDays == null)
+        agent: Ava(agentId: id, onboarded == true, CronTime.AFTER_AVAILABILITY_INTERVAL.isSatisfied(ts),
+                   connectionStrengths: getConnectionStrengthAsValue())
+        lunchCycleData: LunchCycleData(mailsSent > 0, availableDays == null, userResponded == false)
     then
-        agent.send(CultureMaster.ID, new PairingRequest(
-                new EmployeeAvailability(agentId, Arrays.asList(Days.values())), connectionStrengths));
+        agent.send(CultureMaster.ID, new PairingRequest(new EmployeeAvailability(agentId, Arrays.asList(Days.values())), connectionStrengths));
         modify(lunchCycleData){
             setUserResponded(true)
         }
@@ -171,7 +168,7 @@ end
 rule "User already declined or confirmed available days"
     when 
         signal: UserConnected(getParamAsString("trigger") in ("start-lunch-decline-reason-screen", "start-weekly-core")) from entry-point "signals"
-        agent: Ava()
+        agent: Ava(onboarded == true)
         LunchCycleData(userResponded == true)
     then
         agent.showScreen(WeeklyCoreTemplates.userAlreadyRespondedScreen());
@@ -181,7 +178,7 @@ end
 rule "Lunch invite expired"
     when
         signal: UserConnected(getParamAsString("trigger") == "start-weekly-core") from entry-point "signals"
-        agent: Ava()
+        agent: Ava(onboarded == true)
         not LunchCycleData()
     then 
         agent.showScreen(WeeklyCoreTemplates.lunchInviteExpiredScreen());

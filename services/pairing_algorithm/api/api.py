@@ -35,8 +35,5 @@ class LunchCompatibilityEdge(ExtendableModel):
 
 
 class LunchCompatibilities(EmittableDataModel):
+    id = "lunchCompatibilities"
     edges: List[LunchCompatibilityEdge]
-
-    @classmethod
-    def get_service_name(cls) -> str:
-        return "pairing_algorithm"

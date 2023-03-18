@@ -2,16 +2,13 @@ com.mindsmiths.armory.event.UserConnected:
   - !GetAgentByConnection
     connectionName: armory
     connectionField: connectionId
-    agentType: agents.Ava
 
 com.mindsmiths.armory.event.Submit:
   - !GetAgentByConnection
     connectionName: armory
     connectionField: connectionId
-    agentType: agents.Ava
 
 com.mindsmiths.armory.event.UserDisconnected:
   - !GetAgentByConnection
     connectionName: armory
     connectionField: connectionId
-    agentType: agents.Ava

@@ -1,16 +1,15 @@
 package rules.cultureMaster;
 
 import com.mindsmiths.ruleEngine.model.Heartbeat
-import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression
 import agents.CultureMaster
+import models.CronTime
 
 
 rule "Pairing interval"
     salience 500
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        agent: CultureMaster(pairingInterval != evaluateCronExpression("* * 16-17 ? * FRI *", ts, "Europe/Zagreb"),
-                             pairingInterval : pairingInterval)
+        agent: CultureMaster(pairingInterval != CronTime.PAIRING_INTERVAL.isSatisfied(ts), pairingInterval : pairingInterval)
     then
         modify(agent){
             setPairingInterval(!pairingInterval)

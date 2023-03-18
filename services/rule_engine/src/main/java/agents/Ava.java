@@ -15,16 +15,13 @@ import lombok.ToString;
 import models.Neuron;
 import models.OnboardingStage;
 import signals.EmployeeUpdateSignal;
-import utils.EventTracking;
 
-import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
 
 @Data
 @AllArgsConstructor
@@ -74,7 +71,7 @@ public class Ava extends Agent {
     public void decayConnectionNeurons() {
         for (String avaId : this.connectionStrengths.keySet()) {
             long daysPassed = ChronoUnit.DAYS.between(
-                    getConnectionNeuron(avaId).getLastUpdatedAt().toInstant(ZoneOffset.UTC), Utils.now());
+                    getConnectionNeuron(avaId).getLastUpdatedAt(), Utils.now());
             getConnectionNeuron(avaId).decay(daysPassed);
         }
     }
@@ -101,33 +98,11 @@ public class Ava extends Agent {
         return m;
     }
 
-    public boolean anyCronSatisfied(LocalDateTime timestamp, String timezone, String... crons) {
-        for (String cron : crons)
-            if (evaluateCronExpression(cron, timestamp, timezone))
-                return true;
-        return false;
-    }
 
     public Map<String, String> createOtherEmployeeNames() {
         Map<String, String> otherEmployeeNames = new HashMap<>();
         for (Employee employee : otherEmployees.values().stream().filter(Employee::getActive).toList())
             otherEmployeeNames.put(employee.getId(), String.join(" ", employee.getFirstName(), employee.getLastName()));
         return otherEmployeeNames;
-    }
-
-    public void identify() {
-        EventTracking.identify(id, new HashMap<>() {
-            {
-                put("agentType", getClass().getSimpleName());
-            }
-        });
-    }
-
-    public void logEvent(String event) {
-        EventTracking.capture(id, event);
-    }
-
-    public void logEvent(String event, Map<String, Object> properties) {
-        EventTracking.capture(id, event, properties);
     }
 }

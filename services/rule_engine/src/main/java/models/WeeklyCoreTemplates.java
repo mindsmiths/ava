@@ -9,6 +9,7 @@ import com.mindsmiths.mitems.Mitems;
 import com.mindsmiths.mitems.Option;
 import com.mindsmiths.pairingalgorithm.Days;
 import com.mindsmiths.ruleEngine.util.Log;
+import com.mindsmiths.sdk.utils.Utils;
 import com.mindsmiths.sdk.utils.templating.Templating;
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.model.Calendar;
@@ -51,7 +52,8 @@ public class WeeklyCoreTemplates {
                 "armoryUrl1",
                 String.format("%s/%s?trigger=start-weekly-core", Settings.ARMORY_SITE_URL, armoryConnectionId),
                 "armoryUrl2", String.format("%s/%s?trigger=start-lunch-decline-reason-screen",
-                        Settings.ARMORY_SITE_URL, armoryConnectionId)));
+                        Settings.ARMORY_SITE_URL, armoryConnectionId),
+                "now", Utils.datetimeToStr(Utils.now())));
 
         NewEmail email = new NewEmail();
         email.setRecipients(List.of(emailConnectionId));
@@ -71,16 +73,15 @@ public class WeeklyCoreTemplates {
                 .add(new Title(Mitems.getText("weekly-core.title-asking-for-available-days.title")))
                 .add(new Description(Mitems.getText("weekly-core.description-asking-for-available-days.text")))
                 .add(new CloudSelect("availableDays", options))
-                .add(new SubmitButton("confirmDays", "Submit", "confirmDays"));
+                .add(new SubmitButton("confirmDays", "Submit"));
     }
 
     public static List<Screen> confirmingDaysScreen() {
         Option buttonOption = Mitems.getOptions("weekly-core.confirmation-of-choosen-available-days.button")[0];
         return List.of(
                 new Screen("confirmScreen")
-                        .setTemplate("CenteredContent")
                         .add(new Title(Mitems.getHTML("weekly-core.confirmation-of-choosen-available-days.title")))
-                        .add(new SubmitButton(buttonOption.getId(), buttonOption.getText(), buttonOption.getId())),
+                        .add(new SubmitButton(buttonOption.getId(), buttonOption.getText(), "confirmDays")),
                 new Screen("confirmDays")
                         .setTemplate("CenteredContent")
                         .add(new Title(Mitems.getText("weekly-core.stay-tuned-second-confirmation-of-available-days.title"))));
@@ -92,7 +93,9 @@ public class WeeklyCoreTemplates {
                         .add(new Title(Mitems.getText("weekly-core.lunch-decline-reason.title")))
                         .add(new TextArea("answer", true))
                         .add(new SubmitButton("finished-lunch-decline-form", "Submit", "finishedLunchDeclineForm")),
-                new Screen("finishedLunchDeclineForm").add(new Title(Mitems.getText("weekly-core.lunch-decline-reason.final-screen-title"))));
+                new Screen("finishedLunchDeclineForm")
+                        .setTemplate("CenteredContent")
+                        .add(new Title(Mitems.getText("weekly-core.lunch-decline-reason.final-screen-title"))));
     }
 
     public static NewEmail calendarInviteEmail(Days days, Employee currentEmployee,
@@ -124,7 +127,8 @@ public class WeeklyCoreTemplates {
                 "otherName", otherEmployee.getFirstName(),
                 "fullName", String.join(" ", otherEmployee.getFirstName(), otherEmployee.getLastName()),
                 "myName", currentEmployee.getFirstName(),
-                "lunchDay", daysToPrettyString(days)));
+                "lunchDay", daysToPrettyString(days),
+                "now", Utils.datetimeToStr(Utils.now())));
     }
 
     private static byte[] getICSInvite(Days day, Employee currentEmployee, Employee otherEmployee) {
@@ -205,11 +209,13 @@ public class WeeklyCoreTemplates {
 
     public static Screen userAlreadyRespondedScreen() {
         return new Screen("goodbye")
+                .setTemplate("CenteredContent")
                 .add(new Title(Mitems.getText("weekly-core.user-already-responded-screen.title")));
     }
 
     public static Screen lunchInviteExpiredScreen() {
         return new Screen("expiredInvite")
+                .setTemplate("CenteredContent")
                 .add(new Title(Mitems.getText("weekly-core.message-about-not-working-hours-for-links.title")));
     }
 }

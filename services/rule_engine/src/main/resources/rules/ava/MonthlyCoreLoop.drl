@@ -1,7 +1,6 @@
 package rules.ava;
 
 import com.mindsmiths.ruleEngine.model.Heartbeat;
-import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
 import com.mindsmiths.employeeManager.employees.Employee;
 import com.mindsmiths.armory.event.UserConnected;
 import com.mindsmiths.armory.event.Submit;
@@ -11,18 +10,18 @@ import agents.Ava;
 import models.MonthlyCoreStage;
 import models.MonthlyCoreTemplates;
 import models.MonthlyCoreData
+import models.CronTime
 
 
 rule "Send monthly core email"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        eval(evaluateCronExpression("* * * ? * 2#1 *", ts, "Europe/Zagreb"))
-        agent: Ava(workingHours == true, onboarded == true)
+        agent: Ava(workingHours == true, onboarded == true, CronTime.FIRST_TUESDAY_IN_MONTH.isSatisfied(ts),
+                   armory : getConnection("armory") != null, email : getConnection("email") != null)
         employee: Employee()
         not MonthlyCoreData()
     then
-        agent.sendEmail(MonthlyCoreTemplates.monthlyCoreEmail(employee, agent.getConnection("armory"),
-                                    agent.getConnection("email")));
+        agent.sendEmail(MonthlyCoreTemplates.monthlyCoreEmail(employee, armory, email));
         insert(new MonthlyCoreData());
 end
 
@@ -62,7 +61,7 @@ end
 rule "Reset monthly core loop"
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        eval(!evaluateCronExpression("* * * ? * 2#1 *", ts, "Europe/Zagreb"))
+        eval(!CronTime.FIRST_TUESDAY_IN_MONTH.isSatisfied(ts))
         monthlyCoreData: MonthlyCoreData()
     then
      delete(monthlyCoreData);
