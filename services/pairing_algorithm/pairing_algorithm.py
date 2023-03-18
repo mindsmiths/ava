@@ -1,7 +1,8 @@
 import logging
+import random
 from collections import defaultdict
 from itertools import combinations
-from typing import Dict, Tuple
+from typing import Dict
 from typing import List
 
 from forge.conf import settings as forge_settings
@@ -43,8 +44,9 @@ class PairingAlgorithm(BaseService):
         pairs = combinations(range(len(employee_id_mapping)), 2)
         for pair in pairs:
             # check if a and b have days when both are available
-            intersection = set(employeeAvailabilities[pair[0]].availableDays) & set(
-                employeeAvailabilities[pair[1]].availableDays)
+            intersection = list(set(employeeAvailabilities[pair[0]].availableDays) & set(
+                employeeAvailabilities[pair[1]].availableDays))
+            random.shuffle(intersection)
             availability_intersections[tuple(sorted([pair[0], pair[1]]))] = intersection
             if not intersection:
                 continue
@@ -73,37 +75,38 @@ class PairingAlgorithm(BaseService):
         matching = max_weight_matching(edges, False)
         for employee, match in enumerate(matching):
             if match == -1:  # match was not found
-                not_matched.add(employee_id_mapping[employee])
+                not_matched.add(employee)
                 continue
-            first = employee_id_mapping[employee]
-            second = employee_id_mapping[match]
-            if first in already_matched and second in already_matched:
+            if employee in already_matched and match in already_matched:
                 continue
-            already_matched.add(first)
-            already_matched.add(second)
+            already_matched.add(employee)
+            already_matched.add(match)
             day = availability_intersections[tuple(sorted([employee, match]))].pop()
-            match = Match(first=first, second=second, day=day)
+            for pair in availability_intersections:
+                if employee in pair or match in pair:
+                    if day in availability_intersections[pair]:
+                        availability_intersections[pair].remove(day)
+            match = Match(first=employee_id_mapping[employee], second=employee_id_mapping[match], day=day)
             all_matches.append(match)
         # DOUBLE LUNCHES
-        """already_matched_twice = set()
+        already_matched_twice = set()
         not_matched_ = list(not_matched)
         already_matched_ = list(already_matched)
         for first in not_matched_:
             for second in already_matched_:
                 if second in already_matched_twice:
                     continue
-                employee_pair = [first, second]
-                employee_pair.sort()
-                if availability_intersections[tuple(employee_pair)]:
-                    day = availability_intersections[tuple(
-                        employee_pair)].pop()
-                    match = Match(first=first, second=second, day=day)
+                pair = tuple(sorted([first, second]))
+
+                if availability_intersections[pair]:
+                    day = availability_intersections[pair].pop()
+                    match = Match(first=employee_id_mapping[first], second=employee_id_mapping[second], day=day)
                     all_matches.append(match)
                     already_matched.add(first)
                     already_matched.add(second)
                     not_matched.remove(first)
                     already_matched_twice.add(second)
-                    break"""
+                    break
 
         return Matches(allMatches=all_matches)
 

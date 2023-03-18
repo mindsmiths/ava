@@ -40,14 +40,14 @@ public class OnboardingTemplates {
     }
 
     public static List<Screen> familiarityQuizScreens(Map<String, String> otherEmployeeNames) {
-        List<Screen> screens = new ArrayList<>(List.of(new Screen("introScreen")
+        List<Screen> screens = new ArrayList<>(List.of(new Screen("intro-screen")
                         .add(new Title(Mitems.getText("onboarding.familiarity-quiz-intro.title")))
                         .add(new Image(Mitems.getText("onboarding.silos-image-path.connected")))
                         .add(new Description(Mitems.getHTML("onboarding.familiarity-quiz-intro.description")))
-                        .add(new SubmitButton("intro-button", Mitems.getText("onboarding.familiarity-quiz-intro.action"), "secondIntroScreen"))
+                        .add(new SubmitButton("intro-button", Mitems.getText("onboarding.familiarity-quiz-intro.action"), "second-intro-screen"))
 //                        .add(new Description("1/2")),
                 ,
-                new Screen("secondIntroScreen")
+                new Screen("second-intro-screen")
                         .add(new Header(null, true))
                         .add(new Title(Mitems.getText("onboarding.familiarity-quiz-second-intro.title")))
                         .add(new Image(Mitems.getText("onboarding.silos-image-path.devided")))

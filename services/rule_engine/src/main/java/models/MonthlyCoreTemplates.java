@@ -42,7 +42,7 @@ public class MonthlyCoreTemplates {
     public static List<Screen> monthlyQuizScreens(Map<String, String> otherEmployeeNames) {
         Option[] questions = Mitems.getOptions("onboarding.familiarity-quiz-questions.questions");
         List<Screen> screens = new ArrayList<>(
-                List.of(new Screen("introScreen")
+                List.of(new Screen("intro-screen")
                         .add(new Image(Mitems.getText("monthly-core.ava-image-path.path")))
                         .add(new Title(Mitems.getText("monthly-core.familiarity-quiz-intro.title")))
                         .add(new Description(Mitems.getText("monthly-core.familiarity-quiz-intro.description")))

@@ -32,7 +32,7 @@ rule "Start or reconnect monthly quiz"
         monthlyCoreData: MonthlyCoreData(monthlyCoreStage in (MonthlyCoreStage.EMAIL_SENT, MonthlyCoreStage.FAMILIARITY_QUIZ))
         employee: Employee()
    then
-        agent.showScreens("introScreen", MonthlyCoreTemplates.monthlyQuizScreens(agent.createOtherEmployeeNames()));
+        agent.showScreens("intro-screen", MonthlyCoreTemplates.monthlyQuizScreens(agent.createOtherEmployeeNames()));
         modify(monthlyCoreData) {setMonthlyCoreStage(MonthlyCoreStage.FAMILIARITY_QUIZ)};
         delete(signal);
 end

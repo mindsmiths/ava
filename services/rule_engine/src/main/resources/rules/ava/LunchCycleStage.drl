@@ -78,7 +78,7 @@ end
 
 rule "User selected days"
     when
-        signal: Submit(buttonId == "confirmDays", availableDays : getParamAsList("availableDays", String.class)) from entry-point "signals"
+        signal: Submit(buttonId == "confirm-days", availableDays : getParamAsList("available-days", String.class)) from entry-point "signals"
         lunchCycleData: LunchCycleData()
         agent: Ava(onboarded == true)
     then
@@ -93,7 +93,7 @@ rule "Confirm days"
         lunchCycleData: LunchCycleData(availableDays: availableDays != null, availableDays.size() > 0, userResponded == false)
         agent: Ava(onboarded == true, connectionStrengths: getConnectionStrengthAsValue(), agentId: id)
     then
-        agent.showScreens("confirmScreen", WeeklyCoreTemplates.confirmingDaysScreen());
+        agent.showScreens("confirm-screen", WeeklyCoreTemplates.confirmingDaysScreen());
         modify(lunchCycleData){
             setUserResponded(true)
         }
@@ -108,7 +108,7 @@ rule "No days selected"
         modify(lunchCycleData){
             setNoDaysSelected(true)
         }
-        agent.showScreens("LunchDecline", WeeklyCoreTemplates.lunchDeclineReasonScreens());
+        agent.showScreens("lunch-decline", WeeklyCoreTemplates.lunchDeclineReasonScreens());
 end
 
 rule "Lunch decline reason screen"
@@ -117,7 +117,7 @@ rule "Lunch decline reason screen"
         agent: Ava(onboarded == true)
         lunchCycleData: LunchCycleData(userResponded == false)
     then 
-        agent.showScreens("LunchDecline", WeeklyCoreTemplates.lunchDeclineReasonScreens());
+        agent.showScreens("lunch-decline", WeeklyCoreTemplates.lunchDeclineReasonScreens());
         delete(signal);
 end
 

@@ -69,31 +69,31 @@ public class WeeklyCoreTemplates {
         for (Option option : days)
             options.add(new CloudSelect.Option(option.getText(), option.getId(), true));
 
-        return new Screen("availableDaysScreen")
+        return new Screen("available-days-screen")
                 .add(new Title(Mitems.getText("weekly-core.title-asking-for-available-days.title")))
                 .add(new Description(Mitems.getText("weekly-core.description-asking-for-available-days.text")))
-                .add(new CloudSelect("availableDays", options))
+                .add(new CloudSelect("available-days", options))
                 .add(new SubmitButton("confirmDays", "Submit"));
     }
 
     public static List<Screen> confirmingDaysScreen() {
         Option buttonOption = Mitems.getOptions("weekly-core.confirmation-of-choosen-available-days.button")[0];
         return List.of(
-                new Screen("confirmScreen")
+                new Screen("confirm-screen")
                         .add(new Title(Mitems.getHTML("weekly-core.confirmation-of-choosen-available-days.title")))
-                        .add(new SubmitButton(buttonOption.getId(), buttonOption.getText(), "confirmDays")),
-                new Screen("confirmDays")
+                        .add(new SubmitButton(buttonOption.getId(), buttonOption.getText(), "confirm-days")),
+                new Screen("confirm-days")
                         .setTemplate("CenteredContent")
                         .add(new Title(Mitems.getText("weekly-core.stay-tuned-second-confirmation-of-available-days.title"))));
     }
 
     public static List<Screen> lunchDeclineReasonScreens() {
         return List.of(
-                new Screen("LunchDecline")
+                new Screen("lunch-decline")
                         .add(new Title(Mitems.getText("weekly-core.lunch-decline-reason.title")))
                         .add(new TextArea("answer", true))
-                        .add(new SubmitButton("finished-lunch-decline-form", "Submit", "finishedLunchDeclineForm")),
-                new Screen("finishedLunchDeclineForm")
+                        .add(new SubmitButton("finished-lunch-decline-form", "Submit", "finished-lunch-decline-form")),
+                new Screen("finished-lunch-decline-form")
                         .setTemplate("CenteredContent")
                         .add(new Title(Mitems.getText("weekly-core.lunch-decline-reason.final-screen-title"))));
     }
@@ -214,7 +214,7 @@ public class WeeklyCoreTemplates {
     }
 
     public static Screen lunchInviteExpiredScreen() {
-        return new Screen("expiredInvite")
+        return new Screen("expired-invite")
                 .setTemplate("CenteredContent")
                 .add(new Title(Mitems.getText("weekly-core.message-about-not-working-hours-for-links.title")));
     }
