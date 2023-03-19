@@ -1,5 +1,276 @@
 [
   {
+    "title": "Ice breaker",
+    "description": "",
+    "items": [
+      {
+        "name": "Personal question screen",
+        "elements": [
+          {
+            "description": "Buttons",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"Submit\",\"id\":\"submit-answer\"},{\"text\":\"Skip this question\",\"id\":\"skip-question\"}]"
+          }
+        ]
+      },
+      {
+        "name": "Personal questions end",
+        "elements": [
+          {
+            "description": "Button text",
+            "type": "TEXT",
+            "content": "Great, till later"
+          },
+          {
+            "description": "Title",
+            "type": "TEXT",
+            "content": "<p>WooHoo! You did it! 🙌</p>\n<p>You can expect an email from me soon.</p>"
+          }
+        ]
+      },
+      {
+        "name": "Personal questions start",
+        "elements": [
+          {
+            "description": "Buttons",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"Start\",\"id\":\"start\"}]"
+          },
+          {
+            "description": "Description",
+            "type": "TEXT",
+            "content": "<p>The answers to these questions do not require much thought, feel free to answer the first thing that comes to mind.</p><p>You can skip a question if you don’t like it.</p>"
+          },
+          {
+            "description": "Title",
+            "type": "TEXT",
+            "content": "Rapid Fire Questions"
+          }
+        ]
+      },
+      {
+        "name": "Questions",
+        "elements": [
+          {
+            "description": "Annoying celebrity",
+            "type": "TEXT",
+            "content": "Which celebrity annoys you the most?"
+          },
+          {
+            "description": "Annoying celebrity quiz",
+            "type": "TEXT",
+            "content": "Which celebrity annoys {{ name }}?"
+          },
+          {
+            "description": "Best dish cooking",
+            "type": "TEXT",
+            "content": "What dish do you cook best?\n"
+          },
+          {
+            "description": "Best dish cooking quiz",
+            "type": "TEXT",
+            "content": "What dish does  {{ name }} cook best?\n"
+          },
+          {
+            "description": "Coffee or tea",
+            "type": "TEXT",
+            "content": "Coffee, tea or something else? What’s your fav drink and how do you take it?\n"
+          },
+          {
+            "description": "Coffee or tea quiz",
+            "type": "TEXT",
+            "content": "Does {{ name }} prefer coffee, tea or something else?"
+          },
+          {
+            "description": "Favorite board game",
+            "type": "TEXT",
+            "content": "What is your favorite board game?\n"
+          },
+          {
+            "description": "Favorite board game quiz",
+            "type": "TEXT",
+            "content": "What is {{ name }}'s favorite board game?\n"
+          },
+          {
+            "description": "Favorite work lunch",
+            "type": "TEXT",
+            "content": "What’s your favorite type of food for lunch at work?"
+          },
+          {
+            "description": "Favorite work lunch quiz",
+            "type": "TEXT",
+            "content": "What is {{ name }}'s favorite type of food for lunch at work?"
+          },
+          {
+            "description": "Go to snack",
+            "type": "TEXT",
+            "content": "What is your go-to snack?\n"
+          },
+          {
+            "description": "Go to snack quiz",
+            "type": "TEXT",
+            "content": "What is {{ name }}'s go-to snack?"
+          },
+          {
+            "description": "Hidden talent ",
+            "type": "TEXT",
+            "content": "What is your hidden talent?"
+          },
+          {
+            "description": "Hidden talent quiz",
+            "type": "TEXT",
+            "content": "What is a hidden talent of {{ name }}?"
+          },
+          {
+            "description": "Impulse buy",
+            "type": "TEXT",
+            "content": "What was your last impulse buy?"
+          },
+          {
+            "description": "Impulse buy quiz",
+            "type": "TEXT",
+            "content": "What was {{ name }}'s last impulse buy?"
+          },
+          {
+            "description": "Item worth money",
+            "type": "TEXT",
+            "content": "What item is worth spending more money on?"
+          },
+          {
+            "description": "Item worth money quiz",
+            "type": "TEXT",
+            "content": "For what item does {{ name }} think it is worth spending money on it?"
+          },
+          {
+            "description": "Least likely words to describe",
+            "type": "TEXT",
+            "content": "What are the least-likely three words someone would use to describe you?\n"
+          },
+          {
+            "description": "Least likely words to describe quiz",
+            "type": "TEXT",
+            "content": "What does {{ name }} think are the least-likely three words someone would use to describe them?\n"
+          },
+          {
+            "description": "Misplaced object",
+            "type": "TEXT",
+            "content": "What object do you misplace or lose the most?"
+          },
+          {
+            "description": "Misplaced object quiz",
+            "type": "TEXT",
+            "content": "What object does {{ name }} misplace or lose the most?"
+          },
+          {
+            "description": "Personal torture",
+            "type": "TEXT",
+            "content": "What is not a big deal to most people but is torture to you?"
+          },
+          {
+            "description": "Personal torture quiz",
+            "type": "TEXT",
+            "content": "What is not a big deal to most people but is torture to {{ name }}?\n"
+          },
+          {
+            "description": "Place to live",
+            "type": "TEXT",
+            "content": "If you could live anywhere, where would it be?"
+          },
+          {
+            "description": "Place to live quiz",
+            "type": "TEXT",
+            "content": "If {{ name }} could live anywhere, where would it be?"
+          },
+          {
+            "description": "Questions",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"Paris,Island,USA,Australia  \",\"id\":\"place-to-live\"},{\"text\":\"Keys,Phone,Wallet,Credit card\",\"id\":\"misplaced-object\"},{\"text\":\"Miley Cyrus,Donald Trump,Andrew Tate,Jeff Bezos\",\"id\":\"annoying-celebrity\"},{\"text\":\"Lasagna,Bolognese,Pizza,Hamburger\",\"id\":\"best-dish-cooking\"},{\"text\":\"Coffee,Tea,Milk,Water\",\"id\":\"coffee-or-tea\"},{\"text\":\"Catan,Monopoly,Carcassone,Codenames\",\"id\":\"favorite-board-game\"},{\"text\":\"Pizza,Hamburger,Kebab,Squid\",\"id\":\"favorite-work-lunch\"},{\"text\":\"Apple,Chocolate bar,Nuts,Grapes\",\"id\":\"go-to-snack\"},{\"text\":\"Signing,Dancing,Archery,Cooking\",\"id\":\"hidden-talent\"},{\"text\":\"New phone,Shoes,TV,Jacket\",\"id\":\"impulse-buy\"},{\"text\":\"d,a,s,s\",\"id\":\"item-worth-money\"},{\"text\":\"d,a,s,s\",\"id\":\"least-likely-words-to-describe\"},{\"text\":\"d,a,s,s\",\"id\":\"personal-torture\"},{\"text\":\"d,a,s,s\",\"id\":\"waking-up-early\"}]"
+          },
+          {
+            "description": "Waking up early",
+            "type": "TEXT",
+            "content": "Do you wake up long before work, or right before you start working?"
+          },
+          {
+            "description": "Waking up early quiz",
+            "type": "TEXT",
+            "content": "Does {{ name }} wake up long before work, or right before working?"
+          }
+        ]
+      },
+      {
+        "name": "Quiz end",
+        "elements": [
+          {
+            "description": "Button text",
+            "type": "TEXT",
+            "content": "Goodbye"
+          },
+          {
+            "description": "Description",
+            "type": "TEXT",
+            "content": "I will now show you your results and prepare a cheat sheet for your lunch. "
+          },
+          {
+            "description": "Title",
+            "type": "TEXT",
+            "content": "Great, that's it."
+          }
+        ]
+      },
+      {
+        "name": "Quiz question",
+        "elements": [
+          {
+            "description": "Button text",
+            "type": "TEXT",
+            "content": "Next"
+          },
+          {
+            "description": "Correct answer",
+            "type": "TEXT",
+            "content": "You are correct!"
+          },
+          {
+            "description": "Correct photo",
+            "type": "TEXT",
+            "content": "/public/correct.png"
+          },
+          {
+            "description": "Wrong answer",
+            "type": "TEXT",
+            "content": "You guessed wrong!"
+          },
+          {
+            "description": "Wrong photo",
+            "type": "TEXT",
+            "content": "/public/wrong.png"
+          }
+        ]
+      },
+      {
+        "name": "Quiz results",
+        "elements": [
+          {
+            "description": "Button text",
+            "type": "TEXT",
+            "content": "Goodbye"
+          },
+          {
+            "description": "Description",
+            "type": "TEXT",
+            "content": "<p>{{ name }}'s answers:</p>\n<ol>\n  <li>{{ answer1 }}</li>\n  <li>{{ answer2 }}</li>\n  <li>{{ answer3 }}</li>\n</ol>\n<p>Find out more about your colleague during lunch today.</p>\n<p>Have a great day!!</p>"
+          },
+          {
+            "description": "Title",
+            "type": "TEXT",
+            "content": "Your results: </br>\n{{ correct }}/3 "
+          }
+        ]
+      }
+    ]
+  },
+  {
     "title": "Monthly core",
     "description": "",
     "items": [

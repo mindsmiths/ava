@@ -77,12 +77,22 @@ public class OnboardingTemplates {
                 .add(new Image(Mitems.getText("onboarding.ava-image-path.path")))
                 .add(new Title(Mitems.getText("onboarding.familiarity-quiz-goodbye.title")))
                 .add(new Description(Mitems.getText("onboarding.familiarity-quiz-goodbye.text")))
-                .add(new SubmitButton("finish-familiarity-quiz", Mitems.getText("onboarding.familiarity-quiz-goodbye.action"), "final-screen")));
+                .add(new SubmitButton("finish-familiarity-quiz", Mitems.getText("onboarding.familiarity-quiz-goodbye.action"), "personal-quiz-start")));
+
+        // Icebreaker screens
+        screens.addAll(IcebreakerTemplates.icebreakerQuestionScreens());
+
+        for (BaseComponent component : screens.get(screens.size() - 1).getComponents())
+            if (component instanceof SubmitButton)
+                ((SubmitButton) component).setNextScreen("final-screen");
+
         screens.add(new Screen("final-screen")
                 .setTemplate("CenteredContent")
                 .add(new Title(Mitems.getText("onboarding.familiarity-quiz-goodbye.finish-screen"))));
+
         return screens;
     }
+
 
     public static Screen finalScreen() {
         return new Screen("goodbye")

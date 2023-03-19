@@ -33,7 +33,7 @@ rule "Start or reconnect familiarity quiz"
         signal: UserConnected(getParamAsString("trigger") == "start-onboarding") from entry-point "signals"
         agent: Ava(onboardingStage in (OnboardingStage.WELCOME_EMAIL_SENT, OnboardingStage.FAMILIARITY_QUIZ))
    then
-        agent.showScreens("intro-screen", OnboardingTemplates.familiarityQuizScreens(agent.createOtherEmployeeNames()));
+        agent.showOnboardingScreens();
         modify(agent) {setOnboardingStage(OnboardingStage.FAMILIARITY_QUIZ)};
         delete(signal);
 end

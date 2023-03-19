@@ -3,6 +3,7 @@ package agents;
 import com.mindsmiths.armory.ArmoryAPI;
 import com.mindsmiths.armory.Screen;
 import com.mindsmiths.armory.event.Submit;
+import com.mindsmiths.armory.payload.HistoryItem;
 import com.mindsmiths.emailAdapter.EmailAdapterAPI;
 import com.mindsmiths.emailAdapter.NewEmail;
 import com.mindsmiths.employeeManager.employees.Employee;
@@ -12,11 +13,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import models.IcebreakerQuestion;
 import models.Neuron;
 import models.OnboardingStage;
+import models.OnboardingTemplates;
 import signals.EmployeeUpdateSignal;
+import utils.ScreenUtils;
 
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +43,10 @@ public class Ava extends Agent {
     private boolean onboarded;
     private boolean workingHours;
     private boolean availabilityInterval;
+
+    List<HistoryItem> armoryHistory = new ArrayList<>();
+
+    private Map<String, IcebreakerQuestion> answeredIcebreakerQuestions = new HashMap<>();
 
     public void showScreen(Screen screen) {
         ArmoryAPI.show(getConnection("armory"), screen);
@@ -103,5 +112,11 @@ public class Ava extends Agent {
         for (Employee employee : otherEmployees.values().stream().filter(Employee::getActive).toList())
             otherEmployeeNames.put(employee.getId(), String.join(" ", employee.getFirstName(), employee.getLastName()));
         return otherEmployeeNames;
+    }
+
+    public void showOnboardingScreens() {
+        List<String> screensToRemove = answeredIcebreakerQuestions.keySet().stream().toList();
+        showScreens("intro-screen",
+                ScreenUtils.removeScreens(OnboardingTemplates.familiarityQuizScreens(createOtherEmployeeNames()), screensToRemove));
     }
 }

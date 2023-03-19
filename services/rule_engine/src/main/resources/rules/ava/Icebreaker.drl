@@ -1,0 +1,16 @@
+package rules.ava;
+import com.mindsmiths.armory.event.Submit
+import agents.Ava
+
+rule "Store quiz answers"
+    when
+        submit: Submit(buttonId.startsWith("icebreaker-answer-"), answer: getParamAsString(buttonId), buttonId: buttonId) from entry-point "signals"
+        agent: Ava(answeredIcebreakerQuestions: answeredIcebreakerQuestions)
+    then
+        modify(agent){
+            answeredIcebreakerQuestions.put(buttonId.replace("icebreaker-answer-", ""), answer)
+        }
+        delete(submit);
+end
+
+rule "Answered"
