@@ -20,21 +20,6 @@
             "description": "Action",
             "type": "TEXT",
             "content": "Next"
-          },
-          {
-            "description": "question1",
-            "type": "TEXT",
-            "content": "Mark people you had a chance to work with closely in the past month"
-          },
-          {
-            "description": "question2",
-            "type": "TEXT",
-            "content": "Mark people you had the chance to hangout with over drinks or meal in the past month. "
-          },
-          {
-            "description": "question3",
-            "type": "TEXT",
-            "content": "Mark people you spent time with in meetings or calls during the past month."
           }
         ]
       },
@@ -118,19 +103,9 @@
             "content": "(choose one, none or more people, depending on your situation)"
           },
           {
-            "description": "question1",
-            "type": "TEXT",
-            "content": "Mark people you had a chance to work with closely in the past month"
-          },
-          {
-            "description": "question2",
-            "type": "TEXT",
-            "content": "Mark people you had the chance to hangout with over drinks or meal in the past month. "
-          },
-          {
-            "description": "question3",
-            "type": "TEXT",
-            "content": "Mark people you spent time with in meetings or calls during the past month."
+            "description": "questions",
+            "type": "OPTIONS",
+            "content": "[{\"text\":\"Mark people you had a chance to work with closely in the past month\",\"id\":\"question1\"},{\"text\":\"Mark people you had the chance to hangout with over drinks or meal in the past month. \",\"id\":\"question2\"},{\"text\":\"Mark people you spent time with in meetings or calls during the past month.\",\"id\":\"question3\"}]"
           }
         ]
       },
@@ -246,7 +221,7 @@
           {
             "description": "Button",
             "type": "OPTIONS",
-            "content": "[{\"text\":\"Submit\",\"id\":\"confirmDaysAndThanksScreen\"}]"
+            "content": "[{\"text\":\"Submit\",\"id\":\"confirm-days\"}]"
           },
           {
             "description": "Title",

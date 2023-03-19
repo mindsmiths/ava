@@ -1,20 +1,14 @@
-com.mindsmiths.armory.event.UserConnectedEvent:
-  - !GetOrCreateAgentByConnection
+com.mindsmiths.armory.event.UserConnected:
+  - !GetAgentByConnection
     connectionName: armory
     connectionField: connectionId
-    agentType: agents.Ava
-com.mindsmiths.armory.event.SubmitEvent:
-  - !GetOrCreateAgentByConnection
+
+com.mindsmiths.armory.event.Submit:
+  - !GetAgentByConnection
     connectionName: armory
     connectionField: connectionId
-    agentType: agents.Ava
-com.mindsmiths.armory.event.UserDisconnectedEvent:
-  - !GetOrCreateAgentByConnection
+
+com.mindsmiths.armory.event.UserDisconnected:
+  - !GetAgentByConnection
     connectionName: armory
     connectionField: connectionId
-    agentType: agents.Ava
-#com.mindsmiths.employeeManager.employees.Employee:
-#  - !GetOrCreateAgentByConnection
-#    connectionName: employeeId
-#    connectionField: id
-#    agentType: agents.Ava

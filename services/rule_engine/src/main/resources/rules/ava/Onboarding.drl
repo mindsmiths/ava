@@ -2,8 +2,8 @@ package rules.ava;
 
 import com.mindsmiths.ruleEngine.util.Agents;
 import com.mindsmiths.ruleEngine.model.Heartbeat;
-import com.mindsmiths.armory.event.UserConnectedEvent;
-import com.mindsmiths.armory.event.SubmitEvent;
+import com.mindsmiths.armory.event.UserConnected;
+import com.mindsmiths.armory.event.Submit;
 import com.mindsmiths.sdk.utils.templating.*;
 import com.mindsmiths.employeeManager.employees.Employee;
 import com.mindsmiths.ruleEngine.util.Log;
@@ -30,31 +30,28 @@ end
 
 rule "Start or reconnect familiarity quiz"
    when
-        signal: UserConnectedEvent(getParamAsString("trigger") == "start-onboarding") from entry-point "signals"
+        signal: UserConnected(getParamAsString("trigger") == "start-onboarding") from entry-point "signals"
         agent: Ava(onboardingStage in (OnboardingStage.WELCOME_EMAIL_SENT, OnboardingStage.FAMILIARITY_QUIZ))
    then
-        agent.showScreens("introScreen", OnboardingTemplates.familiarityQuizScreens(agent.createOtherEmployeeNames()));
+        agent.showScreens("intro-screen", OnboardingTemplates.familiarityQuizScreens(agent.createOtherEmployeeNames()));
         modify(agent) {setOnboardingStage(OnboardingStage.FAMILIARITY_QUIZ)};
         delete(signal);
 end
 
 rule "Store familiarity answers"
    when
-        signal: SubmitEvent(getParamAsString("submit") == "finish-familiarity-quiz") from entry-point "signals"
-        agent: Ava(onboardingStage == OnboardingStage.FAMILIARITY_QUIZ, familiarity: familiarity)
-        employee: Employee(employeeId: id, firstName: firstName, lastName: lastName)
+        signal: Submit(buttonId == "finish-familiarity-quiz") from entry-point "signals"
+        agent: Ava(onboardingStage == OnboardingStage.FAMILIARITY_QUIZ)
    then
         modify(agent) {
             chargeConnectionNeurons(signal),
             setOnboardingStage(OnboardingStage.FINISHED)
         };
-        agent.logEvent("Onboarding Finished", Map.of("employeeId", employeeId, "familiarity", familiarity,
-                       "full name", String.join(" ", firstName, lastName)));
 end
 
 rule "Reconnect final screen"
    when
-        signal: UserConnectedEvent(getParamAsString("trigger") == "start-onboarding") from entry-point "signals"
+        signal: UserConnected(getParamAsString("trigger") == "start-onboarding") from entry-point "signals"
         agent: Ava(onboardingStage == OnboardingStage.FINISHED)
    then
         agent.showScreen(OnboardingTemplates.finalScreen());

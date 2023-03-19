@@ -1,16 +1,11 @@
 package rules.cultureMaster;
 
-import com.mindsmiths.employeeManager.ManualTriggerEvent;
-import com.mindsmiths.ruleEngine.util.Log;
-import com.mindsmiths.ruleEngine.model.Heartbeat;
-import com.mindsmiths.employeeManager.employees.Employee;
-
-import com.mindsmiths.ruleEngine.util.Agents;
 import agents.CultureMaster;
 import signals.EmployeeUpdateSignal;
 import models.CmLunchCycleStage;
-import com.mindsmiths.sdk.core.api.DataChangeType;
-import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
+import com.mindsmiths.pairingalgorithm.LunchCompatibilities
+import signals.PairingRequest
+
 
 rule "Update employee data"
     when
@@ -21,54 +16,22 @@ rule "Update employee data"
         delete(signal);
 end
 
-rule "Trigger lunch cycle for CultureMaster"
+rule "Store employee pairing data"
     when
-        signal: ManualTriggerEvent(triggerType == "lunch_cycle") from entry-point "signals"
-        agent: CultureMaster()
+        signal: PairingRequest(empAvailability: employeeAvailability, connStrengths: connectionStrengths) from entry-point "signals"
+        agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES, employeeConnectionStrengths: employeeConnectionStrengths)
     then
         modify(agent) {
-            setLunchCycleStage(CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES),
-            deleteLunchCycleDataOnAvas()
-        };
+            addEmployeeAvailability(empAvailability),
+            employeeConnectionStrengths.put(signal.getFrom(), connStrengths)
+        }
         delete(signal);
 end
 
-rule "Lunch pairing"
+rule "Store lunch compatibilities"
     when
-        Heartbeat(ts: timestamp) from entry-point "signals"
-        eval(evaluateCronExpression("* * 16-17 ? * FRI *", ts, "Europe/Zagreb"))
-        agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES 
-                || lunchCycleStage == null)
-    then
-        modify(agent) {
-            setLunchCycleStage(CmLunchCycleStage.LUNCH_PAIRING),
-            requestEmployeeConnectionStrengths(),
-            setConnectionStrengthCounter(0)
-        };
-        //agent.generateMatches();
-end
-
-rule "Trigger lunch pairing for CultureMaster"
-    when
-        signal: ManualTriggerEvent(triggerType == "lunch_pairing") from entry-point "signals"
+        signal: LunchCompatibilities() from entry-point "signals"
         agent: CultureMaster()
     then
-        modify(agent) {
-            setLunchCycleStage(CmLunchCycleStage.LUNCH_PAIRING),
-            requestEmployeeConnectionStrengths(),
-            setConnectionStrengthCounter(0)
-        };
-        //agent.generateMatches();
-        delete(signal);
-end
-
-rule "Generate matches"
-    when
-        agent: CultureMaster(checkAllCOnnectionStrengthsArrived() == true, lunchCycleStage == CmLunchCycleStage.LUNCH_PAIRING)
-    then
-        agent.generateMatches();
-        modify(agent) {
-            setLunchCycleStage(CmLunchCycleStage.COLLECT_GENERATED_MATCHES),
-            setConnectionStrengthCounter(0)
-        };
+        modify(agent) {setLunchCompatibilities(signal)};
 end

@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@DataModel
+@DataModel(emit = true)
 public class Match implements Serializable {
     private String firstEmployeeId;
     private String secondEmployeeId;

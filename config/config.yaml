@@ -1,10 +1,9 @@
 global:
   dependencies:
     python:
-      - forge-sdk==5.0.0b1
-      - forge-cli==5.0.0b5
-      - cecs==4.0.0a3
-      - pymongo[srv]
+      - forge-sdk==5.0.6
+      - forge-cli==5.0.7
+      - cecs==5.0.2
       - services/*.py
   env:
     PROJECT_SLUG: 'ava'
@@ -30,14 +29,15 @@ global:
 
     BACKUP_CONTAINER_NAME: '{{ env.BACKUP_CONTAINER_NAME }}'
     BACKUPS_STORAGE_ACCOUNT_NAME: '{{ env.BACKUPS_STORAGE_ACCOUNT_NAME }}'
-    ARMORY_SITE_URL: '{{ "armory." + env.get("HOST_DOMAIN", "") }}'
+
+    ARMORY_SITE_URL: '{{ "http://armory." + env.get("HOST_DOMAIN", "") }}'
     # Misc
     DEFAULT_TIME_ZONE: Europe/Zagreb
 
   secrets:
     SENTRY_DSN: '{{ env.SENTRY_DSN }}'
-    POSTHOG_API_KEY: 'phc_YqtfdKl9ZJcUP7a8MAf6eVxyhp0ujS5knz70h2lsVIz'
 
+    MONGO_CLIENT_CONNECTION_STRING: '{{ env.MONGO_CLIENT_CONNECTION_STRING }}'
     MONGO_CLIENT_PASSWORD: admin
     POSTGRES_CLIENT_PASSWORD: admin
 
@@ -64,22 +64,24 @@ services:
   rule-engine:
     type: java
     resources:
-      cpu: 500m
-      memory: 650Mi
+      cpu: 100m
+      memory: 1200Mi
     dependencies:
       - pairing-algorithm
       - employee-manager
+      - armory
+      - mitems
 
   heartbeat:
     package: heartbeat
     type: python
-    version: 5.0.0b0
+    version: 5.0.4
     env:
       HEARTBEAT_CYCLE: 30
     db:
       mongo: true
     dependencies:
-      - rule-engine-api==5.0.0b5
+      - rule-engine-api==5.0.6
     resources:
       cpu: 69m
       memory: 65Mi
@@ -94,7 +96,7 @@ services:
 
   mitems:
     type: django
-    version: 5.0.0b1
+    version: 5.0.1
     db:
       postgres: true
     image:
@@ -104,19 +106,18 @@ services:
       INTERNAL_SITE_URL: "http://mitems"
       DJANGO_SUPERUSER_USERNAME: admin
       DJANGO_SUPERUSER_PASSWORD: '{{ env.MITEMS_ADMIN_PASSWORD | default("admin") }}'
-      COMMIT_TOKEN: '{{ env.COMMIT_TOKEN }}'
-      REPO: '@github.com/mindsmiths/ava.git'
+      REPO: 'https://commit-bot:{{ env.COMMIT_TOKEN }}@{{ env.get("CI_REPOSITORY_URL", "").split("@")[1] }}'
+      DATA_HASH: '{{ file_hash("services/mitems/data.json") }}'
       BRANCH: '{{ env.CI_COMMIT_BRANCH }}'
       SECRET_KEY: KE00K%SJ8vjYX46!%6$W3Js1OewOAmk@
-
     resources:
       cpu: 100m
       memory: 67Mi
 
   email-adapter:
     type: python
-    version: 5.0.0b1
-    env: 
+    version: 5.0.2
+    env:
       PROJECT_EMAIL_NAME: "{{env.PROJECT_EMAIL_NAME}}"
       PROJECT_EMAIL_ADDRESS: "{{env.PROJECT_EMAIL_ADDRESS}}"
       PROJECT_EMAIL_PASSWORD: "{{env.PROJECT_EMAIL_PASSWORD}}"
@@ -142,7 +143,7 @@ services:
       - django-import-export==3.0.1
       - psycopg2-binary==2.9.3
       - gunicorn==20.1.0
-      - rule-engine-api==5.0.0b5
+      - rule-engine-api==5.0.6
       - rule-engine
     env:
       DJANGO_SUPERUSER_USERNAME: admin
@@ -156,7 +157,7 @@ services:
 
   armory:
     type: django
-    version: 5.0.0b5
+    version: 5.1.10
     command:
       run: "daphne -b 0.0.0.0 armory.config.asgi:application"
     db:
@@ -164,16 +165,15 @@ services:
       postgres: true
     dependencies:
       - channels==3.0.5
-      - channels-redis==3.3.1
-      - django==3.2.15
+      - channels-redis==3.4.1
+      - django==3.2.16
       - daphne==3.0.2
       - django-environ==0.8.1
       - gunicorn==20.1.0
-      - websockets==10.1
+      - websockets==10.4
     env:
       SITE_URL: '{{ "armory." + env.get("HOST_DOMAIN", "") }}'
       INTERNAL_SITE_URL: "armory"
-      ALLOW_EVERYONE: "false"
     resources:
       cpu: 50m
       memory: 75Mi
