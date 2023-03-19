@@ -1,65 +1,50 @@
 package rules.cultureMaster;
 
-import com.mindsmiths.ruleEngine.model.Heartbeat;
-import com.mindsmiths.ruleEngine.util.Agents;
-import com.mindsmiths.ruleEngine.model.Initialize;
-import com.mindsmiths.pairingalgorithm.Matches;
-import com.mindsmiths.pairingalgorithm.LunchCompatibilities;
-
-import signals.EmployeeConnectionStrengthsSignal;
-import signals.EmployeeAvailabilitySignal;
-
 import agents.CultureMaster;
+import signals.PairingRequest;
 import models.CmLunchCycleStage;
+import com.mindsmiths.pairingalgorithm.Matches;
+import com.mindsmiths.employeeManager.ManualTriggerEvent;
 
-rule "Store Employee availability"
-    when
-        signal: EmployeeAvailabilitySignal(employeeAvailability: employeeAvailability) from entry-point "signals"
-        agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES)
-    then
-        modify(agent) {addEmployeeAvailability(employeeAvailability)};
-        delete(signal);
-end
 
-rule "Store employee connection strengths"
+rule "Force lunch cycle start"
     when
-        signal: EmployeeConnectionStrengthsSignal(connectionStrengths: connectionStrengths) from entry-point "signals"
+        signal: ManualTriggerEvent(triggerType == "lunch_cycle") from entry-point "signals"
         agent: CultureMaster()
     then
-        int counter = agent.getConnectionStrengthCounter();
-        modify(agent){
-            getEmployeeConnectionStrengths().put(signal.getFrom(), connectionStrengths),            
-            setConnectionStrengthCounter(counter+1)
+        modify(agent) {
+            setLunchCycleStage(CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES),
+            deleteLunchCycleDataOnAvas()
         };
         delete(signal);
 end
 
-rule "Store generated matches"
+rule "Generate matches"
+    when
+        agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES, pairingInterval == true)
+    then
+        modify(agent) {
+            setLunchCycleStage(CmLunchCycleStage.COLLECT_GENERATED_MATCHES),
+            generateMatches()
+        }
+end
+
+rule "Send generated matches"
     when
         generatedMatches: Matches(allMatches: allMatches) from entry-point "signals"
         agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.COLLECT_GENERATED_MATCHES)
     then
         modify(agent) {
-            sendMatches(allMatches),
-            setLunchCycleStage(CmLunchCycleStage.FINISHED),
-            clearEmployeeAvailabilities()
-        };
+            sendMatches(allMatches)
+        }
         delete(generatedMatches);
 end
 
 rule "Reset lunch cycle"
     when
-        Heartbeat(ts: timestamp) from entry-point "signals"
-        agent: CultureMaster(lunchCycleStage != CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES)
-        eval(evaluateCronExpression("* * 18-19 ? * FRI *", ts, "Europe/Zagreb"))
+       agent: CultureMaster(lunchCycleStage == CmLunchCycleStage.COLLECT_GENERATED_MATCHES, pairingInterval == false)
     then
-        modify(agent) {setLunchCycleStage(CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES)};
-end 
-
-rule "Store lunch compatibilities"
-    when
-        signal: LunchCompatibilities() from entry-point "signals"
-        agent: CultureMaster()
-    then
-        modify(agent) {setLunchCompatibilities(signal)};
+        modify(agent){
+            resetLunchCycle()
+        }
 end

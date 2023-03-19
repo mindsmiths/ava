@@ -9,7 +9,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import models.CmLunchCycleStage;
 import signals.DeleteLunchCycleDataSignal;
-import signals.EmployeeConnectionStrengthsRequest;
 import signals.EmployeeUpdateSignal;
 import signals.SendMatchesSignal;
 
@@ -19,46 +18,43 @@ import java.util.Map.Entry;
 @Data
 @AllArgsConstructor
 public class CultureMaster extends Agent {
+    public static String ID = "CULTURE_MASTER";
     private List<EmployeeAvailability> employeeAvailabilities = new ArrayList<>();
     private CmLunchCycleStage lunchCycleStage = CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES;
-    private Map<String, Employee> agentToEmployeeMapping = new HashMap<>(); // TODO: premimenovat u employees ?
-    private Map<String, Map<String, Double>> employeeConnectionStrengths = new HashMap<>();
+    private Map<String, Employee> employees = new HashMap<>();
+    public Map<String, Map<String, Double>> employeeConnectionStrengths = new HashMap<>();
     private LunchCompatibilities lunchCompatibilities;
-    private int connectionStrengthCounter = 0;
-    public static String ID = "CULTURE_MASTER";
+
+    private boolean pairingInterval;
 
     public CultureMaster() {
         id = ID;
     }
-    public boolean checkAllCOnnectionStrengthsArrived(){
-        if(agentToEmployeeMapping.size() == connectionStrengthCounter)
-            return true;
-        return false;
-    }
+
     public void addEmployeeAvailability(EmployeeAvailability employeeAvailability) {
         employeeAvailabilities.add(employeeAvailability);
     }
 
-    public void clearEmployeeAvailabilities() {
-        this.employeeAvailabilities = new ArrayList<>();
+    public List<String> activeEmployees() {
+        return employees.values().stream().filter(Employee::getActive).map(Employee::getId).toList();
     }
 
     public void addOrUpdateEmployee(EmployeeUpdateSignal signal) {
         String agentId = signal.getAgentId();
-        if (!agentToEmployeeMapping.containsKey(agentId)) sendNewAvaAllEmployees(agentId);
+        if (!employees.containsKey(agentId)) sendNewAvaAllEmployees(agentId);
 
-        agentToEmployeeMapping.put(agentId, signal.getEmployee());
+        employees.put(agentId, signal.getEmployee());
 
         sendEmployeeToAvas(signal);
     }
 
     public void sendNewAvaAllEmployees(String agentId) {
-        for (Entry<String, Employee> otherEmployee : agentToEmployeeMapping.entrySet())
+        for (Entry<String, Employee> otherEmployee : employees.entrySet())
             send(agentId, new EmployeeUpdateSignal(otherEmployee.getKey(), otherEmployee.getValue()));
     }
 
     public void sendEmployeeToAvas(EmployeeUpdateSignal signal) {
-        for (String avaId : agentToEmployeeMapping.keySet())
+        for (String avaId : employees.keySet())
             if (!Objects.equals(avaId, signal.getAgentId()))
                 send(avaId, signal);
     }
@@ -66,6 +62,7 @@ public class CultureMaster extends Agent {
     public void generateMatches() {
         PairingAlgorithmAPI.generatePairs(new ArrayList<>(employeeAvailabilities), new HashMap<>(employeeConnectionStrengths));
     }
+
 
     public void sendMatches(List<Match> matches) {
         Set<String> matchedPeople = new HashSet<>();
@@ -78,18 +75,20 @@ public class CultureMaster extends Agent {
             send(secondMatch, new SendMatchesSignal(firstMatch, matchDay));
             Database.emitChange(new models.Match(m), DataChangeType.CREATED);
         }
-        for (String agentId : agentToEmployeeMapping.keySet())
+        for (String agentId : employeeAvailabilities.stream().map(EmployeeAvailability::getEmployeeId).toList())
             if (!matchedPeople.contains(agentId))
                 send(agentId, new SendMatchesSignal());
     }
 
-    public void deleteLunchCycleDataOnAvas(){
-        for (String avaId : agentToEmployeeMapping.keySet()) 
-            send(avaId, new DeleteLunchCycleDataSignal());
+    public void resetLunchCycle() {
+        lunchCycleStage = CmLunchCycleStage.COLLECT_AVA_AVAILABILITIES;
+        employeeAvailabilities = new ArrayList<>();
+        employeeConnectionStrengths = new HashMap<>();
     }
 
-    public void requestEmployeeConnectionStrengths(){
-        for (String avaId : agentToEmployeeMapping.keySet()) 
-            send(avaId, new EmployeeConnectionStrengthsRequest());
+    public void deleteLunchCycleDataOnAvas() {
+        for (String avaId : employees.keySet())
+            send(avaId, new DeleteLunchCycleDataSignal());
+        resetLunchCycle();
     }
 }

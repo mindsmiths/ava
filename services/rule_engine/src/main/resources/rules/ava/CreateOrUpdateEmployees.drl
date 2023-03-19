@@ -1,26 +1,22 @@
 package rules.ava;
 
-import com.mindsmiths.employeeManager.employees.Employee;
-import com.mindsmiths.sdk.utils.Utils;
-
-import signals.EmployeeUpdateSignal;
-
-import agents.CultureMaster;
 import agents.Ava;
-
 import models.OnboardingStage;
+import signals.EmployeeUpdateSignal;
+import com.mindsmiths.sdk.utils.Utils;
+import com.mindsmiths.employeeManager.employees.Employee;
+
 
 rule "Intialize employee"
     when
-        employee: Employee(email: email, employeeId: id) from entry-point "signals"
-        agent: Ava(onboardingStage == null, agentId: id)
+        employee: Employee() from entry-point "signals"
+        agent: Ava(onboardingStage == null)
         not Employee()
     then
         modify(agent) {
-            addConnection("email", email),
-            addConnection("armory", Utils.randomGenerator()),
-            setOnboardingStage(OnboardingStage.AVA_CREATED),
-            send(CultureMaster.ID, new EmployeeUpdateSignal(agentId, employee))
+            updateEmployeeData(employee),
+            setConnection("armory", Utils.randomString()),
+            setOnboardingStage(OnboardingStage.AVA_CREATED)
         };
         delete(employee);
         insert(employee);
@@ -32,9 +28,7 @@ rule "Update employee"
         oldEmployee : Employee()
         agent: Ava(agentId: id)
     then
-        modify(agent){ addConnection("email", email) }
-        agent.send(CultureMaster.ID, new EmployeeUpdateSignal(agentId, employee));
-
+        modify(agent){ updateEmployeeData(employee) };
         delete(employee);
         delete(oldEmployee);
         insert(employee);
@@ -45,8 +39,6 @@ rule "Other employees updated"
         updateSignal: EmployeeUpdateSignal(agentId: agentId, employee: employee) from entry-point "signals"
         agent: Ava()
     then
-        modify(agent){
-            addOrUpdateEmployee(agentId, employee)
-        }
+        modify(agent){ addOrUpdateEmployee(agentId, employee) }
         delete(updateSignal);
 end

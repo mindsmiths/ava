@@ -34,25 +34,25 @@
 		<dependency>
 			<groupId>com.mindsmiths</groupId>
 			<artifactId>rule-engine</artifactId>
-			<version>5.0.0b5</version>
+			<version>5.0.6</version>
 		</dependency>
 		<dependency>
 			<groupId>com.mindsmiths</groupId>
 			<artifactId>forge-sdk</artifactId>
-			<version>5.0.0b1</version>
+			<version>5.0.6</version>
 		</dependency>
 		<dependency>
 			<groupId>com.mindsmiths</groupId>
 			<artifactId>mitems-client</artifactId>
-			<version>5.0.0b1</version>
+			<version>5.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.mindsmiths</groupId>
 			<artifactId>email-adapter-client</artifactId>
-			<version>5.0.0b0</version>
+			<version>5.0.2</version>
 		</dependency>
 		<dependency>
-		    <groupId>com.mindsmiths</groupId>
+			<groupId>com.mindsmiths</groupId>
 			<artifactId>pairing-algorithm-client</artifactId>
 			<version>5.0.0b0</version>
 		</dependency>
@@ -60,11 +60,6 @@
 			<groupId>com.mindsmiths</groupId>
 			<artifactId>employee-manager</artifactId>
 			<version>5.0.0b0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.mindsmiths</groupId>
-			<artifactId>armory-client</artifactId>
-			<version>5.0.0b2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -81,16 +76,16 @@
 			<artifactId>commons-lang3</artifactId>
 			<version>3.12.0</version>
 		</dependency>
-        <dependency>
-            <groupId>com.posthog.java</groupId>
-            <artifactId>posthog</artifactId>
-            <version>1.0.2</version>
-        </dependency>
-        <dependency>
-            <groupId>io.github.cdimascio</groupId>
-            <artifactId>java-dotenv </artifactId>
-            <version>5.2.2</version>
-        </dependency>
+		<dependency>
+			<groupId>io.github.cdimascio</groupId>
+			<artifactId>java-dotenv </artifactId>
+			<version>5.2.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.mindsmiths</groupId>
+			<artifactId>armory-client</artifactId>
+			<version>5.1.10</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>app</finalName>

@@ -1,6 +1,5 @@
 package rules.ava;
 
-import static com.mindsmiths.ruleEngine.util.DateUtil.evaluateCronExpression;
 import com.mindsmiths.ruleEngine.model.Heartbeat;
 import com.mindsmiths.employeeManager.employees.Employee;
 
@@ -8,13 +7,13 @@ import agents.Ava;
 
 import models.OnboardingStage
 import models.LunchCycleData
+import models.CronTime
 
 rule "Set working hours"
     salience 500
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        agent: Ava(workingHours != evaluateCronExpression("* * 8-18 ? * MON-FRI *", ts, "Europe/Zagreb"),
-                  workingHours: workingHours)
+        agent: Ava(workingHours: workingHours, workingHours != CronTime.WORKING_HOURS.isSatisfied(ts))
     then
         modify(agent) {setWorkingHours(!workingHours)}
 end
@@ -24,8 +23,7 @@ rule "Set availability interval"
     salience 500
     when
         Heartbeat(ts: timestamp) from entry-point "signals"
-        agent: Ava(interval: availabilityInterval, availabilityInterval !=
-                   anyCronSatisfied(ts, "Europe/Zagreb", "* * 8-18 ? * WED", "* * * ? * THU", "* * 00-15 ? * FRI")):// TODO: PROVJERI OVO
+        agent: Ava(interval: availabilityInterval, availabilityInterval != CronTime.AVAILABILITY_INTERVAL.isSatisfied(ts))
     then
         modify(agent) {setAvailabilityInterval(!interval)};
 end
@@ -54,7 +52,7 @@ rule "Unset onboarded"
         agent: Ava(onboarded == true) 
         profile: Employee(active == false)
     then
-        modify(agent) {setOnboarded(false)}; //TODO: smislit bolji naziv  za onboarded
+        modify(agent) {setOnboarded(false)}
 end
 
 rule "Set can send mail"

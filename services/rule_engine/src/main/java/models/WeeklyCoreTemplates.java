@@ -1,15 +1,14 @@
 package models;
 
+import com.mindsmiths.armory.Screen;
 import com.mindsmiths.armory.component.*;
-import com.mindsmiths.armory.template.BaseTemplate;
-import com.mindsmiths.armory.template.TemplateGenerator;
 import com.mindsmiths.emailAdapter.NewEmail;
 import com.mindsmiths.emailAdapter.api.AttachmentData;
 import com.mindsmiths.employeeManager.employees.Employee;
 import com.mindsmiths.mitems.Mitems;
 import com.mindsmiths.mitems.Option;
 import com.mindsmiths.pairingalgorithm.Days;
-import com.mindsmiths.ruleEngine.util.Log;
+import com.mindsmiths.sdk.utils.Utils;
 import com.mindsmiths.sdk.utils.templating.Templating;
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.model.Calendar;
@@ -23,7 +22,10 @@ import utils.Settings;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class WeeklyCoreTemplates {
 
@@ -35,7 +37,6 @@ public class WeeklyCoreTemplates {
             case 1 -> emailSlug = "second-reminder-email";
             case 2 -> emailSlug = "third-reminder-email";
         }
-        Log.warn("Number of mails sent: " + numberOfMailsSent);
         String subject = Mitems.getText("weekly-core." + emailSlug + ".subject");
         String description = Mitems.getText("weekly-core." + emailSlug + ".description");
 
@@ -49,7 +50,8 @@ public class WeeklyCoreTemplates {
                 "armoryUrl1",
                 String.format("%s/%s?trigger=start-weekly-core", Settings.ARMORY_SITE_URL, armoryConnectionId),
                 "armoryUrl2", String.format("%s/%s?trigger=start-lunch-decline-reason-screen",
-                        Settings.ARMORY_SITE_URL, armoryConnectionId)));
+                        Settings.ARMORY_SITE_URL, armoryConnectionId),
+                "now", Utils.datetimeToStr(Utils.now())));
 
         NewEmail email = new NewEmail();
         email.setRecipients(List.of(emailConnectionId));
@@ -58,52 +60,40 @@ public class WeeklyCoreTemplates {
         return email;
     }
 
-    public static BaseTemplate availableDaysScreen() {
+    public static Screen availableDaysScreen() {
         Option[] days = Mitems.getOptions("weekly-core.days.each-day");
-        List<CloudSelectComponent.Option> options = new ArrayList<>();
+        List<CloudSelect.Option> options = new ArrayList<>();
 
         for (Option option : days)
-            options.add(new CloudSelectComponent.Option(option.getText(), option.getId(), true));
+            options.add(new CloudSelect.Option(option.getText(), option.getId(), true));
 
-        return new TemplateGenerator()
-                .addComponent("title",
-                        new TitleComponent(Mitems.getText("weekly-core.title-asking-for-available-days.title")))
-                .addComponent("text",
-                        new DescriptionComponent(
-                                Mitems.getText("weekly-core.description-asking-for-available-days.text")))
-                .addComponent("cloudSelect",
-                        new CloudSelectComponent("availableDays", options))
-                .addComponent("confirmDays",
-                        new PrimarySubmitButtonComponent("confirmDays", "Submit", "confirmDays"));
+        return new Screen("available-days-screen")
+                .add(new Title(Mitems.getText("weekly-core.title-asking-for-available-days.title")))
+                .add(new Description(Mitems.getText("weekly-core.description-asking-for-available-days.text")))
+                .add(new CloudSelect("available-days", options))
+                .add(new SubmitButton("confirm-days", "Submit"));
     }
 
-    public static Map<String, BaseTemplate> confirmingDaysScreen() {
+    public static List<Screen> confirmingDaysScreen() {
         Option buttonOption = Mitems.getOptions("weekly-core.confirmation-of-choosen-available-days.button")[0];
-        return Map.of(
-                "confirmDaysScreen", new TemplateGenerator("confirmScreen")
-                        .setTemplateName("CenteredContentTemplate")
-                        .addComponent("title", new TitleComponent(
-                                Mitems.getHTML("weekly-core.confirmation-of-choosen-available-days.title")))
-                        .addComponent("button", new PrimarySubmitButtonComponent(
-                                buttonOption.getText(), buttonOption.getId())),
-                "confirmDaysAndThanksScreen", new TemplateGenerator("confirmAndThanksScreen")
-                        .setTemplateName("CenteredContentTemplate")
-                        .addComponent("title", new TitleComponent(
-                                Mitems.getText("weekly-core.stay-tuned-second-confirmation-of-available-days.title"))));
+        return List.of(
+                new Screen("confirm-screen")
+                        .add(new Title(Mitems.getHTML("weekly-core.confirmation-of-choosen-available-days.title")))
+                        .add(new SubmitButton(buttonOption.getId(), buttonOption.getText(), "confirm-days")),
+                new Screen("confirm-days")
+                        .setTemplate("CenteredContent")
+                        .add(new Title(Mitems.getText("weekly-core.stay-tuned-second-confirmation-of-available-days.title"))));
     }
 
-    public static Map<String, BaseTemplate> lunchDeclineReasonScreens() {
-        Map<String, BaseTemplate> screens = new HashMap<>();
-        screens.put("LunchDecline", new TemplateGenerator()
-                .addComponent("title", new TitleComponent(
-                        Mitems.getText("weekly-core.lunch-decline-reason.title")))
-                .addComponent("answer", new TextAreaComponent("answer", true))
-                .addComponent("submit", new PrimarySubmitButtonComponent(
-                        "finished-lunch-decline-form", "Submit", "finished-lunch-decline-form")));
-        screens.put("finished-lunch-decline-form", new TemplateGenerator()
-                .addComponent("description", new TitleComponent(
-                        Mitems.getText("weekly-core.lunch-decline-reason.final-screen-title"))));
-        return screens;
+    public static List<Screen> lunchDeclineReasonScreens() {
+        return List.of(
+                new Screen("lunch-decline")
+                        .add(new Title(Mitems.getText("weekly-core.lunch-decline-reason.title")))
+                        .add(new TextArea("answer", true))
+                        .add(new SubmitButton("finished-lunch-decline-form", "Submit", "finished-lunch-decline-form")),
+                new Screen("finished-lunch-decline-form")
+                        .setTemplate("CenteredContent")
+                        .add(new Title(Mitems.getText("weekly-core.lunch-decline-reason.final-screen-title"))));
     }
 
     public static NewEmail calendarInviteEmail(Days days, Employee currentEmployee,
@@ -135,7 +125,8 @@ public class WeeklyCoreTemplates {
                 "otherName", otherEmployee.getFirstName(),
                 "fullName", String.join(" ", otherEmployee.getFirstName(), otherEmployee.getLastName()),
                 "myName", currentEmployee.getFirstName(),
-                "lunchDay", daysToPrettyString(days)));
+                "lunchDay", daysToPrettyString(days),
+                "now", Utils.datetimeToStr(Utils.now())));
     }
 
     private static byte[] getICSInvite(Days day, Employee currentEmployee, Employee otherEmployee) {
@@ -214,15 +205,15 @@ public class WeeklyCoreTemplates {
         return email;
     }
 
-    public static BaseTemplate userAlreadyRespondedScreen() {
-        return new TemplateGenerator("goodbye")
-                .addComponent("title", new TitleComponent(
-                        Mitems.getText("weekly-core.user-already-responded-screen.title")));
+    public static Screen userAlreadyRespondedScreen() {
+        return new Screen("goodbye")
+                .setTemplate("CenteredContent")
+                .add(new Title(Mitems.getText("weekly-core.user-already-responded-screen.title")));
     }
 
-    public static BaseTemplate lunchInviteExpiredScreen() {
-        return new TemplateGenerator()
-                .addComponent("title", new TitleComponent(
-                        Mitems.getText("weekly-core.message-about-not-working-hours-for-links.title")));
+    public static Screen lunchInviteExpiredScreen() {
+        return new Screen("expired-invite")
+                .setTemplate("CenteredContent")
+                .add(new Title(Mitems.getText("weekly-core.message-about-not-working-hours-for-links.title")));
     }
 }

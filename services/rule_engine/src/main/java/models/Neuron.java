@@ -9,13 +9,13 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 public class Neuron {
-    private String id = Utils.randomGenerator();
+    private String id = Utils.randomString();
 
     private double value = 0;
     private double R_in = 1; // resistance
     private double C = 10; // capacity
 
-    private LocalDateTime lastUpdatedAt = Utils.getUtcDatetime();
+    private LocalDateTime lastUpdatedAt = Utils.now();
 
     public Neuron(double R_in, double C) {
         this.R_in = R_in;
@@ -24,7 +24,7 @@ public class Neuron {
 
     public void decay(double amount) {
         this.update(0, amount, 1);
-        lastUpdatedAt = Utils.getUtcDatetime();
+        lastUpdatedAt = Utils.now();
     }
 
     public void charge(double amount) {

@@ -9,13 +9,13 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "dev-build": "vue-cli-service build --mode development && rm ../static -rf && mv ./dist ../static",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "armory-sdk": "5.0.2",
+    "armory-sdk": "5.1.10",
+    "vue": "^2.6.11",
     "sass-loader": "^10.2.0",
-    "vue": "^2.6.11"
+    "@sentry/vue": "^7.9.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",

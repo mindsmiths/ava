@@ -5,20 +5,22 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <meta http-equiv="ScreenOrientation" content="autoRotate:disabled">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito&display=swap" rel="stylesheet">
     <link rel="icon" href="/favicon.ico">
     <title>Armory</title>
     <script>
-        const websocketUrl = '{{ WEBSOCKET_URL }}';
-        if (!websocketUrl.startsWith("{{")) {
-            window.websocketUrl = window.location.protocol.replace("http", "ws") + "//" + websocketUrl;
-        } else if (window.location.href.includes('connect')) {
-            window.websocketUrl = 'ws://localhost:8000/ws/connect/' + window.location.href.split("connect/")[1];
-        } else {
-            window.websocketUrl = 'ws://localhost:8000/ws/connect'
-        }
+      const websocketUrl = '{{ WEBSOCKET_URL }}';
+      if (!websocketUrl.startsWith("{{"))
+        window.websocketUrl = window.location.protocol.replace("http", "ws") + "//" + websocketUrl;
+      else if (window.location.href.includes('connect'))
+        window.websocketUrl = 'ws://localhost:8000/ws/connect/' + window.location.href.split("connect/")[1];
+      else
+        window.websocketUrl = 'ws://localhost:8000/ws/connect';
+
+      const sentryDsn = '{{ SENTRY_DSN }}';
+      if (!sentryDsn.startsWith("{{"))
+        window.sentryDsn = sentryDsn;
+      else
+        window.sentryDsn = null;
     </script>
 </head>
 
