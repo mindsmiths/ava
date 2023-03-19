@@ -3,6 +3,8 @@ package agents;
 import com.mindsmiths.employeeManager.employees.Employee;
 import com.mindsmiths.pairingalgorithm.*;
 import com.mindsmiths.ruleEngine.model.Agent;
+import com.mindsmiths.sdk.core.api.DataChangeType;
+import com.mindsmiths.sdk.core.db.Database;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import models.CmLunchCycleStage;
@@ -71,8 +73,9 @@ public class CultureMaster extends Agent {
             matchedPeople.add(secondMatch);
             send(firstMatch, new SendMatchesSignal(secondMatch, matchDay));
             send(secondMatch, new SendMatchesSignal(firstMatch, matchDay));
+            Database.emitChange(new models.Match(m), DataChangeType.CREATED);
         }
-        for (String agentId : employees.keySet())
+        for (String agentId : employeeAvailabilities.stream().map(EmployeeAvailability::getEmployeeId).toList())
             if (!matchedPeople.contains(agentId))
                 send(agentId, new SendMatchesSignal());
     }

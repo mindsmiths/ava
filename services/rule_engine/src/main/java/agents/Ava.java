@@ -16,7 +16,9 @@ import models.Neuron;
 import models.OnboardingStage;
 import signals.EmployeeUpdateSignal;
 
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +48,6 @@ public class Ava extends Agent {
     public void showScreens(String firstScreenId, List<Screen> screens) {
         ArmoryAPI.show(getConnection("armory"), firstScreenId, screens);
     }
-
     public void sendEmail(NewEmail email) {
         EmailAdapterAPI.newEmail(email);
     }

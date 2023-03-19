@@ -78,7 +78,7 @@ end
 
 rule "User selected days"
     when
-        signal: Submit(buttonId == "confirm-days", availableDays : getParamAsList("available-days", String.class)) from entry-point "signals"
+        signal: Submit(buttonId == "confirm-days", getParam("available-days") != null, availableDays : getParamAsList("available-days", String.class)) from entry-point "signals"
         lunchCycleData: LunchCycleData()
         agent: Ava(onboarded == true)
     then

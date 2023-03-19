@@ -8,7 +8,6 @@ import com.mindsmiths.employeeManager.employees.Employee;
 import com.mindsmiths.mitems.Mitems;
 import com.mindsmiths.mitems.Option;
 import com.mindsmiths.pairingalgorithm.Days;
-import com.mindsmiths.ruleEngine.util.Log;
 import com.mindsmiths.sdk.utils.Utils;
 import com.mindsmiths.sdk.utils.templating.Templating;
 import net.fortuna.ical4j.data.CalendarOutputter;
@@ -38,7 +37,6 @@ public class WeeklyCoreTemplates {
             case 1 -> emailSlug = "second-reminder-email";
             case 2 -> emailSlug = "third-reminder-email";
         }
-        Log.warn("Number of mails sent: " + numberOfMailsSent);
         String subject = Mitems.getText("weekly-core." + emailSlug + ".subject");
         String description = Mitems.getText("weekly-core." + emailSlug + ".description");
 
@@ -73,7 +71,7 @@ public class WeeklyCoreTemplates {
                 .add(new Title(Mitems.getText("weekly-core.title-asking-for-available-days.title")))
                 .add(new Description(Mitems.getText("weekly-core.description-asking-for-available-days.text")))
                 .add(new CloudSelect("available-days", options))
-                .add(new SubmitButton("confirmDays", "Submit"));
+                .add(new SubmitButton("confirm-days", "Submit"));
     }
 
     public static List<Screen> confirmingDaysScreen() {
