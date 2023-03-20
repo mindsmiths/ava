@@ -28,6 +28,10 @@ $family-primary: "Helvetica", sans-serif;
 //    }
 //}
 
+.Image {
+  justify-content: center;
+  display: flex;
+}
 
 @import "armory-sdk/src/assets/css/override.scss";
 @import "armory-sdk/src/assets/css/default-skin.scss";
