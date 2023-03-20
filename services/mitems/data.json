@@ -125,7 +125,7 @@
           {
             "description": "Text",
             "type": "HTML",
-            "content": "<p>WooHoo! You did it! 🙌</p>\n<p>You can expect an email from me soon.</p>\n<p>&nbsp;</p>"
+            "content": "<p style=\"text-align: center;\">WooHoo! You did it! 🙌</p>\n<p style=\"text-align: center;\">You can expect an email from me soon.</p>\n<p>&nbsp;</p>"
           },
           {
             "description": "Title",
