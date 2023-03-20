@@ -129,8 +129,8 @@
           },
           {
             "description": "Title",
-            "type": "TEXT",
-            "content": "Well done!"
+            "type": "HTML",
+            "content": "<p style=\"text-align: center;\">Well done!</p>"
           }
         ]
       },
