@@ -125,12 +125,12 @@
           {
             "description": "Text",
             "type": "HTML",
-            "content": "<p>WooHoo! You did it! 🙌</p>\n<p>You can expect an email from me soon.</p>\n<p>&nbsp;</p>"
+            "content": "<p style=\"text-align: center;\">WooHoo! You did it! 🙌</p>\n<p style=\"text-align: center;\">You can expect an email from me soon.</p>\n<p>&nbsp;</p>"
           },
           {
             "description": "Title",
-            "type": "TEXT",
-            "content": "Well done!"
+            "type": "HTML",
+            "content": "<p style=\"text-align: center;\">Well done!</p>"
           }
         ]
       },
@@ -200,7 +200,7 @@
           {
             "description": "Description",
             "type": "HTML",
-            "content": "<p><span style=\"font-weight: 400;\">Dear {{ firstName }},</span></p>\n<p><span style=\"font-weight: 400;\">When team members are working in silos, they cannot collaborate effectively, which can lead to missed deadlines, subpar work, poor communication and general feelings of frustration.</span></p>\n<p>&nbsp;</p>\n<p><span style=\"font-weight: 400;\">I think we can all agree that&rsquo;s something we don&rsquo;t want to see around here 😁</span></p>\n<p>&nbsp;</p>\n<p><span style=\"font-weight: 400;\">That&rsquo;s why we will encourage collaboration and networking across the organization.&nbsp;</span></p>\n<p><span style=\"font-weight: 400;\">&nbsp;</span></p>\n<p><span style=\"font-weight: 400;\">You can start by clicking the button below.</span></p>"
+            "content": "<p><span style=\"font-weight: 400;\">Dear {{ firstName }},</span></p>\n<p><span style=\"font-weight: 400;\">When team members are working in siloses, they cannot collaborate effectively, which can lead to missed deadlines, subpar work, poor communication and general feelings of frustration.</span></p>\n<p>&nbsp;</p>\n<p><span style=\"font-weight: 400;\">I think we can all agree that&rsquo;s something we don&rsquo;t want to see around here 😁</span></p>\n<p>&nbsp;</p>\n<p><span style=\"font-weight: 400;\">That&rsquo;s why we will encourage collaboration and networking across the organization.&nbsp;</span></p>\n<p><span style=\"font-weight: 400;\">&nbsp;</span></p>\n<p><span style=\"font-weight: 400;\">You can start by clicking the button below.</span></p>"
           },
           {
             "description": "Subject",
