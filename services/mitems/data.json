@@ -4,7 +4,7 @@
     "description": "",
     "items": [
       {
-        "name": "Ava image path",
+        "name": "Ava image paths",
         "elements": [
           {
             "description": "Path",
