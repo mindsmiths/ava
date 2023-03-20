@@ -106,7 +106,7 @@ services:
       INTERNAL_SITE_URL: "http://mitems"
       DJANGO_SUPERUSER_USERNAME: admin
       DJANGO_SUPERUSER_PASSWORD: '{{ env.MITEMS_ADMIN_PASSWORD | default("admin") }}'
-      REPO: 'https://ms-kulaxa:{{ env.COMMIT_TOKEN }}@github.com/mindsmiths/ava.git' # Change username to github commit bot when created!
+      REPO: 'https://ms-kulaxa:{{ env.MITEMS_COMMIT_TOKEN }}@github.com/mindsmiths/ava.git' # Change username to github commit bot when created!
       DATA_HASH: '{{ file_hash("services/mitems/data.json") }}'
       BRANCH: '{{ env.CI_COMMIT_BRANCH }}'
       SECRET_KEY: KE00K%SJ8vjYX46!%6$W3Js1OewOAmk@
