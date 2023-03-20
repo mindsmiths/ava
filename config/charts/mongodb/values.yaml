@@ -4,8 +4,8 @@ auth:
   rootPassword: '{{ env.MONGO_CLIENT_PASSWORD }}'
 resources:
   requests:
-    cpu: 58m
-    memory: 154Mi
+    cpu: 350m
+    memory: 350Mi
 nodeSelector:
   project: {{ env.CI_PROJECT_NAME }}-{{ env.CI_COMMIT_REF_SLUG }}
 tolerations:
@@ -13,6 +13,8 @@ tolerations:
     operator: "Equal"
     value: '{{ env.CI_PROJECT_NAME }}-{{ env.CI_COMMIT_REF_SLUG }}'
     effect: "NoSchedule"
+architecture: standalone
+useStatefulSet: true
 readinessProbe:
   periodSeconds: 120
 livenessProbe:
