@@ -164,9 +164,9 @@ public class WeeklyCoreTemplates {
                     new DateTime(lunchCalendarDatePlusHour.getTime()),
                     calendarEventName);
             ev.getProperties()
-                    .add(new net.fortuna.ical4j.model.property.Attendee("mailto:" + currentEmployee.getEmail()));
+                    .add(new net.fortuna.ical4j.model.property.Attendee("mailto:" + currentEmployee.getEmail().strip()));
             ev.getProperties()
-                    .add(new net.fortuna.ical4j.model.property.Attendee("mailto:" + otherEmployee.getEmail()));
+                    .add(new net.fortuna.ical4j.model.property.Attendee("mailto:" + otherEmployee.getEmail().strip()));
 
             invite.getComponents().add(ev);
 
