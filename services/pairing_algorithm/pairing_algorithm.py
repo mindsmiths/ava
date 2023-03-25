@@ -44,8 +44,7 @@ class PairingAlgorithm(BaseService):
         pairs = combinations(range(len(employee_id_mapping)), 2)
         for pair in pairs:
             # check if a and b have days when both are available
-            intersection = list(set(employeeAvailabilities[pair[0]].availableDays) & set(
-                employeeAvailabilities[pair[1]].availableDays))
+            intersection = list(set(employee_availabilities[pair[0]]) & set(employee_availabilities[pair[1]]))
             random.shuffle(intersection)
             availability_intersections[tuple(sorted([pair[0], pair[1]]))] = intersection
             if not intersection:
