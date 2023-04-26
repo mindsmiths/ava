@@ -152,18 +152,18 @@ rule "Send no match email"
         delete(signal);
 end
 
-rule "Auto assign days"
-    when
-        Heartbeat(ts: timestamp) from entry-point "signals"
-        agent: Ava(agentId: id, onboarded == true, CronTime.AFTER_AVAILABILITY_INTERVAL.isSatisfied(ts),
-                   connectionStrengths: getConnectionStrengthAsValue())
-        lunchCycleData: LunchCycleData(mailsSent > 0, availableDays == null, userResponded == false)
-    then
-        agent.send(CultureMaster.ID, new PairingRequest(new EmployeeAvailability(agentId, Arrays.asList(Days.values())), connectionStrengths));
-        modify(lunchCycleData){
-            setUserResponded(true)
-        }
-end
+//rule "Auto assign days"
+//    when
+//        Heartbeat(ts: timestamp) from entry-point "signals"
+//        agent: Ava(agentId: id, onboarded == true, CronTime.AFTER_AVAILABILITY_INTERVAL.isSatisfied(ts),
+//                   connectionStrengths: getConnectionStrengthAsValue())
+//        lunchCycleData: LunchCycleData(mailsSent > 0, availableDays == null, userResponded == false)
+//    then
+//        agent.send(CultureMaster.ID, new PairingRequest(new EmployeeAvailability(agentId, Arrays.asList(Days.values())), connectionStrengths));
+//        modify(lunchCycleData){
+//            setUserResponded(true)
+//        }
+//end
 
 rule "User already declined or confirmed available days"
     when 
