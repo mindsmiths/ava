@@ -65,7 +65,7 @@ public class WeeklyCoreTemplates {
         List<CloudSelect.Option> options = new ArrayList<>();
 
         for (Option option : days)
-            options.add(new CloudSelect.Option(option.getText(), option.getId(), true));
+            options.add(new CloudSelect.Option(option.getText(), option.getId(), false));
 
         return new Screen("available-days-screen")
                 .add(new Title(Mitems.getText("weekly-core.title-asking-for-available-days.title")))
