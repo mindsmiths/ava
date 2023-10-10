@@ -246,7 +246,7 @@
           {
             "description": "Text",
             "type": "TEXT",
-            "content": "All days are preselected by default so choose ones that don't suit you."
+            "content": "Select the days that suit you the most "
           }
         ]
       },

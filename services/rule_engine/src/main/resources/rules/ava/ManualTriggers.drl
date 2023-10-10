@@ -7,7 +7,6 @@ import agents.Ava;
 import models.OnboardingStage
 import models.OnboardingTemplates;
 import models.LunchCycleData;
-import models.MonthlyCoreData
 import com.mindsmiths.employeeManager.employees.Employee
 
 rule "Trigger onboarding"
