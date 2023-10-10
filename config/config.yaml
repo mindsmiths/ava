@@ -5,6 +5,7 @@ global:
       - forge-cli==5.0.7
       - cecs==5.0.2
       - services/*.py
+      - pymongo>=4.3.3,<4.4
   env:
     PROJECT_SLUG: 'ava'
 
