@@ -16,7 +16,7 @@
         <repository>
             <id>vingd.repo</id>
             <name>Vingd Nexus maven repo</name>
-            <url>https://nexus.vingd.net/repository/maven-releases/</url>
+            <url>https://nexus.vingd.net/repository/maven-public/</url>
         </repository>
     </repositories>
 
