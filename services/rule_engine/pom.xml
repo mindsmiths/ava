@@ -31,14 +31,14 @@
 		</repository>
 	</repositories>
 	<dependencies>
-		<dependency>
+        <dependency>
+            <groupId>com.mindsmiths</groupId>
+            <artifactId>forge-sdk</artifactId>
+            <version>5.2.2</version>
+        </dependency>
+        <dependency>
 			<groupId>com.mindsmiths</groupId>
 			<artifactId>rule-engine</artifactId>
-			<version>5.0.6</version>
-		</dependency>
-		<dependency>
-			<groupId>com.mindsmiths</groupId>
-			<artifactId>forge-sdk</artifactId>
 			<version>5.0.6</version>
 		</dependency>
 		<dependency>
