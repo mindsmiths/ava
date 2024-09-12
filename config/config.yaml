@@ -59,7 +59,7 @@ global:
   cecs:
     params: -e venv
 
-  repository: nexus.vingd.net
+  repository: mindsmiths.azurecr.io
 
 services:
   rule-engine:
