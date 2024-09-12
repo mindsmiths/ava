@@ -1,11 +1,9 @@
 global:
   dependencies:
     python:
-      - forge-sdk==5.0.6
-      - forge-cli==5.0.7
-      - cecs==5.0.2
+      - forge-sdk==5.1.4
+      - forge-cli==5.1.4
       - services/*.py
-      - pymongo>=4.3.3,<4.4
   env:
     PROJECT_SLUG: 'ava'
 
@@ -76,13 +74,13 @@ services:
   heartbeat:
     package: heartbeat
     type: python
-    version: 5.0.4
+    version: 5.0.5
     env:
       HEARTBEAT_CYCLE: 30
     db:
       mongo: true
     dependencies:
-      - rule-engine-api==5.0.6
+      - rule-engine-api~=5.0
     resources:
       cpu: 69m
       memory: 65Mi
@@ -97,7 +95,7 @@ services:
 
   mitems:
     type: django
-    version: 5.0.1
+    version: 5.0.3
     db:
       postgres: true
     image:
@@ -117,7 +115,7 @@ services:
 
   email-adapter:
     type: python
-    version: 5.0.2
+    version: 5.0.9
     env:
       PROJECT_EMAIL_NAME: "{{env.PROJECT_EMAIL_NAME}}"
       PROJECT_EMAIL_ADDRESS: "{{env.PROJECT_EMAIL_ADDRESS}}"
