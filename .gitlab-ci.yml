@@ -3,3 +3,8 @@ include:
     ref: v3.x
     file:
       - standard.yml
+
+variables:
+  SECURE_PULSAR: "true"
+  PRODUCTION_PULSAR_INSTANCE_NAME: "ms-production-2-pulsar2"
+  SANDBOX_PULSAR_INSTANCE_NAME: "ms-sandbox-2-pulsar3"
