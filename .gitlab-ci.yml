@@ -1,6 +1,6 @@
 include:
   - project: mindsmiths/companions/companions-deploy
-    ref: v3.x
+    ref: v5.x
     file:
       - standard.yml
 
